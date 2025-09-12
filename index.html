@@ -116,9 +116,9 @@
         }
 
         .section-title {
-            text-align: center;
+            text-align: left; 
             font-size: 2.0rem;
-            margin-bottom: 2.25rem;
+            margin-bottom: 1.75rem;
             color: #2c3e50;
         }
 
@@ -255,6 +255,14 @@
           padding-bottom:.45rem;
         }
 
+    
+        /* === Spacing adjustments (v6) === */
+        .section--compact{ padding: 2.666rem 0; }         /* ~2/3 of typical 4rem */
+        .section--tight-top{ padding-top: 1.25rem; }      /* bring 'latest' closer to 'premium' */
+        .job-grid--premium .banner-image{ height: 40px; } /* shorter premium banner visuals */
+        .job-grid--premium .job-card{ padding: .66rem 1rem .75rem; }
+        .job-grid--premium{ margin-top: .9rem; }
+
     </style>
 </head>
 <body>
@@ -294,31 +302,31 @@
     </header>
 
     <!-- 프리미엄 채용정보: 4개 카드 한 줄 -->
-    <section class="section" id="features">
+    <section class="section section--compact" id="features">
         <div class="container">
             <h2 class="section-title">프리미엄 채용정보</h2>
 
             <div class="job-grid job-grid--premium">
                 <a class="job-card" href="#p-job-1" aria-label="프리미엄 - 한국전력공사 채용공고 이동">
-                    <img class="banner-image" src="./한국전력공사.png" alt="한국전력공사 로고">
+                    <img class="banner-image" src="./[image]/한국전력공사.png" alt="한국전력공사 로고">
                     <h3>한국전력공사</h3>
                     <p>신입·경력 / 사무·전기</p>
                     <p><strong>마감:</strong> 2025.10.20 <span style="color:#e74c3c;font-weight:600;">D-3</span></p>
                 </a>
                 <a class="job-card" href="#p-job-2" aria-label="프리미엄 - 한국수력원자력 채용공고 이동">
-                    <img class="banner-image" src="./한국수력원자력.png" alt="한국수력원자력 로고">
+                    <img class="banner-image" src="./[image]/한국수력원자력.png" alt="한국수력원자력 로고">
                     <h3>한국수력원자력</h3>
                     <p>사무·기술</p>
                     <p><strong>마감:</strong> 2025.10.22 <span style="color:#e74c3c;font-weight:600;">D-5</span></p>
                 </a>
                 <a class="job-card" href="#p-job-3" aria-label="프리미엄 - 한국도로공사 채용공고 이동">
-                    <img class="banner-image" src="./한국도로공사.png" alt="한국도로공사 로고">
+                    <img class="banner-image" src="./[image]/한국도로공사.png" alt="한국도로공사 로고">
                     <h3>한국도로공사</h3>
                     <p>토목·전기·통신</p>
                     <p><strong>마감:</strong> 2025.10.17 <span style="color:#e74c3c;font-weight:600;">D-0</span></p>
                 </a>
                 <a class="job-card" href="#p-job-4" aria-label="프리미엄 - 국민건강보험공단 채용공고 이동">
-                    <img class="banner-image" src="./국민건강보험.png" alt="국민건강보험공단 로고">
+                    <img class="banner-image" src="./[image]/국민건강보험.png" alt="국민건강보험공단 로고">
                     <h3>국민건강보험공단</h3>
                     <p>청년인턴</p>
                     <p><strong>마감:</strong> 2025.10.16 <span style="color:#e74c3c;font-weight:600;">D-1</span></p>
@@ -328,7 +336,7 @@
     </section>
 
     <!-- 최신 채용정보: 카드 디자인을 배너형으로 업데이트 -->
-    <section class="section" style="background: white;" id="jobs">
+    <section class="section section--tight-top" style="background: white;" id="jobs">
         <div class="container">
             <h2 class="section-title">최신 채용정보</h2>
             <div class="job-grid">
