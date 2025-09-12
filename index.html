@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>브레인넷 - 공기업 취업 플랫폼</title>
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>브레인넷 - 공기업 취업 플랫폼</title>
+<style>
         * {
             margin: 0;
             padding: 0;
@@ -263,322 +264,726 @@
         .job-grid--premium .job-card{ padding: .66rem 1rem .75rem; }
         .job-grid--premium{ margin-top: .9rem; }
 
-    </style>
+    
+        /* === v7 overrides: 4/5 scaling and visual updates === */
+        /* 1) Banner(card) global scale ~0.8 via font-sizes/paddings/heights */
+        .job-grid{ gap: 1rem; } /* 1.25rem -> 1rem */
+        .job-card{ padding: .8rem .8rem .8rem; }
+        .job-card h3{ font-size: .816rem; line-height: 1.0rem; }  /* 1.02rem -> 0.816rem */
+        .job-card p{ font-size: .72rem; }                         /* .9rem -> .72rem */
+        .badge{ font-size: .576rem; padding: .176rem .4rem; }     /* .72rem -> .576rem */
+        .banner-image{ height: 45px; margin-bottom: .52rem; }     /* 56px -> 45px */
+        /* premium image is a bit shorter */
+        .job-grid--premium .banner-image{ height: 32px; }         /* 40px -> 32px */
+
+        /* 2) Section titles (프리미엄/추천) also 4/5 size */
+        .section-title{ font-size: 1.6rem; }                      /* 2.0rem -> 1.6rem */
+
+        /* 3) Colors for titles */
+        #features .section-title{ color: #4dabf7; }               /* light blue */
+        #jobs .section-title{ color: #ffa94d; }                   /* light orange */
+
+    
+        /* v8 overrides */
+        #general-jobs{ padding-top: 0.5rem; margin-top: -0.25rem; }
+        /* Top navigation font size & spacing */
+        header nav a{ font-size: 1.5rem; margin-right: 2rem; }
+        header nav a:last-child{ margin-right: 0; }
+    
+        /* === v9 overrides per user requests === */
+
+        /* 1) Remove gray background on '프리미엄 채용정보' and tighten inter-section spacing */
+        #features{ background: transparent !important; padding-bottom: .25rem; }
+        #jobs{ margin-top: -.75rem; padding-top: .25rem; padding-bottom: .25rem; }
+        #general-jobs{ margin-top: -.75rem; padding-top: .25rem; }
+
+        /* Make the grids start closer under each title */
+        #features .section-title, #jobs .section-title, #general-jobs .section-title{
+          margin-bottom: .5rem !important;
+        }
+        #features .job-grid, #jobs .job-grid, #general-jobs .job-grid{
+          margin-top: .25rem !important;
+        }
+
+        /* 2) Shrink section titles to 2/3 of current and tighten banner gap under titles */
+        .section-title{
+          font-size: 1.067rem !important; /* ~2/3 of 1.6rem */
+          line-height: 1.2;
+        }
+
+        /* 3) Premium 4 cards: fill with very light sky-blue */
+        #features .job-card{
+          background: #e7f5ff; /* very light sky-blue */
+          border-color: #d0ebff;
+        }
+
+        /* 4) '추천 채용정보' and '일반 채용정보' cards:
+           Top edge only 3x thicker and colored (blue for 추천, light-green for 일반) */
+        #jobs .job-card{
+          border: 1px solid #eaeaea;
+          border-top: 3px solid #4dabf7; /* blue */
+          background: #ffffff;
+        }
+        #general-jobs .job-card{
+          border: 1px solid #eaeaea;
+          border-top: 3px solid #a9e34b; /* light green (연두) */
+          background: #ffffff;
+        }
+
+        /* === v10 overrides === */
+        :root{ --title-size: 1.067rem; }
+
+        /* 1) Inter-section spacing equals section title height */
+        #features{ margin-bottom: var(--title-size) !important; padding-bottom: 0 !important; }
+        #jobs{ margin-top: var(--title-size) !important; margin-bottom: var(--title-size) !important; }
+        #general-jobs{ margin-top: var(--title-size) !important; }
+
+        /* Keep the title tight to its grid underneath */
+        #features .section-title, #jobs .section-title, #general-jobs .section-title{
+          margin-bottom: .4rem !important;
+        }
+        #features .job-grid, #jobs .job-grid, #general-jobs .job-grid{
+          margin-top: .2rem !important;
+        }
+
+        /* 2) Triple the top border thickness for '추천' and '일반' cards; keep colors */
+        #jobs .job-card{
+          border-top-width: 9px !important;        /* 3x of previous 3px */
+          border-top-color: #4dabf7 !important;    /* blue */
+          border-left-width: 1px; border-right-width: 1px; border-bottom-width: 1px;
+        }
+        #general-jobs .job-card{
+          border-top-width: 9px !important;        /* 3x of previous 3px */
+          border-top-color: #a9e34b !important;    /* light green */
+          border-left-width: 1px; border-right-width: 1px; border-bottom-width: 1px;
+        }
+
+        /* === v11 overrides === */
+        #jobs .job-card{ border-top-width: 4.5px !important; }
+        #general-jobs .job-card{ border-top-width: 4.5px !important; }
+
+        /* Deadline strip styling for '추천 채용정보' */
+        #jobs .job-card .deadline{
+          margin-top: .5rem;
+          padding: .5rem .6rem;
+          border-top: 1px solid #1c7ed6;       /* divider line above the text */
+          background: #339af0;                 /* deep sky blue area under the line */
+          color: #ffffff;                      /* make text white */
+          font-size: .9rem;                    /* ~1.25x of .72rem body */
+          line-height: 1.25rem;
+          border-bottom-left-radius: .5rem;
+          border-bottom-right-radius: .5rem;
+        }
+        #jobs .job-card .deadline strong,
+        #jobs .job-card .deadline span{ color:#ffffff !important; }
+
+        /* === v12 overrides === */
+
+        /* 1) Move deadline highlight from '추천' to '프리미엄' */
+        /* Reset jobs deadline block to default look */
+        #jobs .job-card .deadline{
+          background: transparent !important;
+          color: inherit !important;
+          border-top: none !important;
+          font-size: inherit !important;
+          padding: 0 !important;
+          margin-top: 0 !important;
+        }
+        /* Premium (features) deadline strip */
+        #features .job-card .deadline{
+          margin-top: .5rem;
+          padding: .5rem .6rem;
+          border-top: 1px solid #1c7ed6;  /* divider line */
+          background: #339af0;            /* deep sky blue */
+          color: #ffffff;
+          font-size: .9rem;               /* ~1.25x of base .72rem */
+          line-height: 1.25rem;
+          border-bottom-left-radius: .5rem;
+          border-bottom-right-radius: .5rem;
+        }
+        #features .job-card .deadline strong,
+        #features .job-card .deadline span{ color:#ffffff !important; }
+
+        /* 2) In '추천 채용정보' cards, set meta (근무지/마감) text back to normal size & black.
+              We'll mark those <p> with class .meta in HTML. */
+        #jobs .job-card p.meta{
+          font-size: .576rem;  /* same as .badge size, "신입(XX/XX)" */
+          color: #111;
+        }
+
+        /* 3) Top nav: reduce font size to 3/5 of previous 1.5rem => 0.9rem */
+        header nav a{ font-size: .9rem !important; }
+
+        /* 4) '상품신청>' label next to section titles */
+        .section-title .apply{
+          font-size: 0.6em;
+          color: #000;
+          margin-left: 0.6em; /* about two spaces visually */
+          font-weight: 600;
+        }
+
+        /* 5) Ad cards in '추천 채용정보' (last row last 3) */
+        #jobs .job-card.ad{
+          display:flex; flex-direction:column; justify-content:center; align-items:center;
+          text-align:center; color:#adb5bd; /* light gray text */
+          min-height: 180px;
+        }
+        #jobs .job-card.ad .ad-title{ font-size: .9rem; margin-bottom:.4rem; }
+        #jobs .job-card.ad .ad-phone{ font-size: .8rem; display:flex; gap:.4rem; align-items:center; justify-content:center; }
+        #jobs .job-card.ad .ad-phone svg{ width: 18px; height: 18px; fill:#adb5bd; }
+        #jobs .job-card.ad .ad-cta{
+          margin-top:.6rem; display:inline-block; padding:.35rem .7rem;
+          background:#f1f3f5; color:#868e96; border:1px solid #e9ecef; border-radius:.4rem;
+          font-size:.72rem; font-weight:600;
+        }
+        #jobs .job-card.ad .banner-image, 
+        #jobs .job-card.ad h3, 
+        #jobs .job-card.ad p, 
+        #jobs .job-card.ad .job-badges{ display:none !important; }
+
+        /* === v13 overrides === */
+        header nav a{ 
+          font-size: 1.44rem !important;   /* 1.6x of 0.9rem */
+          margin-right: 3rem !important;   /* wider spacing */
+        }
+        header nav a:last-child{ margin-right: 0 !important; }
+
+        .section-title .apply{
+          color: #444 !important;          /* slightly lighter than black */
+        }
+
+        .site-footer{
+          margin-top: 2rem;
+          padding: 2rem 1.25rem;
+          border-top: 1px solid #e9ecef;
+          color: #495057;
+          background: #fff;
+        }
+        .site-footer .brand{
+          font-weight: 800;
+          font-size: 1.5em;                /* 1.5x larger than following lines */
+          color: #212529;
+          margin-bottom: .5rem;
+        }
+        .site-footer .footer-line{ 
+          margin: .25rem 0; 
+          line-height: 1.6;
+        }
+        .site-footer .muted{
+          color: #6c757d;
+        }
+
+        /* === v14 overrides === */
+        /* Remove any gray bottom area and make footer left-aligned. */
+        .site-footer{ background: transparent !important; border-top: none !important; padding-top: 1.25rem; }
+        .site-footer, .site-footer *{ text-align: left !important; }
+
+        /* If footer needs same left start as content, use .container wrapper */
+        .site-footer .container{ max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+        /* Navigation spacing (keep as is from v13 unless overridden elsewhere) */
+        header nav a{ margin-right: 3rem !important; }
+
+        /* '상품신청>' stays slightly lighter */
+        .section-title .apply{ color: #444 !important; }
+
+        /* === v15 spacing tweaks === */
+        #general-jobs{ padding-bottom: 0 !important; margin-bottom: 0 !important; }
+        .site-footer{ margin-top: 1cm !important; padding-top: .75rem !important; }
+        .site-footer .container{ max-width: 960px; margin: 0 auto; padding: 0 24px; text-align:left; }
+
+        /* === v16: Footer should sit directly under #general-jobs === */
+        body{ margin:0 !important; }
+        #general-jobs{ margin-bottom: 0 !important; padding-bottom: 0 !important; }
+        #general-jobs > .container{ margin-bottom: 0 !important; padding-bottom: 0 !important; }
+        #general-jobs .job-grid{ margin-bottom: 0 !important; padding-bottom: 0 !important; }
+        #general-jobs .job-grid > *:last-child{ margin-bottom: 0 !important; }
+        /* Footer: no top margin; tiny padding only */
+        .site-footer{ margin-top: 0 !important; padding-top: .25rem !important; }
+        .site-footer .container{ padding-top: 0 !important; }
+
+        /* === v17 positional fix === */
+        #general-jobs{ margin-bottom: 0 !important; padding-bottom: 0 !important; }
+        #general-jobs > .container{ margin-bottom: 0 !important; padding-bottom: 0 !important; }
+        #general-jobs .job-grid{ margin-bottom: 0 !important; padding-bottom: 0 !important; }
+        .site-footer{ margin-top: .25rem !important; padding-top: .25rem !important; }
+        .site-footer .container{ padding-top: 0 !important; }
+
+        /* === v18: precise left alignment of footer to banner start === */
+        .site-footer{ margin-top: .25rem !important; padding-top: .25rem !important; }
+        .site-footer .container{
+          max-width: 1200px !important;
+          margin: 0 auto !important;
+          padding: 0 20px !important;   /* match the primary .container padding */
+          text-align: left !important;
+        }
+</style>
 </head>
 <body>
-
-    <!-- 상단 글로벌 네비게이션 -->
-    <div class="global-nav">
-        <div class="container">
-            <ul class="global-nav-links">
-                <li><a href="#login">로그인</a></li>
-                <li><a href="#signup">회원가입</a></li>
-                <li><a href="#service-intro">서비스 소개</a></li>
-                <li><a href="#service-apply" class="cta-link">서비스 신청</a></li>
-                <li><a href="#support">고객센터</a></li>
-            </ul>
-        </div>
-    </div>
-
-    <header>
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <!-- 로고 이미지 경로를 수정해주세요 -->
-                    <img src="./CI2.png"  alt="브레인넷 로고" style="height:50px;width:auto;object-fit:contain;">
-                    <div class="logo-text"></div>
-                </div>
-                <nav>
-                    <ul>
-                        <li><a href="#home">홈</a></li>
-                        <li><a href="#jobs">채용정보</a></li>
-                        <li><a href="#companies">기업정보</a></li>
-                        <li><a href="#support">취업지원</a></li>
-                        <li><a href="#contact">문의</a></li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-    </header>
-
-    <!-- 프리미엄 채용정보: 4개 카드 한 줄 -->
-    <section class="section section--compact" id="features">
-        <div class="container">
-            <h2 class="section-title">프리미엄 채용정보</h2>
-
-            <div class="job-grid job-grid--premium">
-                <a class="job-card" href="#p-job-1" aria-label="프리미엄 - 한국전력공사 채용공고 이동">
-                    <img class="banner-image" src="./[image]/한국전력공사.png" alt="한국전력공사 로고">
-                    <h3>한국전력공사</h3>
-                    <p>신입·경력 / 사무·전기</p>
-                    <p><strong>마감:</strong> 2025.10.20 <span style="color:#e74c3c;font-weight:600;">D-3</span></p>
-                </a>
-                <a class="job-card" href="#p-job-2" aria-label="프리미엄 - 한국수력원자력 채용공고 이동">
-                    <img class="banner-image" src="./[image]/한국수력원자력.png" alt="한국수력원자력 로고">
-                    <h3>한국수력원자력</h3>
-                    <p>사무·기술</p>
-                    <p><strong>마감:</strong> 2025.10.22 <span style="color:#e74c3c;font-weight:600;">D-5</span></p>
-                </a>
-                <a class="job-card" href="#p-job-3" aria-label="프리미엄 - 한국도로공사 채용공고 이동">
-                    <img class="banner-image" src="./[image]/한국도로공사.png" alt="한국도로공사 로고">
-                    <h3>한국도로공사</h3>
-                    <p>토목·전기·통신</p>
-                    <p><strong>마감:</strong> 2025.10.17 <span style="color:#e74c3c;font-weight:600;">D-0</span></p>
-                </a>
-                <a class="job-card" href="#p-job-4" aria-label="프리미엄 - 국민건강보험공단 채용공고 이동">
-                    <img class="banner-image" src="./[image]/국민건강보험.png" alt="국민건강보험공단 로고">
-                    <h3>국민건강보험공단</h3>
-                    <p>청년인턴</p>
-                    <p><strong>마감:</strong> 2025.10.16 <span style="color:#e74c3c;font-weight:600;">D-1</span></p>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- 최신 채용정보: 카드 디자인을 배너형으로 업데이트 -->
-    <section class="section section--tight-top" style="background: white;" id="jobs">
-        <div class="container">
-            <h2 class="section-title">최신 채용정보</h2>
-            <div class="job-grid">
-
-                <a class="job-card" href="#job-1" data-job="1" aria-label="한국전력공사 채용공고 상세로 이동">
-                    <img class="banner-image" src="./logo.png" alt="한국전력공사">
-                    <h3>한국전력공사</h3>
-                    <p>신입(사무/전기)</p>
-                    <p><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.15 <span style="color:#e74c3c;font-weight:600;">D-7</span></p>
-                    <div class="job-badges">
-                        <span class="badge">공기업</span>
-                        <span class="badge">온라인접수</span>
-                    </div>
-                </a>
-
-                <a class="job-card" href="#job-2" data-job="2" aria-label="한국수자원공사 채용공고 상세로 이동">
-                    <img class="banner-image" src="./logo.png" alt="한국수자원공사">
-                    <h3>한국수자원공사</h3>
-                    <p>경력(수환경/토목)</p>
-                    <p><strong>근무지:</strong> 대전 · <strong>마감:</strong> 2025.10.20 <span style="color:#e74c3c;font-weight:600;">D-3</span></p>
-                    <div class="job-badges">
-                        <span class="badge">기타공공기관</span>
-                        <span class="badge">온라인접수</span>
-                    </div>
-                </a>
-
-                <a class="job-card" href="#job-3" data-job="3" aria-label="한국철도공사 채용공고 상세로 이동">
-                    <img class="banner-image" src="./logo.png" alt="한국철도공사">
-                    <h3>한국철도공사</h3>
-                    <p>차량/운전/사무</p>
-                    <p><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.25 <span style="color:#e74c3c;font-weight:600;">D-12</span></p>
-                    <div class="job-badges">
-                        <span class="badge">공기업</span>
-                        <span class="badge">온라인접수</span>
-                    </div>
-                </a>
-
-                <a class="job-card" href="#job-4" data-job="4" aria-label="신용보증기금 채용공고 상세로 이동">
-                    <img class="banner-image" src="./logo.png" alt="신용보증기금">
-                    <h3>신용보증기금</h3>
-                    <p>IT/데이터</p>
-                    <p><strong>근무지:</strong> 대구 · <strong>마감:</strong> 2025.10.11 <span style="color:#e74c3c;font-weight:600;">D-2</span></p>
-                    <div class="job-badges">
-                        <span class="badge">기타공공기관</span>
-                        <span class="badge">온라인접수</span>
-                    </div>
-                </a>
-
-                <a class="job-card" href="#job-5" data-job="5" aria-label="한국전력거래소 채용공고 상세로 이동">
-                    <img class="banner-image" src="./logo.png" alt="한국전력거래소">
-                    <h3>한국전력거래소</h3>
-                    <p>전력시장/IT</p>
-                    <p><strong>근무지:</strong> 나주 · <strong>마감:</strong> 2025.10.18 <span style="color:#e74c3c;font-weight:600;">D-9</span></p>
-                    <div class="job-badges">
-                        <span class="badge">공기업</span>
-                        <span class="badge">온라인접수</span>
-                    </div>
-                </a>
-
-                <a class="job-card" href="#job-6" data-job="6" aria-label="국민건강보험공단 채용공고 상세로 이동">
-                    <img class="banner-image" src="./logo.png" alt="국민건강보험공단">
-                    <h3>국민건강보험공단</h3>
-                    <p>청년인턴</p>
-                    <p><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.16 <span style="color:#e74c3c;font-weight:600;">D-5</span></p>
-                    <div class="job-badges">
-                        <span class="badge">준정부기관</span>
-                        <span class="badge">온라인접수</span>
-                    </div>
-                </a>
-
-                <a class="job-card" href="#job-7" data-job="7" aria-label="국민연금공단 채용공고 상세로 이동">
-                    <img class="banner-image" src="./logo.png" alt="국민연금공단">
-                    <h3>국민연금공단</h3>
-                    <p>장애인 제한 경쟁</p>
-                    <p><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.27 <span style="color:#e74c3c;font-weight:600;">D-14</span></p>
-                    <div class="job-badges">
-                        <span class="badge">준정부기관</span>
-                        <span class="badge">온라인접수</span>
-                    </div>
-                </a>
-
-                <a class="job-card" href="#job-8" data-job="8" aria-label="한국가스공사 채용공고 상세로 이동">
-                    <img class="banner-image" src="./logo.png" alt="한국가스공사">
-                    <h3>한국가스공사</h3>
-                    <p>설비/안전/경영</p>
-                    <p><strong>근무지:</strong> 대구 · <strong>마감:</strong> 2025.10.10 <span style="color:#e74c3c;font-weight:600;">D-1</span></p>
-                    <div class="job-badges">
-                        <span class="badge">공기업</span>
-                        <span class="badge">온라인접수</span>
-                    </div>
-                </a>
-
-                <a class="job-card" href="#job-9" data-job="9" aria-label="한국도로공사 채용공고 상세로 이동">
-                    <img class="banner-image" src="./logo.png" alt="한국도로공사">
-                    <h3>한국도로공사</h3>
-                    <p>토목/전기/통신</p>
-                    <p><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.17 <span style="color:#e74c3c;font-weight:600;">D-6</span></p>
-                    <div class="job-badges">
-                        <span class="badge">공기업</span>
-                        <span class="badge">온라인접수</span>
-                    </div>
-                </a>
-
-                <a class="job-card" href="#job-10" data-job="10" aria-label="한국동서발전 채용공고 상세로 이동">
-                    <img class="banner-image" src="./logo.png" alt="한국동서발전">
-                    <h3>한국동서발전</h3>
-                    <p>발전/정비</p>
-                    <p><strong>근무지:</strong> 울산 · <strong>마감:</strong> 2025.10.19 <span style="color:#e74c3c;font-weight:600;">D-8</span></p>
-                    <div class="job-badges">
-                        <span class="badge">공기업</span>
-                        <span class="badge">온라인접수</span>
-                    </div>
-                </a>
-
-                <a class="job-card" href="#job-11" data-job="11" aria-label="한국서부발전 채용공고 상세로 이동">
-                    <img class="banner-image" src="./logo.png" alt="한국서부발전">
-                    <h3>한국서부발전</h3>
-                    <p>기계/전기</p>
-                    <p><strong>근무지:</strong> 태안 · <strong>마감:</strong> 2025.10.15 <span style="color:#e74c3c;font-weight:600;">D-4</span></p>
-                    <div class="job-badges">
-                        <span class="badge">공기업</span>
-                        <span class="badge">온라인접수</span>
-                    </div>
-                </a>
-
-                <a class="job-card" href="#job-12" data-job="12" aria-label="한국남동발전 채용공고 상세로 이동">
-                    <img class="banner-image" src="./logo.png" alt="한국남동발전">
-                    <h3>한국남동발전</h3>
-                    <p>환경/안전/정비</p>
-                    <p><strong>근무지:</strong> 진주 · <strong>마감:</strong> 2025.10.24 <span style="color:#e74c3c;font-weight:600;">D-11</span></p>
-                    <div class="job-badges">
-                        <span class="badge">공기업</span>
-                        <span class="badge">온라인접수</span>
-                    </div>
-                </a>
-
-                <a class="job-card" href="#job-13" data-job="13" aria-label="한국수력원자력 채용공고 상세로 이동">
-                    <img class="banner-image" src="./logo.png" alt="한국수력원자력">
-                    <h3>한국수력원자력</h3>
-                    <p>사무/기술</p>
-                    <p><strong>근무지:</strong> 경주 · <strong>마감:</strong> 2025.10.22 <span style="color:#e74c3c;font-weight:600;">D-10</span></p>
-                    <div class="job-badges">
-                        <span class="badge">공기업</span>
-                        <span class="badge">온라인접수</span>
-                    </div>
-                </a>
-
-                <a class="job-card" href="#job-14" data-job="14" aria-label="한국도로교통공단 채용공고 상세로 이동">
-                    <img class="banner-image" src="./logo.png" alt="한국도로교통공단">
-                    <h3>한국도로교통공단</h3>
-                    <p>교통/안전</p>
-                    <p><strong>근무지:</strong> 원주 · <strong>마감:</strong> 2025.10.26 <span style="color:#e74c3c;font-weight:600;">D-13</span></p>
-                    <div class="job-badges">
-                        <span class="badge">기타공공기관</span>
-                        <span class="badge">온라인접수</span>
-                    </div>
-                </a>
-
-                <a class="job-card" href="#job-15" data-job="15" aria-label="근로복지공단 채용공고 상세로 이동">
-                    <img class="banner-image" src="./logo.png" alt="근로복지공단">
-                    <h3>근로복지공단</h3>
-                    <p>고객/상담/사무</p>
-                    <p><strong>근무지:</strong> 울산 · <strong>마감:</strong> 2025.10.28 <span style="color:#e74c3c;font-weight:600;">D-15</span></p>
-                    <div class="job-badges">
-                        <span class="badge">준정부기관</span>
-                        <span class="badge">온라인접수</span>
-                    </div>
-                </a>
-
-                <a class="job-card" href="#job-16" data-job="16" aria-label="한국환경공단 채용공고 상세로 이동">
-                    <img class="banner-image" src="./logo.png" alt="한국환경공단">
-                    <h3>한국환경공단</h3>
-                    <p>환경/자원</p>
-                    <p><strong>근무지:</strong> 인천 · <strong>마감:</strong> 2025.10.29 <span style="color:#e74c3c;font-weight:600;">D-16</span></p>
-                    <div class="job-badges">
-                        <span class="badge">기타공공기관</span>
-                        <span class="badge">온라인접수</span>
-                    </div>
-                </a>
-
-                <a class="job-card" href="#job-17" data-job="17" aria-label="한국관광공사 채용공고 상세로 이동">
-                    <img class="banner-image" src="./logo.png" alt="한국관광공사">
-                    <h3>한국관광공사</h3>
-                    <p>해외마케팅</p>
-                    <p><strong>근무지:</strong> 원주 · <strong>마감:</strong> 2025.11.01 <span style="color:#e74c3c;font-weight:600;">D-18</span></p>
-                    <div class="job-badges">
-                        <span class="badge">기타공공기관</span>
-                        <span class="badge">온라인접수</span>
-                    </div>
-                </a>
-
-                <a class="job-card" href="#job-18" data-job="18" aria-label="한국무역보험공사 채용공고 상세로 이동">
-                    <img class="banner-image" src="./logo.png" alt="한국무역보험공사">
-                    <h3>한국무역보험공사</h3>
-                    <p>리스크/심사</p>
-                    <p><strong>근무지:</strong> 서울 · <strong>마감:</strong> 2025.10.31 <span style="color:#e74c3c;font-weight:600;">D-17</span></p>
-                    <div class="job-badges">
-                        <span class="badge">기타공공기관</span>
-                        <span class="badge">온라인접수</span>
-                    </div>
-                </a>
-
-                <a class="job-card" href="#job-19" data-job="19" aria-label="예금보험공사 채용공고 상세로 이동">
-                    <img class="banner-image" src="./logo.png" alt="예금보험공사">
-                    <h3>예금보험공사</h3>
-                    <p>금융/심사</p>
-                    <p><strong>근무지:</strong> 서울 · <strong>마감:</strong> 2025.11.03 <span style="color:#e74c3c;font-weight:600;">D-20</span></p>
-                    <div class="job-badges">
-                        <span class="badge">기타공공기관</span>
-                        <span class="badge">온라인접수</span>
-                    </div>
-                </a>
-
-                <a class="job-card" href="#job-20" data-job="20" aria-label="신용보증기금 채용공고 상세로 이동">
-                    <img class="banner-image" src="./logo.png" alt="신용보증기금">
-                    <h3>신용보증기금</h3>
-                    <p>일반행정</p>
-                    <p><strong>근무지:</strong> 대구 · <strong>마감:</strong> 2025.11.02 <span style="color:#e74c3c;font-weight:600;">D-19</span></p>
-                    <div class="job-badges">
-                        <span class="badge">기타공공기관</span>
-                        <span class="badge">온라인접수</span>
-                    </div>
-                </a>
-
-            </div>
-        </div>
-    </section>
-
-    <section id="login" class="section" style="padding:2rem 0;"></section>
-    <section id="signup" class="section" style="padding:2rem 0;"></section>
-    <section id="service-intro" class="section" style="padding:2rem 0;"></section>
-    <section id="service-apply" class="section" style="padding:2rem 0;"></section>
-    <section id="support" class="section" style="padding:2rem 0;"></section>
-
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 PCN 공공브레인넷. All rights reserved.</p>
-            <p>공공기관 취업 네트워크</p>
-        </div>
-    </footer>
-
-    <script>
+<!-- 상단 글로벌 네비게이션 -->
+<div class="global-nav">
+<div class="container">
+<ul class="global-nav-links">
+<li><a href="#login">로그인</a></li>
+<li><a href="#signup">회원가입</a></li>
+<li><a href="#service-intro">서비스 소개</a></li>
+<li><a class="cta-link" href="#service-apply">서비스 신청</a></li>
+<li><a href="#support">고객센터</a></li>
+</ul>
+</div>
+</div>
+<header>
+<div class="container">
+<div class="header-content">
+<div class="logo">
+<!-- 로고 이미지 경로를 수정해주세요 -->
+<img alt="브레인넷 로고" src="./CI2.png" style="height:50px;width:auto;object-fit:contain;"/>
+<div class="logo-text"></div>
+</div>
+<nav>
+<ul>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+</ul>
+<a href="#">채용정보</a><a href="#">기업정보</a><a href="#">인턴채용</a><a href="#">직원채용</a><a href="#">브레인게시판</a><a href="#">마이메뉴</a></nav>
+</div>
+</div>
+</header>
+<!-- 프리미엄 채용정보: 4개 카드 한 줄 -->
+<section class="section section--compact" id="features">
+<div class="container">
+<h2 class="section-title">프리미엄 채용정보 <span class="apply">상품신청&gt;</span></h2>
+<div class="job-grid job-grid--premium">
+<a aria-label="프리미엄 - 한국전력공사 채용공고 이동" class="job-card" data-url="https://recruit.incruit.com/i815/" href="javascript:void(0)" role="button">
+<img alt="독립기념관" class="banner-image" src="./독립기념관.png"/>
+<h3>독립기념관</h3>
+<p>신입·경력 / 사무·전기</p>
+<div class="deadline"><strong>마감:</strong> 2025.10.20 <span style="color:#e74c3c;font-weight:600;">D-3</span></div>
+</a>
+<a aria-label="프리미엄 - 한국수력원자력 채용공고 이동" class="job-card" data-url="https://kospo.machuda.kr" href="javascript:void(0)" role="button">
+<img alt="한국남부발전" class="banner-image" src="./한국남부발전.png"/>
+<h3>한국남부발전</h3>
+<p>사무·기술</p>
+<div class="deadline"><strong>마감:</strong> 2025.10.22 <span style="color:#e74c3c;font-weight:600;">D-5</span></div>
+</a>
+<a aria-label="프리미엄 - 한국도로공사 채용공고 이동" class="job-card" data-url="http://ksif.fairyhr.com/" href="javascript:void(0)" role="button">
+<img alt="세종학당재단" class="banner-image" src="./세종학당재단.png"/>
+<h3>세종학당재단</h3>
+<p>토목·전기·통신</p>
+<div class="deadline"><strong>마감:</strong> 2025.10.17 <span style="color:#e74c3c;font-weight:600;">D-0</span></div>
+</a>
+<a aria-label="프리미엄 - 국민건강보험공단 채용공고 이동" class="job-card" data-url="https://www.nps.or.kr/pnsgdnc/hiregdnc/getOHAE0004M0List.do?menuId=MN24000969" href="javascript:void(0)" role="button">
+<img alt="국민연금공단" class="banner-image" src="./국민연금공단.png"/>
+<h3>국민연금공단</h3>
+<p>청년인턴</p>
+<div class="deadline"><strong>마감:</strong> 2025.10.16 <span style="color:#e74c3c;font-weight:600;">D-1</span></div>
+</a>
+</div>
+</div>
+</section>
+<!-- 최신 채용정보: 카드 디자인을 배너형으로 업데이트 -->
+<section class="section section--tight-top" id="jobs" style="background: white;">
+<div class="container">
+<h2 class="section-title">추천 채용정보 <span class="apply">상품신청&gt;</span></h2>
+<div class="job-grid">
+<a aria-label="한국전력공사 채용공고 상세로 이동" class="job-card" data-job="1" data-url="" href="javascript:void(0)" role="button">
+<img alt="한국전력공사" class="banner-image" src="./logo.png"/>
+<h3>한국전력공사</h3>
+<p>신입(사무/전기)</p>
+<p class="meta"><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.15 <span style="color:#e74c3c;font-weight:600;">D-7</span></p>
+<div class="job-badges">
+<span class="badge">공기업</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="한국수자원공사 채용공고 상세로 이동" class="job-card" data-job="2" data-url="" href="javascript:void(0)" role="button">
+<img alt="한국수자원공사" class="banner-image" src="./logo.png"/>
+<h3>한국수자원공사</h3>
+<p>경력(수환경/토목)</p>
+<p class="meta"><strong>근무지:</strong> 대전 · <strong>마감:</strong> 2025.10.20 <span style="color:#e74c3c;font-weight:600;">D-3</span></p>
+<div class="job-badges">
+<span class="badge">기타공공기관</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="한국철도공사 채용공고 상세로 이동" class="job-card" data-job="3" data-url="" href="javascript:void(0)" role="button">
+<img alt="한국철도공사" class="banner-image" src="./logo.png"/>
+<h3>한국철도공사</h3>
+<p>차량/운전/사무</p>
+<p class="meta"><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.25 <span style="color:#e74c3c;font-weight:600;">D-12</span></p>
+<div class="job-badges">
+<span class="badge">공기업</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="신용보증기금 채용공고 상세로 이동" class="job-card" data-job="4" data-url="" href="javascript:void(0)" role="button">
+<img alt="신용보증기금" class="banner-image" src="./logo.png"/>
+<h3>신용보증기금</h3>
+<p>IT/데이터</p>
+<p class="meta"><strong>근무지:</strong> 대구 · <strong>마감:</strong> 2025.10.11 <span style="color:#e74c3c;font-weight:600;">D-2</span></p>
+<div class="job-badges">
+<span class="badge">기타공공기관</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="한국전력거래소 채용공고 상세로 이동" class="job-card" data-job="5" data-url="" href="javascript:void(0)" role="button">
+<img alt="한국전력거래소" class="banner-image" src="./logo.png"/>
+<h3>한국전력거래소</h3>
+<p>전력시장/IT</p>
+<p class="meta"><strong>근무지:</strong> 나주 · <strong>마감:</strong> 2025.10.18 <span style="color:#e74c3c;font-weight:600;">D-9</span></p>
+<div class="job-badges">
+<span class="badge">공기업</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="국민건강보험공단 채용공고 상세로 이동" class="job-card" data-job="6" data-url="" href="javascript:void(0)" role="button">
+<img alt="국민건강보험공단" class="banner-image" src="./logo.png"/>
+<h3>국민건강보험공단</h3>
+<p>청년인턴</p>
+<p class="meta"><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.16 <span style="color:#e74c3c;font-weight:600;">D-5</span></p>
+<div class="job-badges">
+<span class="badge">준정부기관</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="국민연금공단 채용공고 상세로 이동" class="job-card" data-job="7" data-url="" href="javascript:void(0)" role="button">
+<img alt="국민연금공단" class="banner-image" src="./logo.png"/>
+<h3>국민연금공단</h3>
+<p>장애인 제한 경쟁</p>
+<p class="meta"><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.27 <span style="color:#e74c3c;font-weight:600;">D-14</span></p>
+<div class="job-badges">
+<span class="badge">준정부기관</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="한국가스공사 채용공고 상세로 이동" class="job-card" data-job="8" data-url="" href="javascript:void(0)" role="button">
+<img alt="한국가스공사" class="banner-image" src="./logo.png"/>
+<h3>한국가스공사</h3>
+<p>설비/안전/경영</p>
+<p class="meta"><strong>근무지:</strong> 대구 · <strong>마감:</strong> 2025.10.10 <span style="color:#e74c3c;font-weight:600;">D-1</span></p>
+<div class="job-badges">
+<span class="badge">공기업</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="한국도로공사 채용공고 상세로 이동" class="job-card" data-job="9" data-url="" href="javascript:void(0)" role="button">
+<img alt="한국도로공사" class="banner-image" src="./logo.png"/>
+<h3>한국도로공사</h3>
+<p>토목/전기/통신</p>
+<p class="meta"><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.17 <span style="color:#e74c3c;font-weight:600;">D-6</span></p>
+<div class="job-badges">
+<span class="badge">공기업</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="한국동서발전 채용공고 상세로 이동" class="job-card" data-job="10" data-url="" href="javascript:void(0)" role="button">
+<img alt="한국동서발전" class="banner-image" src="./logo.png"/>
+<h3>한국동서발전</h3>
+<p>발전/정비</p>
+<p class="meta"><strong>근무지:</strong> 울산 · <strong>마감:</strong> 2025.10.19 <span style="color:#e74c3c;font-weight:600;">D-8</span></p>
+<div class="job-badges">
+<span class="badge">공기업</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="한국서부발전 채용공고 상세로 이동" class="job-card" data-job="11" data-url="" href="javascript:void(0)" role="button">
+<img alt="한국서부발전" class="banner-image" src="./logo.png"/>
+<h3>한국서부발전</h3>
+<p>기계/전기</p>
+<p class="meta"><strong>근무지:</strong> 태안 · <strong>마감:</strong> 2025.10.15 <span style="color:#e74c3c;font-weight:600;">D-4</span></p>
+<div class="job-badges">
+<span class="badge">공기업</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="한국남동발전 채용공고 상세로 이동" class="job-card" data-job="12" data-url="" href="javascript:void(0)" role="button">
+<img alt="한국남동발전" class="banner-image" src="./logo.png"/>
+<h3>한국남동발전</h3>
+<p>환경/안전/정비</p>
+<p class="meta"><strong>근무지:</strong> 진주 · <strong>마감:</strong> 2025.10.24 <span style="color:#e74c3c;font-weight:600;">D-11</span></p>
+<div class="job-badges">
+<span class="badge">공기업</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="한국수력원자력 채용공고 상세로 이동" class="job-card" data-job="13" data-url="" href="javascript:void(0)" role="button">
+<img alt="한국수력원자력" class="banner-image" src="./logo.png"/>
+<h3>한국수력원자력</h3>
+<p>사무/기술</p>
+<p class="meta"><strong>근무지:</strong> 경주 · <strong>마감:</strong> 2025.10.22 <span style="color:#e74c3c;font-weight:600;">D-10</span></p>
+<div class="job-badges">
+<span class="badge">공기업</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="한국도로교통공단 채용공고 상세로 이동" class="job-card" data-job="14" data-url="" href="javascript:void(0)" role="button">
+<img alt="한국도로교통공단" class="banner-image" src="./logo.png"/>
+<h3>한국도로교통공단</h3>
+<p>교통/안전</p>
+<p class="meta"><strong>근무지:</strong> 원주 · <strong>마감:</strong> 2025.10.26 <span style="color:#e74c3c;font-weight:600;">D-13</span></p>
+<div class="job-badges">
+<span class="badge">기타공공기관</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="근로복지공단 채용공고 상세로 이동" class="job-card" data-job="15" data-url="" href="javascript:void(0)" role="button">
+<img alt="근로복지공단" class="banner-image" src="./logo.png"/>
+<h3>근로복지공단</h3>
+<p>고객/상담/사무</p>
+<p class="meta"><strong>근무지:</strong> 울산 · <strong>마감:</strong> 2025.10.28 <span style="color:#e74c3c;font-weight:600;">D-15</span></p>
+<div class="job-badges">
+<span class="badge">준정부기관</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="한국환경공단 채용공고 상세로 이동" class="job-card" data-job="16" data-url="" href="javascript:void(0)" role="button">
+<img alt="한국환경공단" class="banner-image" src="./logo.png"/>
+<h3>한국환경공단</h3>
+<p>환경/자원</p>
+<p class="meta"><strong>근무지:</strong> 인천 · <strong>마감:</strong> 2025.10.29 <span style="color:#e74c3c;font-weight:600;">D-16</span></p>
+<div class="job-badges">
+<span class="badge">기타공공기관</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="한국관광공사 채용공고 상세로 이동" class="job-card" data-job="17" data-url="" href="javascript:void(0)" role="button">
+<img alt="한국관광공사" class="banner-image" src="./logo.png"/>
+<h3>한국관광공사</h3>
+<p>해외마케팅</p>
+<p class="meta"><strong>근무지:</strong> 원주 · <strong>마감:</strong> 2025.11.01 <span style="color:#e74c3c;font-weight:600;">D-18</span></p>
+<div class="job-badges">
+<span class="badge">기타공공기관</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="한국무역보험공사 채용공고 상세로 이동" class="job-card ad" data-job="18" data-url="" href="javascript:void(0)" role="button"><div class="ad-title">공공브레인넷 광고 문의</div><div class="ad-phone"><svg aria-hidden="true" viewbox="0 0 24 24">
+<path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.97 22 2 13.03 2 2a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.2 2.2z"></path>
+</svg> 042)629-8159</div><span class="ad-cta">상품신청</span></a>
+<a aria-label="예금보험공사 채용공고 상세로 이동" class="job-card ad" data-job="19" data-url="" href="javascript:void(0)" role="button"><div class="ad-title">공공브레인넷 광고 문의</div><div class="ad-phone"><svg aria-hidden="true" viewbox="0 0 24 24">
+<path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.97 22 2 13.03 2 2a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.2 2.2z"></path>
+</svg> 042)629-8159</div><span class="ad-cta">상품신청</span></a>
+<a aria-label="신용보증기금 채용공고 상세로 이동" class="job-card ad" data-job="20" data-url="" href="javascript:void(0)" role="button"><div class="ad-title">공공브레인넷 광고 문의</div><div class="ad-phone"><svg aria-hidden="true" viewbox="0 0 24 24">
+<path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.97 22 2 13.03 2 2a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.2 2.2z"></path>
+</svg> 042)629-8159</div><span class="ad-cta">상품신청</span></a>
+</div>
+</div>
+</section>
+<section class="section section--tight-top" id="general-jobs" style="background: white;">
+<div class="container">
+<h2 class="section-title" style="color:#5c7cfa;">일반 채용정보 <span class="apply">상품신청&gt;</span></h2>
+<div class="job-grid">
+<a aria-label="일반 채용공고 1 상세로 이동" class="job-card" data-job="g1" data-url="" href="javascript:void(0)" role="button">
+<img alt="기관 1" class="banner-image" src="./logo.png"/>
+<h3>기관 1</h3>
+<p>직무 예시 1</p>
+<p><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.11 <span style="color:#e74c3c;font-weight:600;">D-4</span></p>
+<div class="job-badges">
+<span class="badge">일반</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="일반 채용공고 2 상세로 이동" class="job-card" data-job="g2" data-url="" href="javascript:void(0)" role="button">
+<img alt="기관 2" class="banner-image" src="./logo.png"/>
+<h3>기관 2</h3>
+<p>직무 예시 2</p>
+<p><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.12 <span style="color:#e74c3c;font-weight:600;">D-5</span></p>
+<div class="job-badges">
+<span class="badge">일반</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="일반 채용공고 3 상세로 이동" class="job-card" data-job="g3" data-url="" href="javascript:void(0)" role="button">
+<img alt="기관 3" class="banner-image" src="./logo.png"/>
+<h3>기관 3</h3>
+<p>직무 예시 3</p>
+<p><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.13 <span style="color:#e74c3c;font-weight:600;">D-6</span></p>
+<div class="job-badges">
+<span class="badge">일반</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="일반 채용공고 4 상세로 이동" class="job-card" data-job="g4" data-url="" href="javascript:void(0)" role="button">
+<img alt="기관 4" class="banner-image" src="./logo.png"/>
+<h3>기관 4</h3>
+<p>직무 예시 4</p>
+<p><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.14 <span style="color:#e74c3c;font-weight:600;">D-7</span></p>
+<div class="job-badges">
+<span class="badge">일반</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="일반 채용공고 5 상세로 이동" class="job-card" data-job="g5" data-url="" href="javascript:void(0)" role="button">
+<img alt="기관 5" class="banner-image" src="./logo.png"/>
+<h3>기관 5</h3>
+<p>직무 예시 5</p>
+<p><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.15 <span style="color:#e74c3c;font-weight:600;">D-8</span></p>
+<div class="job-badges">
+<span class="badge">일반</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="일반 채용공고 6 상세로 이동" class="job-card" data-job="g6" data-url="" href="javascript:void(0)" role="button">
+<img alt="기관 6" class="banner-image" src="./logo.png"/>
+<h3>기관 6</h3>
+<p>직무 예시 6</p>
+<p><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.16 <span style="color:#e74c3c;font-weight:600;">D-9</span></p>
+<div class="job-badges">
+<span class="badge">일반</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="일반 채용공고 7 상세로 이동" class="job-card" data-job="g7" data-url="" href="javascript:void(0)" role="button">
+<img alt="기관 7" class="banner-image" src="./logo.png"/>
+<h3>기관 7</h3>
+<p>직무 예시 7</p>
+<p><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.17 <span style="color:#e74c3c;font-weight:600;">D-10</span></p>
+<div class="job-badges">
+<span class="badge">일반</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="일반 채용공고 8 상세로 이동" class="job-card" data-job="g8" data-url="" href="javascript:void(0)" role="button">
+<img alt="기관 8" class="banner-image" src="./logo.png"/>
+<h3>기관 8</h3>
+<p>직무 예시 8</p>
+<p><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.18 <span style="color:#e74c3c;font-weight:600;">D-11</span></p>
+<div class="job-badges">
+<span class="badge">일반</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="일반 채용공고 9 상세로 이동" class="job-card" data-job="g9" data-url="" href="javascript:void(0)" role="button">
+<img alt="기관 9" class="banner-image" src="./logo.png"/>
+<h3>기관 9</h3>
+<p>직무 예시 9</p>
+<p><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.19 <span style="color:#e74c3c;font-weight:600;">D-12</span></p>
+<div class="job-badges">
+<span class="badge">일반</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="일반 채용공고 10 상세로 이동" class="job-card" data-job="g10" data-url="" href="javascript:void(0)" role="button">
+<img alt="기관 10" class="banner-image" src="./logo.png"/>
+<h3>기관 10</h3>
+<p>직무 예시 10</p>
+<p><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.20 <span style="color:#e74c3c;font-weight:600;">D-13</span></p>
+<div class="job-badges">
+<span class="badge">일반</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="일반 채용공고 11 상세로 이동" class="job-card" data-job="g11" data-url="" href="javascript:void(0)" role="button">
+<img alt="기관 11" class="banner-image" src="./logo.png"/>
+<h3>기관 11</h3>
+<p>직무 예시 11</p>
+<p><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.21 <span style="color:#e74c3c;font-weight:600;">D-14</span></p>
+<div class="job-badges">
+<span class="badge">일반</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="일반 채용공고 12 상세로 이동" class="job-card" data-job="g12" data-url="" href="javascript:void(0)" role="button">
+<img alt="기관 12" class="banner-image" src="./logo.png"/>
+<h3>기관 12</h3>
+<p>직무 예시 12</p>
+<p><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.22 <span style="color:#e74c3c;font-weight:600;">D-15</span></p>
+<div class="job-badges">
+<span class="badge">일반</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="일반 채용공고 13 상세로 이동" class="job-card" data-job="g13" data-url="" href="javascript:void(0)" role="button">
+<img alt="기관 13" class="banner-image" src="./logo.png"/>
+<h3>기관 13</h3>
+<p>직무 예시 13</p>
+<p><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.23 <span style="color:#e74c3c;font-weight:600;">D-16</span></p>
+<div class="job-badges">
+<span class="badge">일반</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="일반 채용공고 14 상세로 이동" class="job-card" data-job="g14" data-url="" href="javascript:void(0)" role="button">
+<img alt="기관 14" class="banner-image" src="./logo.png"/>
+<h3>기관 14</h3>
+<p>직무 예시 14</p>
+<p><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.24 <span style="color:#e74c3c;font-weight:600;">D-17</span></p>
+<div class="job-badges">
+<span class="badge">일반</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="일반 채용공고 15 상세로 이동" class="job-card" data-job="g15" data-url="" href="javascript:void(0)" role="button">
+<img alt="기관 15" class="banner-image" src="./logo.png"/>
+<h3>기관 15</h3>
+<p>직무 예시 15</p>
+<p><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.25 <span style="color:#e74c3c;font-weight:600;">D-18</span></p>
+<div class="job-badges">
+<span class="badge">일반</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="일반 채용공고 16 상세로 이동" class="job-card" data-job="g16" data-url="" href="javascript:void(0)" role="button">
+<img alt="기관 16" class="banner-image" src="./logo.png"/>
+<h3>기관 16</h3>
+<p>직무 예시 16</p>
+<p><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.26 <span style="color:#e74c3c;font-weight:600;">D-19</span></p>
+<div class="job-badges">
+<span class="badge">일반</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="일반 채용공고 17 상세로 이동" class="job-card" data-job="g17" data-url="" href="javascript:void(0)" role="button">
+<img alt="기관 17" class="banner-image" src="./logo.png"/>
+<h3>기관 17</h3>
+<p>직무 예시 17</p>
+<p><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.27 <span style="color:#e74c3c;font-weight:600;">D-3</span></p>
+<div class="job-badges">
+<span class="badge">일반</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="일반 채용공고 18 상세로 이동" class="job-card" data-job="g18" data-url="" href="javascript:void(0)" role="button">
+<img alt="기관 18" class="banner-image" src="./logo.png"/>
+<h3>기관 18</h3>
+<p>직무 예시 18</p>
+<p><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.28 <span style="color:#e74c3c;font-weight:600;">D-4</span></p>
+<div class="job-badges">
+<span class="badge">일반</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="일반 채용공고 19 상세로 이동" class="job-card" data-job="g19" data-url="" href="javascript:void(0)" role="button">
+<img alt="기관 19" class="banner-image" src="./logo.png"/>
+<h3>기관 19</h3>
+<p>직무 예시 19</p>
+<p><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.29 <span style="color:#e74c3c;font-weight:600;">D-5</span></p>
+<div class="job-badges">
+<span class="badge">일반</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+<a aria-label="일반 채용공고 20 상세로 이동" class="job-card" data-job="g20" data-url="" href="javascript:void(0)" role="button">
+<img alt="기관 20" class="banner-image" src="./logo.png"/>
+<h3>기관 20</h3>
+<p>직무 예시 20</p>
+<p><strong>근무지:</strong> 전국 · <strong>마감:</strong> 2025.10.10 <span style="color:#e74c3c;font-weight:600;">D-6</span></p>
+<div class="job-badges">
+<span class="badge">일반</span>
+<span class="badge">온라인접수</span>
+</div>
+</a>
+</div>
+</div>
+</section><footer class="site-footer"><div class="container"><div class="brand">공공브레인넷</div><div class="footer-line">대표 : 이경한, 노성민 | 사업자등록번호 : 123-45-67890</div><div class="footer-line">(34430) 대전광역시 대덕구 한남로70 (오정동133) 경상대학 315호실</div><div class="footer-line">통신판매업 신고번호 : 제 2025-대전의창-0000호 | 직업정보제공사업 : 대전 제 2025-0</div><div class="footer-line">청소년보호책임자 : 오지원 | 공공기관뉴스 기사배열 책임자 : 오지원</div><div class="footer-line muted">© 2025 - 현재 puconet.com 공공브레인넷. All rights reserved.</div></div></footer>
+<section class="section" id="login" style="padding:2rem 0;"></section>
+<section class="section" id="signup" style="padding:2rem 0;"></section>
+<section class="section" id="service-intro" style="padding:2rem 0;"></section>
+<section class="section" id="service-apply" style="padding:2rem 0;"></section>
+<section class="section" id="support" style="padding:2rem 0;"></section>
+<script>
         // 부드러운 스크롤 효과
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
@@ -605,5 +1010,31 @@
             }
         });
     </script>
-</body>
+<script>
+    (function(){
+      function openPopup(url){
+        if(!url){ 
+          alert('이 배너에 연결할 채용 웹사이트 주소(URL)를 data-url 속성에 넣어주세요.');
+          return;
+        }
+        try{
+          window.open(url, 'jobpopup', 'noopener,noreferrer,width=1200,height=800');
+        }catch(e){
+          window.open(url, '_blank', 'noopener,noreferrer');
+        }
+      }
+      document.addEventListener('click', function(e){
+        var el = e.target;
+        // climb up to nearest .job-card anchor
+        while(el && el !== document){
+          if(el.classList && el.classList.contains('job-card')){
+            e.preventDefault();
+            openPopup(el.getAttribute('data-url'));
+            return;
+          }
+          el = el.parentNode;
+        }
+      }, true);
+    })();
+</script></body>
 </html>
