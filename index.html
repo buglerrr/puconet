@@ -517,6 +517,21 @@
           padding: 0 20px !important;   /* match the primary .container padding */
           text-align: left !important;
         }
+
+/* === v19: Premium logo max-fit (keep aspect, fill cell as much as possible) === */
+#features .job-card .banner-image{
+  width: 100% !important;
+  height: auto !important;
+  max-height: 120px !important;   /* grow logo area for premium */
+  object-fit: contain !important;
+  display: block !important;
+  margin-bottom: .6rem !important;
+}
+/* Slightly increase top padding so bigger logos have breathing room */
+#features .job-card{
+  padding-top: 1rem !important;
+}
+
 </style>
 </head>
 <body>
