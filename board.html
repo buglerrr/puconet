@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>브레인게시판</title>
+  <style>
+    :root{
+      --brand:#0f172a; /* slate-900 */
+      --link:#2563eb;  /* blue-600 */
+      --border:#e5e7eb;/* gray-200 */
+    }
+    *{ box-sizing:border-box; }
+    body{ font-family:system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Noto Color Emoji, sans-serif;
+          margin:0; color:#111827; background:#fff; }
+    header{ position:sticky; top:0; background:#fff; border-bottom:1px solid var(--border); z-index:10; }
+    .container{ max-width: 960px; margin:0 auto; padding: 14px 16px; }
+    .title{ font-size:1.25rem; font-weight:800; color:var(--brand); }
+    .toolbar{ display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; margin-top:.5rem; }
+    .toolbar input[type="search"]{
+      flex:1; min-width:200px; padding:.5rem .6rem; border:1px solid var(--border); border-radius:8px;
+    }
+    .btn{ display:inline-flex; align-items:center; justify-content:center; gap:.4rem;
+          padding:.5rem .75rem; border:1px solid var(--border); background:#111827; color:#fff; border-radius:8px; text-decoration:none; font-weight:600; }
+    .btn.secondary{ background:#fff; color:#111827; }
+    .btn:hover{ opacity:.9; }
+    main{ padding: 12px 16px 40px; }
+    ul.posts{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:.75rem; }
+    .post{
+      border:1px solid var(--border); border-radius:10px; padding:.75rem .9rem;
+    }
+    .post a.title{ color:var(--link); font-weight:700; text-decoration:none; }
+    .post a.title:hover{ text-decoration:underline; }
+    .meta{ font-size:.85rem; color:#6b7280; margin-top:.25rem; display:flex; gap:.8rem; flex-wrap:wrap; }
+    .labels{ display:flex; gap:.35rem; flex-wrap:wrap; margin-top:.35rem; }
+    .label{ font-size:.72rem; background:#f3f4f6; padding:.1rem .5rem; border:1px solid var(--border); border-radius:999px; }
+    .empty{ color:#6b7280; text-align:center; padding:1.5rem 0; }
+    .pager{ display:flex; gap:.5rem; justify-content:center; margin-top:1rem; }
+    .pager button{ padding:.45rem .7rem; border:1px solid var(--border); background:#fff; border-radius:8px; cursor:pointer; }
+    .pager button[disabled]{ opacity:.4; cursor:not-allowed; }
+    footer{ border-top:1px solid var(--border); margin-top:24px; padding-top:12px; color:#6b7280; font-size:.9rem; }
+    @media (max-width:560px){
+      .title{ font-size:1.1rem; }
+      .btn{ padding:.45rem .6rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="title">브레인게시판</div>
+      <div class="toolbar">
+        <input id="q" type="search" placeholder="제목/본문 검색..." />
+        <button class="btn secondary" id="searchBtn">검색</button>
+        <a class="btn" id="newBtn" target="_blank" rel="noopener">새 글쓰기</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <ul id="list" class="posts" aria-live="polite"></ul>
+    <div class="pager">
+      <button id="prev">이전</button>
+      <button id="next">다음</button>
+    </div>
+    <div id="status" class="empty" style="display:none;"></div>
+    <footer>이 게시판은 GitHub Issues를 데이터 저장소로 사용합니다. 스팸/악성 글은 저장소의 이슈 관리에서 언제든지 차단/삭제할 수 있습니다.</footer>
+  </main>
+
+  <script>
+    // === 설정(필수): 본인 저장소로 바꾸세요 ===
+    const OWNER = "YOUR_GH_USER";         // 예: truman-lee
+    const REPO  = "YOUR_REPO";            // 예: puconet-site
+    const LABEL = "board";                // 이 라벨이 붙은 이슈만 게시글로 취급
+    const PER_PAGE = 20;
+
+    // "새 글쓰기" 버튼: 라벨/템플릿이 적용된 새 이슈 작성 링크
+    const newIssueURL = `https://github.com/${OWNER}/${REPO}/issues/new?labels=${encodeURIComponent(LABEL)}&title=&body=`;
+    document.getElementById("newBtn").href = newIssueURL;
+
+    let page = 1;
+    let lastKeyword = "";
+
+    const $list = document.getElementById("list");
+    const $status = document.getElementById("status");
+    const $q = document.getElementById("q");
+    const $prev = document.getElementById("prev");
+    const $next = document.getElementById("next");
+
+    document.getElementById("searchBtn").addEventListener("click", () => {
+      page = 1;
+      lastKeyword = $q.value.trim();
+      load();
+    });
+    $q.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter"){ 
+        page = 1; lastKeyword = $q.value.trim(); load();
+      }
+    });
+    $prev.addEventListener("click", ()=>{ if(page>1){ page--; load(); } });
+    $next.addEventListener("click", ()=>{ page++; load(); });
+
+    async function load(){
+      $status.style.display = "none";
+      $list.innerHTML = "";
+      const endpoint = buildSearchURL(page, lastKeyword);
+      try{
+        const res = await fetch(endpoint, { headers: { "Accept":"application/vnd.github+json" }});
+        if(!res.ok) throw new Error("GitHub API 오류: " + res.status);
+        const data = await res.json();
+        const items = data.items || []; // search API
+        if(items.length === 0){
+          $status.textContent = lastKeyword ? "검색 결과가 없습니다." : "등록된 글이 없습니다.";
+          $status.style.display = "block";
+        }else{
+          for(const it of items){
+            $list.appendChild(renderItem(it));
+          }
+        }
+        // 간단한 페이지네이션 (검색 total_count 기반)
+        const total = data.total_count ?? (items.length < PER_PAGE ? (page-1)*PER_PAGE + items.length : 999999);
+        $prev.disabled = page <= 1;
+        $next.disabled = (page * PER_PAGE) >= total;
+      }catch(err){
+        console.error(err);
+        $status.textContent = "불러오는 중 문제가 발생했습니다.";
+        $status.style.display = "block";
+      }
+    }
+
+    function buildSearchURL(page, keyword){
+      // GitHub Search API: repo:OWNER/REPO label:board is:issue state:open keyword
+      const base = `https://api.github.com/search/issues`;
+      const q = [
+        `repo:${OWNER}/${REPO}`,
+        `label:${LABEL}`,
+        `is:issue`,
+        `state:open`,
+        keyword ? `${keyword} in:title,body` : ""
+      ].filter(Boolean).join(" ");
+      const params = new URLSearchParams({
+        q, sort:"created", order:"desc", per_page:String(PER_PAGE), page:String(page)
+      });
+      return `${base}?${params.toString()}`;
+    }
+
+    function renderItem(it){
+      // it: search item (issue)
+      const li = document.createElement("li");
+      li.className = "post";
+      const a = document.createElement("a");
+      a.className = "title";
+      a.href = it.html_url; a.target = "_blank"; a.rel = "noopener";
+      a.textContent = it.title || "(제목 없음)";
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      const d = new Date(it.created_at);
+      meta.innerHTML = [
+        `#${it.number}`,
+        `${it.user?.login ?? "unknown"}`,
+        d.toLocaleString("ko-KR"),
+        `댓글 ${it.comments ?? 0}개`
+      ].join(" · ");
+      const labels = document.createElement("div");
+      labels.className = "labels";
+      (it.labels||[]).forEach(lb=>{
+        const span = document.createElement("span");
+        span.className = "label";
+        span.textContent = typeof lb === "string" ? lb : lb.name;
+        labels.appendChild(span);
+      });
+      li.appendChild(a);
+      li.appendChild(meta);
+      if(labels.childNodes.length) li.appendChild(labels);
+      return li;
+    }
+
+    load();
+  </script>
+</body>
+</html>
