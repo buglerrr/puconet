@@ -67,115 +67,202 @@
     <footer>이 게시판은 GitHub Issues를 데이터 저장소로 사용합니다. 스팸/악성 글은 저장소의 이슈 관리에서 언제든지 차단/삭제할 수 있습니다.</footer>
   </main>
 
-  <script>
-    // === 설정(필수): 본인 저장소로 바꾸세요 ===
-    const OWNER = "buglerrr";         // 예: truman-lee
-    const REPO  = "puconet";            // 예: puconet-site
-    const LABEL = "board";                // 이 라벨이 붙은 이슈만 게시글로 취급
-    const PER_PAGE = 20;
+  
+<script>
+  // === 설정(필수): 본인 저장소로 바꾸세요 ===
+  const OWNER = "YOUR_GH_USER";   // 예: truman-lee
+  const REPO  = "YOUR_REPO";      // 예: puconet-site
+  const LABEL = "board";          // 이 라벨이 붙은 이슈만 게시글로 취급
+  const PER_PAGE = 20;
 
-    // "새 글쓰기" 버튼: 라벨/템플릿이 적용된 새 이슈 작성 링크
-    const newIssueURL = `https://github.com/${OWNER}/${REPO}/issues/new?labels=${encodeURIComponent(LABEL)}&title=&body=`;
-    document.getElementById("newBtn").href = newIssueURL;
+  // "새 글쓰기" 버튼: 라벨/템플릿이 적용된 새 이슈 작성 링크
+  const newIssueURL = `https://github.com/${OWNER}/${REPO}/issues/new?labels=${encodeURIComponent(LABEL)}&title=&body=`;
+  document.getElementById("newBtn").href = newIssueURL;
 
-    let page = 1;
-    let lastKeyword = "";
+  let page = 1;
+  let lastKeyword = "";
 
-    const $list = document.getElementById("list");
-    const $status = document.getElementById("status");
-    const $q = document.getElementById("q");
-    const $prev = document.getElementById("prev");
-    const $next = document.getElementById("next");
+  const $list = document.getElementById("list");
+  const $status = document.getElementById("status");
+  const $q = document.getElementById("q");
+  const $prev = document.getElementById("prev");
+  const $next = document.getElementById("next");
 
-    document.getElementById("searchBtn").addEventListener("click", () => {
-      page = 1;
-      lastKeyword = $q.value.trim();
-      load();
-    });
-    $q.addEventListener("keydown", (e)=>{
-      if(e.key === "Enter"){ 
-        page = 1; lastKeyword = $q.value.trim(); load();
+  document.getElementById("searchBtn").addEventListener("click", () => {
+    page = 1;
+    lastKeyword = $q.value.trim();
+    load();
+  });
+  $q.addEventListener("keydown", (e)=>{
+    if(e.key === "Enter"){
+      page = 1; lastKeyword = $q.value.trim(); load();
+    }
+  });
+  $prev.addEventListener("click", ()=>{ if(page>1){ page--; load(); } });
+  $next.addEventListener("click", ()=>{ page++; load(); });
+
+  async function load(){
+    $status.style.display = "none";
+    $list.innerHTML = "";
+
+    if(OWNER.includes("YOUR_") || REPO.includes("YOUR_")){
+      showError("설정이 필요합니다: board.html 안의 OWNER/REPO 값을 본인 저장소로 변경하세요.");
+      return;
+    }
+
+    const issuesURL = buildIssuesURL(page);
+    try{
+      let res = await fetch(issuesURL, { headers: { "Accept":"application/vnd.github+json" }});
+      if(!res.ok){
+        const msg = await safeText(res);
+        throw new Error(`Issues API 오류: ${res.status} ${res.statusText}
+${msg}`);
       }
-    });
-    $prev.addEventListener("click", ()=>{ if(page>1){ page--; load(); } });
-    $next.addEventListener("click", ()=>{ page++; load(); });
+      let items = await res.json();
+      if(lastKeyword){
+        const kw = lastKeyword.toLowerCase();
+        items = items.filter(it => (it.title && it.title.toLowerCase().includes(kw)) ||
+                                   (it.body && it.body.toLowerCase().includes(kw)));
+      }
+      items = items.filter(it => !it.pull_request);
 
-    async function load(){
-      $status.style.display = "none";
-      $list.innerHTML = "";
-      const endpoint = buildSearchURL(page, lastKeyword);
+      if(items.length === 0){
+        $status.textContent = lastKeyword ? "검색 결과가 없습니다." : "등록된 글이 없습니다.";
+        $status.style.display = "block";
+      }else{
+        for(const it of items){
+          $list.appendChild(renderIssue(it));
+        }
+      }
+
+      $prev.disabled = page <= 1;
+      $next.disabled = items.length < PER_PAGE;
+    }catch(err){
+      console.error(err);
+
       try{
-        const res = await fetch(endpoint, { headers: { "Accept":"application/vnd.github+json" }});
-        if(!res.ok) throw new Error("GitHub API 오류: " + res.status);
+        const endpoint = buildSearchURL(page, lastKeyword);
+        let res = await fetch(endpoint, { headers: { "Accept":"application/vnd.github+json" }});
+        if(!res.ok){
+          const msg = await safeText(res);
+          throw new Error(`Search API 오류: ${res.status} ${res.statusText}
+${msg}`);
+        }
         const data = await res.json();
-        const items = data.items || []; // search API
+        const items = data.items || [];
         if(items.length === 0){
           $status.textContent = lastKeyword ? "검색 결과가 없습니다." : "등록된 글이 없습니다.";
           $status.style.display = "block";
         }else{
           for(const it of items){
-            $list.appendChild(renderItem(it));
+            $list.appendChild(renderSearchItem(it));
           }
         }
-        // 간단한 페이지네이션 (검색 total_count 기반)
         const total = data.total_count ?? (items.length < PER_PAGE ? (page-1)*PER_PAGE + items.length : 999999);
         $prev.disabled = page <= 1;
         $next.disabled = (page * PER_PAGE) >= total;
-      }catch(err){
-        console.error(err);
-        $status.textContent = "불러오는 중 문제가 발생했습니다.";
-        $status.style.display = "block";
+      }catch(err2){
+        console.error(err2);
+        showError(`불러오는 중 문제가 발생했습니다.
+
+세부 정보:
+${err.message}
+
+${err2.message}
+` +
+                  `점검: 1) 저장소 공개 여부 2) Issues 활성화 3) 'LABEL=${LABEL}' 라벨 생성 4) 라벨 달린 이슈 존재 여부`);
       }
     }
+  }
 
-    function buildSearchURL(page, keyword){
-      // GitHub Search API: repo:OWNER/REPO label:board is:issue state:open keyword
-      const base = `https://api.github.com/search/issues`;
-      const q = [
-        `repo:${OWNER}/${REPO}`,
-        `label:${LABEL}`,
-        `is:issue`,
-        `state:open`,
-        keyword ? `${keyword} in:title,body` : ""
-      ].filter(Boolean).join(" ");
-      const params = new URLSearchParams({
-        q, sort:"created", order:"desc", per_page:String(PER_PAGE), page:String(page)
-      });
-      return `${base}?${params.toString()}`;
-    }
+  function buildIssuesURL(page){
+    const base = `https://api.github.com/repos/${OWNER}/${REPO}/issues`;
+    const params = new URLSearchParams({
+      state:"open",
+      labels: LABEL,
+      per_page:String(PER_PAGE),
+      page:String(page)
+    });
+    return `${base}?${params.toString()}`;
+  }
 
-    function renderItem(it){
-      // it: search item (issue)
-      const li = document.createElement("li");
-      li.className = "post";
-      const a = document.createElement("a");
-      a.className = "title";
-      a.href = it.html_url; a.target = "_blank"; a.rel = "noopener";
-      a.textContent = it.title || "(제목 없음)";
-      const meta = document.createElement("div");
-      meta.className = "meta";
-      const d = new Date(it.created_at);
-      meta.innerHTML = [
-        `#${it.number}`,
-        `${it.user?.login ?? "unknown"}`,
-        d.toLocaleString("ko-KR"),
-        `댓글 ${it.comments ?? 0}개`
-      ].join(" · ");
-      const labels = document.createElement("div");
-      labels.className = "labels";
-      (it.labels||[]).forEach(lb=>{
-        const span = document.createElement("span");
-        span.className = "label";
-        span.textContent = typeof lb === "string" ? lb : lb.name;
-        labels.appendChild(span);
-      });
-      li.appendChild(a);
-      li.appendChild(meta);
-      if(labels.childNodes.length) li.appendChild(labels);
-      return li;
-    }
+  function buildSearchURL(page, keyword){
+    const base = `https://api.github.com/search/issues`;
+    const q = [
+      `repo:${OWNER}/${REPO}`,
+      `label:${LABEL}`,
+      `is:issue`,
+      `state:open`,
+      keyword ? `${keyword} in:title,body` : ""
+    ].filter(Boolean).join(" ");
+    const params = new URLSearchParams({
+      q, sort:"created", order:"desc", per_page:String(PER_PAGE), page:String(page)
+    });
+    return `${base}?${params.toString()}`;
+  }
 
-    load();
-  </script>
+  function renderIssue(it){
+    const li = document.createElement("li");
+    li.className = "post";
+    const a = document.createElement("a");
+    a.className = "title";
+    a.href = it.html_url; a.target = "_blank"; a.rel = "noopener";
+    a.textContent = it.title || "(제목 없음)";
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    const d = new Date(it.created_at);
+    const comments = typeof it.comments === "number" ? it.comments : 0;
+    meta.innerHTML = [`#${it.number}`, `${it.user?.login ?? "unknown"}`, d.toLocaleString("ko-KR"), `댓글 ${comments}개`].join(" · ");
+    const labels = document.createElement("div");
+    labels.className = "labels";
+    (it.labels||[]).forEach(lb=>{
+      const span = document.createElement("span");
+      span.className = "label";
+      span.textContent = typeof lb === "string" ? lb : lb.name;
+      labels.appendChild(span);
+    });
+    li.appendChild(a);
+    li.appendChild(meta);
+    if(labels.childNodes.length) li.appendChild(labels);
+    return li;
+  }
+
+  function renderSearchItem(it){
+    const li = document.createElement("li");
+    li.className = "post";
+    const a = document.createElement("a");
+    a.className = "title";
+    a.href = it.html_url; a.target = "_blank"; a.rel = "noopener";
+    a.textContent = it.title || "(제목 없음)";
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    const d = new Date(it.created_at);
+    meta.innerHTML = [`#${it.number}`, `${it.user?.login ?? "unknown"}`, d.toLocaleString("ko-KR"), `댓글 ${it.comments ?? 0}개`].join(" · ");
+    const labels = document.createElement("div");
+    labels.className = "labels";
+    (it.labels||[]).forEach(lb=>{
+      const span = document.createElement("span");
+      span.className = "label";
+      span.textContent = typeof lb === "string" ? lb : lb.name;
+      labels.appendChild(span);
+    });
+    li.appendChild(a);
+    li.appendChild(meta);
+    if(labels.childNodes.length) li.appendChild(labels);
+    return li;
+  }
+
+  async function safeText(res){
+    try{ return await res.text(); }catch{ return ""; }
+  }
+
+  function showError(msg){
+    $status.textContent = msg;
+    $status.style.display = "block";
+  }
+
+  load();
+</script>
+
 </body>
 </html>
