@@ -593,6 +593,65 @@
   #features .job-grid.job-grid--premium{ grid-template-columns: 1fr !important; }
 }
 
+
+/* === v22 mobile fixes === */
+/* More conservative breakpoints for grids to avoid cramped cards */
+@media (max-width: 1100px){
+  .job-grid{ grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 860px){
+  .job-grid{ grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px){
+  .job-grid{ grid-template-columns: 1fr; }
+}
+
+/* Improve mobile readability: restore legible sizes */
+@media (max-width: 560px){
+  body{ font-size: 16px !important; }
+  .job-card h3{ font-size: 1rem !important; line-height: 1.25rem !important; }
+  .job-card p{ font-size: .9rem !important; }
+  .badge{ font-size: .72rem !important; }
+  #features .job-card .banner-image{ height: 64px !important; padding: 6px !important; }
+  .container{ padding: 0 16px !important; }
+}
+
+/* Prevent overflow: long titles truncated cleanly */
+.job-card h3{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Header: hamburger for small screens */
+.menu-toggle{
+  display:none;
+  background:#0f172a;
+  color:#fff;
+  border:none;
+  padding:.5rem .75rem;
+  border-radius:6px;
+  font-weight:700;
+}
+@media (max-width: 860px){
+  .header-content{ gap: .75rem; }
+  nav{ width: 100%; }
+  nav .nav-links{
+    display:none;
+    flex-direction: column;
+    gap: .5rem;
+    padding-top: .5rem;
+  }
+  nav.open .nav-links{ display:flex; }
+  .menu-toggle{ display:inline-block; margin-left:auto; }
+  /* shrink logo a touch on narrow screens */
+  .logo img{ height: 42px; }
+  header nav a{ margin-right: 0 !important; } /* override wide spacing */
+}
+
+/* Premium section background: keep white and add subtle separation only via spacing */
+#features{ background:#ffffff !important; }
+
 </style>
 </head>
 <body>
@@ -617,14 +676,11 @@
 <div class="logo-text"></div>
 </div>
 <nav>
-<ul>
-<li></li>
-<li></li>
-<li></li>
-<li></li>
-<li></li>
-</ul>
-<a href="#">채용정보</a><a href="#">기업정보</a><a href="#">인턴채용</a><a href="#">직원채용</a><a href="#">브레인게시판</a><a href="#">마이메뉴</a></nav>
+<button class="menu-toggle" type="button" aria-label="메뉴 열기">메뉴</button>
+<div class="nav-links">
+<a href="#">채용정보</a><a href="#">기업정보</a><a href="#">인턴채용</a><a href="#">직원채용</a><a href="#">브레인게시판</a><a href="#">마이메뉴</a>
+</div>
+</nav>
 </div>
 </div>
 </header>
@@ -633,26 +689,26 @@
 <div class="container">
 <h2 class="section-title">프리미엄 채용정보 <span class="apply">상품신청&gt;</span></h2>
 <div class="job-grid job-grid--premium">
-<a aria-label="프리미엄 - 독립기념관 이동" class="job-card" data-url="https://recruit.incruit.com/i815/" href="javascript:void(0)" role="button">
-<img alt="독립기념관" class="banner-image" src="./독립기념관.png"/>
+<a aria-label="프리미엄 - 한국전력공사 채용공고 이동" class="job-card" data-url="https://recruit.incruit.com/i815/" href="javascript:void(0)" role="button">
+<img alt="독립기념관" class="banner-image" src="./logo.png"/>
 <h3>독립기념관</h3>
 <p>신입·경력 / 사무·전기</p>
 <div class="deadline"><strong>마감:</strong> 2025.10.20 <span style="color:#e74c3c;font-weight:600;">D-3</span></div>
 </a>
-<a aria-label="프리미엄 - 한국남부발전 채용공고 이동" class="job-card" data-url="https://kospo.machuda.kr" href="javascript:void(0)" role="button">
-<img alt="한국남부발전" class="banner-image" src="./한국남부발전.png"/>
+<a aria-label="프리미엄 - 한국수력원자력 채용공고 이동" class="job-card" data-url="https://kospo.machuda.kr" href="javascript:void(0)" role="button">
+<img alt="한국남부발전" class="banner-image" src="./logo.png"/>
 <h3>한국남부발전</h3>
 <p>사무·기술</p>
 <div class="deadline"><strong>마감:</strong> 2025.10.22 <span style="color:#e74c3c;font-weight:600;">D-5</span></div>
 </a>
-<a aria-label="프리미엄 - 세종학당재단 채용공고 이동" class="job-card" data-url="http://ksif.fairyhr.com/" href="javascript:void(0)" role="button">
-<img alt="세종학당재단" class="banner-image" src="./세종학당재단.png"/>
+<a aria-label="프리미엄 - 한국도로공사 채용공고 이동" class="job-card" data-url="http://ksif.fairyhr.com/" href="javascript:void(0)" role="button">
+<img alt="세종학당재단" class="banner-image" src="./logo.png"/>
 <h3>세종학당재단</h3>
 <p>토목·전기·통신</p>
 <div class="deadline"><strong>마감:</strong> 2025.10.17 <span style="color:#e74c3c;font-weight:600;">D-0</span></div>
 </a>
-<a aria-label="프리미엄 - 국민연금공단 채용공고 이동" class="job-card" data-url="https://www.nps.or.kr/pnsgdnc/hiregdnc/getOHAE0004M0List.do?menuId=MN24000969" href="javascript:void(0)" role="button">
-<img alt="국민연금공단" class="banner-image" src="./국민연금공단.png"/>
+<a aria-label="프리미엄 - 국민건강보험공단 채용공고 이동" class="job-card" data-url="https://www.nps.or.kr/pnsgdnc/hiregdnc/getOHAE0004M0List.do?menuId=MN24000969" href="javascript:void(0)" role="button">
+<img alt="국민연금공단" class="banner-image" src="./logo.png"/>
 <h3>국민연금공단</h3>
 <p>청년인턴</p>
 <div class="deadline"><strong>마감:</strong> 2025.10.16 <span style="color:#e74c3c;font-weight:600;">D-1</span></div>
@@ -1112,5 +1168,28 @@
         }
       }, true);
     })();
-</script></body>
+</script><script>
+
+/* v22: hamburger toggle for small screens */
+(function(){
+  const nav = document.querySelector('header nav');
+  const btn = document.querySelector('.menu-toggle');
+  if(btn && nav){
+    btn.addEventListener('click', function(){
+      nav.classList.toggle('open');
+      btn.setAttribute('aria-label', nav.classList.contains('open') ? '메뉴 닫기' : '메뉴 열기');
+    });
+  }
+})();
+
+/* NOTE on m-dot domains:
+   'm.example.com'은 DNS/서버(또는 CDN) 레벨에서 별도 호스트를 구성하고,
+   서버에서 User-Agent/Viewport 감지 후 리다이렉트(또는 Vary 헤더 기반 캐시 분리)로 제공하는 것이 일반적입니다.
+   HTML만으로 호스트를 바꾸진 못합니다. 마지막 수단으로 JS 리다이렉트를 쓸 수 있으나 SEO/UX에 권장되지 않습니다.
+   예시(비권장):
+   if (screen.width < 768) location.replace(location.href.replace('//www.', '//m.'));
+*/
+
+</script>
+</body>
 </html>
