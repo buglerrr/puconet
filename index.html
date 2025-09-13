@@ -594,63 +594,84 @@
 }
 
 
-/* === v22 mobile fixes === */
-/* More conservative breakpoints for grids to avoid cramped cards */
-@media (max-width: 1100px){
-  .job-grid{ grid-template-columns: repeat(3, 1fr); }
-}
+/* === v23 overrides === */
+
+/* 1) Mobile: keep full menu inline (one row). Shrink font & enable horizontal scroll if overflowed. */
 @media (max-width: 860px){
-  .job-grid{ grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 560px){
-  .job-grid{ grid-template-columns: 1fr; }
-}
-
-/* Improve mobile readability: restore legible sizes */
-@media (max-width: 560px){
-  body{ font-size: 16px !important; }
-  .job-card h3{ font-size: 1rem !important; line-height: 1.25rem !important; }
-  .job-card p{ font-size: .9rem !important; }
-  .badge{ font-size: .72rem !important; }
-  #features .job-card .banner-image{ height: 64px !important; padding: 6px !important; }
-  .container{ padding: 0 16px !important; }
-}
-
-/* Prevent overflow: long titles truncated cleanly */
-.job-card h3{
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Header: hamburger for small screens */
-.menu-toggle{
-  display:none;
-  background:#0f172a;
-  color:#fff;
-  border:none;
-  padding:.5rem .75rem;
-  border-radius:6px;
-  font-weight:700;
-}
-@media (max-width: 860px){
-  .header-content{ gap: .75rem; }
-  nav{ width: 100%; }
-  nav .nav-links{
-    display:none;
-    flex-direction: column;
-    gap: .5rem;
-    padding-top: .5rem;
+  header nav ul,
+  nav ul,
+  .globalNavigationUl,
+  .nav-links {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 10px !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 6px 8px !important;
+    margin: 0 !important;
   }
-  nav.open .nav-links{ display:flex; }
-  .menu-toggle{ display:inline-block; margin-left:auto; }
-  /* shrink logo a touch on narrow screens */
-  .logo img{ height: 42px; }
-  header nav a{ margin-right: 0 !important; } /* override wide spacing */
+  header nav li,
+  nav li {
+    margin: 0 !important;
+  }
+  header nav a,
+  nav a,
+  .globalNavigationUl a {
+    font-size: 12px !important;
+    line-height: 1 !important;
+    padding: 6px 8px !important;
+  }
+  /* Hide any hamburger button if it exists */
+  .menu-toggle { display: none !important; }
+  /* Slightly reduce logo height for tighter header */
+  .logo img, .hbnlogo img, .site-logo img { max-height: 40px !important; height: 40px !important; }
 }
 
-/* Premium section background: keep white and add subtle separation only via spacing */
-#features{ background:#ffffff !important; }
+/* 2) Mobile: show 2 cards per row for job/banners */
+@media (max-width: 560px){
+  /* Grid-based layouts */
+  .job-grid { 
+    display: grid !important; 
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important; 
+    gap: 12px !important;
+  }
+  /* UL-based banner lists */
+  .bannerSection .bannerBody ul {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+  }
+  .bannerSection .bannerBody ul li {
+    margin: 0 !important; /* eliminate legacy margins that break grid alignment */
+  }
+  /* Premium grid if present */
+  .hbn-main-platinum-plus-banner,
+  .hbn-main-join-banner {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+  }
+  .banner-wrap { margin: 0 !important; }
+}
+
+/* 3) Remove extra bottom whitespace below footer on desktop & all */
+footer, .footer, #footer, .site-footer {
+  margin-bottom: 0 !important;
+  padding-bottom: 16px !important;
+}
+html, body { margin: 0 !important; padding: 0 !important; }
+#wrapper, .hbnContainer, .hbnMainContainer, .bodyWrapper, #main {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+.bottom-space, .page-bottom, .pageEnd, .page-end-spacer, .footer-spacer, .tailSpacer {
+  height: 0 !important; margin: 0 !important; padding: 0 !important; display: none !important;
+}
+
+/* Keep premium background white as requested previously */
+#features { background: #ffffff !important; }
 
 </style>
 </head>
@@ -664,7 +685,7 @@
 <li><a href="#service-intro">서비스 소개</a></li>
 <li><a class="cta-link" href="#service-apply">서비스 신청</a></li>
 <li><a href="#support">고객센터</a></li>
-</ul>
+</ul></div>
 </div>
 </div>
 <header>
@@ -676,11 +697,14 @@
 <div class="logo-text"></div>
 </div>
 <nav>
-<button class="menu-toggle" type="button" aria-label="메뉴 열기">메뉴</button>
-<div class="nav-links">
-<a href="#">채용정보</a><a href="#">기업정보</a><a href="#">인턴채용</a><a href="#">직원채용</a><a href="#">브레인게시판</a><a href="#">마이메뉴</a>
-</div>
-</nav>
+<div class=\"nav-links\"><ul>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+</ul>
+<a href="#">채용정보</a><a href="#">기업정보</a><a href="#">인턴채용</a><a href="#">직원채용</a><a href="#">브레인게시판</a><a href="#">마이메뉴</a></nav>
 </div>
 </div>
 </header>
@@ -1168,28 +1192,5 @@
         }
       }, true);
     })();
-</script><script>
-
-/* v22: hamburger toggle for small screens */
-(function(){
-  const nav = document.querySelector('header nav');
-  const btn = document.querySelector('.menu-toggle');
-  if(btn && nav){
-    btn.addEventListener('click', function(){
-      nav.classList.toggle('open');
-      btn.setAttribute('aria-label', nav.classList.contains('open') ? '메뉴 닫기' : '메뉴 열기');
-    });
-  }
-})();
-
-/* NOTE on m-dot domains:
-   'm.example.com'은 DNS/서버(또는 CDN) 레벨에서 별도 호스트를 구성하고,
-   서버에서 User-Agent/Viewport 감지 후 리다이렉트(또는 Vary 헤더 기반 캐시 분리)로 제공하는 것이 일반적입니다.
-   HTML만으로 호스트를 바꾸진 못합니다. 마지막 수단으로 JS 리다이렉트를 쓸 수 있으나 SEO/UX에 권장되지 않습니다.
-   예시(비권장):
-   if (screen.width < 768) location.replace(location.href.replace('//www.', '//m.'));
-*/
-
-</script>
-</body>
+</script></body>
 </html>
