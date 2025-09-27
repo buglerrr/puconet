@@ -652,6 +652,43 @@
 /* Premium section background: keep white and add subtle separation only via spacing */
 #features{ background:#ffffff !important; }
 
+/* === [교육과정 배너 전용 스타일] 폭은 .container로 자동 일치 === */
+#edu-courses .edu-banner-list{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)); /* 한 줄 3개 */
+  gap: 20px;                                        /* 위 배너들과 동일 간격 */
+  width: 100%;
+}
+
+#edu-courses .edu-banner{
+  width: 100%;               /* 칼럼 폭 100% (폭 어긋남 방지) */
+  height: 360px;             /* 기존 대비 약 2배 (필요시 320~400px 조정) */
+  display: flex; flex-direction: column;
+  border-radius: 16px; overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0,0,0,.08);
+  transition: transform .12s ease;
+}
+#edu-courses .edu-banner:hover{ transform: translateY(-2px); }
+
+#edu-courses .edu-banner .thumb{ flex: 1 0 auto; background: #f1f3f5; }
+#edu-courses .edu-banner .thumb img{ width: 100%; height: 100%; object-fit: cover; }
+
+#edu-courses .edu-banner .meta{ padding: 12px 14px; }
+#edu-courses .edu-banner .meta h3{ font-size: 16px; line-height: 1.35; margin-bottom: 6px; font-weight: 700; }
+#edu-courses .edu-banner .meta p{ font-size: 13px; color: #666; }
+
+/* 반응형: 3 → 2 → 1열 */
+@media (max-width: 1024px){
+  #edu-courses .edu-banner-list{ grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px){
+  #edu-courses .edu-banner-list{ grid-template-columns: 1fr; }
+}
+
+
+
+
 </style>
 <style id="jobcard-fixed-size-style">
 /* 주입: job-card 고정 크기 */
@@ -968,11 +1005,134 @@
         <p class="meta">근무지: 인천 외 · 마감: 2025-09-25 D-6</p>
         <div class="job-badges"></div>
     </a>
+    <a aria-label="한국무역보험공사 채용공고 상세로 이동" class="job-card ad" data-job="18" data-url="" href="javascript:void(0)" role="button"><div class="ad-title">공공브레인넷 광고 문의</div><div class="ad-phone"><svg aria-hidden="true" viewbox="0 0 24 24">
+        <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.97 22 2 13.03 2 2a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.2 2.2z"></path>
+        </svg> 042)629-8159</div><span class="ad-cta">상품신청</span></a>
+    <a aria-label="한국무역보험공사 채용공고 상세로 이동" class="job-card ad" data-job="18" data-url="" href="javascript:void(0)" role="button"><div class="ad-title">공공브레인넷 광고 문의</div><div class="ad-phone"><svg aria-hidden="true" viewbox="0 0 24 24">
+        <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.97 22 2 13.03 2 2a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.2 2.2z"></path>
+        </svg> 042)629-8159</div><span class="ad-cta">상품신청</span></a>
+    <a aria-label="한국무역보험공사 채용공고 상세로 이동" class="job-card ad" data-job="18" data-url="" href="javascript:void(0)" role="button"><div class="ad-title">공공브레인넷 광고 문의</div><div class="ad-phone"><svg aria-hidden="true" viewbox="0 0 24 24">
+        <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.97 22 2 13.03 2 2a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.2 2.2z"></path>
+        </svg> 042)629-8159</div><span class="ad-cta">상품신청</span></a>
+
 </div>
 </section>
+<!-- [요청 반영] 공공기관 임직원 교육과정 (폭 일치 + 3열 + 높이 2배) -->
+<section class="section section--tight-top" id="edu-courses" >
+  <div class="container">
+    <h2 class="section-title" style="color:#5c7cfa;">공공기관 임직원 교육과정 <span class="apply">상품신청&gt;</span> </h2>
+
+    <div class="edu-banner-list">
+      <!-- 배너 1 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="./edu_banner_1.jpg" alt="교육과정 1 썸네일">
+        </div>
+        <div class="meta">
+          <h3>디지털 혁신과 공공 리더십</h3>
+          <p>주관: K 공공교육원 · 11/04(월)~11/06(수)</p>
+        </div>
+      </a>
+
+      <!-- 배너 2 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="./edu_banner_2.jpg" alt="교육과정 2 썸네일">
+        </div>
+        <div class="meta">
+          <h3>ESG 경영 실무(공공기관 특화)</h3>
+          <p>주관: G 리서치 · 10/28(화)~10/29(수)</p>
+        </div>
+      </a>
+
+      <!-- 배너 3 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="./edu_banner_3.jpg" alt="교육과정 3 썸네일">
+        </div>
+        <div class="meta">
+          <h3>조달·계약 컴플라이언스 집중</h3>
+          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
+        </div>
+      </a>
+
+      <!-- 배너 4 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="./edu_banner_3.jpg" alt="교육과정 3 썸네일">
+        </div>
+        <div class="meta">
+          <h3>조달·계약 컴플라이언스 집중</h3>
+          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
+        </div>
+      </a>
+
+      <!-- 배너 5 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="./edu_banner_3.jpg" alt="교육과정 3 썸네일">
+        </div>
+        <div class="meta">
+          <h3>조달·계약 컴플라이언스 집중</h3>
+          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
+        </div>
+      </a>
+
+      <!-- 배너 6 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="./edu_banner_3.jpg" alt="교육과정 3 썸네일">
+        </div>
+        <div class="meta">
+          <h3>조달·계약 컴플라이언스 집중</h3>
+          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
+        </div>
+      </a>
+      
+     <!-- 배너 7 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="./edu_banner_3.jpg" alt="교육과정 3 썸네일">
+        </div>
+        <div class="meta">
+          <h3>조달·계약 컴플라이언스 집중</h3>
+          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
+        </div>
+      </a>
+
+      <!-- 배너 8 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="./edu_banner_3.jpg" alt="교육과정 3 썸네일">
+        </div>
+        <div class="meta">
+          <h3>조달·계약 컴플라이언스 집중</h3>
+          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
+        </div>
+      </a>
+
+      <!-- 배너 9 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="./edu_banner_3.jpg" alt="교육과정 3 썸네일">
+        </div>
+        <div class="meta">
+          <h3>조달·계약 컴플라이언스 집중</h3>
+          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
+        </div>
+      </a>
+
+      <!-- 필요 시 더 추가 -->
+      <!-- 배너 4~6 ... 동일한 형식으로 복사/붙여넣기 -->
+    </div>
+  </div>
+</section>
+
+
+
 <section class="section section--tight-top" id="general-jobs" style="background: white;">
 <div class="container">
-<h2 class="section-title" style="color:#5c7cfa;">일반 채용정보 <span class="apply">상품신청&gt;</span></h2>
+<h2 class="section-title" style="color:#5c7cfa;">공공기관 임직원 교육과정 <span class="apply">상품신청&gt;</span></h2>
 <div class="job-grid">
 <a aria-label="한국항로표지기술원 채용공고 상세로 이동" class="job-card" data-job="g1" data-url="" href="javascript:void(0)" role="button">
 <img alt="기관 1" class="banner-image" src="./logo.png"/>
