@@ -353,7 +353,20 @@
 <h3>등록된 채용정보가 없습니다</h3>
 <p>첫 번째 채용정보를 등록해보세요!</p>
 </div>
+<div style="margin-bottom: 1rem;">
+    <input type="text" id="searchInput" placeholder="🔍 기관명 또는 제목으로 검색..." 
+           style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;"
+           oninput="searchJobs()">
 
+   
+<div style="margin-bottom: 1rem;">
+    <input type="text" id="searchInput" placeholder="🔍 기관명 또는 제목으로 검색..." 
+           style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;"
+           oninput="searchJobs()">
+</div>
+   
+   
+   
 <!-- 테이블 -->
 <table class="board-table" id="jobTable" style="display: none;">
 <thead>
@@ -649,4 +662,5 @@ window.onclick = function(event) {
 }
 </script>
 </body>
+
 </html>
