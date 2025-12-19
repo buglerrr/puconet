@@ -660,7 +660,20 @@ window.onclick = function(event) {
         event.target.style.display = 'none';
     }
 }
+
+function searchJobs() {
+    const input = document.getElementById('searchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('#jobTableBody tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(input) ? '' : 'none';
+    });
+}
+
+   
 </script>
 </body>
 
 </html>
+
