@@ -36,9 +36,10 @@
 
         .header-content {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
             padding: 1rem 0;
+            gap: 3rem;  /*'채용정보 등' 배너의 위치 조정(오른쪽으로) */
         }
 
         .logo {
@@ -63,6 +64,7 @@
             display: flex;
             list-style: none;
             gap: 2rem;
+            margin-left: 2rem;
         }
 
         nav a {
@@ -686,7 +688,7 @@
 
 .bannerHeader {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   margin-bottom: 1.75rem;
 }
@@ -696,11 +698,12 @@
   font-size: 1.2rem;
   margin-bottom: 0;
   color: #2c3e50;
-  font-weight: normal;
+  font-weight: bold;
 }
 
 .btnSet {
   margin-top: 0;
+  margin-left: 1rem;
 }
 
 .btn_subScribe {
@@ -745,7 +748,7 @@
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   display: block;
-  margin: 0 auto;
+  margin: 0;
 }
 
 .main-research-line {
@@ -771,7 +774,7 @@
   height: auto;
   border-radius: 8px;
   display: block;
-  margin: 0 auto;
+  margin: 0;
 }
 
 /* 반응형: 1200px 이하에서 사이드바를 상단으로 이동 */
