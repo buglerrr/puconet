@@ -37,7 +37,7 @@
         .header-content {
             display: flex;
             justify-content: flex-start;
-            align-items: center;
+            align-items: flex-end;
             padding: 1rem 0;
             gap: 3rem;  /*'채용정보 등' 배너의 위치 조정(오른쪽으로) */
         }
@@ -690,12 +690,12 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  margin-bottom: 1.75rem;
+  margin-bottom: 1rem;
 }
 
 .hbntitleImage {
   text-align: left; 
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   margin-bottom: 0;
   color: #2c3e50;
   font-weight: bold;
@@ -790,7 +790,28 @@
     margin-bottom: 2rem;
   }
 }
+/* 프리미엄 채용정보 배너 배경색 */
+.job-grid--premium .job-card:nth-child(1) {
+  background: #e3f2fd !important;  /* 연한 하늘색 (독립기념관) */
+}
 
+.job-grid--premium .job-card:nth-child(2) {
+  background: #f3e5f5 !important;  /* 연한 보라색 (한국남부발전) */
+}
+
+.job-grid--premium .job-card:nth-child(3) {
+  background: #fff3e0 !important;  /* 연한 주황색 (세종학당재단) */
+}
+
+.job-grid--premium .job-card:nth-child(4) {
+  background: #f1f8e9 !important;  /* 연한 연두색 (국민연금공단) */
+}
+
+
+/* 프리미엄 채용정보 배너 배경색 */
+... (위의 코드 추가) ...
+
+/* === [교육과정 배너 전용 스타일] 폭은 .container로 자동 일치 === */
 /* === [교육과정 배너 전용 스타일] 폭은 .container로 자동 일치 === */
 #edu-courses .edu-banner-list{
   display: grid;
@@ -903,7 +924,7 @@
 <nav>
 <button aria-label="메뉴 열기" class="menu-toggle" type="button">메뉴</button>
 <div class="nav-links">
-<a href="#">채용정보</a><a href="board.html">게시판</a><a href="#">공공기관 뉴스</a><a href="#">공모전 소식</a><a href="#">취업 이야기</a><a href="#">마이메뉴</a>
+<a href="#">채용정보</a><a href="board.html">공공게시판</a><a href="#">공공기관 뉴스</a><a href="#">공모전 소식</a><a href="#">취업 이야기</a><a href="#">마이메뉴</a>
 </div>
 </nav>
 </div>
