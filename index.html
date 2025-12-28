@@ -652,6 +652,142 @@
 /* Premium section background: keep white and add subtle separation only via spacing */
 #features{ background:#ffffff !important; }
 
+/* === 사이드바 레이아웃 스타일 === */
+.content-with-sidebar-wrapper {
+  display: flex;
+  gap: 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.main-content-area {
+  flex: 1;
+  min-width: 0;
+}
+
+.research-sidebar {
+  flex: 0 0 300px;
+  align-self: flex-start;
+}
+
+/* 사이드바 스타일 */
+.mainResearchWrapper {
+  background: #ffffff;
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: none;
+  padding-top: 2.666rem;
+}
+
+.bannerSection {
+  padding: 0 1rem 1rem 1rem;
+}
+
+.bannerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.75rem;
+}
+
+.hbntitleImage {
+  text-align: left; 
+  font-size: 1.6rem;
+  margin-bottom: 0;
+  color: #2c3e50;
+  font-weight: normal;
+}
+
+.btnSet {
+  margin-top: 0;
+}
+
+.btn_subScribe {
+  display: inline-block;
+  background: transparent;
+  color: #3498db;
+  padding: 0;
+  text-decoration: none;
+  border-radius: 0;
+  font-size: 0.9rem;
+  font-weight: normal;
+  transition: color 0.3s;
+  cursor: pointer;
+}
+
+.btn_subScribe:hover {
+  color: #2980b9;
+  text-decoration: underline;
+}
+
+.bannerBody ul {
+  list-style: none;
+  padding: 0;
+}
+
+.bannerList {
+  margin-bottom: 1rem;
+}
+
+.bannerList a {
+  display: block;
+  transition: transform 0.2s;
+}
+
+.bannerList a:hover {
+  transform: scale(1.02);
+}
+
+.bannerList img {
+  width: 66.67%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: block;
+  margin: 0 auto;
+}
+
+.main-research-line {
+  height: 1px;
+  background: #e0e0e0;
+  margin: 0.75rem 0;
+}
+
+.hbn-row-image {
+  margin-top: 1rem;
+}
+
+.hbn-row-image.small-bottom {
+  margin-bottom: 0.75rem;
+}
+
+.hbn-row-image a {
+  display: block;
+}
+
+.hbn-row-image img {
+  width: 66.67%;
+  height: auto;
+  border-radius: 8px;
+  display: block;
+  margin: 0 auto;
+}
+
+/* 반응형: 1200px 이하에서 사이드바를 상단으로 이동 */
+@media (max-width: 1200px) {
+  .content-with-sidebar-wrapper {
+    flex-direction: column;
+  }
+  
+  .research-sidebar {
+    flex: 0 0 auto;
+    position: static;
+    max-height: none;
+    margin-bottom: 2rem;
+  }
+}
+
 /* === [교육과정 배너 전용 스타일] 폭은 .container로 자동 일치 === */
 #edu-courses .edu-banner-list{
   display: grid;
@@ -770,6 +906,11 @@
 </div>
 </div>
 </header>
+<!-- 레이아웃 래퍼 시작 (사이드바 + 메인 콘텐츠) -->
+<div class="content-with-sidebar-wrapper">
+<!-- 메인 콘텐츠 영역 시작 -->
+<div class="main-content-area">
+
 <!-- 프리미엄 채용정보: 4개 카드 한 줄 -->
 <section class="section section--compact" id="features">
 <div class="container">
@@ -1337,7 +1478,60 @@
 </a>
 </div>
 </div>
-</section><footer class="site-footer"><div class="container"><div class="brand">공공브레인넷</div><div class="footer-line">대표 :  | 사업자등록번호 : 123-45-67890</div><div class="footer-line">(34430) 대전광역시 대덕구 한남로70 (오정동133) 경상대학 315호실</div><div class="footer-line">통신판매업 신고번호 : 제 2025-대전의창-0000호 | 직업정보제공사업 : 대전 제 2025-0</div><div class="footer-line">청소년보호책임자 :  | 공공기관뉴스 기사배열 책임자 : </div><div class="footer-line muted">© 2025 - 현재 puconet.com 공공브레인넷. All rights reserved.</div></div></footer>
+</section>
+<!-- 메인 콘텐츠 영역 끝 -->
+</div>
+
+<!-- 오른쪽 사이드바 -->
+<aside class="research-sidebar">
+<div class="mainResearchWrapper wide">
+<div class="bannerSection research">
+<div class="bannerHeader">
+<div class="hbntitleImage">학술연구정보</div>
+<div class="btnSet"><a class="btn_subScribe" href="/order">상품신청</a></div>
+</div>
+<div class="bannerBody">
+<ul>
+<li class="bannerList index0">
+<a href="/research/researches/486/recruitments/114/recruits/3557259?listType=ING&amp;sortType=AD&amp;pagekey=3557259&amp;adId=174703"><img alt="에코프로비엠 R&amp;D 부문 산학장학생 모집" src="//asset.hibrain.io/banners/logos_thumbs/1766552595110_x2.png?v=17071120251224140315" srcset="//asset.hibrain.io/banners/logos_thumbs/1766552595110_x2.png?v=17071120251224140315 2x, //asset.hibrain.io/banners/logos_thumbs/1766552595110_x3.png?v=17071120251224140315 3x"/></a>
+</li>
+<div class="main-research-line"></div>
+<li class="bannerList index0">
+<a href="/research/researches/486/recruitments/115/recruits/3554044?listType=ING&amp;sortType=AD&amp;pagekey=3554044&amp;adId=173456"><img alt="아모레퍼시픽 2026 AI 이노베이션 챌린지 공모전" src="//asset.hibrain.io/banners/logos_thumbs/1764813620775_x2.png?v=17071120251204110020" srcset="//asset.hibrain.io/banners/logos_thumbs/1764813620775_x2.png?v=17071120251204110020 2x, //asset.hibrain.io/banners/logos_thumbs/1764813620775_x3.png?v=17071120251204110020 3x"/></a>
+</li>
+<div class="main-research-line"></div>
+<li class="bannerList index0">
+<a href="/research/researches/33/recruitments/112/recruits/3556696?listType=ING&amp;sortType=AD&amp;pagekey=3556696&amp;adId=174445"><img alt="KAIST 생명화학공학과 2026 Young Global Investigator Symposium 개최 및 발표자 모집" src="//asset.hibrain.io/banners/logos_thumbs/1766125244808_x2.png?v=17071120251219152044" srcset="//asset.hibrain.io/banners/logos_thumbs/1766125244808_x2.png?v=17071120251219152044 2x, //asset.hibrain.io/banners/logos_thumbs/1766125244808_x3.png?v=17071120251219152044 3x"/></a>
+</li>
+<li class="bannerList index1">
+<a href="/research/researches/34/recruitments/108/recruits/3554471?listType=ING&amp;sortType=AD&amp;pagekey=3554471&amp;adId=173607"><img alt="비스타그래픽스 저널커버&amp;피규어 2D&amp;3D 그래픽제작" src="//asset.hibrain.io/banners/logos_thumbs/1764915686341_x2.png?v=17071120251205152126" srcset="//asset.hibrain.io/banners/logos_thumbs/1764915686341_x2.png?v=17071120251205152126 2x, //asset.hibrain.io/banners/logos_thumbs/1764915686341_x3.png?v=17071120251205152126 3x"/></a>
+</li>
+<div class="main-research-line"></div>
+<div class="hbn-row-image small-bottom">
+<a href="/order">
+<img alt="하이브레인넷" onerror="this.style.display='none';" src="https://asset.hibrain.io/images/dist/button/mainHibrainnetBanner-240731_x2.png?v=1.50.5" srcset="https://asset.hibrain.io/images/dist/button/mainHibrainnetBanner-240731.png?v=1.50.5 1x, https://asset.hibrain.io/images/dist/button/mainHibrainnetBanner-240731_x2.png?v=1.50.5 2x, https://asset.hibrain.io/images/dist/button/mainHibrainnetBanner-240731_x3.png?v=1.50.5 3x"/>
+</a>
+</div>
+<div class="hbn-row-image small-bottom">
+<a href="https://www.higrad.net/" target="_blank">
+<img alt="하이그래드넷" onerror="this.style.display='none';" src="https://asset.hibrain.io/images/dist/button/mainHigradnetBanner-241106_x2.png?v=1.50.5" srcset="https://asset.hibrain.io/images/dist/button/mainHigradnetBanner-241106.png?v=1.50.5 1x, https://asset.hibrain.io/images/dist/button/mainHigradnetBanner-241106_x2.png?v=1.50.5 2x, https://asset.hibrain.io/images/dist/button/mainHigradnetBanner-241106_x3.png?v=1.50.5 3x"/>
+</a>
+</div>
+<div class="hbn-row-image">
+<a href="https://global.hibrain.net/" target="_blank">
+<img alt="글로벌 하이브레인넷" onerror="this.style.display='none';" src="https://asset.hibrain.io/images/dist/button/mainGlobalBanner-240731_x2.png?v=1.50.5" srcset="https://asset.hibrain.io/images/dist/button/mainGlobalBanner-240731.png?v=1.50.5 1x, https://asset.hibrain.io/images/dist/button/mainGlobalBanner-240731_x2.png?v=1.50.5 2x, https://asset.hibrain.io/images/dist/button/mainGlobalBanner-240731_x3.png?v=1.50.5 3x"/>
+</a>
+</div>
+</ul>
+</div>
+</div>
+</div>
+</aside>
+
+<!-- 레이아웃 래퍼 끝 -->
+</div>
+
+<footer class="site-footer"><div class="container"><div class="brand">공공브레인넷</div><div class="footer-line">대표 :  | 사업자등록번호 : 123-45-67890</div><div class="footer-line">(34430) 대전광역시 대덕구 한남로70 (오정동133) 경상대학 315호실</div><div class="footer-line">통신판매업 신고번호 : 제 2025-대전의창-0000호 | 직업정보제공사업 : 대전 제 2025-0</div><div class="footer-line">청소년보호책임자 :  | 공공기관뉴스 기사배열 책임자 : </div><div class="footer-line muted">© 2025 - 현재 puconet.com 공공브레인넷. All rights reserved.</div></div></footer>
 <section class="section" id="login" style="padding:2rem 0;"></section>
 <section class="section" id="signup" style="padding:2rem 0;"></section>
 <section class="section" id="service-intro" style="padding:2rem 0;"></section>
