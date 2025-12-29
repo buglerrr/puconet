@@ -207,7 +207,7 @@
 
         /* === Global Top Navigation (non-sticky) === */
         .global-nav{
-          background:#0f172a; /* slate-900 */
+          background:transparent; /* slate-900 */
           color:#fff;
           font-size:14px;
         }
@@ -215,7 +215,11 @@
           display:flex;
           justify-content:flex-end;
           align-items:center;
-          padding: .4rem 20px;
+          padding: .4rem 100px .4rem 20px;
+          background:#0f172a;     /* 검은 바를 컨테이너에만 */
+          max-width: 1300px;      /* 본문(프리미엄+사이드바) 폭과 맞춤 */
+          margin: 0 auto;         /* 가운데 정렬 */
+
         }
         .global-nav-links{
           list-style:none;
@@ -260,7 +264,7 @@
 
     
         /* === Spacing adjustments (v6) === */
-        .section--compact{ padding: 2.666rem 0; }         /* ~2/3 of typical 4rem */
+        .section--compact{ padding: 1.2rem 0 2.666rem; }  /* 위(top)만 줄이고 아래(bottom)는 유지 */
         .section--tight-top{ padding-top: 1.25rem; }      /* bring 'latest' closer to 'premium' */
         .job-grid--premium .banner-image{ height: 40px; } /* shorter premium banner visuals */
         .job-grid--premium .job-card{ padding: .66rem 1rem .75rem; }
@@ -679,18 +683,18 @@
   border-radius: 0;
   overflow: hidden;
   box-shadow: none;
-  padding-top: 2.666rem;
+  padding-top: 1rem;
 }
 
 .bannerSection {
-  padding: 0 0.3rem 1rem 1rem;
+  padding: 0 0.3rem 1rem 0;
 }
 
 .bannerHeader {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.1rem;
 }
 
 .hbntitleImage {
