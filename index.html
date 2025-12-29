@@ -38,7 +38,7 @@
             display: flex;
             justify-content: flex-start;
             align-items: flex-end;
-            padding: 1rem 0;
+            padding: 0.1rem 0; /*로그인 등 메뉴와 헤더 사이의 간격 줄이기 */
             gap: 3rem;  /*'채용정보 등' 배너의 위치 조정(오른쪽으로) */
         }
 
@@ -209,14 +209,14 @@
         .global-nav{
           background:transparent; /* slate-900 */
           color:#fff;
-          font-size:14px;
+          font-size:17px;
         }
         .global-nav .container{
           display:flex;
           justify-content:flex-end;
           align-items:center;
           padding: .4rem 100px .4rem 20px;
-          background:#0f172a;     /* 검은 바를 컨테이너에만 */
+          background: transparent;     /* 검은 바를 컨테이너에만 */
           max-width: 1300px;      /* 본문(프리미엄+사이드바) 폭과 맞춤 */
           margin: 0 auto;         /* 가운데 정렬 */
 
@@ -227,7 +227,7 @@
           gap:1.25rem;
         }
         .global-nav a{
-          color:#fff;
+          color:#000000;
           text-decoration:none;
           opacity:.9;
           transition:opacity .2s ease;
@@ -238,6 +238,7 @@
           padding:.35rem .75rem;
           border-radius:999px;
           font-weight:600;
+          color:#fff !important;  /* 이 줄 추가 - 흰색 글자 */
         }
         @media (max-width:768px){
           .global-nav .container{ justify-content:center; }
