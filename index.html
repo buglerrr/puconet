@@ -38,7 +38,7 @@
             display: flex;
             justify-content: flex-start;
             align-items: flex-end;
-            padding: 0.1rem 0; /*로그인 등 메뉴와 헤더 사이의 간격 줄이기 */
+            padding: 1rem 0;
             gap: 3rem;  /*'채용정보 등' 배너의 위치 조정(오른쪽으로) */
         }
 
@@ -209,14 +209,14 @@
         .global-nav{
           background:transparent; /* slate-900 */
           color:#fff;
-          font-size:17px;
+          font-size:14px;
         }
         .global-nav .container{
           display:flex;
           justify-content:flex-end;
           align-items:center;
           padding: .4rem 100px .4rem 20px;
-          background: transparent;     /* 검은 바를 컨테이너에만 */
+          background:#0f172a;     /* 검은 바를 컨테이너에만 */
           max-width: 1300px;      /* 본문(프리미엄+사이드바) 폭과 맞춤 */
           margin: 0 auto;         /* 가운데 정렬 */
 
@@ -227,7 +227,7 @@
           gap:1.25rem;
         }
         .global-nav a{
-          color:#000000;
+          color:#fff;
           text-decoration:none;
           opacity:.9;
           transition:opacity .2s ease;
@@ -238,7 +238,6 @@
           padding:.35rem .75rem;
           border-radius:999px;
           font-weight:600;
-          color:#fff !important;  /* 이 줄 추가 - 흰색 글자 */
         }
         @media (max-width:768px){
           .global-nav .container{ justify-content:center; }
@@ -517,11 +516,11 @@
         .site-footer .container{ padding-top: 0 !important; }
 
         /* === v18: precise left alignment of footer to banner start === */
-        .site-footer{ margin-top: .25rem !important; padding-top: .25rem !important; }
+        .site-footer{ margin-top: .25rem !important; padding: .25rem 0 !important; }
         .site-footer .container{
-          max-width: 1200px !important;
+          max-width: 1400px !important;
           margin: 0 auto !important;
-          padding: 0 20px !important;   /* match the primary .container padding */
+          padding: 0 40px !important;   /* match the primary .container padding */
           text-align: left !important;
         }
 
@@ -1184,122 +1183,10 @@
 
 </div>
 </section>
-<!-- [요청 반영] 공공기관 임직원 교육과정 (폭 일치 + 3열 + 높이 2배) -->
-<section class="section section--tight-top" id="edu-courses" >
-  <div class="container">
-    <h2 class="section-title" style="color:#5c7cfa;">공공기관 임직원 교육과정 <span class="apply">상품신청&gt;</span> </h2>
-
-    <div class="edu-banner-list">
-      <!-- 배너 1 -->
-      <a class="edu-banner" href="#" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://www.maip.kr/data/editor/2509/38ef0815bfbceb5bab9b4b79c6e0224a_1758868464_5928.jpg" alt="교육과정 1 썸네일">
-        </div>
-        <div class="meta">
-          <h3>디지털 혁신과 공공 리더십</h3>
-          <p>주관: K 공공교육원 · 11/04(월)~11/06(수)</p>
-        </div>
-      </a>
-
-      <!-- 배너 2 -->
-      <a class="edu-banner" href="#" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://www.maip.kr/data/editor/2509/8f64df29ed2ac16f7d5bb85f8135bfaf_1757318289_4353.jpg" alt="교육과정 2 썸네일">
-        </div>
-        <div class="meta">
-          <h3>ESG 경영 실무(공공기관 특화)</h3>
-          <p>주관: G 리서치 · 10/28(화)~10/29(수)</p>
-        </div>
-      </a>
-
-      <!-- 배너 3 -->
-      <a class="edu-banner" href="#" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://www.maip.kr/data/editor/2509/8f64df29ed2ac16f7d5bb85f8135bfaf_1757318387_9057.jpg" alt="교육과정 3 썸네일">
-        </div>
-        <div class="meta">
-          <h3>조달·계약 컴플라이언스 집중</h3>
-          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
-        </div>
-      </a>
-
-      <!-- 배너 4 -->
-      <a class="edu-banner" href="#" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://www.maip.kr/data/editor/2509/b86764943d17014c464ed47aecfad800_1757666722_5722.jpg" alt="교육과정 3 썸네일">
-        </div>
-        <div class="meta">
-          <h3>조달·계약 컴플라이언스 집중</h3>
-          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
-        </div>
-      </a>
-
-      <!-- 배너 5 -->
-      <a class="edu-banner" href="#" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://www.maip.kr/data/editor/2509/38ef0815bfbceb5bab9b4b79c6e0224a_1758870913_8889.jpg" alt="교육과정 3 썸네일">
-        </div>
-        <div class="meta">
-          <h3>조달·계약 컴플라이언스 집중</h3>
-          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
-        </div>
-      </a>
-
-      <!-- 배너 6 -->
-      <a class="edu-banner" href="#" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://www.maip.kr/data/editor/2509/97d4a2481f17c2a7a3beec14aeac362c_1758248304_772.jpg" alt="교육과정 3 썸네일">
-        </div>
-        <div class="meta">
-          <h3>조달·계약 컴플라이언스 집중</h3>
-          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
-        </div>
-      </a>
-      
-     <!-- 배너 7 -->
-      <a class="edu-banner" href="#" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://www.maip.kr/data/editor/2509/38ef0815bfbceb5bab9b4b79c6e0224a_1758870949_5722.jpg" alt="교육과정 3 썸네일">
-        </div>
-        <div class="meta">
-          <h3>조달·계약 컴플라이언스 집중</h3>
-          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
-        </div>
-      </a>
-
-      <!-- 배너 8 -->
-      <a class="edu-banner" href="#" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://www.maip.kr/data/editor/2509/38ef0815bfbceb5bab9b4b79c6e0224a_1758870975_5712.jpg" alt="교육과정 3 썸네일">
-        </div>
-        <div class="meta">
-          <h3>조달·계약 컴플라이언스 집중</h3>
-          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
-        </div>
-      </a>
-
-      <!-- 배너 9 -->
-      <a class="edu-banner" href="#" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://www.maip.kr/data/editor/2509/38ef0815bfbceb5bab9b4b79c6e0224a_1758871148_1617.jpg" alt="교육과정 3 썸네일">
-        </div>
-        <div class="meta">
-          <h3>조달·계약 컴플라이언스 집중</h3>
-          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
-        </div>
-      </a>
-
-      <!-- 필요 시 더 추가 -->
-      <!-- 배너 4~6 ... 동일한 형식으로 복사/붙여넣기 -->
-    </div>
-  </div>
-</section>
-
-
 
 <section class="section section--tight-top" id="general-jobs" style="background: white;">
 <div class="container">
-<h2 class="section-title" style="color:#5c7cfa;">주요 채용정보 <span class="apply">상품신청&gt;</span></h2>
+<h2 class="section-title" style="color:#5c7cfa;">공공기관 임직원 교육과정 <span class="apply">상품신청&gt;</span></h2>
 <div class="job-grid">
 <a aria-label="한국항로표지기술원 채용공고 상세로 이동" class="job-card" data-job="g1" data-url="" href="javascript:void(0)" role="button">
 <img alt="기관 1" class="banner-image" src="./logo.png"/>
@@ -1504,6 +1391,122 @@
 </div>
 </div>
 </section>
+
+
+<!-- [요청 반영] 공공기관 임직원 교육과정 (폭 일치 + 3열 + 높이 2배) -->
+<section class="section section--tight-top" id="edu-courses" >
+  <div class="container">
+    <h2 class="section-title" style="color:#5c7cfa;">공공기관 임직원 교육과정 <span class="apply">상품신청&gt;</span> </h2>
+
+    <div class="edu-banner-list">
+      <!-- 배너 1 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="https://www.maip.kr/data/editor/2509/38ef0815bfbceb5bab9b4b79c6e0224a_1758868464_5928.jpg" alt="교육과정 1 썸네일">
+        </div>
+        <div class="meta">
+          <h3>디지털 혁신과 공공 리더십</h3>
+          <p>주관: K 공공교육원 · 11/04(월)~11/06(수)</p>
+        </div>
+      </a>
+
+      <!-- 배너 2 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="https://www.maip.kr/data/editor/2509/8f64df29ed2ac16f7d5bb85f8135bfaf_1757318289_4353.jpg" alt="교육과정 2 썸네일">
+        </div>
+        <div class="meta">
+          <h3>ESG 경영 실무(공공기관 특화)</h3>
+          <p>주관: G 리서치 · 10/28(화)~10/29(수)</p>
+        </div>
+      </a>
+
+      <!-- 배너 3 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="https://www.maip.kr/data/editor/2509/8f64df29ed2ac16f7d5bb85f8135bfaf_1757318387_9057.jpg" alt="교육과정 3 썸네일">
+        </div>
+        <div class="meta">
+          <h3>조달·계약 컴플라이언스 집중</h3>
+          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
+        </div>
+      </a>
+
+      <!-- 배너 4 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="https://www.maip.kr/data/editor/2509/b86764943d17014c464ed47aecfad800_1757666722_5722.jpg" alt="교육과정 3 썸네일">
+        </div>
+        <div class="meta">
+          <h3>조달·계약 컴플라이언스 집중</h3>
+          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
+        </div>
+      </a>
+
+      <!-- 배너 5 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="https://www.maip.kr/data/editor/2509/38ef0815bfbceb5bab9b4b79c6e0224a_1758870913_8889.jpg" alt="교육과정 3 썸네일">
+        </div>
+        <div class="meta">
+          <h3>조달·계약 컴플라이언스 집중</h3>
+          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
+        </div>
+      </a>
+
+      <!-- 배너 6 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="https://www.maip.kr/data/editor/2509/97d4a2481f17c2a7a3beec14aeac362c_1758248304_772.jpg" alt="교육과정 3 썸네일">
+        </div>
+        <div class="meta">
+          <h3>조달·계약 컴플라이언스 집중</h3>
+          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
+        </div>
+      </a>
+      
+     <!-- 배너 7 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="https://www.maip.kr/data/editor/2509/38ef0815bfbceb5bab9b4b79c6e0224a_1758870949_5722.jpg" alt="교육과정 3 썸네일">
+        </div>
+        <div class="meta">
+          <h3>조달·계약 컴플라이언스 집중</h3>
+          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
+        </div>
+      </a>
+
+      <!-- 배너 8 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="https://www.maip.kr/data/editor/2509/38ef0815bfbceb5bab9b4b79c6e0224a_1758870975_5712.jpg" alt="교육과정 3 썸네일">
+        </div>
+        <div class="meta">
+          <h3>조달·계약 컴플라이언스 집중</h3>
+          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
+        </div>
+      </a>
+
+      <!-- 배너 9 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="https://www.maip.kr/data/editor/2509/38ef0815bfbceb5bab9b4b79c6e0224a_1758871148_1617.jpg" alt="교육과정 3 썸네일">
+        </div>
+        <div class="meta">
+          <h3>조달·계약 컴플라이언스 집중</h3>
+          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
+        </div>
+      </a>
+
+      <!-- 필요 시 더 추가 -->
+      <!-- 배너 4~6 ... 동일한 형식으로 복사/붙여넣기 -->
+    </div>
+  </div>
+</section>
+
+
+
+
 <!-- 메인 콘텐츠 영역 끝 -->
 </div>
 
