@@ -20,7 +20,7 @@
         }
 
         .container {
-            max-width: 1350px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 0 20px;
         }
@@ -36,10 +36,9 @@
 
         .header-content {
             display: flex;
-            justify-content: flex-start;
-            align-items: flex-end;
-            padding: 0.1rem 0; /*로그인 등 메뉴와 헤더 사이의 간격 줄이기 */
-            gap: 3rem;  /*'채용정보 등' 배너의 위치 조정(오른쪽으로) */
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
         }
 
         .logo {
@@ -64,7 +63,6 @@
             display: flex;
             list-style: none;
             gap: 2rem;
-            margin-left: 2rem;
         }
 
         nav a {
@@ -204,22 +202,26 @@
             text-align: center;
             padding: 2rem 0;
         }
+        
+        /* 푸터 왼쪽 정렬 */
+        .site-footer .container {
+            max-width: 1750px !important;
+            margin: 0 auto !important;
+            padding: 0 20px !important;
+            text-align: left !important;
+        }
 
         /* === Global Top Navigation (non-sticky) === */
         .global-nav{
-          background:transparent; /* slate-900 */
+          background:#0f172a; /* slate-900 */
           color:#fff;
-          font-size:17px;
+          font-size:14px;
         }
         .global-nav .container{
           display:flex;
           justify-content:flex-end;
           align-items:center;
-          padding: .4rem 100px .4rem 20px;
-          background: transparent;     /* 검은 바를 컨테이너에만 */
-          max-width: 1300px;      /* 본문(프리미엄+사이드바) 폭과 맞춤 */
-          margin: 0 auto;         /* 가운데 정렬 */
-
+          padding: .4rem 20px;
         }
         .global-nav-links{
           list-style:none;
@@ -227,7 +229,7 @@
           gap:1.25rem;
         }
         .global-nav a{
-          color:#000000;
+          color:#fff;
           text-decoration:none;
           opacity:.9;
           transition:opacity .2s ease;
@@ -238,7 +240,6 @@
           padding:.35rem .75rem;
           border-radius:999px;
           font-weight:600;
-          color:#fff !important;  /* 이 줄 추가 - 흰색 글자 */
         }
         @media (max-width:768px){
           .global-nav .container{ justify-content:center; }
@@ -265,7 +266,7 @@
 
     
         /* === Spacing adjustments (v6) === */
-        .section--compact{ padding: 1.2rem 0 2.666rem; }  /* 위(top)만 줄이고 아래(bottom)는 유지 */
+        .section--compact{ padding: 2.666rem 0; }         /* ~2/3 of typical 4rem */
         .section--tight-top{ padding-top: 1.25rem; }      /* bring 'latest' closer to 'premium' */
         .job-grid--premium .banner-image{ height: 40px; } /* shorter premium banner visuals */
         .job-grid--premium .job-card{ padding: .66rem 1rem .75rem; }
@@ -659,11 +660,99 @@
 /* Premium section background: keep white and add subtle separation only via spacing */
 #features{ background:#ffffff !important; }
 
-/* === 사이드바 레이아웃 스타일 === */
+/* === [교육과정 배너 전용 스타일] 폭은 .container로 자동 일치 === */
+#edu-courses .edu-banner-list{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)); /* 한 줄 3개 */
+  gap: 20px;                                        /* 위 배너들과 동일 간격 */
+  width: 100%;
+}
+
+#edu-courses .edu-banner{
+  width: 100%;               /* 칼럼 폭 100% (폭 어긋남 방지) */
+  height: 360px;             /* 기존 대비 약 2배 (필요시 320~400px 조정) */
+  display: flex; flex-direction: column;
+  border-radius: 16px; overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0,0,0,.08);
+  transition: transform .12s ease;
+}
+#edu-courses .edu-banner:hover{ transform: translateY(-2px); }
+
+#edu-courses .edu-banner .thumb{ flex: 1 0 auto; background: #f1f3f5; }
+#edu-courses .edu-banner .thumb img{ width: 100%; height: 100%; object-fit: cover; }
+
+#edu-courses .edu-banner .meta{ padding: 12px 14px; }
+#edu-courses .edu-banner .meta h3{ font-size: 16px; line-height: 1.35; margin-bottom: 6px; font-weight: 700; }
+#edu-courses .edu-banner .meta p{ font-size: 13px; color: #666; }
+
+/* 반응형: 3 → 2 → 1열 */
+@media (max-width: 1024px){
+  #edu-courses .edu-banner-list{ grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px){
+  #edu-courses .edu-banner-list{ grid-template-columns: 1fr; }
+}
+
+
+
+
+</style>
+<style id="jobcard-fixed-size-style">
+/* 주입: job-card 고정 크기 */
+#jobs .job-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap:16px;
+}
+#jobs .job-card{
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  align-items:stretch;
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+  padding:12px;
+  box-sizing:border-box;
+  width:100%;
+  max-width:100%;
+  height:200px;              /* 전체 카드 높이 고정 / 추천 채용정보 (수정) 배너(카드) 높이 줄이기 px부분 숫자 수정 */
+  overflow:hidden;           /* 넘침 방지 */
+  background:#ffffff;
+  text-decoration:none;
+}
+#jobs .job-card .banner-image{
+  width:100%;
+  height:64px;               /* 로고 박스 고정 */
+  object-fit:contain;
+  object-position:center;
+  display:block;
+}
+#jobs .job-card h3{
+  font-size:16px;
+  line-height:1.3;
+  margin:8px 0 4px;
+  display:-webkit-box;
+  -webkit-line-clamp:2;      /* 제목 2줄 고정 */
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+#jobs .job-card p{
+  margin:0 0 4px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;    /* 한 줄 자르기 */
+  font-size: .95rem; /* 추천 채용정보 '정규직' 부분 크기 키우기 숫자 수정 */
+}
+#jobs .job-card .meta{
+  margin-top:auto;           /* 하단 정렬 */
+}
+
+/* 레이아웃: 사이드바 + 메인 콘텐츠 */
 .content-with-sidebar-wrapper {
   display: flex;
-  gap: 1rem;
-  max-width: 1400px;
+  gap: 2rem;
+  max-width: 1750px;
   margin: 0 auto;
   padding: 0 20px;
 }
@@ -673,8 +762,14 @@
   min-width: 0;
 }
 
+/* 메인 콘텐츠 영역 내부의 container는 max-width 제한 없음 */
+.main-content-area .container {
+  max-width: none;
+  width: 100%;
+}
+
 .research-sidebar {
-  flex: 0 0 300px;
+  flex: 0 0 280px;
   align-self: flex-start;
 }
 
@@ -684,11 +779,11 @@
   border-radius: 0;
   overflow: hidden;
   box-shadow: none;
-  padding-top: 1rem;
+  padding-top: 0;
 }
 
 .bannerSection {
-  padding: 0 0.3rem 1rem 0;
+  padding: 0 0 1rem 0;
 }
 
 .bannerHeader {
@@ -748,7 +843,7 @@
 }
 
 .bannerList img {
-  width: 66.67%;
+  width: 100%;
   height: auto;
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
@@ -775,7 +870,7 @@
 }
 
 .hbn-row-image img {
-  width: 66.67%;
+  width: 100%;
   height: auto;
   border-radius: 8px;
   display: block;
@@ -795,111 +890,7 @@
     margin-bottom: 2rem;
   }
 }
-/* 프리미엄 채용정보 배너 배경색 */
-.job-grid--premium .job-card:nth-child(1) {
-  background: #e3f2fd !important;  /* 연한 하늘색 (독립기념관) */
-}
 
-.job-grid--premium .job-card:nth-child(2) {
-  background: #f3e5f5 !important;  /* 연한 보라색 (한국남부발전) */
-}
-
-.job-grid--premium .job-card:nth-child(3) {
-  background: #fff3e0 !important;  /* 연한 주황색 (세종학당재단) */
-}
-
-.job-grid--premium .job-card:nth-child(4) {
-  background: #f1f8e9 !important;  /* 연한 연두색 (국민연금공단) */
-}
-
-
-/* === [교육과정 배너 전용 스타일] 폭은 .container로 자동 일치 === */
-#edu-courses .edu-banner-list{
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr)); /* 한 줄 3개 */
-  gap: 20px;                                        /* 위 배너들과 동일 간격 */
-  width: 100%;
-}
-
-#edu-courses .edu-banner{
-  width: 100%;               /* 칼럼 폭 100% (폭 어긋남 방지) */
-  height: 360px;             /* 기존 대비 약 2배 (필요시 320~400px 조정) */
-  display: flex; flex-direction: column;
-  border-radius: 16px; overflow: hidden;
-  background: #fff;
-  box-shadow: 0 2px 10px rgba(0,0,0,.08);
-  transition: transform .12s ease;
-}
-#edu-courses .edu-banner:hover{ transform: translateY(-2px); }
-
-#edu-courses .edu-banner .thumb{ flex: 1 0 auto; background: #f1f3f5; }
-#edu-courses .edu-banner .thumb img{ width: 100%; height: 100%; object-fit: cover; }
-
-#edu-courses .edu-banner .meta{ padding: 12px 14px; }
-#edu-courses .edu-banner .meta h3{ font-size: 16px; line-height: 1.35; margin-bottom: 6px; font-weight: 700; }
-#edu-courses .edu-banner .meta p{ font-size: 13px; color: #666; }
-
-/* 반응형: 3 → 2 → 1열 */
-@media (max-width: 1024px){
-  #edu-courses .edu-banner-list{ grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 640px){
-  #edu-courses .edu-banner-list{ grid-template-columns: 1fr; }
-}
-
-
-
-
-</style>
-<style id="jobcard-fixed-size-style">
-/* 주입: job-card 고정 크기 */
-#jobs .job-grid{
-  display:grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap:16px;
-}
-#jobs .job-card{
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-start;
-  align-items:stretch;
-  border:1px solid #e5e7eb;
-  border-radius:12px;
-  padding:12px;
-  box-sizing:border-box;
-  width:100%;
-  max-width:100%;
-  height:200px;              /* 전체 카드 높이 고정 / 추천 채용정보 (수정) 배너(카드) 높이 줄이기 px부분 숫자 수정 */
-  overflow:hidden;           /* 넘침 방지 */
-  background:#ffffff;
-  text-decoration:none;
-}
-#jobs .job-card .banner-image{
-  width:100%;
-  height:64px;               /* 로고 박스 고정 */
-  object-fit:contain;
-  object-position:center;
-  display:block;
-}
-#jobs .job-card h3{
-  font-size:16px;
-  line-height:1.3;
-  margin:8px 0 4px;
-  display:-webkit-box;
-  -webkit-line-clamp:2;      /* 제목 2줄 고정 */
-  -webkit-box-orient:vertical;
-  overflow:hidden;
-}
-#jobs .job-card p{
-  margin:0 0 4px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;    /* 한 줄 자르기 */
-  font-size: .95rem; /* 추천 채용정보 '정규직' 부분 크기 키우기 숫자 수정 */
-}
-#jobs .job-card .meta{
-  margin-top:auto;           /* 하단 정렬 */
-}
 </style></head>
 <body>
 <!-- 상단 글로벌 네비게이션 -->
@@ -925,7 +916,7 @@
 <nav>
 <button aria-label="메뉴 열기" class="menu-toggle" type="button">메뉴</button>
 <div class="nav-links">
-<a href="#">채용정보</a><a href="board.html">공공게시판</a><a href="#">공공기관 뉴스</a><a href="#">공모전 소식</a><a href="#">취업 이야기</a><a href="#">마이메뉴</a>
+<a href="#">채용정보</a><a href="board.html">게시판</a><a href="#">공공기관 뉴스</a><a href="#">공모전 소식</a><a href="#">취업 이야기</a><a href="#">마이메뉴</a>
 </div>
 </nav>
 </div>
@@ -1184,116 +1175,6 @@
 
 </div>
 </section>
-<!-- [요청 반영] 공공기관 임직원 교육과정 (폭 일치 + 3열 + 높이 2배) -->
-<section class="section section--tight-top" id="edu-courses" >
-  <div class="container">
-    <h2 class="section-title" style="color:#5c7cfa;">공공기관 임직원 교육과정 <span class="apply">상품신청&gt;</span> </h2>
-
-    <div class="edu-banner-list">
-      <!-- 배너 1 -->
-      <a class="edu-banner" href="#" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://www.maip.kr/data/editor/2509/38ef0815bfbceb5bab9b4b79c6e0224a_1758868464_5928.jpg" alt="교육과정 1 썸네일">
-        </div>
-        <div class="meta">
-          <h3>디지털 혁신과 공공 리더십</h3>
-          <p>주관: K 공공교육원 · 11/04(월)~11/06(수)</p>
-        </div>
-      </a>
-
-      <!-- 배너 2 -->
-      <a class="edu-banner" href="#" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://www.maip.kr/data/editor/2509/8f64df29ed2ac16f7d5bb85f8135bfaf_1757318289_4353.jpg" alt="교육과정 2 썸네일">
-        </div>
-        <div class="meta">
-          <h3>ESG 경영 실무(공공기관 특화)</h3>
-          <p>주관: G 리서치 · 10/28(화)~10/29(수)</p>
-        </div>
-      </a>
-
-      <!-- 배너 3 -->
-      <a class="edu-banner" href="#" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://www.maip.kr/data/editor/2509/8f64df29ed2ac16f7d5bb85f8135bfaf_1757318387_9057.jpg" alt="교육과정 3 썸네일">
-        </div>
-        <div class="meta">
-          <h3>조달·계약 컴플라이언스 집중</h3>
-          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
-        </div>
-      </a>
-
-      <!-- 배너 4 -->
-      <a class="edu-banner" href="#" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://www.maip.kr/data/editor/2509/b86764943d17014c464ed47aecfad800_1757666722_5722.jpg" alt="교육과정 3 썸네일">
-        </div>
-        <div class="meta">
-          <h3>조달·계약 컴플라이언스 집중</h3>
-          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
-        </div>
-      </a>
-
-      <!-- 배너 5 -->
-      <a class="edu-banner" href="#" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://www.maip.kr/data/editor/2509/38ef0815bfbceb5bab9b4b79c6e0224a_1758870913_8889.jpg" alt="교육과정 3 썸네일">
-        </div>
-        <div class="meta">
-          <h3>조달·계약 컴플라이언스 집중</h3>
-          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
-        </div>
-      </a>
-
-      <!-- 배너 6 -->
-      <a class="edu-banner" href="#" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://www.maip.kr/data/editor/2509/97d4a2481f17c2a7a3beec14aeac362c_1758248304_772.jpg" alt="교육과정 3 썸네일">
-        </div>
-        <div class="meta">
-          <h3>조달·계약 컴플라이언스 집중</h3>
-          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
-        </div>
-      </a>
-      
-     <!-- 배너 7 -->
-      <a class="edu-banner" href="#" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://www.maip.kr/data/editor/2509/38ef0815bfbceb5bab9b4b79c6e0224a_1758870949_5722.jpg" alt="교육과정 3 썸네일">
-        </div>
-        <div class="meta">
-          <h3>조달·계약 컴플라이언스 집중</h3>
-          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
-        </div>
-      </a>
-
-      <!-- 배너 8 -->
-      <a class="edu-banner" href="#" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://www.maip.kr/data/editor/2509/38ef0815bfbceb5bab9b4b79c6e0224a_1758870975_5712.jpg" alt="교육과정 3 썸네일">
-        </div>
-        <div class="meta">
-          <h3>조달·계약 컴플라이언스 집중</h3>
-          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
-        </div>
-      </a>
-
-      <!-- 배너 9 -->
-      <a class="edu-banner" href="#" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://www.maip.kr/data/editor/2509/38ef0815bfbceb5bab9b4b79c6e0224a_1758871148_1617.jpg" alt="교육과정 3 썸네일">
-        </div>
-        <div class="meta">
-          <h3>조달·계약 컴플라이언스 집중</h3>
-          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
-        </div>
-      </a>
-
-      <!-- 필요 시 더 추가 -->
-      <!-- 배너 4~6 ... 동일한 형식으로 복사/붙여넣기 -->
-    </div>
-  </div>
-</section>
 
 
 
@@ -1504,8 +1385,121 @@
 </div>
 </div>
 </section>
+
+
+<!-- [요청 반영] 공공기관 임직원 교육과정 (폭 일치 + 3열 + 높이 2배) -->
+<section class="section section--tight-top" id="edu-courses" >
+  <div class="container">
+    <h2 class="section-title" style="color:#5c7cfa;">공공기관 임직원 교육과정 <span class="apply">상품신청&gt;</span> </h2>
+
+    <div class="edu-banner-list">
+      <!-- 배너 1 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="https://www.maip.kr/data/editor/2509/38ef0815bfbceb5bab9b4b79c6e0224a_1758868464_5928.jpg" alt="교육과정 1 썸네일">
+        </div>
+        <div class="meta">
+          <h3>디지털 혁신과 공공 리더십</h3>
+          <p>주관: K 공공교육원 · 11/04(월)~11/06(수)</p>
+        </div>
+      </a>
+
+      <!-- 배너 2 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="https://www.maip.kr/data/editor/2509/8f64df29ed2ac16f7d5bb85f8135bfaf_1757318289_4353.jpg" alt="교육과정 2 썸네일">
+        </div>
+        <div class="meta">
+          <h3>ESG 경영 실무(공공기관 특화)</h3>
+          <p>주관: G 리서치 · 10/28(화)~10/29(수)</p>
+        </div>
+      </a>
+
+      <!-- 배너 3 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="https://www.maip.kr/data/editor/2509/8f64df29ed2ac16f7d5bb85f8135bfaf_1757318387_9057.jpg" alt="교육과정 3 썸네일">
+        </div>
+        <div class="meta">
+          <h3>조달·계약 컴플라이언스 집중</h3>
+          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
+        </div>
+      </a>
+
+      <!-- 배너 4 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="https://www.maip.kr/data/editor/2509/b86764943d17014c464ed47aecfad800_1757666722_5722.jpg" alt="교육과정 3 썸네일">
+        </div>
+        <div class="meta">
+          <h3>조달·계약 컴플라이언스 집중</h3>
+          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
+        </div>
+      </a>
+
+      <!-- 배너 5 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="https://www.maip.kr/data/editor/2509/38ef0815bfbceb5bab9b4b79c6e0224a_1758870913_8889.jpg" alt="교육과정 3 썸네일">
+        </div>
+        <div class="meta">
+          <h3>조달·계약 컴플라이언스 집중</h3>
+          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
+        </div>
+      </a>
+
+      <!-- 배너 6 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="https://www.maip.kr/data/editor/2509/97d4a2481f17c2a7a3beec14aeac362c_1758248304_772.jpg" alt="교육과정 3 썸네일">
+        </div>
+        <div class="meta">
+          <h3>조달·계약 컴플라이언스 집중</h3>
+          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
+        </div>
+      </a>
+      
+     <!-- 배너 7 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="https://www.maip.kr/data/editor/2509/38ef0815bfbceb5bab9b4b79c6e0224a_1758870949_5722.jpg" alt="교육과정 3 썸네일">
+        </div>
+        <div class="meta">
+          <h3>조달·계약 컴플라이언스 집중</h3>
+          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
+        </div>
+      </a>
+
+      <!-- 배너 8 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="https://www.maip.kr/data/editor/2509/38ef0815bfbceb5bab9b4b79c6e0224a_1758870975_5712.jpg" alt="교육과정 3 썸네일">
+        </div>
+        <div class="meta">
+          <h3>조달·계약 컴플라이언스 집중</h3>
+          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
+        </div>
+      </a>
+
+      <!-- 배너 9 -->
+      <a class="edu-banner" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img src="https://www.maip.kr/data/editor/2509/38ef0815bfbceb5bab9b4b79c6e0224a_1758871148_1617.jpg" alt="교육과정 3 썸네일">
+        </div>
+        <div class="meta">
+          <h3>조달·계약 컴플라이언스 집중</h3>
+          <p>주관: P 컨설팅 · 11/12(화)~11/13(수)</p>
+        </div>
+      </a>
+
+      <!-- 필요 시 더 추가 -->
+      <!-- 배너 4~6 ... 동일한 형식으로 복사/붙여넣기 -->
+    </div>
+  </div>
+</section>
 <!-- 메인 콘텐츠 영역 끝 -->
 </div>
+
 
 <!-- 오른쪽 사이드바 -->
 <aside class="research-sidebar">
