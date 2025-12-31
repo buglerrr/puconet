@@ -4,7 +4,7 @@
 
 <head>
   <meta charset="utf-8" />
-  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <meta content="width=1520" name="viewport" />
   <title>브레인넷 - 공기업 취업 플랫폼</title>
   <style>
     * {
@@ -18,11 +18,13 @@
       line-height: 1.6;
       color: #333;
       background-color: #ffffff;
-
+      min-width: 1520px;
+      /* 고정 너비 설정 */
     }
 
     .container {
-      max-width: 1350px;
+      width: 1480px;
+      /* max-width -> width 로 변경하여 완전 고정 */
       margin: 0 auto;
       padding: 0 20px;
     }
@@ -723,11 +725,7 @@
     }
 
     /* If footer needs same left start as content, use .container wrapper */
-    .site-footer .container {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
+
 
     /* Navigation spacing (keep as is from v13 unless overridden elsewhere) */
     header nav a {
@@ -750,12 +748,7 @@
       padding-top: .75rem !important;
     }
 
-    .site-footer .container {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 0 24px;
-      text-align: left;
-    }
+
 
     /* === v16: Footer should sit directly under #general-jobs === */
     body {
@@ -823,10 +816,11 @@
     }
 
     .site-footer .container {
-      max-width: 1400px !important;
+      max-width: 1480px !important;
+      /* Global container width */
       margin: 0 auto !important;
-      padding: 0 40px !important;
-      /* match the primary .container padding */
+      padding: 0 20px !important;
+      /* Global container padding */
       text-align: left !important;
     }
 
@@ -909,6 +903,7 @@
       gap: 1rem !important;
     }
 
+    /*
     @media (max-width: 1024px) {
       #features .job-grid.job-grid--premium {
         grid-template-columns: repeat(3, 1fr) !important;
@@ -926,10 +921,12 @@
         grid-template-columns: 1fr !important;
       }
     }
+    */
 
 
     /* === v22 mobile fixes === */
     /* More conservative breakpoints for grids to avoid cramped cards */
+    /*
     @media (max-width: 1100px) {
       .job-grid {
         grid-template-columns: repeat(3, 1fr);
@@ -947,6 +944,7 @@
         grid-template-columns: 1fr;
       }
     }
+    */
 
     /* Improve mobile readability: restore legible sizes */
     @media (max-width: 560px) {
@@ -1583,6 +1581,58 @@
       margin-bottom: 1rem;
     }
 
+    /* === 레이아웃 정렬 수정 (Header - Main - Footer 수직선 맞춤) === */
+    .content-with-sidebar-wrapper {
+      display: flex;
+      max-width: 1480px;
+      /* 헤더 .container와 동일한 폭 */
+      margin: 0 auto;
+      padding: 0 20px;
+      gap: 30px;
+      /* 본문과 사이드바 사이 간격 */
+      align-items: flex-start;
+    }
+
+    .main-content-area {
+      flex: 1;
+      /* 남은 공간 모두 차지 */
+      min-width: 0;
+      /* Flexbox 넘침 방지 */
+    }
+
+    /* 본문 내부의 .container는 래퍼의 규칙을 따르도록 초기화 */
+    .main-content-area .container {
+      max-width: 100% !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    .research-sidebar {
+      width: 320px;
+      /* 사이드바 고정 너비 */
+      flex-shrink: 0;
+    }
+
+    /* 반응형: 비활성화 (고정 레이아웃) */
+    /*
+    @media (max-width: 1024px) {
+      .content-with-sidebar-wrapper {
+        flex-direction: column;
+      }
+      .research-sidebar {
+        width: 100%;
+        margin-top: 2rem;
+      }
+    }
+    */
+
+    /* === 상단 글로벌 네비게이션 정렬 (오른쪽 정렬) === */
+    .global-nav .container {
+      display: flex;
+      justify-content: flex-end;
+      /* 오른쪽 끝으로 정렬 */
+    }
+
     /* 반응형 */
     @media (max-width: 768px) {
       .board-table {
@@ -1607,8 +1657,9 @@
   <div class="global-nav">
     <div class="container">
       <ul class="global-nav-links">
-        <li><a href="#login">로그인</a></li>
-        <li><a href="#signup">회원가입</a></li>
+        <li><a href="#" onclick="openLoginModal(); return false;" id="nav-login">로그인</a></li>
+        <li><a href="#" onclick="openSignupModal(); return false;" id="nav-signup">회원가입</a></li>
+        <li><a href="#" onclick="handleLogout()" id="nav-logout" style="display:none;">로그아웃</a></li>
         <li><a href="#service-intro">서비스 소개</a></li>
         <li><a class="cta-link" href="#service-apply">서비스 신청</a></li>
         <li><a href="#support">고객센터</a></li>
@@ -2581,6 +2632,54 @@
   <section class="section" id="service-intro" style="padding:2rem 0;"></section>
   <section class="section" id="service-apply" style="padding:2rem 0;"></section>
   <section class="section" id="support" style="padding:2rem 0;"></section>
+
+  <!-- 로그인 모달 -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+      <span class="close" onclick="closeLoginModal()">&times;</span>
+      <h2>로그인</h2>
+      <form onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>이메일</label>
+          <input type="email" id="login_email" required placeholder="이메일을 입력하세요">
+        </div>
+        <div class="form-group">
+          <label>비밀번호</label>
+          <input type="password" id="login_password" required placeholder="비밀번호를 입력하세요">
+        </div>
+        <div style="text-align: right; margin-top: 20px;">
+          <button type="submit" class="btn-submit">로그인</button>
+          <button type="button" class="btn-cancel" onclick="closeLoginModal()">취소</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 회원가입 모달 -->
+  <div id="signupModal" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+      <span class="close" onclick="closeSignupModal()">&times;</span>
+      <h2>회원가입</h2>
+      <form onsubmit="handleSignup(event)">
+        <div class="form-group">
+          <label>이름</label>
+          <input type="text" id="signup_name" required placeholder="이름을 입력하세요">
+        </div>
+        <div class="form-group">
+          <label>이메일</label>
+          <input type="email" id="signup_email" required placeholder="이메일을 입력하세요">
+        </div>
+        <div class="form-group">
+          <label>비밀번호</label>
+          <input type="password" id="signup_password" required placeholder="비밀번호를 입력하세요 (6자리 이상)">
+        </div>
+        <div style="text-align: right; margin-top: 20px;">
+          <button type="submit" class="btn-submit">가입하기</button>
+          <button type="button" class="btn-cancel" onclick="closeSignupModal()">취소</button>
+        </div>
+      </form>
+    </div>
+  </div>
   <script>
     // 부드러운 스크롤 효과
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -2663,6 +2762,7 @@
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, orderBy, query, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
     import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
     // Firebase 설정
     const firebaseConfig = {
@@ -2678,6 +2778,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const storage = getStorage(app);
+    const auth = getAuth(app);
 
     // 전역으로 함수 노출
     window.db = db;
@@ -2695,6 +2796,108 @@
     window.uploadBytes = uploadBytes;
     window.getDownloadURL = getDownloadURL;
     window.jobsData = {}; // 전역 데이터 저장소
+
+    // --- Auth Logic Setup ---
+    window.auth = auth;
+    window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+    window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+    window.signOut = signOut;
+    window.updateProfile = updateProfile;
+
+    // 인증 상태 감지 및 UI 업데이트
+    onAuthStateChanged(auth, (user) => {
+      const loginBtn = document.getElementById('nav-login');
+      const signupBtn = document.getElementById('nav-signup');
+      const logoutBtn = document.getElementById('nav-logout');
+
+      if (user) {
+        // 로그인 상태
+        if (loginBtn) {
+          // 이름이 없으면 이메일 앞부분 사용
+          const displayName = user.displayName || user.email.split('@')[0];
+          loginBtn.textContent = displayName + '님';
+          loginBtn.onclick = null; // 클릭 시 아무 동작 안함 (추후 마이페이지 등 연결 가능)
+          loginBtn.style.cursor = 'default';
+        }
+        if (signupBtn) signupBtn.style.display = 'none';
+        if (logoutBtn) logoutBtn.style.display = 'inline-block'; // 로그아웃 버튼 보이기
+      } else {
+        // 로그아웃 상태
+        if (loginBtn) {
+          loginBtn.textContent = '로그인';
+          loginBtn.onclick = function () { openLoginModal(); return false; };
+          loginBtn.style.cursor = 'pointer';
+        }
+        if (signupBtn) signupBtn.style.display = 'inline-block';
+        if (logoutBtn) logoutBtn.style.display = 'none';
+      }
+    });
+
+    // 전역 함수로 등록 (module 밖에서 호출 가능하도록)
+    window.openLoginModal = function () {
+      document.getElementById('loginModal').style.display = 'block';
+    }
+    window.closeLoginModal = function () {
+      document.getElementById('loginModal').style.display = 'none';
+    }
+    window.openSignupModal = function () {
+      document.getElementById('signupModal').style.display = 'block';
+    }
+    window.closeSignupModal = function () {
+      document.getElementById('signupModal').style.display = 'none';
+    }
+
+    window.handleLogin = async function (e) {
+      e.preventDefault();
+      const email = document.getElementById('login_email').value;
+      const pw = document.getElementById('login_password').value;
+      try {
+        await signInWithEmailAndPassword(auth, email, pw);
+        alert('✅ 로그인되었습니다.');
+        closeLoginModal();
+      } catch (err) {
+        let msg = '로그인 실패: ' + err.message;
+        if (err.code === 'auth/invalid-credential') msg = '이메일 또는 비밀번호가 올바르지 않습니다.';
+        alert(msg);
+      }
+    }
+
+    window.handleSignup = async function (e) {
+      e.preventDefault();
+      const email = document.getElementById('signup_email').value;
+      const pw = document.getElementById('signup_password').value;
+      const name = document.getElementById('signup_name').value;
+
+      if (pw.length < 6) {
+        alert('비밀번호는 6자리 이상이어야 합니다.');
+        return;
+      }
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, pw);
+        // 프로필 이름 설정
+        await updateProfile(userCredential.user, { displayName: name });
+        alert('✅ 가입을 환영합니다! (' + name + '님)\n자동으로 로그인되었습니다.');
+        closeSignupModal();
+      } catch (err) {
+        let msg = '가입 실패: ' + err.message;
+        if (err.code === 'auth/email-already-in-use') msg = '이미 사용 중인 이메일입니다.';
+        alert(msg);
+      }
+    }
+
+    window.handleLogout = async function () {
+      if (!confirm('로그아웃 하시겠습니까?')) return;
+      try {
+        await signOut(auth);
+        alert('로그아웃되었습니다.');
+        // 메인으로 이동하거나 새로고침
+        window.location.reload();
+      } catch (err) {
+        alert('로그아웃 실패: ' + err.message);
+      }
+    }
+    // ----------------------
 
     // 페이지 로드 시 데이터 불러오기
     // 페이지 로드 시 데이터 불러오기 - 제거됨 (하단 스크립트에서 호출)
