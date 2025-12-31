@@ -2700,7 +2700,8 @@
     window.getDownloadURL = getDownloadURL;
 
     // 페이지 로드 시 데이터 불러오기
-    loadJobs();
+    // 페이지 로드 시 데이터 불러오기 - 제거됨 (하단 스크립트에서 호출)
+    // loadJobs();
   </script>
 
   <script>
@@ -2938,8 +2939,11 @@
     async function addJob(e) {
       e.preventDefault();
       console.log('addJob started');
+      const submitBtn = e.target.querySelector('button[type="submit"]');
 
       try {
+        if (submitBtn) submitBtn.disabled = true;
+
         const contentImageFile = document.getElementById('add_content_image').files[0];
         const attachmentFile = document.getElementById('add_attachment_file').files[0];
 
@@ -2948,9 +2952,11 @@
         let attachmentName = '';
 
         if (contentImageFile) {
+          alert('이미지 업로드를 시작합니다...');
           contentImageUrl = await uploadFile(contentImageFile, 'images');
         }
         if (attachmentFile) {
+          alert('첨부파일 업로드를 시작합니다...');
           attachmentUrl = await uploadFile(attachmentFile, 'attachments');
           attachmentName = attachmentFile.name;
         }
@@ -2977,6 +2983,8 @@
       } catch (error) {
         console.error('등록 실패:', error);
         alert('등록에 실패했습니다: ' + error.message);
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
       }
     }
 
@@ -3041,6 +3049,8 @@
         event.target.style.display = 'none';
       }
     }
+    // 페이지 로드 완료 시 loadJobs 실행
+    window.addEventListener('DOMContentLoaded', loadJobs);
   </script>
 </body>
 
