@@ -1628,8 +1628,9 @@
         <nav>
           <button aria-label="메뉴 열기" class="menu-toggle" type="button">메뉴</button>
           <div class="nav-links">
-            <a href="#" onclick="showBoard(); return false;">채용정보</a><a href="board.html">공공게시판</a><a href="#">공공기관
-              뉴스</a><a href="#">공모전 소식</a><a href="#">취업 이야기</a><a href="#">마이메뉴</a>
+            <a href="#" onclick="showBoard(); return false;">채용정보</a>
+            <a href="#" onclick="alert('준비 중입니다.'); return false;">공공게시판</a>
+            <a href="#">공공기관 뉴스</a><a href="#">공모전 소식</a><a href="#">취업 이야기</a><a href="#">마이메뉴</a>
           </div>
         </nav>
       </div>
@@ -2330,13 +2331,8 @@
                 style="background:#3498db; color:white; padding:0.3rem 0.6rem; border-radius:4px; font-size:0.8rem;"></span>
               <h2 id="detail-title" style="font-size:1.8rem; margin:0.5rem 0; color:#2c3e50;"></h2>
               <div style="color:#7f8c8d; font-size:0.95rem;">
-                <div class="logo">
-                  <a href="javascript:void(0)" onclick="goHome()"
-                    style="text-decoration:none; display:flex; align-items:center;">
-                    <img src="./logo.png" alt="공공브레인넷 로고">
-                    <span style="font-weight:700; font-size:1.2rem; color:#333; margin-left:0.5rem;">공공브레인넷</span>
-                  </a>
-                </div>
+                <span id="detail-company" style="font-weight:bold; margin-right:10px;"></span>
+                <span id="detail-date"></span>
               </div>
             </div>
 
@@ -2673,7 +2669,7 @@
       apiKey: "AIzaSyAxVeMDkNyI-3vW5BvDsq8J7POUPwraoy4",
       authDomain: "recruit-board.firebaseapp.com",
       projectId: "recruit-board",
-      storageBucket: "recruit-board.appspot.com",
+      storageBucket: "recruit-board.firebasestorage.app",
       messagingSenderId: "614136048192",
       appId: "1:614136048192:web:5153e389c9f26ddbb24da5"
     };
@@ -2698,6 +2694,7 @@
     window.ref = ref;
     window.uploadBytes = uploadBytes;
     window.getDownloadURL = getDownloadURL;
+    window.jobsData = {}; // 전역 데이터 저장소
 
     // 페이지 로드 시 데이터 불러오기
     // 페이지 로드 시 데이터 불러오기 - 제거됨 (하단 스크립트에서 호출)
@@ -2749,20 +2746,26 @@
       window.scrollTo(0, 0);
     }
 
-    // 상세 보기 함수
-    function viewDetail(id, title, company, date, content, imageUrl, detailUrl, jobType, location, contentImageUrl, attachmentName, attachmentUrl) {
+    // 상세 보기 함수 (ID로 조회)
+    function viewDetail(id) {
+      const job = window.jobsData[id];
+      if (!job) {
+        alert('데이터를 찾을 수 없습니다.');
+        return;
+      }
       // 섹션 전환
       document.getElementById('board-section').style.display = 'none';
       const detailSection = document.getElementById('detail-section');
       if (detailSection) detailSection.style.display = 'block';
 
       // 데이터 바인딩
-      document.getElementById('detail-title').textContent = title;
-      document.getElementById('detail-company').textContent = company;
-      document.getElementById('detail-date').textContent = '등록일: ' + date + (location ? ' | 근무지: ' + location : '');
-      document.getElementById('detail-badge').textContent = jobType || '채용';
+      document.getElementById('detail-title').textContent = job.title;
+      document.getElementById('detail-company').textContent = job.company;
+      document.getElementById('detail-date').textContent = '등록일: ' + job.createdDate + (job.location ? ' | 근무지: ' + job.location : '');
+      document.getElementById('detail-badge').textContent = job.jobType || '채용';
 
-      // 내용 (줄바꿈 처리 등)
+      // 내용 (줄바꿈 처리)
+      const content = job.content || '';
       document.getElementById('detail-desc').innerHTML = content ? content.replace(/\n/g, '<br>') : '내용이 없습니다.';
 
       // 이미지 처리
@@ -2770,15 +2773,13 @@
       const mainImg = document.getElementById('detail-main-image');
 
       // 1. 본문 이미지가 있으면 우선 표시
-      if (contentImageUrl) {
-        console.log('Rendering content image:', contentImageUrl);
-        mainImg.src = contentImageUrl;
+      if (job.contentImageUrl) {
+        mainImg.src = job.contentImageUrl;
         imgArea.style.display = 'block';
       }
       // 2. 본문 이미지는 없고 로고 이미지만 있는데, 로고가 기본(./logo.png)이 아니면 표시
-      // (기획에 따라 로고는 본문에 안 보여줄 수도 있으나, 여기서는 유지)
-      else if (imageUrl && imageUrl !== './logo.png' && !imageUrl.startsWith('./')) {
-        mainImg.src = imageUrl;
+      else if (job.imageUrl && job.imageUrl !== './logo.png' && !job.imageUrl.startsWith('./')) {
+        mainImg.src = job.imageUrl;
         imgArea.style.display = 'block';
       } else {
         imgArea.style.display = 'none';
@@ -2787,10 +2788,10 @@
       // 첨부파일 처리
       const attArea = document.getElementById('detail-attachment-area');
       const attLink = document.getElementById('detail-attachment-link');
-      if (attachmentUrl && attachmentName) {
-        attLink.href = attachmentUrl;
-        attLink.setAttribute('download', attachmentName); // 다운로드 속성 추가
-        attLink.textContent = attachmentName;
+      if (job.attachmentUrl && job.attachmentName) {
+        attLink.href = job.attachmentUrl;
+        attLink.setAttribute('download', job.attachmentName);
+        attLink.textContent = job.attachmentName;
         attArea.style.display = 'block';
       } else {
         attArea.style.display = 'none';
@@ -2798,8 +2799,8 @@
 
       // 외부 링크 버튼
       const linkBtn = document.getElementById('detail-link');
-      if (detailUrl) {
-        linkBtn.href = detailUrl;
+      if (job.detailUrl) {
+        linkBtn.href = job.detailUrl;
         linkBtn.style.display = 'inline-block';
         linkBtn.textContent = '채용 사이트 방문';
       } else {
@@ -2851,19 +2852,21 @@
           const safeContentImageUrl = (job.contentImageUrl || '').replace(/'/g, "\\'");
           const safeAttachmentName = (job.attachmentName || '').replace(/'/g, "\\'");
           const safeAttachmentUrl = (job.attachmentUrl || '').replace(/'/g, "\\'");
+          // 데이터 캐싱
+          window.jobsData[docSnap.id] = { ...job, id: docSnap.id, createdDate: createdDate };
 
           tr.innerHTML = `
                 <td><img src="${job.imageUrl || './logo.png'}" class="job-image" alt="로고"></td>
                 <td>${job.company}</td>
                 <td>
-                    <a href="javascript:void(0)" onclick="viewDetail('${docSnap.id}', '${safeTitle}', '${safeCompany}', '${createdDate}', '${safeContent}', '${safeImageUrl}', '${safeDetailUrl}', '${safeJobType}', '${safeLocation}', '${safeContentImageUrl}', '${safeAttachmentName}', '${safeAttachmentUrl}')" style="text-decoration:none; color:#2c3e50; font-weight:600; display:block;">${job.title}</a>
+                    <a href="#" onclick="viewDetail('${docSnap.id}'); return false;" style="text-decoration:none; color:#2c3e50; font-weight:600; display:block;">${escapeHtml(job.title)}</a>
                 </td>
                 <td>${job.jobType || '-'}</td>
                 <td>${job.location || '-'}</td>
                 <td>${job.deadline || '-'}</td>
                 <td>${createdDate}</td>
                 <td>
-                    <button class="btn-edit" onclick="openEditModal('${docSnap.id}', '${safeTitle}', '${safeCompany}', '${safeJobType}', '${safeLocation}', '${job.deadline || ''}', '${safeImageUrl}', '${safeDetailUrl}', '${safeContent}', '${safeContentImageUrl}', '${safeAttachmentName}', '${safeAttachmentUrl}')">수정</button>
+                    <button class="btn-edit" onclick="openEditModal('${docSnap.id}')">수정</button>
                     <button class="btn-delete" onclick="deleteJob('${docSnap.id}')">삭제</button>
                 </td>
             `;
@@ -2895,19 +2898,22 @@
       document.getElementById('addModal').style.display = 'none';
       document.querySelector('#addModal form').reset();
     }
-    function openEditModal(id, title, company, jobType, location, deadline, imageUrl, detailUrl, content, contentImageUrl, attachmentName, attachmentUrl) {
+    function openEditModal(id) {
+      const job = window.jobsData[id];
+      if (!job) return;
+
       const editModal = document.getElementById('editModal');
       if (!editModal) return;
 
       document.getElementById('edit_id').value = id;
-      document.getElementById('edit_title').value = title;
-      document.getElementById('edit_company').value = company;
-      document.getElementById('edit_job_type').value = jobType;
-      document.getElementById('edit_location').value = location;
-      document.getElementById('edit_deadline').value = deadline;
-      document.getElementById('edit_image_url').value = imageUrl;
-      document.getElementById('edit_detail_url').value = detailUrl;
-      document.getElementById('edit_content').value = content || '';
+      document.getElementById('edit_title').value = job.title;
+      document.getElementById('edit_company').value = job.company;
+      document.getElementById('edit_job_type').value = job.jobType || '';
+      document.getElementById('edit_location').value = job.location || '';
+      document.getElementById('edit_deadline').value = job.deadline || '';
+      document.getElementById('edit_image_url').value = job.imageUrl || '';
+      document.getElementById('edit_detail_url').value = job.detailUrl || '';
+      document.getElementById('edit_content').value = job.content || '';
 
       // 파일 input 초기화 (보안상 값 설정 불가)
       document.getElementById('edit_content_image').value = '';
@@ -2919,14 +2925,13 @@
     // 파일 업로드 헬퍼
     async function uploadFile(file, folder) {
       if (!file) return null;
-      console.log('Uploading file:', file.name);
       try {
         const storageRef = window.ref(window.storage, folder + '/' + Date.now() + '_' + file.name);
         await window.uploadBytes(storageRef, file);
         const url = await window.getDownloadURL(storageRef);
-        console.log('File uploaded:', url);
         return url;
       } catch (err) {
+        alert('❌ 파일 업로드 중 오류 발생: ' + err.code + ' / ' + err.message);
         console.error('Upload failed:', err);
         throw err;
       }
@@ -2952,11 +2957,9 @@
         let attachmentName = '';
 
         if (contentImageFile) {
-          alert('이미지 업로드를 시작합니다...');
           contentImageUrl = await uploadFile(contentImageFile, 'images');
         }
         if (attachmentFile) {
-          alert('첨부파일 업로드를 시작합니다...');
           attachmentUrl = await uploadFile(attachmentFile, 'attachments');
           attachmentName = attachmentFile.name;
         }
