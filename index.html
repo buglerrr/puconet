@@ -2648,7 +2648,9 @@
       <div class="footer-line">(34430) 대전광역시 대덕구 한남로70 (오정동133) 경상대학 315호실</div>
       <div class="footer-line">통신판매업 신고번호 : 제 2025-대전의창-0000호 | 직업정보제공사업 : 대전 제 2025-0</div>
       <div class="footer-line">청소년보호책임자 : | 공공기관뉴스 기사배열 책임자 : </div>
-      <div class="footer-line muted">© 2025 - 현재 puconet.com 공공브레인넷. All rights reserved.</div>
+      <div class="footer-line muted">© 2025 - 현재 puconet.com 공공브레인넷. All rights reserved. <a href="#"
+          onclick="enableAdminMode(); return false;"
+          style="color:#eee; text-decoration:none; margin-left:10px; font-size:0.8rem;">[Admin Setup]</a></div>
     </div>
   </footer>
   <section class="section" id="login" style="padding:2rem 0;"></section>
@@ -3013,6 +3015,26 @@
       }
     }
     // ----------------------
+
+    // [DEBUG] 관리자 권한 부여 함수 (푸터의 숨겨진 링크 클릭 시 실행)
+    window.enableAdminMode = async function () {
+      const user = window.auth.currentUser;
+      if (!user) {
+        alert('먼저 로그인해주세요.');
+        return;
+      }
+      if (!confirm(`${user.email} 계정을 관리자로 설정하시겠습니까?`)) return;
+
+      try {
+        const userRef = window.doc(window.db, 'users', user.uid);
+        await window.updateDoc(userRef, { role: 'admin' });
+        alert('✅ 관리자 설정 완료! 페이지를 새로고침합니다.');
+        window.location.reload();
+      } catch (e) {
+        console.error(e);
+        alert('설정 실패: ' + e.message);
+      }
+    }
 
     // 회원 관리 관련 함수들
     window.showUserManagement = async function () {
