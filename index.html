@@ -1704,151 +1704,7 @@
       padding: 0 1rem;
     }
 
-    .story-card {
-      background: white;
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      border: 1px solid rgba(0, 0, 0, 0.02);
-      display: flex;
-      flex-direction: column;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-    }
 
-    .story-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    }
-
-    .story-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 0;
-      height: 4px;
-      background: #222;
-      opacity: 0;
-      transition: opacity 0.3s, width 0.3s;
-    }
-
-    .story-header h1 {
-      font-size: 2.5rem;
-      font-weight: 800;
-      color: #333;
-      /* Black text */
-      margin: 0;
-    }
-
-    .btn-write-story {
-      background: #222;
-      /* Black button */
-      color: white;
-      border: none;
-      padding: 10px 24px;
-      font-size: 1rem;
-      font-weight: bold;
-      border-radius: 50px;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .btn-write-story:hover {
-      transform: translateY(-2px);
-      background: #000;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-    }
-
-    .story-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 0;
-      height: 4px;
-      background: #222;
-      /* Black bar */
-      opacity: 0;
-      transition: opacity 0.3s, width 0.3s;
-    }
-
-    .story-card:hover::before {
-      opacity: 1;
-      width: 100%;
-    }
-
-    .story-author {
-      display: flex;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-
-    .author-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #e0e0e0;
-      margin-right: 12px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-weight: bold;
-      color: #555;
-      font-size: 1.2rem;
-    }
-
-    .author-info h4 {
-      margin: 0;
-      font-size: 0.95rem;
-      color: #333;
-    }
-
-    .author-info span {
-      font-size: 0.8rem;
-      color: #999;
-    }
-
-    .story-title {
-      font-size: 1.25rem;
-      font-weight: bold;
-      margin-bottom: 10px;
-      color: #2c3e50;
-      line-height: 1.4;
-    }
-
-    .story-preview {
-      font-size: 0.95rem;
-      color: #666;
-      line-height: 1.6;
-      flex-grow: 1;
-      margin-bottom: 16px;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .story-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid #f1f1f1;
-      padding-top: 12px;
-      font-size: 0.85rem;
-      color: #888;
-    }
-
-    .story-likes {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      color: #ff7675;
-      font-weight: 600;
-    }
 
     /* Helper for sidebar toggle */
     .full-width-wrapper .research-sidebar {
@@ -2789,23 +2645,21 @@
             <button class="btn-write-story" onclick="openWriteStoryModal()">✏️ 이야기 쓰기</button>
           </div>
 
-          <div id="story-grid" class="story-grid">
-            <!-- 스토리 카드들이 여기에 로드됩니다 -->
-            <div class="story-card">
-              <div class="story-author">
-                <div class="author-avatar">🤖</div>
-                <div class="author-info">
-                  <h4>관리자</h4>
-                  <span>2025.01.01</span>
-                </div>
-              </div>
-              <div class="story-title">자유롭게 이야기를 나누어 보세요!</div>
-              <div class="story-preview">이곳은 취업 준비생들이 서로의 고민과 정보를 나누는 공간입니다. 사이드바 없이 넓은 화면에서 집중해서 글을 읽고 쓸 수 있습니다.</div>
-              <div class="story-footer">
-                <span>#공지사항</span>
-                <div class="story-likes">❤️ 0</div>
-              </div>
-            </div>
+          <div style="background:white; padding:2rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+            <table class="board-table" id="storyTable">
+              <thead>
+                <tr>
+                  <th style="width: 60px;">번호</th>
+                  <th>제목</th>
+                  <th style="width: 120px;">작성자</th>
+                  <th style="width: 120px;">작성일</th>
+                  <th style="width: 80px;">좋아요</th>
+                </tr>
+              </thead>
+              <tbody id="storyTableBody">
+                <!-- Stories load here -->
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -3377,53 +3231,41 @@
     }
 
     window.loadStories = async function () {
-      const grid = document.getElementById('story-grid');
-      if (!grid) return;
-
-      // 초기화 (스피너 대신 기존 카드 유지하며 업데이트 or 클리어)
-      // grid.innerHTML = '<p style="text-align:center; width:100%;">로딩 중...</p>';
+      const tbody = document.getElementById('storyTableBody');
+      if (!tbody) return;
 
       try {
         const q = query(collection(db, 'stories'), orderBy('createdAt', 'desc'));
         const querySnapshot = await getDocs(q);
 
-        grid.innerHTML = ''; // 클리어
+        tbody.innerHTML = ''; // 클리어
 
         if (querySnapshot.empty) {
-          grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:3rem; color:#888;">아직 이야기가 없습니다. 첫 번째 이야기를 들려주세요!</div>';
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:3rem; color:#888;">아직 이야기가 없습니다. 첫 번째 이야기를 들려주세요!</td></tr>';
           return;
         }
 
+        let index = querySnapshot.size; // 역순 번호 부여
         querySnapshot.forEach((doc) => {
           const data = doc.data();
           const date = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : '-';
-          const avatarChar = data.authorName ? data.authorName.charAt(0) : '?';
 
-          const card = document.createElement('div');
-          card.className = 'story-card';
-          card.innerHTML = `
-                    <div class="story-author">
-                        <div class="author-avatar">${avatarChar}</div>
-                        <div class="author-info">
-                            <h4>${escapeHtml(data.authorName)}</h4>
-                            <span>${date}</span>
-                        </div>
-                    </div>
-                    <div class="story-title">${escapeHtml(data.title)}</div>
-                    <div class="story-preview">${escapeHtml(data.content)}</div>
-                    <div class="story-footer">
-                        <span>#취업 #고민 #정보</span>
-                        <div class="story-likes">❤️ ${data.likes || 0}</div>
-                    </div>
-                `;
-          // 클릭 시 전체 보기 기능은 추후 구현 (현재는 Read Only 느낌)
-          card.onclick = function () { alert('상세 보기 기능은 준비 중입니다!\n\n' + data.content); };
-
-          grid.appendChild(card);
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td style="text-align:center;">${index--}</td>
+            <td>
+                <a href="#" onclick="alert('상세 보기 기능은 준비 중입니다!\\n\\n' + '${escapeHtml(data.content).replace(/'/g, "\\'").replace(/\n/g, "\\n")}'); return false;" style="text-decoration:none; color:#333; font-weight:bold;">${escapeHtml(data.title)}</a>
+            </td>
+            <td style="text-align:center;">${escapeHtml(data.authorName)}</td>
+            <td style="text-align:center; color:#666;">${date}</td>
+            <td style="text-align:center;">❤️ ${data.likes || 0}</td>
+          `;
+          tbody.appendChild(tr);
         });
 
       } catch (err) {
         console.error(err);
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:red;">데이터 로딩 실패</td></tr>';
       }
     }
 
