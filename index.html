@@ -1649,6 +1649,217 @@
         height: 40px;
       }
     }
+
+    /* === Story Board Styles (Fancy) === */
+    #story-board-section {
+      padding: 2rem 0;
+      background: #f8f9fa;
+      /* Light background for contrast */
+      min-height: 80vh;
+    }
+
+    .story-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding: 0 1rem;
+    }
+
+    .story-header h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: none;
+      -webkit-background-clip: unset;
+      -webkit-text-fill-color: initial;
+      color: #111;
+      margin: 0;
+    }
+
+    .btn-write-story {
+      background: #222;
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-write-story:hover {
+      transform: translateY(-2px);
+      background: #000;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    }
+
+
+
+    .story-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+      padding: 0 1rem;
+    }
+
+    .story-card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: 1px solid rgba(0, 0, 0, 0.02);
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .story-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .story-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 4px;
+      background: #222;
+      opacity: 0;
+      transition: opacity 0.3s, width 0.3s;
+    }
+
+    .story-header h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #333;
+      /* Black text */
+      margin: 0;
+    }
+
+    .btn-write-story {
+      background: #222;
+      /* Black button */
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-write-story:hover {
+      transform: translateY(-2px);
+      background: #000;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .story-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 4px;
+      background: #222;
+      /* Black bar */
+      opacity: 0;
+      transition: opacity 0.3s, width 0.3s;
+    }
+
+    .story-card:hover::before {
+      opacity: 1;
+      width: 100%;
+    }
+
+    .story-author {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .author-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      margin-right: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      color: #555;
+      font-size: 1.2rem;
+    }
+
+    .author-info h4 {
+      margin: 0;
+      font-size: 0.95rem;
+      color: #333;
+    }
+
+    .author-info span {
+      font-size: 0.8rem;
+      color: #999;
+    }
+
+    .story-title {
+      font-size: 1.25rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #2c3e50;
+      line-height: 1.4;
+    }
+
+    .story-preview {
+      font-size: 0.95rem;
+      color: #666;
+      line-height: 1.6;
+      flex-grow: 1;
+      margin-bottom: 16px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .story-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #f1f1f1;
+      padding-top: 12px;
+      font-size: 0.85rem;
+      color: #888;
+    }
+
+    .story-likes {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #ff7675;
+      font-weight: 600;
+    }
+
+    /* Helper for sidebar toggle */
+    .full-width-wrapper .research-sidebar {
+      display: none !important;
+    }
+
+    .full-width-wrapper .main-content-area {
+      width: 100% !important;
+      flex: none !important;
+      max-width: 100% !important;
+    }
   </style>
 </head>
 
@@ -1681,7 +1892,10 @@
           <div class="nav-links">
             <a href="#" onclick="showBoard(); return false;">채용정보</a>
             <a href="#" onclick="alert('준비 중입니다.'); return false;">공공게시판</a>
-            <a href="#">공공기관 뉴스</a><a href="#">공모전 소식</a><a href="#">취업 이야기</a><a href="#">마이메뉴</a>
+            <a href="#">공공기관 뉴스</a>
+            <a href="#" onclick="alert('준비 중입니다.'); return false;">공모전 소식</a>
+            <a href="#" onclick="showStoryBoard(); return false;" style="color: #666; font-weight:bold;">취업 이야기</a>
+            <a href="#">마이메뉴</a>
           </div>
         </nav>
       </div>
@@ -2567,6 +2781,57 @@
         </div>
       </div>
 
+      <!-- 취업 이야기 게시판 섹션 -->
+      <div id="story-board-section" style="display:none; width:100%;">
+        <div class="container" style="max-width:1200px; margin:0 auto;">
+          <div class="story-header">
+            <h1>취업 이야기</h1>
+            <button class="btn-write-story" onclick="openWriteStoryModal()">✏️ 이야기 쓰기</button>
+          </div>
+
+          <div id="story-grid" class="story-grid">
+            <!-- 스토리 카드들이 여기에 로드됩니다 -->
+            <div class="story-card">
+              <div class="story-author">
+                <div class="author-avatar">🤖</div>
+                <div class="author-info">
+                  <h4>관리자</h4>
+                  <span>2025.01.01</span>
+                </div>
+              </div>
+              <div class="story-title">자유롭게 이야기를 나누어 보세요!</div>
+              <div class="story-preview">이곳은 취업 준비생들이 서로의 고민과 정보를 나누는 공간입니다. 사이드바 없이 넓은 화면에서 집중해서 글을 읽고 쓸 수 있습니다.</div>
+              <div class="story-footer">
+                <span>#공지사항</span>
+                <div class="story-likes">❤️ 0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 글쓰기 모달 -->
+      <div id="storyModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+          <h2>✏️ 이야기 작성하기</h2>
+          <form onsubmit="handlePostStory(event)">
+            <div class="form-group">
+              <label>제목</label>
+              <input type="text" id="story_title" required placeholder="제목을 입력하세요">
+            </div>
+            <div class="form-group">
+              <label>내용</label>
+              <textarea id="story_content" rows="8" required placeholder="무슨 생각을 하고 계신가요?"
+                style="resize:vertical;"></textarea>
+            </div>
+            <div style="text-align: right; margin-top: 20px;">
+              <button type="submit" class="btn-submit">올리기</button>
+              <button type="button" class="btn-cancel" onclick="closeStoryModal()">취소</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
       <!-- 메인 콘텐츠 영역 끝 -->
     </div>
 
@@ -3036,6 +3301,132 @@
       }
     }
 
+    // === 취업 이야기 관련 로직 ===
+    window.showStoryBoard = async function () {
+      // 1. 모든 다른 섹션 숨기기
+      document.getElementById('features').style.display = 'none';
+      document.getElementById('jobs').style.display = 'none';
+      document.getElementById('general-jobs').style.display = 'none';
+      document.getElementById('edu-courses').style.display = 'none';
+      document.getElementById('detail-section').style.display = 'none';
+      const boardSection = document.getElementById('board-section');
+      if (boardSection) boardSection.style.display = 'none';
+      const userSection = document.getElementById('user-manage-section');
+      if (userSection) userSection.style.display = 'none';
+
+      // 2. 사이드바 숨기기 (Wrapper에 클래스 추가로 제어)
+      const wrapper = document.querySelector('.content-with-sidebar-wrapper');
+      if (wrapper) wrapper.classList.add('full-width-wrapper');
+
+      // 3. 스토리 섹션 보이기
+      const storySection = document.getElementById('story-board-section');
+      if (storySection) {
+        storySection.style.display = 'block';
+        await loadStories();
+      }
+      window.scrollTo(0, 0);
+    }
+
+    // 원래 화면으로 복귀 시 사이드바 복구
+    // 원래 화면으로 복귀 시 사이드바 복구 (전역 노출)
+    window.restoreSidebar = function () {
+      const wrapper = document.querySelector('.content-with-sidebar-wrapper');
+      if (wrapper) wrapper.classList.remove('full-width-wrapper');
+
+      const storySection = document.getElementById('story-board-section');
+      if (storySection) storySection.style.display = 'none';
+    }
+
+    window.openWriteStoryModal = function () {
+      if (!window.auth.currentUser) {
+        alert('로그인이 필요한 서비스입니다.');
+        window.openLoginModal();
+        return;
+      }
+      document.getElementById('storyModal').style.display = 'block';
+    }
+    window.closeStoryModal = function () {
+      document.getElementById('storyModal').style.display = 'none';
+      document.querySelector('#storyModal form').reset();
+    }
+
+    window.handlePostStory = async function (e) {
+      e.preventDefault();
+      const user = window.auth.currentUser;
+      if (!user) { alert('로그인이 필요합니다.'); return; }
+
+      const title = document.getElementById('story_title').value;
+      const content = document.getElementById('story_content').value;
+
+      try {
+        await window.addDoc(window.collection(window.db, 'stories'), {
+          title: title,
+          content: content,
+          authorUid: user.uid,
+          authorName: user.displayName || '익명',
+          createdAt: window.Timestamp.now(),
+          likes: 0
+        });
+        alert('✅ 이야기가 등록되었습니다.');
+        closeStoryModal();
+        loadStories();
+      } catch (err) {
+        console.error(err);
+        alert('등록 실패: ' + err.message);
+      }
+    }
+
+    window.loadStories = async function () {
+      const grid = document.getElementById('story-grid');
+      if (!grid) return;
+
+      // 초기화 (스피너 대신 기존 카드 유지하며 업데이트 or 클리어)
+      // grid.innerHTML = '<p style="text-align:center; width:100%;">로딩 중...</p>';
+
+      try {
+        const q = query(collection(db, 'stories'), orderBy('createdAt', 'desc'));
+        const querySnapshot = await getDocs(q);
+
+        grid.innerHTML = ''; // 클리어
+
+        if (querySnapshot.empty) {
+          grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:3rem; color:#888;">아직 이야기가 없습니다. 첫 번째 이야기를 들려주세요!</div>';
+          return;
+        }
+
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          const date = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : '-';
+          const avatarChar = data.authorName ? data.authorName.charAt(0) : '?';
+
+          const card = document.createElement('div');
+          card.className = 'story-card';
+          card.innerHTML = `
+                    <div class="story-author">
+                        <div class="author-avatar">${avatarChar}</div>
+                        <div class="author-info">
+                            <h4>${escapeHtml(data.authorName)}</h4>
+                            <span>${date}</span>
+                        </div>
+                    </div>
+                    <div class="story-title">${escapeHtml(data.title)}</div>
+                    <div class="story-preview">${escapeHtml(data.content)}</div>
+                    <div class="story-footer">
+                        <span>#취업 #고민 #정보</span>
+                        <div class="story-likes">❤️ ${data.likes || 0}</div>
+                    </div>
+                `;
+          // 클릭 시 전체 보기 기능은 추후 구현 (현재는 Read Only 느낌)
+          card.onclick = function () { alert('상세 보기 기능은 준비 중입니다!\n\n' + data.content); };
+
+          grid.appendChild(card);
+        });
+
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
     // 회원 관리 관련 함수들
     window.showUserManagement = async function () {
       // 기존 섹션 숨기기
@@ -3105,7 +3496,9 @@
 
   <script>
     // 메인 화면으로 돌아가는 함수
-    function goHome() {
+    window.goHome = function () {
+      restoreSidebar(); // 사이드바 복구
+
       // 모든 메인 섹션 보이기
       document.getElementById('features').style.display = 'block';
       document.getElementById('jobs').style.display = 'block';
@@ -3122,17 +3515,28 @@
         boardSection.style.display = 'none';
       }
 
+      const userSection = document.getElementById('user-manage-section');
+      if (userSection) userSection.style.display = 'none';
+
       // 스크롤 상단으로
       window.scrollTo(0, 0);
     }
 
     // 화면 전환 함수
-    function showBoard() {
+    // 화면 전환 함수 (채용정보 게시판) - Full Width 적용
+    window.showBoard = function () {
+      // 사이드바 숨기기 (취업 이야기와 동일하게)
+      const wrapper = document.querySelector('.content-with-sidebar-wrapper');
+      if (wrapper) wrapper.classList.add('full-width-wrapper');
+
       // 메인 섹션들 숨기기
       document.getElementById('features').style.display = 'none';
       document.getElementById('jobs').style.display = 'none';
       document.getElementById('general-jobs').style.display = 'none';
       document.getElementById('edu-courses').style.display = 'none';
+
+      const storySection = document.getElementById('story-board-section');
+      if (storySection) storySection.style.display = 'none';
 
       // 상세 섹션 숨기기
       const detailSection = document.getElementById('detail-section');
@@ -3142,7 +3546,11 @@
       const boardSection = document.getElementById('board-section');
       if (boardSection) {
         boardSection.style.display = 'block';
+        // loadJobs(); // 데이터 로드 (필요 시)
       }
+
+      const userSection = document.getElementById('user-manage-section');
+      if (userSection) userSection.style.display = 'none';
 
       // 스크롤 상단으로
       window.scrollTo(0, 0);
