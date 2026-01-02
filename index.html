@@ -4212,44 +4212,49 @@
         attArea.style.display = 'none';
       }
 
-      // 버튼 영역 초기화
-      actionArea.innerHTML = '';
-      actionArea.style.display = 'block'; // 항상 표시 (목록으로 버튼 때문)
+      // 버튼 영역 초기화 & 정의
+      const actionArea = document.getElementById('story-detail-actions');
+      if (actionArea) {
+        actionArea.innerHTML = '';
+        actionArea.style.display = 'block';
 
-      // 1. 목록으로 돌아가기 버튼 (파란색 사각형)
-      const backBtn = document.createElement('button');
-      backBtn.textContent = '목록으로 돌아가기';
-      backBtn.style.cssText = 'background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin-right: 10px; font-size: 1rem;';
-      backBtn.onclick = backToStoryList;
-      actionArea.appendChild(backBtn);
+        // 1. 목록으로 돌아가기 버튼 (파란색 사각형)
+        const backBtn = document.createElement('button');
+        backBtn.textContent = '목록으로 돌아가기';
+        backBtn.style.cssText = 'background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin-right: 10px; font-size: 1rem;';
+        backBtn.onclick = backToStoryList;
+        actionArea.appendChild(backBtn);
 
-      // 2. 삭제 버튼 (권한 체크)
-      const currentUser = window.auth.currentUser;
-      if (currentUser) {
-        let isAdmin = false;
-        let isAuthor = (currentUser.uid === data.authorUid);
+        // 2. 권한 확인 및 수정/삭제 버튼 추가
+        const currentUser = window.auth.currentUser;
+        if (currentUser) {
+          let isAdmin = false;
+          let isAuthor = (currentUser.uid === data.authorUid);
 
-        try {
-          const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-          if (userDoc.exists() && userDoc.data().role === 'admin') isAdmin = true;
-        } catch (e) { }
+          try {
+            const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+            if (userDoc.exists() && userDoc.data().role === 'admin') isAdmin = true;
+          } catch (e) {
+            console.error(e);
+          }
 
-        if (isAdmin || isAuthor) {
-          // 수정 버튼
-          const editBtn = document.createElement('button');
-          editBtn.textContent = '수정';
-          editBtn.className = 'btn-edit';
-          editBtn.style.cssText = 'padding: 10px 20px; font-size: 1rem; margin-right:5px;';
-          editBtn.onclick = function () { openStoryModal(id); };
-          actionArea.appendChild(editBtn);
+          if (isAdmin || isAuthor) {
+            // 수정 버튼
+            const editBtn = document.createElement('button');
+            editBtn.textContent = '수정';
+            editBtn.className = 'btn-edit';
+            editBtn.style.cssText = 'padding: 10px 20px; font-size: 1rem; margin-right:5px; background: #ffa94d; color: white; border: none; border-radius: 4px; cursor: pointer;';
+            editBtn.onclick = function () { openStoryModal(id); }; // openStoryModal needs to support ID for editing
+            actionArea.appendChild(editBtn);
 
-          // 삭제 버튼
-          const delBtn = document.createElement('button');
-          delBtn.textContent = '삭제';
-          delBtn.className = 'btn-delete';
-          delBtn.style.cssText = 'padding: 10px 20px; font-size: 1rem;';
-          delBtn.onclick = function () { deleteStory(id); };
-          actionArea.appendChild(delBtn);
+            // 삭제 버튼
+            const delBtn = document.createElement('button');
+            delBtn.textContent = '삭제';
+            delBtn.className = 'btn-delete';
+            delBtn.style.cssText = 'padding: 10px 20px; font-size: 1rem; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;';
+            delBtn.onclick = function () { deleteStory(id); };
+            actionArea.appendChild(delBtn);
+          }
         }
       }
     }
