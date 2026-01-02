@@ -3859,7 +3859,9 @@
     // === 취업 이야기 관련 로직 ===
     window.currentStoryCategory = 'free'; // 기본값
 
-    window.showStoryBoard = async function (category = 'free') {
+    window.showStoryBoard = async function (category = 'free', addToHistory = true) {
+      if (addToHistory) window.updateHistory({ view: 'storyBoard', category: category }, '#story-' + category);
+
       // 1. 모든 다른 섹션 숨기기
       document.getElementById('features').style.display = 'none';
       document.getElementById('jobs').style.display = 'none';
@@ -4146,7 +4148,8 @@
       try {
         await deleteDoc(doc(db, 'stories', docId));
         alert('삭제되었습니다.');
-        loadStories(window.currentStoryCategory);
+        // 삭제 후 목록으로 복귀
+        window.showStoryBoard(window.currentStoryCategory, true);
       } catch (e) {
         console.error(e);
         alert('삭제 실패: ' + e.message);
@@ -4154,8 +4157,10 @@
     }
 
     // 게시판 전환 함수
-    window.switchStoryBoard = function (boardType) {
+    window.switchStoryBoard = function (boardType, addToHistory = true) {
+      if (addToHistory) window.updateHistory({ view: 'storyBoard', category: boardType }, '#story-' + boardType);
       window.currentStoryCategory = boardType;
+
 
       // 사이드바 메뉴 활성화 상태 변경
       const menuItems = document.querySelectorAll('.board-sidebar a');
@@ -4178,7 +4183,9 @@
     }
 
     // 상세 보기
-    window.viewStoryDetail = async function (id) {
+    window.viewStoryDetail = async function (id, addToHistory = true) {
+      if (addToHistory) window.updateHistory({ view: 'storyDetail', id: id }, '#story-view-' + id);
+
       const data = window.storiesData[id];
       if (!data) return;
 
@@ -4265,7 +4272,9 @@
     }
 
     // 회원 관리 관련 함수들
-    window.showUserManagement = async function () {
+    window.showUserManagement = async function (addToHistory = true) {
+      if (addToHistory) window.updateHistory({ view: 'admin' }, '#admin');
+
       // 기존 섹션 숨기기
       document.getElementById('features').style.display = 'none';
       document.getElementById('jobs').style.display = 'none';
@@ -4328,12 +4337,56 @@
 
     // 페이지 로드 시 데이터 불러오기
     // 페이지 로드 시 데이터 불러오기 - 제거됨 (하단 스크립트에서 호출)
-    // loadJobs();
+    // --- History Management (SPA Navigation) ---
+    window.updateHistory = function (state, urlHash) {
+      if (state.addToHistory !== false) {
+        history.pushState(state, '', urlHash);
+      }
+    };
+
+    window.onpopstate = function (event) {
+      const state = event.state;
+      if (!state) {
+        // 기본 상태 (Home)
+        window.goHome(false);
+        return;
+      }
+
+      switch (state.view) {
+        case 'home':
+          window.goHome(false);
+          break;
+        case 'jobBoard':
+          window.showBoard(false);
+          if (state.category) window.switchJobBoard(state.category, false);
+          break;
+        case 'jobDetail':
+          window.viewDetail(state.id, false);
+          break;
+        case 'storyBoard':
+          window.showStoryBoard(state.category, false);
+          break;
+        case 'storyDetail':
+          window.viewStoryDetail(state.id, false);
+          break;
+        case 'admin':
+          window.showUserManagement(false);
+          break;
+        default:
+          window.goHome(false);
+      }
+    };
+
+    // 페이지 로드 시 초기 상태 저장
+    // window.history.replaceState({ view: 'home' }, '', '#home');
+    // loadJobs(); // -> DOMContentLoaded에서 호출됨
   </script>
 
   <script>
     // 메인 화면으로 돌아가는 함수
-    window.goHome = function () {
+    window.goHome = function (addToHistory = true) {
+      if (addToHistory) window.updateHistory({ view: 'home' }, '#home');
+
       restoreSidebar(); // 사이드바 복구
 
       // 모든 메인 섹션 보이기
@@ -4361,7 +4414,9 @@
 
     // 화면 전환 함수
     // 화면 전환 함수 (채용정보 게시판) - Full Width 적용
-    window.showBoard = function () {
+    window.showBoard = function (addToHistory = true) {
+      if (addToHistory) window.updateHistory({ view: 'jobBoard', category: 'all' }, '#board');
+
       // 사이드바 숨기기 (취업 이야기와 동일하게)
       const wrapper = document.querySelector('.content-with-sidebar-wrapper');
       if (wrapper) wrapper.classList.add('full-width-wrapper');
@@ -4398,7 +4453,9 @@
     }
 
     // 채용정보 게시판 전환 함수
-    window.switchJobBoard = function (boardType) {
+    window.switchJobBoard = function (boardType, addToHistory = true) {
+      if (addToHistory) window.updateHistory({ view: 'jobBoard', category: boardType }, '#board-' + boardType);
+
       // 사이드바 메뉴 활성화 상태 변경
       const menuItems = document.querySelectorAll('#board-section .board-sidebar a');
       menuItems.forEach(item => item.classList.remove('active'));
@@ -4425,7 +4482,9 @@
     }
 
     // 상세 보기 함수 (ID로 조회)
-    function viewDetail(id) {
+    function viewDetail(id, addToHistory = true) {
+      if (addToHistory) window.updateHistory({ view: 'jobDetail', id: id }, '#job-' + id);
+
       const job = window.jobsData[id];
       if (!job) {
         alert('데이터를 찾을 수 없습니다.');
@@ -4777,7 +4836,8 @@
       try {
         await deleteDoc(doc(db, 'jobs', id));
         alert('✅ 삭제되었습니다!');
-        loadJobs();
+        // 삭제 후 목록으로 돌아가기
+        window.showBoard(true);
       } catch (error) {
         console.error('삭제 실패:', error);
         alert('삭제에 실패했습니다: ' + error.message);
