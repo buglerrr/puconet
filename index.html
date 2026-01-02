@@ -2824,7 +2824,7 @@
                     <th style="width: 120px;">근무지</th>
                     <th style="width: 120px;">마감일</th>
                     <th style="width: 120px;">등록일</th>
-                    <th style="width: 180px;">관리</th>
+                    <th style="width: 180px;" id="jobHeaderManage">관리</th>
                   </tr>
                 </thead>
                 <tbody id="jobTableBody">
@@ -3054,6 +3054,11 @@
               style="background:#f9f9f9; padding:1rem; border-radius:8px; display:none;">
               <strong>💾 첨부파일:</strong> <a id="story-detail-attachment-link" href="#" target="_blank"
                 style="color:#3498db; text-decoration:underline; margin-left:5px;"></a>
+            </div>
+
+            <div id="story-detail-actions"
+              style="text-align:right; margin-top:20px; border-top:1px solid #eee; padding-top:20px; display:none;">
+              <!-- Delete button injected here -->
             </div>
           </div>
         </div>
@@ -4038,11 +4043,7 @@
           window.storiesData = window.storiesData || {};
           window.storiesData[docId] = { ...data, dateString: date };
 
-          // 작성자 본인 확인 또는 관리자
-          const isAuthor = currentUser && (currentUser.uid === data.authorUid);
-          const canDelete = isAuthor || isAdmin;
-
-          const deleteBtn = canDelete ? `<button onclick="deleteStory('${docId}'); return false;" class="btn-delete" style="font-size:0.8rem; padding:2px 8px; margin-left:5px;">삭제</button>` : '';
+          // 테이블에는 삭제 버튼을 표시하지 않음 (상세보기에서 제공)
 
           const tr = document.createElement('tr');
           tr.innerHTML = `
@@ -4053,7 +4054,6 @@
             <td style="text-align:center;">${escapeHtml(data.authorName)}</td>
             <td style="text-align:center; color:#666;">${date}</td>
             <td style="text-align:center;">❤️ ${data.likes || 0}</td>
-            <td style="text-align:center;">${deleteBtn}</td> 
           `;
           tbody.appendChild(tr);
         });
@@ -4126,7 +4126,7 @@
     }
 
     // 상세 보기
-    window.viewStoryDetail = function (id) {
+    window.viewStoryDetail = async function (id) {
       const data = window.storiesData[id];
       if (!data) return;
 
@@ -4158,6 +4158,29 @@
         attArea.style.display = 'block';
       } else {
         attArea.style.display = 'none';
+      }
+
+      // 관리자/작성자 권한 확인 후 삭제 버튼 표시
+      const actionArea = document.getElementById('story-detail-actions');
+      if (actionArea) {
+        actionArea.innerHTML = '';
+        actionArea.style.display = 'none';
+
+        const currentUser = window.auth.currentUser;
+        if (currentUser) {
+          let isAdmin = false;
+          let isAuthor = (currentUser.uid === data.authorUid);
+
+          try {
+            const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+            if (userDoc.exists() && userDoc.data().role === 'admin') isAdmin = true;
+          } catch (e) { }
+
+          if (isAdmin || isAuthor) {
+            actionArea.style.display = 'block';
+            actionArea.innerHTML = `<button onclick="deleteStory('${id}');" class="btn-delete" style="padding: 10px 20px; font-size: 1rem;">삭제</button>`;
+          }
+        }
       }
     }
 
@@ -4396,6 +4419,7 @@
       const emptyState = document.getElementById('emptyState');
       const jobTable = document.getElementById('jobTable');
       const tbody = document.getElementById('jobTableBody');
+      const manageHeader = document.getElementById('jobHeaderManage');
 
       if (!loading || !tbody) return;
 
@@ -4408,6 +4432,11 @@
             isAdmin = true;
           }
         } catch (e) { console.error(e); }
+      }
+
+      // 관리자 항목 헤더 제어
+      if (manageHeader) {
+        manageHeader.style.display = isAdmin ? '' : 'none';
       }
 
       try {
@@ -4439,12 +4468,14 @@
           // 데이터 캐싱
           window.jobsData[docSnap.id] = { ...job, id: docSnap.id, createdDate: createdDate };
 
-          let manageBtns = '';
+          let manageCell = '';
           if (isAdmin) {
-            manageBtns = `
-                <button class="btn-edit" onclick="openEditModal('${docSnap.id}')">수정</button>
-                <button class="btn-delete" onclick="deleteJob('${docSnap.id}')">삭제</button>
-              `;
+            manageCell = `
+                <td>
+                    <button class="btn-edit" onclick="openEditModal('${docSnap.id}')">수정</button>
+                    <button class="btn-delete" onclick="deleteJob('${docSnap.id}')">삭제</button>
+                </td>
+             `;
           }
 
           tr.innerHTML = `
@@ -4457,9 +4488,7 @@
                 <td>${job.location || '-'}</td>
                 <td>${job.deadline || '-'}</td>
                 <td>${createdDate}</td>
-                <td>
-                    ${manageBtns}
-                </td>
+                ${manageCell}
             `;
           tbody.appendChild(tr);
         });
