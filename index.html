@@ -1716,6 +1716,219 @@
       flex: none !important;
       max-width: 100% !important;
     }
+
+    /* === 회원가입 모달 스타일 (JobKorea 벤치마킹) === */
+    .signup-modal .modal-content {
+      max-width: 800px;
+      /* 좀 더 넓게 */
+      padding: 0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .signup-header {
+      padding: 20px;
+      border-bottom: 2px solid #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+    }
+
+    .signup-header h2 {
+      margin: 0;
+      font-size: 20px;
+      color: #333;
+      font-weight: bold;
+    }
+
+    .btn-close-modal {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #666;
+    }
+
+    .signup-body {
+      padding: 20px 30px;
+      max-height: 70vh;
+      overflow-y: auto;
+      background: #fff;
+    }
+
+    .row_group {
+      margin-bottom: 30px;
+    }
+
+    .row_group h4 {
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    .mbr_info .row {
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #e1e1e1;
+      padding: 10px 0;
+    }
+
+    .mbr_info .col_1 {
+      width: 160px;
+      color: #333;
+      font-weight: bold;
+      padding-left: 10px;
+      font-size: 14px;
+    }
+
+    .mbr_info .col_2 {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .mbr_info .col_3 {
+      margin-left: 10px;
+    }
+
+    .mbr_info input[type="text"],
+    .mbr_info input[type="password"],
+    .mbr_info input[type="tel"],
+    .mbr_info input[type="email"] {
+      height: 36px;
+      border: 1px solid #ccc;
+      padding: 0 10px;
+      font-size: 14px;
+      min-width: 200px;
+    }
+
+    .mbr_info input[type="radio"] {
+      margin-right: 5px;
+    }
+
+    .mbr_info label {
+      margin-right: 15px;
+      font-weight: normal;
+      font-size: 14px;
+    }
+
+    .notice_msg {
+      width: 100%;
+      font-size: 12px;
+      color: #e74c3c;
+      margin-top: 5px;
+      display: none;
+      /* JS로 제어 */
+    }
+
+    .btnHelp {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #999;
+      color: #fff;
+      border: none;
+      font-size: 12px;
+      cursor: pointer;
+      margin-left: 5px;
+    }
+
+    .mbrBtnAuth,
+    .buttonSendCertification,
+    .btnConfirm,
+    .btnSend {
+      height: 36px;
+      padding: 0 10px;
+      background: #3498db;
+      border: 1px solid #3498db;
+      color: #fff;
+      cursor: pointer;
+      font-size: 13px;
+      border-radius: 4px;
+    }
+
+    .mbrBtnAuth:hover,
+    .buttonSendCertification:hover,
+    .btnConfirm:hover,
+    .btnSend:hover {
+      background: #2980b9;
+    }
+
+    /* 약관 동의 */
+    .policy_check_all {
+      background: #f8f9fa;
+      border: 1px solid #e1e1e1;
+      padding: 15px;
+      margin-bottom: 15px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .policy_check_service {
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .policy_check_privacyOptional,
+    .check_sms {
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .mbrBtnPolicy {
+      font-size: 12px;
+      color: #888;
+      text-decoration: underline;
+      margin-left: 5px;
+      cursor: pointer;
+    }
+
+    .policyTplBox {
+      border: 1px solid #d9d9d9;
+      padding: 10px;
+      height: 100px;
+      overflow-y: scroll;
+      background: #fff;
+      font-size: 12px;
+      color: #666;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      display: block;
+    }
+
+    .policyTplBox ol,
+    .policyTplBox ul {
+      padding-left: 20px;
+    }
+
+    .policyTplBox li {
+      margin-bottom: 5px;
+    }
+
+    .regist_complete {
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    .mbrBtnRegist {
+      width: 100%;
+      height: 50px;
+      background: #3498db;
+      color: #fff;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .mbrBtnRegist:hover {
+      background: #2980b9;
+    }
   </style>
 </head>
 
@@ -2850,39 +3063,7 @@
     </div>
   </div>
 
-  <!-- 회원가입 모달 -->
-  <div id="signupModal" class="modal">
-    <div class="modal-content" style="max-width: 400px;">
-      <span class="close" onclick="closeSignupModal()">&times;</span>
-      <h2>회원가입</h2>
-      <form onsubmit="handleSignup(event)">
-        <div class="form-group">
-          <label>이름</label>
-          <input type="text" id="signup_name" required placeholder="이름을 입력하세요">
-        </div>
-        <div class="form-group">
-          <label>이메일</label>
-          <input type="email" id="signup_email" required placeholder="이메일을 입력하세요">
-        </div>
-        <div class="form-group">
-          <label>비밀번호</label>
-          <input type="password" id="signup_password" required placeholder="비밀번호를 입력하세요 (6자리 이상)">
-        </div>
-        <div style="text-align: right; margin-top: 20px;">
-          <button type="submit" class="btn-submit">가입하기</button>
-          <button type="button" class="btn-cancel" onclick="closeSignupModal()">취소</button>
-        </div>
-        <div style="text-align: center; margin-top: 1rem; border-top: 1px solid #eee; padding-top: 1rem;">
-          <button type="button" onclick="handleGoogleLogin()"
-            style="background: #fff; color: #444; border: 1px solid #ddd; padding: 0.75rem; border-radius: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 100%; font-weight: bold; gap: 10px;">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-              style="width: 18px; height: 18px;">
-            Google로 가입하기
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
+
   <script>
     // 부드러운 스크롤 효과
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -2960,6 +3141,218 @@
     */
 
   </script>
+
+
+  <!-- 내 정보 관리 모달 -->
+  <div id="myInfoModal" class="modal signup-modal" style="display:none;">
+    <div class="modal-content">
+      <div class="signup-header">
+        <h2>내 정보 관리</h2>
+        <button type="button" class="btn-close-modal" onclick="closeMyInfoModal()">×</button>
+      </div>
+      <div class="signup-body">
+        <form onsubmit="handleUpdateInfo(event)">
+          <div class="row_group mbr_info">
+            <h4>회원님의 정보를 최신으로 유지해주세요.</h4>
+
+            <!-- 이메일 (읽기 전용) -->
+            <div class="row mbr_email">
+              <div class="col_1">
+                <label>이메일</label>
+              </div>
+              <div class="col_2">
+                <input type="email" id="info_email" readonly disabled style="background:#f9f9f9; color:#666;" />
+              </div>
+            </div>
+
+            <!-- 이름 (실명) -->
+            <div class="row mbr_name">
+              <div class="col_1">
+                <label for="info_name">이름(실명)</label>
+              </div>
+              <div class="col_2">
+                <input type="text" id="info_name" placeholder="실명을 입력해주세요" maxlength="12" />
+              </div>
+            </div>
+
+            <!-- 닉네임 (신규) -->
+            <div class="row mbr_nickname">
+              <div class="col_1">
+                <label for="info_nickname">닉네임</label>
+              </div>
+              <div class="col_2">
+                <input type="text" id="info_nickname" placeholder="게시판 활동명 (필수)" maxlength="16" required />
+                <div class="notice_msg" style="display:block; color:#666;">* 취업 이야기 게시판 작성자로 표시됩니다.</div>
+              </div>
+            </div>
+
+            <!-- 휴대폰 -->
+            <div class="row mbr_phone">
+              <div class="col_1">
+                <label for="info_phone">휴대폰번호</label>
+              </div>
+              <div class="col_2">
+                <input type="tel" id="info_phone" placeholder="010-0000-0000" maxlength="13" />
+              </div>
+            </div>
+
+            <!-- 비밀번호 변경 (추후 구현) -->
+            <div class="row" style="margin-top:10px;">
+              <div class="col_1">비밀번호</div>
+              <div class="col_2">
+                <button type="button" class="mbrBtnAuth" onclick="alert('비밀번호 변경 기능은 준비 중입니다.');">비밀번호 변경</button>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="regist_complete">
+            <button type="submit" class="mbrBtnRegist">정보 수정 완료</button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 회원가입 모달 (JobKorea 벤치마킹) -->
+  <div id="signupModal" class="modal signup-modal" style="display:none;">
+    <div class="modal-content">
+      <div class="signup-header">
+        <h2>개인회원 가입</h2>
+        <button type="button" class="btn-close-modal" onclick="closeSignupModal()">×</button>
+      </div>
+      <div class="signup-body">
+        <form onsubmit="handleSignup(event)">
+          <!-- 소셜 로그인 (생략 또는 기존 유지) -->
+
+          <div class="row_group mbr_info">
+            <h4>회원가입하고 다양한 혜택을 누리세요!</h4>
+
+            <!-- 아이디 -->
+            <div class="row mbr_id">
+              <div class="col_1">
+                <label for="signup_id">아이디</label>
+              </div>
+              <div class="col_2">
+                <input type="text" id="signup_id" placeholder="잡코리아, 알바몬 통합 ID" maxlength="16" />
+                <div class="notice_msg" id="notice_msg_id"></div>
+              </div>
+            </div>
+
+            <!-- 비밀번호 -->
+            <div class="row mbr_passwd">
+              <div class="col_1">
+                <label for="signup_password">비밀번호</label>
+              </div>
+              <div class="col_2">
+                <input type="password" id="signup_password" placeholder="8~16자의 영문, 숫자, 특수기호" maxlength="16" />
+                <button type="button" class="btnHelp" title="도움말">?</button>
+                <div class="notice_msg" id="notice_msg_pwd"></div>
+              </div>
+              <div class="col_3">
+                <button type="button" class="mbrBtnAuth"
+                  onclick="togglePasswordVisibility('signup_password')">표시</button>
+              </div>
+            </div>
+
+            <!-- 이름 -->
+            <div class="row mbr_name">
+              <div class="col_1">
+                <label for="signup_name">이름(실명)</label>
+              </div>
+              <div class="col_2">
+                <input type="text" id="signup_name" placeholder="실명을 입력해주세요" maxlength="12" />
+                <div class="notice_msg" id="notice_msg_name"></div>
+              </div>
+            </div>
+
+            <!-- 이메일 -->
+            <div class="row mbr_email">
+              <div class="col_1">
+                <label for="signup_email">이메일</label>
+              </div>
+              <div class="col_2">
+                <input type="email" id="signup_email" placeholder="example@email.com" />
+                <div class="notice_msg" id="notice_msg_mail"></div>
+              </div>
+            </div>
+
+            <!-- 휴대폰 -->
+            <div class="row mbr_phone">
+              <div class="col_1">
+                <label for="signup_phone">휴대폰번호</label>
+              </div>
+              <div class="col_2">
+                <input type="tel" id="signup_phone" placeholder="010-0000-0000" maxlength="13" />
+                <button type="button" class="buttonSendCertification" onclick="alert('인증번호가 전송되었습니다 (모의).')">인증번호
+                  전송</button>
+                <div class="notice_msg" id="notice_msg_phone"></div>
+              </div>
+            </div>
+
+            <!-- 인증번호 -->
+            <div class="row authentication_check">
+              <div class="col_1">
+                <label for="signup_cert">인증번호 입력</label>
+              </div>
+              <div class="col_2">
+                <input type="text" id="signup_cert" placeholder="인증번호 6자리" maxlength="6" />
+                <button type="button" class="btnConfirm" onclick="alert('인증되었습니다 (모의).')">확인</button>
+                <button type="button" class="btnSend" onclick="alert('재전송되었습니다 (모의).')">재전송</button>
+                <div class="notice_msg" id="notice_msg_certify"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 약관 동의 -->
+          <div class="row_group policy">
+            <div class="row policy_check_all">
+              <input type="checkbox" id="chk_all" onchange="toggleAllTerms(this)" />
+              <label for="chk_all">필수 동의 항목 및 개인정보 수집 및 이용 동의(선택), 광고성 정보 수신(선택)에 모두 동의합니다.</label>
+            </div>
+
+            <div class="row policy_check_service required">
+              <input type="checkbox" id="chk_age" class="term-chk required-term" />
+              <label for="chk_age"><strong>[필수]</strong> 만 15세 이상입니다.</label>
+            </div>
+
+            <div class="row policy_check_service required">
+              <input type="checkbox" id="chk_service" class="term-chk required-term" />
+              <label for="chk_service"><strong>[필수]</strong> 이용약관 동의</label>
+            </div>
+
+            <div class="policyTplBox">
+              <ol>
+                <li><strong>제 1 조 (목적)</strong><br>본 약관은 회사와 회원간의 이용 조건 및 절차를 규정합니다.</li>
+                <li><strong>제 2 조 (용어의 정의)</strong><br>회원, 아이디, 비밀번호 등에 대한 정의를 따릅니다.</li>
+                <li><strong>제 3 조 (약관의 게시)</strong><br>회사는 약관을 초기 화면에 게시합니다.</li>
+                <!-- 내용 생략 -->
+              </ol>
+            </div>
+
+            <div class="row policy_check_privacyOptional">
+              <input type="checkbox" id="chk_privacy" class="term-chk optional-term" />
+              <label for="chk_privacy">[선택] 개인정보 수집 및 이용 동의</label>
+              <a href="#" class="mbrBtnPolicy">내용보기</a>
+            </div>
+
+            <div class="row check_sms">
+              <input type="checkbox" id="chk_marketing" class="term-chk optional-term" />
+              <label for="chk_marketing">[선택] 광고성 정보 수신 동의</label>
+              <a href="#" class="mbrBtnPolicy">내용보기</a>
+            </div>
+          </div>
+
+          <div class="regist_complete">
+            <button type="submit" class="mbrBtnRegist">가입하기</button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     // Firebase 9 버전 SDK 가져오기
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -3062,6 +3455,20 @@
           loginBtn.textContent = displayName + '님';
           loginBtn.onclick = null;
           loginBtn.style.cursor = 'default';
+
+          // "나의 정보관리" 메뉴 추가
+          if (!document.getElementById('nav-my-info')) {
+            // 로그인 버튼 바로 옆(뒤)에 추가하거나, "로그아웃" 앞에 추가
+            // 여기서는 로그아웃 버튼 앞에 추가
+            const ul = document.querySelector('.global-nav-links');
+            const li = document.createElement('li');
+            li.innerHTML = '<a href="#" onclick="openMyInfoModal(); return false;" id="nav-my-info" style="color: #2ecc71; font-weight:bold;">나의 정보관리</a>';
+            // nav-login (index 0) 바로 뒤에 넣기
+            // 현재 구조: Login(0), Signup(1-hidden), Logout(2), Service(3)...
+            // insertBefore Logout
+            const logoutLi = logoutBtn.parentElement;
+            ul.insertBefore(li, logoutLi);
+          }
         }
         if (signupBtn) signupBtn.style.display = 'none';
         if (logoutBtn) logoutBtn.style.display = 'inline-block';
@@ -3093,9 +3500,12 @@
         if (signupBtn) signupBtn.style.display = 'inline-block';
         if (logoutBtn) logoutBtn.style.display = 'none';
 
-        // 관리자 메뉴 제거
+        // 관리자 메뉴 & 내 정보 메뉴 제거
         const adminBtn = document.getElementById('nav-admin-users');
         if (adminBtn) adminBtn.parentElement.remove();
+
+        const myInfoBtn = document.getElementById('nav-my-info');
+        if (myInfoBtn) myInfoBtn.parentElement.remove();
       }
     });
 
@@ -3111,6 +3521,71 @@
     }
     window.closeSignupModal = function () {
       document.getElementById('signupModal').style.display = 'none';
+    }
+
+    // 내 정보 관리 모달 함수
+    window.openMyInfoModal = async function () {
+      const user = window.auth.currentUser;
+      if (!user) { alert('로그인이 필요합니다.'); return; }
+
+      document.getElementById('myInfoModal').style.display = 'block';
+
+      // 데이터 로드
+      document.getElementById('info_email').value = user.email;
+      document.getElementById('info_name').value = user.displayName || '';
+
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          document.getElementById('info_nickname').value = data.nickname || '';
+          document.getElementById('info_phone').value = data.phone || '';
+        }
+      } catch (e) { console.error(e); }
+    }
+    window.closeMyInfoModal = function () {
+      document.getElementById('myInfoModal').style.display = 'none';
+      document.querySelector('#myInfoModal form').reset();
+    }
+
+    window.handleUpdateInfo = async function (e) {
+      e.preventDefault();
+      const user = window.auth.currentUser;
+      if (!user) return;
+
+      const newName = document.getElementById('info_name').value;
+      const newNickname = document.getElementById('info_nickname').value;
+      const newPhone = document.getElementById('info_phone').value;
+
+      if (!newNickname) {
+        alert('닉네임은 필수입니다.');
+        return;
+      }
+
+      try {
+        // 1. Auth Profile 업데이트 (이름)
+        if (newName !== user.displayName) {
+          await updateProfile(user, { displayName: newName });
+        }
+
+        // 2. Firestore 업데이트 (닉네임, 전화번호, 이름 등)
+        await updateDoc(doc(db, 'users', user.uid), {
+          name: newName,
+          nickname: newNickname,
+          phone: newPhone
+        });
+
+        alert('✅ 회원 정보가 수정되었습니다.');
+        closeMyInfoModal();
+
+        // 헤더 이름 업데이트 (새로고침 없이 반영)
+        const loginBtn = document.getElementById('nav-login');
+        if (loginBtn) loginBtn.textContent = newName + '님';
+
+      } catch (err) {
+        console.error(err);
+        alert('정보 수정 실패: ' + err.message);
+      }
     }
 
     window.handleLogin = async function (e) {
@@ -3140,11 +3615,41 @@
       }
     }
 
+    window.togglePasswordVisibility = function (id) {
+      const input = document.getElementById(id);
+      if (input.type === "password") {
+        input.type = "text";
+      } else {
+        input.type = "password";
+      }
+    }
+
+    window.toggleAllTerms = function (source) {
+      const checkboxes = document.querySelectorAll('.term-chk');
+      for (let chk of checkboxes) {
+        chk.checked = source.checked;
+      }
+    }
+
     window.handleSignup = async function (e) {
       e.preventDefault();
+
       const email = document.getElementById('signup_email').value;
       const pw = document.getElementById('signup_password').value;
       const name = document.getElementById('signup_name').value;
+
+      // 약관 동의 체크
+      const chkAge = document.getElementById('chk_age');
+      const chkService = document.getElementById('chk_service');
+
+      if (chkAge && !chkAge.checked) {
+        alert('만 15세 이상임에 동의해주세요 (필수).');
+        return;
+      }
+      if (chkService && !chkService.checked) {
+        alert('이용약관에 동의해주세요 (필수).');
+        return;
+      }
 
       if (pw.length < 6) {
         alert('비밀번호는 6자리 이상이어야 합니다.');
@@ -3285,17 +3790,32 @@
           attachmentName = attachmentFile.name;
         }
 
-        await window.addDoc(window.collection(window.db, 'stories'), {
+        const docData = {
           title: title,
           content: content,
           imageUrl: imageUrl,
           attachmentUrl: attachmentUrl,
           attachmentName: attachmentName,
           authorUid: user.uid,
-          authorName: user.displayName || '익명',
+          authorName: '익명', // 기본값, 아래에서 덮어씌움
           createdAt: window.Timestamp.now(),
           likes: 0
-        });
+        };
+
+        // 닉네임 조회
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists() && userDoc.data().nickname) {
+            docData.authorName = userDoc.data().nickname;
+          } else {
+            docData.authorName = user.displayName || user.email.split('@')[0];
+          }
+        } catch (e) {
+          docData.authorName = user.displayName || user.email.split('@')[0];
+        }
+
+        await window.addDoc(window.collection(window.db, 'stories'), docData);
+
         alert('✅ 이야기가 등록되었습니다.');
         closeStoryModal();
         loadStories();
