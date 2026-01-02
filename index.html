@@ -950,33 +950,14 @@
     */
 
     /* Improve mobile readability: restore legible sizes */
+    /* Improve mobile readability: restore legible sizes - DISABLED
     @media (max-width: 560px) {
       body {
         font-size: 16px !important;
       }
-
-      .job-card h3 {
-        font-size: 1rem !important;
-        line-height: 1.25rem !important;
-      }
-
-      .job-card p {
-        font-size: .9rem !important;
-      }
-
-      .badge {
-        font-size: .72rem !important;
-      }
-
-      #features .job-card .banner-image {
-        height: 64px !important;
-        padding: 6px !important;
-      }
-
-      .container {
-        padding: 0 16px !important;
-      }
+      ...
     }
+    */
 
     /* Prevent overflow: long titles truncated cleanly */
     .job-card h3 {
@@ -986,6 +967,7 @@
     }
 
     /* Header: hamburger for small screens */
+    /* Header: hamburger for small screens - DISABLED
     .menu-toggle {
       display: none;
       background: #0f172a;
@@ -994,8 +976,11 @@
       padding: .5rem .75rem;
       border-radius: 6px;
       font-weight: 700;
+      /* display: none helps but let's ensure it doesn't show */
     }
 
+    */
+    /*
     @media (max-width: 860px) {
       .header-content {
         gap: .75rem;
@@ -1021,7 +1006,7 @@
         margin-left: auto;
       }
 
-      /* shrink logo a touch on narrow screens */
+      /* shrink logo a touch on narrow screens *
       .logo img {
         height: 42px;
       }
@@ -1029,9 +1014,8 @@
       header nav a {
         margin-right: 0 !important;
       }
-
-      /* override wide spacing */
     }
+    */
 
     /* Premium section background: keep white and add subtle separation only via spacing */
     #features {
