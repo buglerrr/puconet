@@ -3998,19 +3998,18 @@
       if (!tbody) return;
 
       const currentUser = window.auth.currentUser;
+      let isAdmin = false;
+      if (currentUser) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+          if (userDoc.exists() && userDoc.data().role === 'admin') {
+            isAdmin = true;
+          }
+        } catch (e) { console.error(e); }
+      }
 
       try {
-        // 복합 인덱스 문제 회피를 위해:
-        // 1. Where 절만 사용하고 JS에서 정렬하거나
-        // 2. 인덱스가 생성되었다면 둘 다 사용.
-        // 일단 DB가 작으므로 orderBy만 가져와서 JS 필터링이 안전함.
-        // 하지만 user request는 '게시판 기능을 삽입'이므로 where 절을 시도.
-
         let q;
-        // 카테고리 필터
-        // q = query(collection(db, 'stories'), where('category', '==', category), orderBy('createdAt', 'desc'));
-        // *주의*: 인덱스 없으면 에러 발생. 일단 단순화하여 전체 로드 후 JS 필터링 (안전한 방법)
-
         q = query(collection(db, 'stories'), orderBy('createdAt', 'desc'));
 
         const querySnapshot = await getDocs(q);
@@ -4020,7 +4019,6 @@
         let stories = [];
         querySnapshot.forEach((docSnap) => {
           const data = docSnap.data();
-          // 카테고리 체크 (없으면 'free'로 간주하거나, 모달에서 저장 안된 구 데이터는 'free'로 취급)
           const dataCat = data.category || 'free';
           if (dataCat === category) {
             stories.push({ ...data, id: docSnap.id });
@@ -4040,9 +4038,11 @@
           window.storiesData = window.storiesData || {};
           window.storiesData[docId] = { ...data, dateString: date };
 
-          // 작성자 본인 확인
+          // 작성자 본인 확인 또는 관리자
           const isAuthor = currentUser && (currentUser.uid === data.authorUid);
-          const deleteBtn = isAuthor ? `<button onclick="deleteStory('${docId}'); return false;" class="btn-delete" style="font-size:0.8rem; padding:2px 8px; margin-left:5px;">삭제</button>` : '';
+          const canDelete = isAuthor || isAdmin;
+
+          const deleteBtn = canDelete ? `<button onclick="deleteStory('${docId}'); return false;" class="btn-delete" style="font-size:0.8rem; padding:2px 8px; margin-left:5px;">삭제</button>` : '';
 
           const tr = document.createElement('tr');
           tr.innerHTML = `
@@ -4065,6 +4065,31 @@
     }
 
     window.deleteStory = async function (docId) {
+      const currentUser = window.auth.currentUser;
+      if (!currentUser) {
+        alert('로그인이 필요합니다.');
+        return;
+      }
+
+      // 권한 확인 (DB + Logic)
+      let isAdmin = false;
+      try {
+        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+        if (userDoc.exists() && userDoc.data().role === 'admin') isAdmin = true;
+      } catch (e) { }
+
+      let isAuthor = false;
+      try {
+        const sDoc = await getDoc(doc(db, 'stories', docId));
+        if (sDoc.exists() && sDoc.data().authorUid === currentUser.uid) isAuthor = true;
+      } catch (e) { }
+
+      // 작성자도 아니고 관리자도 아니면 거부
+      if (!isAdmin && !isAuthor) {
+        alert('삭제 권한이 없습니다.');
+        return;
+      }
+
       if (!confirm('정말 이 이야기를 삭제하시겠습니까?')) return;
       try {
         await deleteDoc(doc(db, 'stories', docId));
@@ -4374,6 +4399,17 @@
 
       if (!loading || !tbody) return;
 
+      const currentUser = window.auth.currentUser;
+      let isAdmin = false;
+      if (currentUser) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+          if (userDoc.exists() && userDoc.data().role === 'admin') {
+            isAdmin = true;
+          }
+        } catch (e) { console.error(e); }
+      }
+
       try {
         loading.style.display = 'block';
         if (emptyState) emptyState.style.display = 'none';
@@ -4398,17 +4434,18 @@
 
           // 데이터 준비 (이스케이프 처리 주의)
           const safeTitle = escapeHtml(job.title).replace(/'/g, "\\'");
-          const safeCompany = escapeHtml(job.company).replace(/'/g, "\\'");
-          const safeContent = (job.content || '').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n');
-          const safeImageUrl = (job.imageUrl || '').replace(/'/g, "\\'");
-          const safeDetailUrl = (job.detailUrl || '').replace(/'/g, "\\'");
-          const safeJobType = (job.jobType || '').replace(/'/g, "\\'");
-          const safeLocation = (job.location || '').replace(/'/g, "\\'");
-          const safeContentImageUrl = (job.contentImageUrl || '').replace(/'/g, "\\'");
-          const safeAttachmentName = (job.attachmentName || '').replace(/'/g, "\\'");
-          const safeAttachmentUrl = (job.attachmentUrl || '').replace(/'/g, "\\'");
+          // ... (기타 변수들 생략 가능하지만 구조상 유지)
+
           // 데이터 캐싱
           window.jobsData[docSnap.id] = { ...job, id: docSnap.id, createdDate: createdDate };
+
+          let manageBtns = '';
+          if (isAdmin) {
+            manageBtns = `
+                <button class="btn-edit" onclick="openEditModal('${docSnap.id}')">수정</button>
+                <button class="btn-delete" onclick="deleteJob('${docSnap.id}')">삭제</button>
+              `;
+          }
 
           tr.innerHTML = `
                 <td><img src="${job.imageUrl || './logo.png'}" class="job-image" alt="로고"></td>
@@ -4421,8 +4458,7 @@
                 <td>${job.deadline || '-'}</td>
                 <td>${createdDate}</td>
                 <td>
-                    <button class="btn-edit" onclick="openEditModal('${docSnap.id}')">수정</button>
-                    <button class="btn-delete" onclick="deleteJob('${docSnap.id}')">삭제</button>
+                    ${manageBtns}
                 </td>
             `;
           tbody.appendChild(tr);
