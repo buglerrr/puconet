@@ -2782,13 +2782,19 @@
             <aside class="board-sidebar">
               <h3>기관별 채용</h3>
               <ul>
-                <li><a href="#" onclick="switchJobBoard('all'); return false;" id="job-menu-all" class="active">전체</a></li>
+                <li><a href="#" onclick="switchJobBoard('all'); return false;" id="job-menu-all" class="active">전체</a>
+                </li>
                 <li><a href="#" onclick="switchJobBoard('public'); return false;" id="job-menu-public">공기업</a></li>
-                <li><a href="#" onclick="switchJobBoard('quasi-gov'); return false;" id="job-menu-quasi-gov">준정부기관</a></li>
-                <li><a href="#" onclick="switchJobBoard('other-public'); return false;" id="job-menu-other-public">기타공공기관</a></li>
-                <li><a href="#" onclick="switchJobBoard('local-public'); return false;" id="job-menu-local-public">지방공기업</a></li>
-                <li><a href="#" onclick="switchJobBoard('local-funded'); return false;" id="job-menu-local-funded">지방출자/출연기관</a></li>
-                <li><a href="#" onclick="switchJobBoard('research'); return false;" id="job-menu-research">정부출연연구기관</a></li>
+                <li><a href="#" onclick="switchJobBoard('quasi-gov'); return false;" id="job-menu-quasi-gov">준정부기관</a>
+                </li>
+                <li><a href="#" onclick="switchJobBoard('other-public'); return false;"
+                    id="job-menu-other-public">기타공공기관</a></li>
+                <li><a href="#" onclick="switchJobBoard('local-public'); return false;"
+                    id="job-menu-local-public">지방공기업</a></li>
+                <li><a href="#" onclick="switchJobBoard('local-funded'); return false;"
+                    id="job-menu-local-funded">지방출자/출연기관</a></li>
+                <li><a href="#" onclick="switchJobBoard('research'); return false;" id="job-menu-research">정부출연연구기관</a>
+                </li>
                 <li><a href="#" onclick="switchJobBoard('other'); return false;" id="job-menu-other">기타(공직유관단체)</a></li>
               </ul>
             </aside>
@@ -2817,24 +2823,25 @@
                     <th style="width: 100px;">고용형태</th>
                     <th style="width: 120px;">근무지</th>
                     <th style="width: 120px;">마감일</th>
-                <th style="width: 120px;">등록일</th>
-                <th style="width: 180px;">관리</th>
-              </tr>
-            </thead>
-            <tbody id="jobTableBody">
-              <!-- Firebase에서 데이터를 가져와 여기에 표시됩니다 -->
-            </tbody>
-          </table>
+                    <th style="width: 120px;">등록일</th>
+                    <th style="width: 180px;">관리</th>
+                  </tr>
+                </thead>
+                <tbody id="jobTableBody">
+                  <!-- Firebase에서 데이터를 가져와 여기에 표시됩니다 -->
+                </tbody>
+              </table>
 
-          <!-- 게시판별 준비중 메시지 -->
-          <div id="jobBoardMessage" class="board-message" style="display:none; background:white; padding:3rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
-            <h3>준비 중입니다</h3>
-            <p>곧 새로운 채용정보가 업데이트됩니다!</p>
+              <!-- 게시판별 준비중 메시지 -->
+              <div id="jobBoardMessage" class="board-message"
+                style="display:none; background:white; padding:3rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+                <h3>준비 중입니다</h3>
+                <p>곧 새로운 채용정보가 업데이트됩니다!</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
 
       <!-- 등록 모달 -->
       <div id="addModal" class="modal">
@@ -2970,20 +2977,27 @@
             <aside class="board-sidebar">
               <h3>게시판</h3>
               <ul>
-                <li><a href="#" onclick="switchStoryBoard('free'); return false;" id="story-menu-free" class="active">자유게시판</a></li>
-                <li><a href="#" onclick="switchStoryBoard('consulting'); return false;" id="story-menu-consulting">취업상담실</a></li>
+                <li><a href="#" onclick="switchStoryBoard('free'); return false;" id="story-menu-free"
+                    class="active">자유게시판</a></li>
+                <li><a href="#" onclick="switchStoryBoard('consulting'); return false;"
+                    id="story-menu-consulting">취업상담실</a></li>
                 <li><a href="#" onclick="switchStoryBoard('study'); return false;" id="story-menu-study">스터디 모집</a></li>
-                <li><a href="#" onclick="switchStoryBoard('ncs-review'); return false;" id="story-menu-ncs-review">NCS 후기</a></li>
-                <li><a href="#" onclick="switchStoryBoard('interview'); return false;" id="story-menu-interview">면접 후기</a></li>
-                <li><a href="#" onclick="switchStoryBoard('success'); return false;" id="story-menu-success">최종합격 수기</a></li>
-                <li><a href="#" onclick="switchStoryBoard('expert'); return false;" id="story-menu-expert">현직자/전문가</a></li>
+                <li><a href="#" onclick="switchStoryBoard('ncs-review'); return false;" id="story-menu-ncs-review">NCS
+                    후기</a></li>
+                <li><a href="#" onclick="switchStoryBoard('interview'); return false;" id="story-menu-interview">면접
+                    후기</a></li>
+                <li><a href="#" onclick="switchStoryBoard('success'); return false;" id="story-menu-success">최종합격 수기</a>
+                </li>
+                <li><a href="#" onclick="switchStoryBoard('expert'); return false;" id="story-menu-expert">현직자/전문가</a>
+                </li>
               </ul>
             </aside>
 
             <!-- 오른쪽 게시판 컨텐츠 -->
             <div class="board-content">
               <!-- 게시판 테이블 -->
-              <div id="storyBoardTable" style="background:white; padding:2rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+              <div id="storyBoardTable"
+                style="background:white; padding:2rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
                 <table class="board-table" id="storyTable">
                   <thead>
                     <tr>
@@ -3001,7 +3015,8 @@
               </div>
 
               <!-- 게시판별 준비중 메시지 -->
-              <div id="storyBoardMessage" class="board-message" style="display:none; background:white; padding:3rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+              <div id="storyBoardMessage" class="board-message"
+                style="display:none; background:white; padding:3rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
                 <h3>준비 중입니다</h3>
                 <p>곧 새로운 게시판이 오픈됩니다!</p>
               </div>
@@ -3836,7 +3851,9 @@
     }
 
     // === 취업 이야기 관련 로직 ===
-    window.showStoryBoard = async function () {
+    window.currentStoryCategory = 'free'; // 기본값
+
+    window.showStoryBoard = async function (category = 'free') {
       // 1. 모든 다른 섹션 숨기기
       document.getElementById('features').style.display = 'none';
       document.getElementById('jobs').style.display = 'none';
@@ -3856,14 +3873,12 @@
       const storySection = document.getElementById('story-board-section');
       if (storySection) {
         storySection.style.display = 'block';
-        // 기본적으로 자유게시판으로 시작
-        switchStoryBoard('free');
+        switchStoryBoard(category);
       }
       window.scrollTo(0, 0);
     }
 
     // 원래 화면으로 복귀 시 사이드바 복구
-    // 원래 화면으로 복귀 시 사이드바 복구 (전역 노출)
     window.restoreSidebar = function () {
       const wrapper = document.querySelector('.content-with-sidebar-wrapper');
       if (wrapper) wrapper.classList.remove('full-width-wrapper');
@@ -3881,11 +3896,29 @@
         window.openLoginModal();
         return;
       }
+      // 모달 제목에 현재 카테고리 표시 (선택사항)
+      const catName = getCategoryName(window.currentStoryCategory);
+      document.querySelector('#storyModal h2').textContent = `✏️ 이야기 작성하기 (${catName})`;
+
       document.getElementById('storyModal').style.display = 'block';
     }
+
     window.closeStoryModal = function () {
       document.getElementById('storyModal').style.display = 'none';
       document.querySelector('#storyModal form').reset();
+    }
+
+    function getCategoryName(cat) {
+      const map = {
+        'free': '자유게시판',
+        'consulting': '취업상담실',
+        'study': '스터디 모집',
+        'ncs-review': 'NCS 후기',
+        'interview': '면접 후기',
+        'success': '최종합격 수기',
+        'expert': '현직자/전문가'
+      };
+      return map[cat] || '게시판';
     }
 
     // 파일 업로드 유틸리티 함수
@@ -3931,9 +3964,10 @@
           attachmentUrl: attachmentUrl,
           attachmentName: attachmentName,
           authorUid: user.uid,
-          authorName: '익명', // 기본값, 아래에서 덮어씌움
+          authorName: '익명',
           createdAt: window.Timestamp.now(),
-          likes: 0
+          likes: 0,
+          category: window.currentStoryCategory // 현재 카테고리 저장
         };
 
         // 닉네임 조회
@@ -3952,36 +3986,63 @@
 
         alert('✅ 이야기가 등록되었습니다.');
         closeStoryModal();
-        loadStories();
+        loadStories(window.currentStoryCategory);
       } catch (err) {
         console.error(err);
         alert('등록 실패: ' + err.message);
       }
     }
 
-    window.loadStories = async function () {
+    window.loadStories = async function (category = 'free') {
       const tbody = document.getElementById('storyTableBody');
       if (!tbody) return;
 
+      const currentUser = window.auth.currentUser;
+
       try {
-        const q = query(collection(db, 'stories'), orderBy('createdAt', 'desc'));
+        // 복합 인덱스 문제 회피를 위해:
+        // 1. Where 절만 사용하고 JS에서 정렬하거나
+        // 2. 인덱스가 생성되었다면 둘 다 사용.
+        // 일단 DB가 작으므로 orderBy만 가져와서 JS 필터링이 안전함.
+        // 하지만 user request는 '게시판 기능을 삽입'이므로 where 절을 시도.
+
+        let q;
+        // 카테고리 필터
+        // q = query(collection(db, 'stories'), where('category', '==', category), orderBy('createdAt', 'desc'));
+        // *주의*: 인덱스 없으면 에러 발생. 일단 단순화하여 전체 로드 후 JS 필터링 (안전한 방법)
+
+        q = query(collection(db, 'stories'), orderBy('createdAt', 'desc'));
+
         const querySnapshot = await getDocs(q);
 
         tbody.innerHTML = ''; // 클리어
 
-        if (querySnapshot.empty) {
-          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:3rem; color:#888;">아직 이야기가 없습니다. 첫 번째 이야기를 들려주세요!</td></tr>';
+        let stories = [];
+        querySnapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          // 카테고리 체크 (없으면 'free'로 간주하거나, 모달에서 저장 안된 구 데이터는 'free'로 취급)
+          const dataCat = data.category || 'free';
+          if (dataCat === category) {
+            stories.push({ ...data, id: docSnap.id });
+          }
+        });
+
+        if (stories.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:3rem; color:#888;">아직 이야기가 없습니다. 첫 번째 이야기를 들려주세요!</td></tr>';
           return;
         }
 
-        let index = querySnapshot.size;
-        querySnapshot.forEach((docSnap) => {
-          const data = docSnap.data();
-          const docId = docSnap.id;
+        let index = stories.length;
+        stories.forEach((data) => {
           const date = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : '-';
+          const docId = data.id;
 
           window.storiesData = window.storiesData || {};
-          window.storiesData[docId] = { ...data, id: docId, dateString: date };
+          window.storiesData[docId] = { ...data, dateString: date };
+
+          // 작성자 본인 확인
+          const isAuthor = currentUser && (currentUser.uid === data.authorUid);
+          const deleteBtn = isAuthor ? `<button onclick="deleteStory('${docId}'); return false;" class="btn-delete" style="font-size:0.8rem; padding:2px 8px; margin-left:5px;">삭제</button>` : '';
 
           const tr = document.createElement('tr');
           tr.innerHTML = `
@@ -3992,40 +4053,54 @@
             <td style="text-align:center;">${escapeHtml(data.authorName)}</td>
             <td style="text-align:center; color:#666;">${date}</td>
             <td style="text-align:center;">❤️ ${data.likes || 0}</td>
+            <td style="text-align:center;">${deleteBtn}</td> 
           `;
           tbody.appendChild(tr);
         });
 
       } catch (err) {
         console.error(err);
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:red;">데이터 로딩 실패</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">데이터 로딩 실패</td></tr>';
+      }
+    }
+
+    window.deleteStory = async function (docId) {
+      if (!confirm('정말 이 이야기를 삭제하시겠습니까?')) return;
+      try {
+        await deleteDoc(doc(db, 'stories', docId));
+        alert('삭제되었습니다.');
+        loadStories(window.currentStoryCategory);
+      } catch (e) {
+        console.error(e);
+        alert('삭제 실패: ' + e.message);
       }
     }
 
     // 게시판 전환 함수
     window.switchStoryBoard = function (boardType) {
+      window.currentStoryCategory = boardType;
+
       // 사이드바 메뉴 활성화 상태 변경
       const menuItems = document.querySelectorAll('.board-sidebar a');
       menuItems.forEach(item => item.classList.remove('active'));
       const activeMenu = document.getElementById('story-menu-' + boardType);
       if (activeMenu) activeMenu.classList.add('active');
-      
-      // 게시판 타입에 따라 표시 제어
+
+      // 모든 게시판 타입에 대해 테이블 표시 (이제 준비중 메시지 X)
       const boardTable = document.getElementById('storyBoardTable');
       const boardMessage = document.getElementById('storyBoardMessage');
-      
-      if (boardType === 'free') {
-        // 자유게시판: 기존 스토리 게시판 표시
-        if (boardTable) boardTable.style.display = 'block';
-        if (boardMessage) boardMessage.style.display = 'none';
-        loadStories();
-      } else {
-        // 다른 게시판: 준비중 메시지 표시
-        if (boardTable) boardTable.style.display = 'none';
-        if (boardMessage) boardMessage.style.display = 'block';
-      }
+
+      if (boardTable) boardTable.style.display = 'block';
+      if (boardMessage) boardMessage.style.display = 'none';
+
+      // 헤더 제목 변경 (선택사항)
+      const titleEl = document.querySelector('.story-header h1');
+      if (titleEl) titleEl.textContent = getCategoryName(boardType);
+
+      loadStories(boardType);
     }
 
+    // 상세 보기
     window.viewStoryDetail = function (id) {
       const data = window.storiesData[id];
       if (!data) return;
@@ -4206,13 +4281,13 @@
       menuItems.forEach(item => item.classList.remove('active'));
       const activeMenu = document.getElementById('job-menu-' + boardType);
       if (activeMenu) activeMenu.classList.add('active');
-      
+
       // 게시판 타입에 따라 표시 제어
       const jobTable = document.getElementById('jobTable');
       const loading = document.getElementById('loading');
       const emptyState = document.getElementById('emptyState');
       const jobBoardMessage = document.getElementById('jobBoardMessage');
-      
+
       if (boardType === 'all') {
         // 전체: 기존 채용정보 게시판 표시
         if (jobBoardMessage) jobBoardMessage.style.display = 'none';
