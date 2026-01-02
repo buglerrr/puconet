@@ -3927,13 +3927,46 @@
       return map[cat] || '게시판';
     }
 
-    // 파일 업로드 유틸리티 함수
-    window.uploadFile = async function (file, folderName) {
+    // 이야기 작성 모달 열기 (수정 모드 지원)
+    window.openStoryModal = function (editId = null) {
+      const modal = document.getElementById('storyModal');
+      const form = document.querySelector('#storyModal form');
+      const btn = document.querySelector('#storyModal .btn-submit');
+
+      if (!modal) return;
+
+      modal.style.display = 'block';
+
+      // 초기화
+      if (form) form.reset();
+      window.currentStoryEditId = null;
+
+      // 수정 모드일 경우
+      if (editId) {
+        window.currentStoryEditId = editId;
+        if (btn) btn.textContent = '이야기 수정';
+
+        const data = window.storiesData[editId];
+        if (data) {
+          document.getElementById('story_title').value = data.title || '';
+          document.getElementById('story_content').value = data.content || '';
+          // 이미지/파일은 보안상 value 설정 불가 (새로 업로드 필요 시 입력)
+        }
+      } else {
+        if (btn) btn.textContent = '이야기 등록';
+      }
+    }
+
+    window.closeStoryModal = function () {
+      document.getElementById('storyModal').style.display = 'none';
+      window.currentStoryEditId = null;
+    }
+
+    // 파일 업로드 함수 (재사용)
+    window.uploadFile = async function (file, folder) {
       if (!file) return null;
       try {
-        const ext = file.name.split('.').pop();
-        const filename = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${ext}`;
-        const storageRef = window.ref(window.storage, `${folderName}/${filename}`);
+        const storageRef = window.ref(window.storage, `${folder}/${Date.now()}_${file.name}`);
         const snapshot = await window.uploadBytes(storageRef, file);
         return await window.getDownloadURL(snapshot.ref);
       } catch (e) {
@@ -3957,6 +3990,14 @@
         let attachmentUrl = '';
         let attachmentName = '';
 
+        // 기존 데이터 유지 (수정 시 파일 변경 없으면)
+        if (window.currentStoryEditId && window.storiesData[window.currentStoryEditId]) {
+          const oldData = window.storiesData[window.currentStoryEditId];
+          imageUrl = oldData.imageUrl || '';
+          attachmentUrl = oldData.attachmentUrl || '';
+          attachmentName = oldData.attachmentName || '';
+        }
+
         if (imageFile) imageUrl = await window.uploadFile(imageFile, 'story_images');
         if (attachmentFile) {
           attachmentUrl = await window.uploadFile(attachmentFile, 'story_attachments');
@@ -3969,33 +4010,43 @@
           imageUrl: imageUrl,
           attachmentUrl: attachmentUrl,
           attachmentName: attachmentName,
+          // author info is immutable on edit usually, but safe to re-set
           authorUid: user.uid,
-          authorName: '익명',
-          createdAt: window.Timestamp.now(),
-          likes: 0,
-          category: window.currentStoryCategory // 현재 카테고리 저장
+          authorName: user.displayName || '익명',
+          updatedAt: window.Timestamp.now(), // 수정 시각
+          category: window.currentStoryCategory
         };
 
-        // 닉네임 조회
+        if (!window.currentStoryEditId) {
+          // 신규 작성 시 추가 필드
+          docData.createdAt = window.Timestamp.now();
+          docData.likes = 0;
+          docData.views = 0;
+        }
+
+        // 닉네임 조회 (신규 작성 시에만? 수정시에도 업데이트? -> 작성자명은 유지하는게 보통이나 여기선 갱신)
         try {
           const userDoc = await getDoc(doc(db, 'users', user.uid));
           if (userDoc.exists() && userDoc.data().nickname) {
             docData.authorName = userDoc.data().nickname;
-          } else {
-            docData.authorName = user.displayName || user.email.split('@')[0];
           }
-        } catch (e) {
-          docData.authorName = user.displayName || user.email.split('@')[0];
+        } catch (e) { }
+
+        if (window.currentStoryEditId) {
+          // 수정
+          await updateDoc(doc(db, 'stories', window.currentStoryEditId), docData);
+          alert('✅ 이야기가 수정되었습니다.');
+        } else {
+          // 등록
+          await window.addDoc(window.collection(window.db, 'stories'), docData);
+          alert('✅ 이야기가 등록되었습니다.');
         }
 
-        await window.addDoc(window.collection(window.db, 'stories'), docData);
-
-        alert('✅ 이야기가 등록되었습니다.');
         closeStoryModal();
         loadStories(window.currentStoryCategory);
       } catch (err) {
         console.error(err);
-        alert('등록 실패: ' + err.message);
+        alert('처리 실패: ' + err.message);
       }
     }
 
@@ -4184,6 +4235,15 @@
         } catch (e) { }
 
         if (isAdmin || isAuthor) {
+          // 수정 버튼
+          const editBtn = document.createElement('button');
+          editBtn.textContent = '수정';
+          editBtn.className = 'btn-edit';
+          editBtn.style.cssText = 'padding: 10px 20px; font-size: 1rem; margin-right:5px;';
+          editBtn.onclick = function () { openStoryModal(id); };
+          actionArea.appendChild(editBtn);
+
+          // 삭제 버튼
           const delBtn = document.createElement('button');
           delBtn.textContent = '삭제';
           delBtn.className = 'btn-delete';
