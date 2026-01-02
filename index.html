@@ -200,7 +200,7 @@
       margin-top: 1.25rem;
     }
 
-    /* Responsive columns - DISABLED for Fixed Layout
+    /* Responsive columns */
     @media (max-width: 1024px) {
       .job-grid {
         grid-template-columns: repeat(3, 1fr);
@@ -218,7 +218,6 @@
         grid-template-columns: 1fr;
       }
     }
-    */
 
     /* 푸터 */
     footer {
@@ -281,7 +280,6 @@
       color: #fff !important;
     }
 
-    /*
     @media (max-width:768px) {
       .global-nav .container {
         justify-content: center;
@@ -292,7 +290,6 @@
         flex-wrap: wrap;
       }
     }
-    */
 
     /* === Force header & global nav non-sticky === */
     .global-nav,
@@ -950,14 +947,33 @@
     */
 
     /* Improve mobile readability: restore legible sizes */
-    /* Improve mobile readability: restore legible sizes - DISABLED
     @media (max-width: 560px) {
       body {
         font-size: 16px !important;
       }
-      ...
+
+      .job-card h3 {
+        font-size: 1rem !important;
+        line-height: 1.25rem !important;
+      }
+
+      .job-card p {
+        font-size: .9rem !important;
+      }
+
+      .badge {
+        font-size: .72rem !important;
+      }
+
+      #features .job-card .banner-image {
+        height: 64px !important;
+        padding: 6px !important;
+      }
+
+      .container {
+        padding: 0 16px !important;
+      }
     }
-    */
 
     /* Prevent overflow: long titles truncated cleanly */
     .job-card h3 {
@@ -967,7 +983,6 @@
     }
 
     /* Header: hamburger for small screens */
-    /* Header: hamburger for small screens - DISABLED */
     .menu-toggle {
       display: none;
       background: #0f172a;
@@ -976,7 +991,6 @@
       padding: .5rem .75rem;
       border-radius: 6px;
       font-weight: 700;
-      /* display: none helps but let's ensure it doesn't show */
     }
 
     @media (max-width: 860px) {
@@ -1004,7 +1018,7 @@
         margin-left: auto;
       }
 
-      /* shrink logo a touch on narrow screens *
+      /* shrink logo a touch on narrow screens */
       .logo img {
         height: 42px;
       }
@@ -1012,229 +1026,230 @@
       header nav a {
         margin-right: 0 !important;
       }
+
+      /* override wide spacing */
     }
-    */
 
-      /* Premium section background: keep white and add subtle separation only via spacing */
-      #features {
-        background: #ffffff !important;
-      }
+    /* Premium section background: keep white and add subtle separation only via spacing */
+    #features {
+      background: #ffffff !important;
+    }
 
-      /* === 사이드바 레이아웃 스타일 === */
+    /* === 사이드바 레이아웃 스타일 === */
+    .content-with-sidebar-wrapper {
+      display: flex;
+      gap: 1rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .main-content-area {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .research-sidebar {
+      flex: 0 0 300px;
+      align-self: flex-start;
+    }
+
+    /* 사이드바 스타일 */
+    .mainResearchWrapper {
+      background: #ffffff;
+      border-radius: 0;
+      overflow: hidden;
+      box-shadow: none;
+      padding-top: 1rem;
+    }
+
+    .bannerSection {
+      padding: 0 0.3rem 1rem 0;
+    }
+
+    .bannerHeader {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      margin-bottom: 0.1rem;
+    }
+
+    .hbntitleImage {
+      text-align: left;
+      font-size: 1.1rem;
+      margin-bottom: 0;
+      color: #2c3e50;
+      font-weight: bold;
+    }
+
+    .btnSet {
+      margin-top: 0;
+      margin-left: 1rem;
+    }
+
+    .btn_subScribe {
+      display: inline-block;
+      background: transparent;
+      color: #3498db;
+      padding: 0;
+      text-decoration: none;
+      border-radius: 0;
+      font-size: 0.9rem;
+      font-weight: normal;
+      transition: color 0.3s;
+      cursor: pointer;
+    }
+
+    .btn_subScribe:hover {
+      color: #2980b9;
+      text-decoration: underline;
+    }
+
+    .bannerBody ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .bannerList {
+      margin-bottom: 1rem;
+    }
+
+    .bannerList a {
+      display: block;
+      transition: transform 0.2s;
+    }
+
+    .bannerList a:hover {
+      transform: scale(1.02);
+    }
+
+    .bannerList img {
+      width: 66.67%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      display: block;
+      margin: 0;
+    }
+
+    .main-research-line {
+      height: 1px;
+      background: #e0e0e0;
+      margin: 0.75rem 0;
+    }
+
+    .hbn-row-image {
+      margin-top: 1rem;
+    }
+
+    .hbn-row-image.small-bottom {
+      margin-bottom: 0.75rem;
+    }
+
+    .hbn-row-image a {
+      display: block;
+    }
+
+    .hbn-row-image img {
+      width: 66.67%;
+      height: auto;
+      border-radius: 8px;
+      display: block;
+      margin: 0;
+    }
+
+    /* 반응형: 1200px 이하에서 사이드바를 상단으로 이동 */
+    @media (max-width: 1200px) {
       .content-with-sidebar-wrapper {
-        display: flex;
-        gap: 1rem;
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 0 20px;
-      }
-
-      .main-content-area {
-        flex: 1;
-        min-width: 0;
+        flex-direction: column;
       }
 
       .research-sidebar {
-        flex: 0 0 300px;
-        align-self: flex-start;
+        flex: 0 0 auto;
+        position: static;
+        max-height: none;
+        margin-bottom: 2rem;
       }
+    }
 
-      /* 사이드바 스타일 */
-      .mainResearchWrapper {
-        background: #ffffff;
-        border-radius: 0;
-        overflow: hidden;
-        box-shadow: none;
-        padding-top: 1rem;
-      }
+    /* 프리미엄 채용정보 배너 배경색 */
+    .job-grid--premium .job-card:nth-child(1) {
+      background: #e3f2fd !important;
+      /* 연한 하늘색 (독립기념관) */
+    }
 
-      .bannerSection {
-        padding: 0 0.3rem 1rem 0;
-      }
+    .job-grid--premium .job-card:nth-child(2) {
+      background: #f3e5f5 !important;
+      /* 연한 보라색 (한국남부발전) */
+    }
 
-      .bannerHeader {
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-        margin-bottom: 0.1rem;
-      }
+    .job-grid--premium .job-card:nth-child(3) {
+      background: #fff3e0 !important;
+      /* 연한 주황색 (세종학당재단) */
+    }
 
-      .hbntitleImage {
-        text-align: left;
-        font-size: 1.1rem;
-        margin-bottom: 0;
-        color: #2c3e50;
-        font-weight: bold;
-      }
-
-      .btnSet {
-        margin-top: 0;
-        margin-left: 1rem;
-      }
-
-      .btn_subScribe {
-        display: inline-block;
-        background: transparent;
-        color: #3498db;
-        padding: 0;
-        text-decoration: none;
-        border-radius: 0;
-        font-size: 0.9rem;
-        font-weight: normal;
-        transition: color 0.3s;
-        cursor: pointer;
-      }
-
-      .btn_subScribe:hover {
-        color: #2980b9;
-        text-decoration: underline;
-      }
-
-      .bannerBody ul {
-        list-style: none;
-        padding: 0;
-      }
-
-      .bannerList {
-        margin-bottom: 1rem;
-      }
-
-      .bannerList a {
-        display: block;
-        transition: transform 0.2s;
-      }
-
-      .bannerList a:hover {
-        transform: scale(1.02);
-      }
-
-      .bannerList img {
-        width: 66.67%;
-        height: auto;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        display: block;
-        margin: 0;
-      }
-
-      .main-research-line {
-        height: 1px;
-        background: #e0e0e0;
-        margin: 0.75rem 0;
-      }
-
-      .hbn-row-image {
-        margin-top: 1rem;
-      }
-
-      .hbn-row-image.small-bottom {
-        margin-bottom: 0.75rem;
-      }
-
-      .hbn-row-image a {
-        display: block;
-      }
-
-      .hbn-row-image img {
-        width: 66.67%;
-        height: auto;
-        border-radius: 8px;
-        display: block;
-        margin: 0;
-      }
-
-      /* 반응형: 1200px 이하에서 사이드바를 상단으로 이동 */
-      @media (max-width: 1200px) {
-        .content-with-sidebar-wrapper {
-          flex-direction: column;
-        }
-
-        .research-sidebar {
-          flex: 0 0 auto;
-          position: static;
-          max-height: none;
-          margin-bottom: 2rem;
-        }
-      }
-
-      /* 프리미엄 채용정보 배너 배경색 */
-      .job-grid--premium .job-card:nth-child(1) {
-        background: #e3f2fd !important;
-        /* 연한 하늘색 (독립기념관) */
-      }
-
-      .job-grid--premium .job-card:nth-child(2) {
-        background: #f3e5f5 !important;
-        /* 연한 보라색 (한국남부발전) */
-      }
-
-      .job-grid--premium .job-card:nth-child(3) {
-        background: #fff3e0 !important;
-        /* 연한 주황색 (세종학당재단) */
-      }
-
-      .job-grid--premium .job-card:nth-child(4) {
-        background: #f1f8e9 !important;
-        /* 연한 연두색 (국민연금공단) */
-      }
+    .job-grid--premium .job-card:nth-child(4) {
+      background: #f1f8e9 !important;
+      /* 연한 연두색 (국민연금공단) */
+    }
 
 
-      /* === [교육과정 배너 전용 스타일] 폭은 .container로 자동 일치 === */
-      #edu-courses .edu-banner-list {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        /* 한 줄 3개 */
-        gap: 20px;
-        /* 위 배너들과 동일 간격 */
-        width: 100%;
-      }
+    /* === [교육과정 배너 전용 스타일] 폭은 .container로 자동 일치 === */
+    #edu-courses .edu-banner-list {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      /* 한 줄 3개 */
+      gap: 20px;
+      /* 위 배너들과 동일 간격 */
+      width: 100%;
+    }
 
-      #edu-courses .edu-banner {
-        width: 100%;
-        /* 칼럼 폭 100% (폭 어긋남 방지) */
-        height: 360px;
-        /* 기존 대비 약 2배 (필요시 320~400px 조정) */
-        display: flex;
-        flex-direction: column;
-        border-radius: 16px;
-        overflow: hidden;
-        background: #fff;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
-        transition: transform .12s ease;
-      }
+    #edu-courses .edu-banner {
+      width: 100%;
+      /* 칼럼 폭 100% (폭 어긋남 방지) */
+      height: 360px;
+      /* 기존 대비 약 2배 (필요시 320~400px 조정) */
+      display: flex;
+      flex-direction: column;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
+      transition: transform .12s ease;
+    }
 
-      #edu-courses .edu-banner:hover {
-        transform: translateY(-2px);
-      }
+    #edu-courses .edu-banner:hover {
+      transform: translateY(-2px);
+    }
 
-      #edu-courses .edu-banner .thumb {
-        flex: 1 0 auto;
-        background: #f1f3f5;
-      }
+    #edu-courses .edu-banner .thumb {
+      flex: 1 0 auto;
+      background: #f1f3f5;
+    }
 
-      #edu-courses .edu-banner .thumb img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
+    #edu-courses .edu-banner .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-      #edu-courses .edu-banner .meta {
-        padding: 12px 14px;
-      }
+    #edu-courses .edu-banner .meta {
+      padding: 12px 14px;
+    }
 
-      #edu-courses .edu-banner .meta h3 {
-        font-size: 16px;
-        line-height: 1.35;
-        margin-bottom: 6px;
-        font-weight: 700;
-      }
+    #edu-courses .edu-banner .meta h3 {
+      font-size: 16px;
+      line-height: 1.35;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
 
-      #edu-courses .edu-banner .meta p {
-        font-size: 13px;
-        color: #666;
-      }
+    #edu-courses .edu-banner .meta p {
+      font-size: 13px;
+      color: #666;
+    }
 
-      /* 반응형: 3 → 2 → 1열 - DISABLED
+    /* 반응형: 3 → 2 → 1열 */
     @media (max-width: 1024px) {
       #edu-courses .edu-banner-list {
         grid-template-columns: repeat(2, 1fr);
@@ -1246,7 +1261,6 @@
         grid-template-columns: 1fr;
       }
     }
-    */
   </style>
   <style id="jobcard-fixed-size-style">
     /* 주입: job-card 고정 크기 */
@@ -2720,6 +2734,7 @@
         <div class="board-container">
           <div class="board-header">
             <h1 class="board-title">채용정보 상세</h1>
+            <button class="btn-add" onclick="showBoard()">목록으로</button>
           </div>
 
           <div class="detail-content-box"
@@ -2748,11 +2763,6 @@
                   style="color:#3498db; text-decoration:underline;"></a>
               </div>
               <a id="detail-link" href="#" target="_blank" class="cta-button" style="display:none;">채용 사이트 방문</a>
-
-              <div id="detail-actions"
-                style="margin-top:20px; text-align:right; border-top:1px solid #eee; padding-top:20px;">
-                <!-- Buttons injected by JS -->
-              </div>
             </div>
           </div>
         </div>
@@ -2766,65 +2776,36 @@
             <button class="btn-add" onclick="openAddModal()">+ 채용정보 등록</button>
           </div>
 
-          <!-- 게시판 레이아웃: 사이드바 + 컨텐츠 -->
-          <div class="board-layout">
-            <!-- 왼쪽 사이드바 (세부 메뉴) -->
-            <aside class="board-sidebar">
-              <h3>기관별 채용</h3>
-              <!-- 사이드바 메뉴 -->
-              <ul style="list-style:none; padding:0;">
-                <li><a href="#" id="job-menu-all" onclick="switchJobBoard('all')" class="active">전체</a>
-                </li>
-                <li><a href="#" id="job-menu-intern" onclick="switchJobBoard('intern')">청년인턴</a></li>
-                <li><a href="#" id="job-menu-new" onclick="switchJobBoard('new')">신입직</a></li>
-                <li><a href="#" id="job-menu-experienced" onclick="switchJobBoard('experienced')">경력직</a>
-                </li>
-                <li><a href="#" id="job-menu-contract" onclick="switchJobBoard('contract')">무기계약직</a>
-                </li>
-              </ul>
-            </aside>
-
-            <!-- 오른쪽 게시판 컨텐츠 -->
-            <div class="board-content">
-              <!-- 로딩 상태 -->
-              <div id="loading" class="loading">
-                <div class="spinner"></div>
-                <p>로딩 중...</p>
-              </div>
-
-              <!-- 빈 상태 -->
-              <div id="emptyState" class="empty-state" style="display: none;">
-                <h3>등록된 채용정보가 없습니다</h3>
-                <p>첫 번째 채용정보를 등록해보세요!</p>
-              </div>
-
-              <!-- 테이블 -->
-              <table class="board-table" id="jobTable" style="display: none;">
-                <thead>
-                  <tr>
-                    <th style="width: 80px;">로고</th>
-                    <th style="width: 150px;">기관명</th>
-                    <th>제목</th>
-                    <th style="width: 100px;">고용형태</th>
-                    <th style="width: 120px;">근무지</th>
-                    <th style="width: 120px;">마감일</th>
-                    <th style="width: 120px;">등록일</th>
-                    <th style="width: 180px;" id="jobHeaderManage">관리</th>
-                  </tr>
-                </thead>
-                <tbody id="jobTableBody">
-                  <!-- Firebase에서 데이터를 가져와 여기에 표시됩니다 -->
-                </tbody>
-              </table>
-
-              <!-- 게시판별 준비중 메시지 -->
-              <div id="jobBoardMessage" class="board-message"
-                style="display:none; background:white; padding:3rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
-                <h3>준비 중입니다</h3>
-                <p>곧 새로운 채용정보가 업데이트됩니다!</p>
-              </div>
-            </div>
+          <!-- 로딩 상태 -->
+          <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>로딩 중...</p>
           </div>
+
+          <!-- 빈 상태 -->
+          <div id="emptyState" class="empty-state" style="display: none;">
+            <h3>등록된 채용정보가 없습니다</h3>
+            <p>첫 번째 채용정보를 등록해보세요!</p>
+          </div>
+
+          <!-- 테이블 -->
+          <table class="board-table" id="jobTable" style="display: none;">
+            <thead>
+              <tr>
+                <th style="width: 80px;">로고</th>
+                <th style="width: 150px;">기관명</th>
+                <th>제목</th>
+                <th style="width: 100px;">고용형태</th>
+                <th style="width: 120px;">근무지</th>
+                <th style="width: 120px;">마감일</th>
+                <th style="width: 120px;">등록일</th>
+                <th style="width: 180px;">관리</th>
+              </tr>
+            </thead>
+            <tbody id="jobTableBody">
+              <!-- Firebase에서 데이터를 가져와 여기에 표시됩니다 -->
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -2953,7 +2934,7 @@
         <div class="container" style="max-width:1400px; margin:0 auto;">
           <div class="story-header">
             <h1>취업 이야기</h1>
-            <button class="btn-write-story" onclick="openWriteStoryModal()">✏️ 글 작성하기</button>
+            <button class="btn-write-story" onclick="openWriteStoryModal()">✏️ 이야기 쓰기</button>
           </div>
 
           <!-- 게시판 레이아웃: 사이드바 + 컨텐츠 -->
@@ -2961,28 +2942,21 @@
             <!-- 왼쪽 사이드바 (세부 메뉴) -->
             <aside class="board-sidebar">
               <h3>게시판</h3>
-              <!-- 사이드바 메뉴 -->
-              <ul style="list-style:none; padding:0;">
-                <li><a href="#" id="story-menu-free" onclick="switchStoryBoard('free')" class="active">취업
-                    이야기</a></li>
-                <li><a href="#" id="story-menu-consulting" onclick="switchStoryBoard('consulting')">취업상담실</a></li>
-                <li><a href="#" id="story-menu-study" onclick="switchStoryBoard('study')">스터디 모집</a></li>
-                <li><a href="#" id="story-menu-ncs-review" onclick="switchStoryBoard('ncs-review')">NCS
-                    후기</a></li>
-                <li><a href="#" id="story-menu-interview" onclick="switchStoryBoard('interview')">면접
-                    후기</a></li>
-                <li><a href="#" id="story-menu-success" onclick="switchStoryBoard('success')">최종합격 수기</a>
-                </li>
-                <li><a href="#" id="story-menu-expert" onclick="switchStoryBoard('expert')">현직자/전문가</a>
-                </li>
+              <ul>
+                <li><a href="#" onclick="switchStoryBoard('free'); return false;" id="story-menu-free" class="active">자유게시판</a></li>
+                <li><a href="#" onclick="switchStoryBoard('consulting'); return false;" id="story-menu-consulting">취업상담실</a></li>
+                <li><a href="#" onclick="switchStoryBoard('study'); return false;" id="story-menu-study">스터디 모집</a></li>
+                <li><a href="#" onclick="switchStoryBoard('ncs-review'); return false;" id="story-menu-ncs-review">NCS 후기</a></li>
+                <li><a href="#" onclick="switchStoryBoard('interview'); return false;" id="story-menu-interview">면접 후기</a></li>
+                <li><a href="#" onclick="switchStoryBoard('success'); return false;" id="story-menu-success">최종합격 수기</a></li>
+                <li><a href="#" onclick="switchStoryBoard('expert'); return false;" id="story-menu-expert">현직자/전문가</a></li>
               </ul>
             </aside>
 
             <!-- 오른쪽 게시판 컨텐츠 -->
             <div class="board-content">
               <!-- 게시판 테이블 -->
-              <div id="storyBoardTable"
-                style="background:white; padding:2rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+              <div id="storyBoardTable" style="background:white; padding:2rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
                 <table class="board-table" id="storyTable">
                   <thead>
                     <tr>
@@ -3000,8 +2974,7 @@
               </div>
 
               <!-- 게시판별 준비중 메시지 -->
-              <div id="storyBoardMessage" class="board-message"
-                style="display:none; background:white; padding:3rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+              <div id="storyBoardMessage" class="board-message" style="display:none; background:white; padding:3rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
                 <h3>준비 중입니다</h3>
                 <p>곧 새로운 게시판이 오픈됩니다!</p>
               </div>
@@ -3013,6 +2986,9 @@
       <!-- 이야기 상세 보기 섹션 -->
       <div id="story-detail-section" style="display:none; width:100%;">
         <div class="container" style="max-width:1000px; margin:0 auto;">
+          <button onclick="backToStoryList()"
+            style="margin-bottom:1rem; background:none; border:none; font-size:1.1rem; cursor:pointer; color:#555;">&larr;
+            목록으로 돌아가기</button>
           <div style="background:white; padding:3rem; border-radius:10px; box-shadow:0 2px 20px rgba(0,0,0,0.05);">
             <div style="border-bottom:1px solid #eee; padding-bottom:1rem; margin-bottom:2rem;">
               <h1 id="story-detail-title" style="margin:0 0 1rem 0; font-size:2rem; color:#222;"></h1>
@@ -3036,11 +3012,6 @@
               style="background:#f9f9f9; padding:1rem; border-radius:8px; display:none;">
               <strong>💾 첨부파일:</strong> <a id="story-detail-attachment-link" href="#" target="_blank"
                 style="color:#3498db; text-decoration:underline; margin-left:5px;"></a>
-            </div>
-
-            <div id="story-detail-actions"
-              style="text-align:right; margin-top:20px; border-top:1px solid #eee; padding-top:20px; display:none;">
-              <!-- Delete button injected here -->
             </div>
           </div>
         </div>
@@ -3838,11 +3809,7 @@
     }
 
     // === 취업 이야기 관련 로직 ===
-    window.currentStoryCategory = 'free'; // 기본값
-
-    window.showStoryBoard = async function (category = 'free', addToHistory = true) {
-      if (addToHistory) window.updateHistory({ view: 'storyBoard', category: category }, '#story-' + category);
-
+    window.showStoryBoard = async function () {
       // 1. 모든 다른 섹션 숨기기
       document.getElementById('features').style.display = 'none';
       document.getElementById('jobs').style.display = 'none';
@@ -3862,12 +3829,14 @@
       const storySection = document.getElementById('story-board-section');
       if (storySection) {
         storySection.style.display = 'block';
-        switchStoryBoard(category);
+        // 기본적으로 자유게시판으로 시작
+        switchStoryBoard('free');
       }
       window.scrollTo(0, 0);
     }
 
     // 원래 화면으로 복귀 시 사이드바 복구
+    // 원래 화면으로 복귀 시 사이드바 복구 (전역 노출)
     window.restoreSidebar = function () {
       const wrapper = document.querySelector('.content-with-sidebar-wrapper');
       if (wrapper) wrapper.classList.remove('full-width-wrapper');
@@ -3885,71 +3854,20 @@
         window.openLoginModal();
         return;
       }
-      // 모달 제목에 현재 카테고리 표시 (선택사항)
-      const catName = getCategoryName(window.currentStoryCategory);
-      document.querySelector('#storyModal h2').textContent = `✏️ 이야기 작성하기 (${catName})`;
-
       document.getElementById('storyModal').style.display = 'block';
     }
-
     window.closeStoryModal = function () {
       document.getElementById('storyModal').style.display = 'none';
       document.querySelector('#storyModal form').reset();
     }
 
-    function getCategoryName(cat) {
-      const map = {
-        'free': '취업  이야기',
-        'consulting': '취업상담실',
-        'study': '스터디 모집',
-        'ncs-review': 'NCS 후기',
-        'interview': '면접 후기',
-        'success': '최종합격 수기',
-        'expert': '현직자/전문가'
-      };
-      return map[cat] || '게시판';
-    }
-
-    // 이야기 작성 모달 열기 (수정 모드 지원)
-    window.openStoryModal = function (editId = null) {
-      const modal = document.getElementById('storyModal');
-      const form = document.querySelector('#storyModal form');
-      const btn = document.querySelector('#storyModal .btn-submit');
-
-      if (!modal) return;
-
-      modal.style.display = 'block';
-
-      // 초기화
-      if (form) form.reset();
-      window.currentStoryEditId = null;
-
-      // 수정 모드일 경우
-      if (editId) {
-        window.currentStoryEditId = editId;
-        if (btn) btn.textContent = '이야기 수정';
-
-        const data = window.storiesData[editId];
-        if (data) {
-          document.getElementById('story_title').value = data.title || '';
-          document.getElementById('story_content').value = data.content || '';
-          // 이미지/파일은 보안상 value 설정 불가 (새로 업로드 필요 시 입력)
-        }
-      } else {
-        if (btn) btn.textContent = '이야기 등록';
-      }
-    }
-
-    window.closeStoryModal = function () {
-      document.getElementById('storyModal').style.display = 'none';
-      window.currentStoryEditId = null;
-    }
-
-    // 파일 업로드 함수 (재사용)
-    window.uploadFile = async function (file, folder) {
+    // 파일 업로드 유틸리티 함수
+    window.uploadFile = async function (file, folderName) {
       if (!file) return null;
       try {
-        const storageRef = window.ref(window.storage, `${folder}/${Date.now()}_${file.name}`);
+        const ext = file.name.split('.').pop();
+        const filename = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${ext}`;
+        const storageRef = window.ref(window.storage, `${folderName}/${filename}`);
         const snapshot = await window.uploadBytes(storageRef, file);
         return await window.getDownloadURL(snapshot.ref);
       } catch (e) {
@@ -3973,14 +3891,6 @@
         let attachmentUrl = '';
         let attachmentName = '';
 
-        // 기존 데이터 유지 (수정 시 파일 변경 없으면)
-        if (window.currentStoryEditId && window.storiesData[window.currentStoryEditId]) {
-          const oldData = window.storiesData[window.currentStoryEditId];
-          imageUrl = oldData.imageUrl || '';
-          attachmentUrl = oldData.attachmentUrl || '';
-          attachmentName = oldData.attachmentName || '';
-        }
-
         if (imageFile) imageUrl = await window.uploadFile(imageFile, 'story_images');
         if (attachmentFile) {
           attachmentUrl = await window.uploadFile(attachmentFile, 'story_attachments');
@@ -3993,92 +3903,58 @@
           imageUrl: imageUrl,
           attachmentUrl: attachmentUrl,
           attachmentName: attachmentName,
-          // author info is immutable on edit usually, but safe to re-set
           authorUid: user.uid,
-          authorName: user.displayName || '익명',
-          updatedAt: window.Timestamp.now(), // 수정 시각
-          category: window.currentStoryCategory
+          authorName: '익명', // 기본값, 아래에서 덮어씌움
+          createdAt: window.Timestamp.now(),
+          likes: 0
         };
 
-        if (!window.currentStoryEditId) {
-          // 신규 작성 시 추가 필드
-          docData.createdAt = window.Timestamp.now();
-          docData.likes = 0;
-          docData.views = 0;
-        }
-
-        // 닉네임 조회 (신규 작성 시에만? 수정시에도 업데이트? -> 작성자명은 유지하는게 보통이나 여기선 갱신)
+        // 닉네임 조회
         try {
           const userDoc = await getDoc(doc(db, 'users', user.uid));
           if (userDoc.exists() && userDoc.data().nickname) {
             docData.authorName = userDoc.data().nickname;
+          } else {
+            docData.authorName = user.displayName || user.email.split('@')[0];
           }
-        } catch (e) { }
-
-        if (window.currentStoryEditId) {
-          // 수정
-          await updateDoc(doc(db, 'stories', window.currentStoryEditId), docData);
-          alert('✅ 이야기가 수정되었습니다.');
-        } else {
-          // 등록
-          await window.addDoc(window.collection(window.db, 'stories'), docData);
-          alert('✅ 이야기가 등록되었습니다.');
+        } catch (e) {
+          docData.authorName = user.displayName || user.email.split('@')[0];
         }
 
+        await window.addDoc(window.collection(window.db, 'stories'), docData);
+
+        alert('✅ 이야기가 등록되었습니다.');
         closeStoryModal();
-        loadStories(window.currentStoryCategory);
+        loadStories();
       } catch (err) {
         console.error(err);
-        alert('처리 실패: ' + err.message);
+        alert('등록 실패: ' + err.message);
       }
     }
 
-    window.loadStories = async function (category = 'free') {
+    window.loadStories = async function () {
       const tbody = document.getElementById('storyTableBody');
       if (!tbody) return;
 
-      const currentUser = window.auth.currentUser;
-      let isAdmin = false;
-      if (currentUser) {
-        try {
-          const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-          if (userDoc.exists() && userDoc.data().role === 'admin') {
-            isAdmin = true;
-          }
-        } catch (e) { console.error(e); }
-      }
-
       try {
-        let q;
-        q = query(collection(db, 'stories'), orderBy('createdAt', 'desc'));
-
+        const q = query(collection(db, 'stories'), orderBy('createdAt', 'desc'));
         const querySnapshot = await getDocs(q);
 
         tbody.innerHTML = ''; // 클리어
 
-        let stories = [];
-        querySnapshot.forEach((docSnap) => {
-          const data = docSnap.data();
-          const dataCat = data.category || 'free';
-          if (dataCat === category) {
-            stories.push({ ...data, id: docSnap.id });
-          }
-        });
-
-        if (stories.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:3rem; color:#888;">아직 이야기가 없습니다. 첫 번째 이야기를 들려주세요!</td></tr>';
+        if (querySnapshot.empty) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:3rem; color:#888;">아직 이야기가 없습니다. 첫 번째 이야기를 들려주세요!</td></tr>';
           return;
         }
 
-        let index = stories.length;
-        stories.forEach((data) => {
+        let index = querySnapshot.size;
+        querySnapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          const docId = docSnap.id;
           const date = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : '-';
-          const docId = data.id;
 
           window.storiesData = window.storiesData || {};
-          window.storiesData[docId] = { ...data, dateString: date };
-
-          // 테이블에는 삭제 버튼을 표시하지 않음 (상세보기에서 제공)
+          window.storiesData[docId] = { ...data, id: docId, dateString: date };
 
           const tr = document.createElement('tr');
           tr.innerHTML = `
@@ -4095,80 +3971,35 @@
 
       } catch (err) {
         console.error(err);
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">데이터 로딩 실패</td></tr>';
-      }
-    }
-
-    window.deleteStory = async function (docId) {
-      const currentUser = window.auth.currentUser;
-      if (!currentUser) {
-        alert('로그인이 필요합니다.');
-        return;
-      }
-
-      // 권한 확인 (DB + Logic)
-      let isAdmin = false;
-      try {
-        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-        if (userDoc.exists() && userDoc.data().role === 'admin') isAdmin = true;
-      } catch (e) { }
-
-      let isAuthor = false;
-      try {
-        const sDoc = await getDoc(doc(db, 'stories', docId));
-        if (sDoc.exists() && sDoc.data().authorUid === currentUser.uid) isAuthor = true;
-      } catch (e) { }
-
-      // 작성자도 아니고 관리자도 아니면 거부
-      if (!isAdmin && !isAuthor) {
-        alert('삭제 권한이 없습니다.');
-        return;
-      }
-
-      if (!confirm('정말 이 이야기를 삭제하시겠습니까?')) return;
-      try {
-        await deleteDoc(doc(db, 'stories', docId));
-        alert('삭제되었습니다.');
-        // 삭제 후 목록으로 복귀 (히스토리 추가 안함 -> replaceState 개념, 혹은 그냥 추가)
-        window.showStoryBoard(window.currentStoryCategory, true);
-
-      } catch (e) {
-        console.error(e);
-        alert('삭제 실패: ' + e.message);
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:red;">데이터 로딩 실패</td></tr>';
       }
     }
 
     // 게시판 전환 함수
-    window.switchStoryBoard = function (boardType, addToHistory = true) {
-      if (addToHistory) window.updateHistory({ view: 'storyBoard', category: boardType }, '#story-' + boardType);
-
-      window.currentStoryCategory = boardType;
-
-
+    window.switchStoryBoard = function (boardType) {
       // 사이드바 메뉴 활성화 상태 변경
       const menuItems = document.querySelectorAll('.board-sidebar a');
       menuItems.forEach(item => item.classList.remove('active'));
       const activeMenu = document.getElementById('story-menu-' + boardType);
       if (activeMenu) activeMenu.classList.add('active');
-
-      // 모든 게시판 타입에 대해 테이블 표시 (이제 준비중 메시지 X)
+      
+      // 게시판 타입에 따라 표시 제어
       const boardTable = document.getElementById('storyBoardTable');
       const boardMessage = document.getElementById('storyBoardMessage');
-
-      if (boardTable) boardTable.style.display = 'block';
-      if (boardMessage) boardMessage.style.display = 'none';
-
-      // 헤더 제목 변경 (선택사항)
-      const titleEl = document.querySelector('.story-header h1');
-      if (titleEl) titleEl.textContent = getCategoryName(boardType);
-
-      loadStories(boardType);
+      
+      if (boardType === 'free') {
+        // 자유게시판: 기존 스토리 게시판 표시
+        if (boardTable) boardTable.style.display = 'block';
+        if (boardMessage) boardMessage.style.display = 'none';
+        loadStories();
+      } else {
+        // 다른 게시판: 준비중 메시지 표시
+        if (boardTable) boardTable.style.display = 'none';
+        if (boardMessage) boardMessage.style.display = 'block';
+      }
     }
 
-    // 상세 보기
-    window.viewStoryDetail = async function (id, addToHistory = true) {
-      if (addToHistory) window.updateHistory({ view: 'storyDetail', id: id }, '#story-view-' + id);
-
+    window.viewStoryDetail = function (id) {
       const data = window.storiesData[id];
       if (!data) return;
 
@@ -4201,52 +4032,6 @@
       } else {
         attArea.style.display = 'none';
       }
-
-      // 버튼 영역 초기화 & 정의
-      const actionArea = document.getElementById('story-detail-actions');
-      if (actionArea) {
-        actionArea.innerHTML = '';
-        actionArea.style.display = 'block';
-
-        // 1. 목록으로 돌아가기 버튼 (파란색 사각형)
-        const backBtn = document.createElement('button');
-        backBtn.textContent = '목록으로 돌아가기';
-        backBtn.style.cssText = 'background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin-right: 10px; font-size: 1rem;';
-        backBtn.onclick = backToStoryList;
-        actionArea.appendChild(backBtn);
-
-        // 2. 권한 확인 및 수정/삭제 버튼 추가
-        const currentUser = window.auth.currentUser;
-        if (currentUser) {
-          let isAdmin = false;
-          let isAuthor = (currentUser.uid === data.authorUid);
-
-          try {
-            const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-            if (userDoc.exists() && userDoc.data().role === 'admin') isAdmin = true;
-          } catch (e) {
-            console.error(e);
-          }
-
-          if (isAdmin || isAuthor) {
-            // 수정 버튼
-            const editBtn = document.createElement('button');
-            editBtn.textContent = '수정';
-            editBtn.className = 'btn-edit';
-            editBtn.style.cssText = 'padding: 10px 20px; font-size: 1rem; margin-right:5px; background: #ffa94d; color: white; border: none; border-radius: 4px; cursor: pointer;';
-            editBtn.onclick = function () { openStoryModal(id); }; // openStoryModal needs to support ID for editing
-            actionArea.appendChild(editBtn);
-
-            // 삭제 버튼
-            const delBtn = document.createElement('button');
-            delBtn.textContent = '삭제';
-            delBtn.className = 'btn-delete';
-            delBtn.style.cssText = 'padding: 10px 20px; font-size: 1rem; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;';
-            delBtn.onclick = function () { deleteStory(id); };
-            actionArea.appendChild(delBtn);
-          }
-        }
-      }
     }
 
     window.backToStoryList = function () {
@@ -4255,9 +4040,7 @@
     }
 
     // 회원 관리 관련 함수들
-    window.showUserManagement = async function (addToHistory = true) {
-      if (addToHistory) window.updateHistory({ view: 'admin' }, '#admin');
-
+    window.showUserManagement = async function () {
       // 기존 섹션 숨기기
       document.getElementById('features').style.display = 'none';
       document.getElementById('jobs').style.display = 'none';
@@ -4320,56 +4103,12 @@
 
     // 페이지 로드 시 데이터 불러오기
     // 페이지 로드 시 데이터 불러오기 - 제거됨 (하단 스크립트에서 호출)
-    // --- History Management (SPA Navigation) ---
-    window.updateHistory = function (state, urlHash) {
-      if (state.addToHistory !== false) {
-        history.pushState(state, '', urlHash);
-      }
-    };
-
-    window.onpopstate = function (event) {
-      const state = event.state;
-      if (!state) {
-        // 기본 상태 (Home)
-        window.goHome(false);
-        return;
-      }
-
-      switch (state.view) {
-        case 'home':
-          window.goHome(false);
-          break;
-        case 'jobBoard':
-          window.showBoard(false);
-          if (state.category) window.switchJobBoard(state.category, false);
-          break;
-        case 'jobDetail':
-          window.viewDetail(state.id, false);
-          break;
-        case 'storyBoard':
-          window.showStoryBoard(state.category, false);
-          break;
-        case 'storyDetail':
-          window.viewStoryDetail(state.id, false);
-          break;
-        case 'admin':
-          window.showUserManagement(false);
-          break;
-        default:
-          window.goHome(false);
-      }
-    };
-
-    // 페이지 로드 시 초기 상태 저장
-    window.history.replaceState({ view: 'home' }, '', '#home');
-    // loadJobs(); // -> DOMContentLoaded에서 호출됨
+    // loadJobs();
   </script>
 
   <script>
     // 메인 화면으로 돌아가는 함수
-    window.goHome = function (addToHistory = true) {
-      if (addToHistory) window.updateHistory({ view: 'home' }, '#home');
-
+    window.goHome = function () {
       restoreSidebar(); // 사이드바 복구
 
       // 모든 메인 섹션 보이기
@@ -4397,9 +4136,7 @@
 
     // 화면 전환 함수
     // 화면 전환 함수 (채용정보 게시판) - Full Width 적용
-    window.showBoard = function (addToHistory = true) {
-      if (addToHistory) window.updateHistory({ view: 'jobBoard', category: 'all' }, '#board');
-
+    window.showBoard = function () {
       // 사이드바 숨기기 (취업 이야기와 동일하게)
       const wrapper = document.querySelector('.content-with-sidebar-wrapper');
       if (wrapper) wrapper.classList.add('full-width-wrapper');
@@ -4424,8 +4161,7 @@
       const boardSection = document.getElementById('board-section');
       if (boardSection) {
         boardSection.style.display = 'block';
-        // 기본적으로 '전체' 게시판으로 시작
-        switchJobBoard('all');
+        // loadJobs(); // 데이터 로드 (필요 시)
       }
 
       const userSection = document.getElementById('user-manage-section');
@@ -4435,40 +4171,8 @@
       window.scrollTo(0, 0);
     }
 
-    // 채용정보 게시판 전환 함수
-    window.switchJobBoard = function (boardType, addToHistory = true) {
-      if (addToHistory) window.updateHistory({ view: 'jobBoard', category: boardType }, '#board-' + boardType);
-
-
-      // 사이드바 메뉴 활성화 상태 변경
-      const menuItems = document.querySelectorAll('#board-section .board-sidebar a');
-      menuItems.forEach(item => item.classList.remove('active'));
-      const activeMenu = document.getElementById('job-menu-' + boardType);
-      if (activeMenu) activeMenu.classList.add('active');
-
-      // 게시판 타입에 따라 표시 제어
-      const jobTable = document.getElementById('jobTable');
-      const loading = document.getElementById('loading');
-      const emptyState = document.getElementById('emptyState');
-      const jobBoardMessage = document.getElementById('jobBoardMessage');
-
-      if (boardType === 'all') {
-        // 전체: 기존 채용정보 게시판 표시
-        if (jobBoardMessage) jobBoardMessage.style.display = 'none';
-        loadJobs(); // 데이터 로드
-      } else {
-        // 다른 게시판: 준비중 메시지 표시
-        if (jobTable) jobTable.style.display = 'none';
-        if (loading) loading.style.display = 'none';
-        if (emptyState) emptyState.style.display = 'none';
-        if (jobBoardMessage) jobBoardMessage.style.display = 'block';
-      }
-    }
-
     // 상세 보기 함수 (ID로 조회)
-    function viewDetail(id, addToHistory = true) {
-      if (addToHistory) window.updateHistory({ view: 'jobDetail', id: id }, '#job-' + id);
-
+    function viewDetail(id) {
       const job = window.jobsData[id];
       if (!job) {
         alert('데이터를 찾을 수 없습니다.');
@@ -4529,49 +4233,6 @@
       }
 
       window.scrollTo(0, 0);
-
-      // 하단 버튼 (목록으로 + 관리자용 수정/삭제)
-      const actionArea = document.getElementById('detail-actions');
-      if (actionArea) {
-        actionArea.innerHTML = ''; // 초기화
-
-        // 목록으로 버튼
-        const backBtn = document.createElement('button');
-        backBtn.textContent = '목록으로 돌아가기';
-        backBtn.style.cssText = 'background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin-right: 10px; font-size: 1rem;';
-        backBtn.onclick = showBoard;
-        actionArea.appendChild(backBtn);
-
-        // 관리자 접근 체크 및 버튼 추가
-        const currentUser = window.auth.currentUser;
-        if (currentUser) {
-          // 비동기를 `viewDetail` 안에서 처리하기보다 `jobsData`나 전역 isAdmin을 쓰는게 좋지만,
-          // 여기서는 간단히 비동기 체크 (UI 렌더링 후 뜸)
-          checkAdminAndRenderButtons(currentUser.uid, id, actionArea);
-        }
-      }
-    }
-
-    // 관리자 버튼 렌더링 헬퍼
-    async function checkAdminAndRenderButtons(uid, docId, container) {
-      try {
-        const userDoc = await getDoc(doc(db, 'users', uid));
-        if (userDoc.exists() && userDoc.data().role === 'admin') {
-          const editBtn = document.createElement('button');
-          editBtn.className = 'btn-edit';
-          editBtn.textContent = '수정';
-          editBtn.onclick = function () { openEditModal(docId); };
-          editBtn.style.marginRight = '5px';
-
-          const delBtn = document.createElement('button');
-          delBtn.className = 'btn-delete';
-          delBtn.textContent = '삭제';
-          delBtn.onclick = function () { deleteJob(docId); };
-
-          container.appendChild(editBtn);
-          container.appendChild(delBtn);
-        }
-      } catch (e) { console.error(e); }
     }
 
     // 채용정보 목록 불러오기
@@ -4580,25 +4241,8 @@
       const emptyState = document.getElementById('emptyState');
       const jobTable = document.getElementById('jobTable');
       const tbody = document.getElementById('jobTableBody');
-      const manageHeader = document.getElementById('jobHeaderManage');
 
       if (!loading || !tbody) return;
-
-      const currentUser = window.auth.currentUser;
-      let isAdmin = false;
-      if (currentUser) {
-        try {
-          const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-          if (userDoc.exists() && userDoc.data().role === 'admin') {
-            isAdmin = true;
-          }
-        } catch (e) { console.error(e); }
-      }
-
-      // 관리자 항목 헤더 제어
-      if (manageHeader) {
-        manageHeader.style.display = isAdmin ? '' : 'none';
-      }
 
       try {
         loading.style.display = 'block';
@@ -4624,20 +4268,17 @@
 
           // 데이터 준비 (이스케이프 처리 주의)
           const safeTitle = escapeHtml(job.title).replace(/'/g, "\\'");
-          // ... (기타 변수들 생략 가능하지만 구조상 유지)
-
+          const safeCompany = escapeHtml(job.company).replace(/'/g, "\\'");
+          const safeContent = (job.content || '').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n');
+          const safeImageUrl = (job.imageUrl || '').replace(/'/g, "\\'");
+          const safeDetailUrl = (job.detailUrl || '').replace(/'/g, "\\'");
+          const safeJobType = (job.jobType || '').replace(/'/g, "\\'");
+          const safeLocation = (job.location || '').replace(/'/g, "\\'");
+          const safeContentImageUrl = (job.contentImageUrl || '').replace(/'/g, "\\'");
+          const safeAttachmentName = (job.attachmentName || '').replace(/'/g, "\\'");
+          const safeAttachmentUrl = (job.attachmentUrl || '').replace(/'/g, "\\'");
           // 데이터 캐싱
           window.jobsData[docSnap.id] = { ...job, id: docSnap.id, createdDate: createdDate };
-
-          let manageCell = '';
-          if (isAdmin) {
-            manageCell = `
-                <td>
-                    <button class="btn-edit" onclick="openEditModal('${docSnap.id}')">수정</button>
-                    <button class="btn-delete" onclick="deleteJob('${docSnap.id}')">삭제</button>
-                </td>
-             `;
-          }
 
           tr.innerHTML = `
                 <td><img src="${job.imageUrl || './logo.png'}" class="job-image" alt="로고"></td>
@@ -4649,7 +4290,10 @@
                 <td>${job.location || '-'}</td>
                 <td>${job.deadline || '-'}</td>
                 <td>${createdDate}</td>
-                ${manageCell}
+                <td>
+                    <button class="btn-edit" onclick="openEditModal('${docSnap.id}')">수정</button>
+                    <button class="btn-delete" onclick="deleteJob('${docSnap.id}')">삭제</button>
+                </td>
             `;
           tbody.appendChild(tr);
         });
@@ -4820,8 +4464,7 @@
       try {
         await deleteDoc(doc(db, 'jobs', id));
         alert('✅ 삭제되었습니다!');
-        // 삭제 후 목록으로 돌아가기
-        window.showBoard(true);
+        loadJobs();
       } catch (error) {
         console.error('삭제 실패:', error);
         alert('삭제에 실패했습니다: ' + error.message);
