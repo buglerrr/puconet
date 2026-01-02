@@ -1658,6 +1658,85 @@
       min-height: 80vh;
     }
 
+    /* === 게시판 레이아웃 with 사이드바 === */
+    .board-layout {
+      display: flex;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    /* 왼쪽 사이드바 (세부 메뉴) */
+    .board-sidebar {
+      width: 220px;
+      flex-shrink: 0;
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 1.5rem 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      align-self: flex-start;
+    }
+
+    .board-sidebar h3 {
+      padding: 0 1.5rem;
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+      color: #2c3e50;
+    }
+
+    .board-sidebar ul {
+      list-style: none;
+    }
+
+    .board-sidebar li {
+      margin: 0;
+    }
+
+    .board-sidebar a {
+      display: block;
+      padding: 0.9rem 1.5rem;
+      text-decoration: none;
+      color: #495057;
+      font-weight: 500;
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+    }
+
+    .board-sidebar a:hover {
+      background: #e9ecef;
+      color: #3498db;
+      border-left-color: #3498db;
+    }
+
+    .board-sidebar a.active {
+      background: #e9ecef;
+      color: #3498db;
+      border-left-color: #3498db;
+      font-weight: 600;
+    }
+
+    /* 오른쪽 게시판 컨텐츠 */
+    .board-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* 게시판 준비중 메시지 */
+    .board-message {
+      text-align: center;
+      padding: 3rem;
+      color: #7f8c8d;
+    }
+
+    .board-message h3 {
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+      color: #2c3e50;
+    }
+
+    .board-message p {
+      font-size: 1rem;
+    }
+
     .story-header {
       display: flex;
       justify-content: space-between;
@@ -2852,27 +2931,54 @@
 
       <!-- 취업 이야기 게시판 섹션 -->
       <div id="story-board-section" style="display:none; width:100%;">
-        <div class="container" style="max-width:1200px; margin:0 auto;">
+        <div class="container" style="max-width:1400px; margin:0 auto;">
           <div class="story-header">
             <h1>취업 이야기</h1>
             <button class="btn-write-story" onclick="openWriteStoryModal()">✏️ 이야기 쓰기</button>
           </div>
 
-          <div style="background:white; padding:2rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
-            <table class="board-table" id="storyTable">
-              <thead>
-                <tr>
-                  <th style="width: 60px;">번호</th>
-                  <th>제목</th>
-                  <th style="width: 120px;">작성자</th>
-                  <th style="width: 120px;">작성일</th>
-                  <th style="width: 80px;">좋아요</th>
-                </tr>
-              </thead>
-              <tbody id="storyTableBody">
-                <!-- Stories load here -->
-              </tbody>
-            </table>
+          <!-- 게시판 레이아웃: 사이드바 + 컨텐츠 -->
+          <div class="board-layout">
+            <!-- 왼쪽 사이드바 (세부 메뉴) -->
+            <aside class="board-sidebar">
+              <h3>게시판</h3>
+              <ul>
+                <li><a href="#" onclick="switchStoryBoard('free'); return false;" id="story-menu-free" class="active">자유게시판</a></li>
+                <li><a href="#" onclick="switchStoryBoard('consulting'); return false;" id="story-menu-consulting">취업상담실</a></li>
+                <li><a href="#" onclick="switchStoryBoard('study'); return false;" id="story-menu-study">스터디 모집</a></li>
+                <li><a href="#" onclick="switchStoryBoard('ncs-review'); return false;" id="story-menu-ncs-review">NCS 후기</a></li>
+                <li><a href="#" onclick="switchStoryBoard('interview'); return false;" id="story-menu-interview">면접 후기</a></li>
+                <li><a href="#" onclick="switchStoryBoard('success'); return false;" id="story-menu-success">최종합격 수기</a></li>
+                <li><a href="#" onclick="switchStoryBoard('expert'); return false;" id="story-menu-expert">현직자/전문가</a></li>
+              </ul>
+            </aside>
+
+            <!-- 오른쪽 게시판 컨텐츠 -->
+            <div class="board-content">
+              <!-- 게시판 테이블 -->
+              <div id="storyBoardTable" style="background:white; padding:2rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+                <table class="board-table" id="storyTable">
+                  <thead>
+                    <tr>
+                      <th style="width: 60px;">번호</th>
+                      <th>제목</th>
+                      <th style="width: 120px;">작성자</th>
+                      <th style="width: 120px;">작성일</th>
+                      <th style="width: 80px;">좋아요</th>
+                    </tr>
+                  </thead>
+                  <tbody id="storyTableBody">
+                    <!-- Stories load here -->
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- 게시판별 준비중 메시지 -->
+              <div id="storyBoardMessage" class="board-message" style="display:none; background:white; padding:3rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+                <h3>준비 중입니다</h3>
+                <p>곧 새로운 게시판이 오픈됩니다!</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -3723,7 +3829,8 @@
       const storySection = document.getElementById('story-board-section');
       if (storySection) {
         storySection.style.display = 'block';
-        await loadStories();
+        // 기본적으로 자유게시판으로 시작
+        switchStoryBoard('free');
       }
       window.scrollTo(0, 0);
     }
@@ -3865,6 +3972,30 @@
       } catch (err) {
         console.error(err);
         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:red;">데이터 로딩 실패</td></tr>';
+      }
+    }
+
+    // 게시판 전환 함수
+    window.switchStoryBoard = function (boardType) {
+      // 사이드바 메뉴 활성화 상태 변경
+      const menuItems = document.querySelectorAll('.board-sidebar a');
+      menuItems.forEach(item => item.classList.remove('active'));
+      const activeMenu = document.getElementById('story-menu-' + boardType);
+      if (activeMenu) activeMenu.classList.add('active');
+      
+      // 게시판 타입에 따라 표시 제어
+      const boardTable = document.getElementById('storyBoardTable');
+      const boardMessage = document.getElementById('storyBoardMessage');
+      
+      if (boardType === 'free') {
+        // 자유게시판: 기존 스토리 게시판 표시
+        if (boardTable) boardTable.style.display = 'block';
+        if (boardMessage) boardMessage.style.display = 'none';
+        loadStories();
+      } else {
+        // 다른 게시판: 준비중 메시지 표시
+        if (boardTable) boardTable.style.display = 'none';
+        if (boardMessage) boardMessage.style.display = 'block';
       }
     }
 
