@@ -2734,7 +2734,6 @@
         <div class="board-container">
           <div class="board-header">
             <h1 class="board-title">채용정보 상세</h1>
-            <button class="btn-add" onclick="showBoard()">목록으로</button>
           </div>
 
           <div class="detail-content-box"
@@ -2763,6 +2762,11 @@
                   style="color:#3498db; text-decoration:underline;"></a>
               </div>
               <a id="detail-link" href="#" target="_blank" class="cta-button" style="display:none;">채용 사이트 방문</a>
+
+              <div id="detail-actions"
+                style="margin-top:20px; text-align:right; border-top:1px solid #eee; padding-top:20px;">
+                <!-- Buttons injected by JS -->
+              </div>
             </div>
           </div>
         </div>
@@ -3028,9 +3032,6 @@
       <!-- 이야기 상세 보기 섹션 -->
       <div id="story-detail-section" style="display:none; width:100%;">
         <div class="container" style="max-width:1000px; margin:0 auto;">
-          <button onclick="backToStoryList()"
-            style="margin-bottom:1rem; background:none; border:none; font-size:1.1rem; cursor:pointer; color:#555;">&larr;
-            목록으로 돌아가기</button>
           <div style="background:white; padding:3rem; border-radius:10px; box-shadow:0 2px 20px rgba(0,0,0,0.05);">
             <div style="border-bottom:1px solid #eee; padding-bottom:1rem; margin-bottom:2rem;">
               <h1 id="story-detail-title" style="margin:0 0 1rem 0; font-size:2rem; color:#222;"></h1>
@@ -4160,26 +4161,35 @@
         attArea.style.display = 'none';
       }
 
-      // 관리자/작성자 권한 확인 후 삭제 버튼 표시
-      const actionArea = document.getElementById('story-detail-actions');
-      if (actionArea) {
-        actionArea.innerHTML = '';
-        actionArea.style.display = 'none';
+      // 버튼 영역 초기화
+      actionArea.innerHTML = '';
+      actionArea.style.display = 'block'; // 항상 표시 (목록으로 버튼 때문)
 
-        const currentUser = window.auth.currentUser;
-        if (currentUser) {
-          let isAdmin = false;
-          let isAuthor = (currentUser.uid === data.authorUid);
+      // 1. 목록으로 돌아가기 버튼 (파란색 사각형)
+      const backBtn = document.createElement('button');
+      backBtn.textContent = '목록으로 돌아가기';
+      backBtn.style.cssText = 'background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin-right: 10px; font-size: 1rem;';
+      backBtn.onclick = backToStoryList;
+      actionArea.appendChild(backBtn);
 
-          try {
-            const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-            if (userDoc.exists() && userDoc.data().role === 'admin') isAdmin = true;
-          } catch (e) { }
+      // 2. 삭제 버튼 (권한 체크)
+      const currentUser = window.auth.currentUser;
+      if (currentUser) {
+        let isAdmin = false;
+        let isAuthor = (currentUser.uid === data.authorUid);
 
-          if (isAdmin || isAuthor) {
-            actionArea.style.display = 'block';
-            actionArea.innerHTML = `<button onclick="deleteStory('${id}');" class="btn-delete" style="padding: 10px 20px; font-size: 1rem;">삭제</button>`;
-          }
+        try {
+          const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+          if (userDoc.exists() && userDoc.data().role === 'admin') isAdmin = true;
+        } catch (e) { }
+
+        if (isAdmin || isAuthor) {
+          const delBtn = document.createElement('button');
+          delBtn.textContent = '삭제';
+          delBtn.className = 'btn-delete';
+          delBtn.style.cssText = 'padding: 10px 20px; font-size: 1rem;';
+          delBtn.onclick = function () { deleteStory(id); };
+          actionArea.appendChild(delBtn);
         }
       }
     }
@@ -4411,6 +4421,49 @@
       }
 
       window.scrollTo(0, 0);
+
+      // 하단 버튼 (목록으로 + 관리자용 수정/삭제)
+      const actionArea = document.getElementById('detail-actions');
+      if (actionArea) {
+        actionArea.innerHTML = ''; // 초기화
+
+        // 목록으로 버튼
+        const backBtn = document.createElement('button');
+        backBtn.textContent = '목록으로 돌아가기';
+        backBtn.style.cssText = 'background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin-right: 10px; font-size: 1rem;';
+        backBtn.onclick = showBoard;
+        actionArea.appendChild(backBtn);
+
+        // 관리자 접근 체크 및 버튼 추가
+        const currentUser = window.auth.currentUser;
+        if (currentUser) {
+          // 비동기를 `viewDetail` 안에서 처리하기보다 `jobsData`나 전역 isAdmin을 쓰는게 좋지만,
+          // 여기서는 간단히 비동기 체크 (UI 렌더링 후 뜸)
+          checkAdminAndRenderButtons(currentUser.uid, id, actionArea);
+        }
+      }
+    }
+
+    // 관리자 버튼 렌더링 헬퍼
+    async function checkAdminAndRenderButtons(uid, docId, container) {
+      try {
+        const userDoc = await getDoc(doc(db, 'users', uid));
+        if (userDoc.exists() && userDoc.data().role === 'admin') {
+          const editBtn = document.createElement('button');
+          editBtn.className = 'btn-edit';
+          editBtn.textContent = '수정';
+          editBtn.onclick = function () { openEditModal(docId); };
+          editBtn.style.marginRight = '5px';
+
+          const delBtn = document.createElement('button');
+          delBtn.className = 'btn-delete';
+          delBtn.textContent = '삭제';
+          delBtn.onclick = function () { deleteJob(docId); };
+
+          container.appendChild(editBtn);
+          container.appendChild(delBtn);
+        }
+      } catch (e) { console.error(e); }
     }
 
     // 채용정보 목록 불러오기
