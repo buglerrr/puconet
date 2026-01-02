@@ -2776,28 +2776,47 @@
             <button class="btn-add" onclick="openAddModal()">+ 채용정보 등록</button>
           </div>
 
-          <!-- 로딩 상태 -->
-          <div id="loading" class="loading">
-            <div class="spinner"></div>
-            <p>로딩 중...</p>
-          </div>
+          <!-- 게시판 레이아웃: 사이드바 + 컨텐츠 -->
+          <div class="board-layout">
+            <!-- 왼쪽 사이드바 (세부 메뉴) -->
+            <aside class="board-sidebar">
+              <h3>기관별 채용</h3>
+              <ul>
+                <li><a href="#" onclick="switchJobBoard('all'); return false;" id="job-menu-all" class="active">전체</a></li>
+                <li><a href="#" onclick="switchJobBoard('public'); return false;" id="job-menu-public">공기업</a></li>
+                <li><a href="#" onclick="switchJobBoard('quasi-gov'); return false;" id="job-menu-quasi-gov">준정부기관</a></li>
+                <li><a href="#" onclick="switchJobBoard('other-public'); return false;" id="job-menu-other-public">기타공공기관</a></li>
+                <li><a href="#" onclick="switchJobBoard('local-public'); return false;" id="job-menu-local-public">지방공기업</a></li>
+                <li><a href="#" onclick="switchJobBoard('local-funded'); return false;" id="job-menu-local-funded">지방출자/출연기관</a></li>
+                <li><a href="#" onclick="switchJobBoard('research'); return false;" id="job-menu-research">정부출연연구기관</a></li>
+                <li><a href="#" onclick="switchJobBoard('other'); return false;" id="job-menu-other">기타(공직유관단체)</a></li>
+              </ul>
+            </aside>
 
-          <!-- 빈 상태 -->
-          <div id="emptyState" class="empty-state" style="display: none;">
-            <h3>등록된 채용정보가 없습니다</h3>
-            <p>첫 번째 채용정보를 등록해보세요!</p>
-          </div>
+            <!-- 오른쪽 게시판 컨텐츠 -->
+            <div class="board-content">
+              <!-- 로딩 상태 -->
+              <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>로딩 중...</p>
+              </div>
 
-          <!-- 테이블 -->
-          <table class="board-table" id="jobTable" style="display: none;">
-            <thead>
-              <tr>
-                <th style="width: 80px;">로고</th>
-                <th style="width: 150px;">기관명</th>
-                <th>제목</th>
-                <th style="width: 100px;">고용형태</th>
-                <th style="width: 120px;">근무지</th>
-                <th style="width: 120px;">마감일</th>
+              <!-- 빈 상태 -->
+              <div id="emptyState" class="empty-state" style="display: none;">
+                <h3>등록된 채용정보가 없습니다</h3>
+                <p>첫 번째 채용정보를 등록해보세요!</p>
+              </div>
+
+              <!-- 테이블 -->
+              <table class="board-table" id="jobTable" style="display: none;">
+                <thead>
+                  <tr>
+                    <th style="width: 80px;">로고</th>
+                    <th style="width: 150px;">기관명</th>
+                    <th>제목</th>
+                    <th style="width: 100px;">고용형태</th>
+                    <th style="width: 120px;">근무지</th>
+                    <th style="width: 120px;">마감일</th>
                 <th style="width: 120px;">등록일</th>
                 <th style="width: 180px;">관리</th>
               </tr>
@@ -2806,8 +2825,16 @@
               <!-- Firebase에서 데이터를 가져와 여기에 표시됩니다 -->
             </tbody>
           </table>
+
+          <!-- 게시판별 준비중 메시지 -->
+          <div id="jobBoardMessage" class="board-message" style="display:none; background:white; padding:3rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+            <h3>준비 중입니다</h3>
+            <p>곧 새로운 채용정보가 업데이트됩니다!</p>
+          </div>
         </div>
       </div>
+    </div>
+  </div>
 
       <!-- 등록 모달 -->
       <div id="addModal" class="modal">
@@ -4161,7 +4188,8 @@
       const boardSection = document.getElementById('board-section');
       if (boardSection) {
         boardSection.style.display = 'block';
-        // loadJobs(); // 데이터 로드 (필요 시)
+        // 기본적으로 '전체' 게시판으로 시작
+        switchJobBoard('all');
       }
 
       const userSection = document.getElementById('user-manage-section');
@@ -4169,6 +4197,33 @@
 
       // 스크롤 상단으로
       window.scrollTo(0, 0);
+    }
+
+    // 채용정보 게시판 전환 함수
+    window.switchJobBoard = function (boardType) {
+      // 사이드바 메뉴 활성화 상태 변경
+      const menuItems = document.querySelectorAll('#board-section .board-sidebar a');
+      menuItems.forEach(item => item.classList.remove('active'));
+      const activeMenu = document.getElementById('job-menu-' + boardType);
+      if (activeMenu) activeMenu.classList.add('active');
+      
+      // 게시판 타입에 따라 표시 제어
+      const jobTable = document.getElementById('jobTable');
+      const loading = document.getElementById('loading');
+      const emptyState = document.getElementById('emptyState');
+      const jobBoardMessage = document.getElementById('jobBoardMessage');
+      
+      if (boardType === 'all') {
+        // 전체: 기존 채용정보 게시판 표시
+        if (jobBoardMessage) jobBoardMessage.style.display = 'none';
+        loadJobs(); // 데이터 로드
+      } else {
+        // 다른 게시판: 준비중 메시지 표시
+        if (jobTable) jobTable.style.display = 'none';
+        if (loading) loading.style.display = 'none';
+        if (emptyState) emptyState.style.display = 'none';
+        if (jobBoardMessage) jobBoardMessage.style.display = 'block';
+      }
     }
 
     // 상세 보기 함수 (ID로 조회)
