@@ -18,15 +18,16 @@
       line-height: 1.6;
       color: #333;
       background-color: #ffffff;
-      min-width: 1520px;
-      /* 고정 너비 설정 */
+      min-width: 1520px !important;
+      width: 1520px !important;
+      overflow-x: auto !important;
     }
 
     .container {
-      width: 1480px;
-      /* max-width -> width 로 변경하여 완전 고정 */
+      width: 1480px !important;
+      max-width: none !important;
       margin: 0 auto;
-      padding: 0 20px;
+      padding: 0 20px !important;
     }
 
     /* 헤더 스타일 */
@@ -967,9 +968,9 @@
     }
 
     /* Header: hamburger for small screens */
-    /* Header: hamburger for small screens - DISABLED
+    /* Header: hamburger for small screens - DISABLED FORCEFULLY */
     .menu-toggle {
-      display: none;
+      display: none !important;
       background: #0f172a;
       color: #fff;
       border: none;
@@ -2773,21 +2774,16 @@
             <!-- 왼쪽 사이드바 (세부 메뉴) -->
             <aside class="board-sidebar">
               <h3>기관별 채용</h3>
-              <ul>
-                <li><a href="#" onclick="switchJobBoard('all'); return false;" id="job-menu-all" class="active">전체</a>
+              <!-- 사이드바 메뉴 -->
+              <ul style="list-style:none; padding:0;">
+                <li><a href="#" id="job-menu-all" onclick="switchJobBoard('all'); return false;" class="active">전체</a>
                 </li>
-                <li><a href="#" onclick="switchJobBoard('public'); return false;" id="job-menu-public">공기업</a></li>
-                <li><a href="#" onclick="switchJobBoard('quasi-gov'); return false;" id="job-menu-quasi-gov">준정부기관</a>
+                <li><a href="#" id="job-menu-intern" onclick="switchJobBoard('intern'); return false;">청년인턴</a></li>
+                <li><a href="#" id="job-menu-new" onclick="switchJobBoard('new'); return false;">신입직</a></li>
+                <li><a href="#" id="job-menu-experienced" onclick="switchJobBoard('experienced'); return false;">경력직</a>
                 </li>
-                <li><a href="#" onclick="switchJobBoard('other-public'); return false;"
-                    id="job-menu-other-public">기타공공기관</a></li>
-                <li><a href="#" onclick="switchJobBoard('local-public'); return false;"
-                    id="job-menu-local-public">지방공기업</a></li>
-                <li><a href="#" onclick="switchJobBoard('local-funded'); return false;"
-                    id="job-menu-local-funded">지방출자/출연기관</a></li>
-                <li><a href="#" onclick="switchJobBoard('research'); return false;" id="job-menu-research">정부출연연구기관</a>
+                <li><a href="#" id="job-menu-contract" onclick="switchJobBoard('contract'); return false;">무기계약직</a>
                 </li>
-                <li><a href="#" onclick="switchJobBoard('other'); return false;" id="job-menu-other">기타(공직유관단체)</a></li>
               </ul>
             </aside>
 
@@ -2968,19 +2964,20 @@
             <!-- 왼쪽 사이드바 (세부 메뉴) -->
             <aside class="board-sidebar">
               <h3>게시판</h3>
-              <ul>
-                <li><a href="#" onclick="switchStoryBoard('free'); return false;" id="story-menu-free"
-                    class="active">자유게시판</a></li>
-                <li><a href="#" onclick="switchStoryBoard('consulting'); return false;"
-                    id="story-menu-consulting">취업상담실</a></li>
-                <li><a href="#" onclick="switchStoryBoard('study'); return false;" id="story-menu-study">스터디 모집</a></li>
-                <li><a href="#" onclick="switchStoryBoard('ncs-review'); return false;" id="story-menu-ncs-review">NCS
+              <!-- 사이드바 메뉴 -->
+              <ul style="list-style:none; padding:0;">
+                <li><a href="#" id="story-menu-free" onclick="switchStoryBoard('free'); return false;" class="active">취업
+                    이야기</a></li>
+                <li><a href="#" id="story-menu-consulting"
+                    onclick="switchStoryBoard('consulting'); return false;">취업상담실</a></li>
+                <li><a href="#" id="story-menu-study" onclick="switchStoryBoard('study'); return false;">스터디 모집</a></li>
+                <li><a href="#" id="story-menu-ncs-review" onclick="switchStoryBoard('ncs-review'); return false;">NCS
                     후기</a></li>
-                <li><a href="#" onclick="switchStoryBoard('interview'); return false;" id="story-menu-interview">면접
+                <li><a href="#" id="story-menu-interview" onclick="switchStoryBoard('interview'); return false;">면접
                     후기</a></li>
-                <li><a href="#" onclick="switchStoryBoard('success'); return false;" id="story-menu-success">최종합격 수기</a>
+                <li><a href="#" id="story-menu-success" onclick="switchStoryBoard('success'); return false;">최종합격 수기</a>
                 </li>
-                <li><a href="#" onclick="switchStoryBoard('expert'); return false;" id="story-menu-expert">현직자/전문가</a>
+                <li><a href="#" id="story-menu-expert" onclick="switchStoryBoard('expert'); return false;">현직자/전문가</a>
                 </li>
               </ul>
             </aside>
@@ -4136,8 +4133,9 @@
       try {
         await deleteDoc(doc(db, 'stories', docId));
         alert('삭제되었습니다.');
-        // 삭제 후 목록으로 복귀
+        // 삭제 후 목록으로 복귀 (히스토리 추가 안함 -> replaceState 개념, 혹은 그냥 추가)
         window.showStoryBoard(window.currentStoryCategory, true);
+
       } catch (e) {
         console.error(e);
         alert('삭제 실패: ' + e.message);
@@ -4146,7 +4144,8 @@
 
     // 게시판 전환 함수
     window.switchStoryBoard = function (boardType, addToHistory = true) {
-      if (addToHistory) window.updateHistory({ view: 'storyBoard', category: boardType }, '#story-' + boardType);
+      if (addToHistory && boardType) window.updateHistory({ view: 'storyBoard', category: boardType }, '#story');
+
       window.currentStoryCategory = boardType;
 
 
@@ -4442,7 +4441,8 @@
 
     // 채용정보 게시판 전환 함수
     window.switchJobBoard = function (boardType, addToHistory = true) {
-      if (addToHistory) window.updateHistory({ view: 'jobBoard', category: boardType }, '#board-' + boardType);
+      if (addToHistory && boardType) window.updateHistory({ view: 'jobBoard', category: boardType }, '#board');
+
 
       // 사이드바 메뉴 활성화 상태 변경
       const menuItems = document.querySelectorAll('#board-section .board-sidebar a');
