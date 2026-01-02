@@ -200,7 +200,7 @@
       margin-top: 1.25rem;
     }
 
-    /* Responsive columns */
+    /* Responsive columns - DISABLED for Fixed Layout
     @media (max-width: 1024px) {
       .job-grid {
         grid-template-columns: repeat(3, 1fr);
@@ -218,6 +218,7 @@
         grid-template-columns: 1fr;
       }
     }
+    */
 
     /* 푸터 */
     footer {
@@ -280,6 +281,7 @@
       color: #fff !important;
     }
 
+    /*
     @media (max-width:768px) {
       .global-nav .container {
         justify-content: center;
@@ -290,6 +292,7 @@
         flex-wrap: wrap;
       }
     }
+    */
 
     /* === Force header & global nav non-sticky === */
     .global-nav,
@@ -1249,7 +1252,7 @@
       color: #666;
     }
 
-    /* 반응형: 3 → 2 → 1열 */
+    /* 반응형: 3 → 2 → 1열 - DISABLED
     @media (max-width: 1024px) {
       #edu-courses .edu-banner-list {
         grid-template-columns: repeat(2, 1fr);
@@ -1261,6 +1264,7 @@
         grid-template-columns: 1fr;
       }
     }
+    */
   </style>
   <style id="jobcard-fixed-size-style">
     /* 주입: job-card 고정 크기 */
@@ -4378,7 +4382,7 @@
     };
 
     // 페이지 로드 시 초기 상태 저장
-    // window.history.replaceState({ view: 'home' }, '', '#home');
+    window.history.replaceState({ view: 'home' }, '', '#home');
     // loadJobs(); // -> DOMContentLoaded에서 호출됨
   </script>
 
