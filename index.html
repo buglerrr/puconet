@@ -6,6 +6,15 @@
   <meta charset="utf-8" />
   <meta content="width=1520" name="viewport" />
   <title>브레인넷 - 공기업 취업 플랫폼</title>
+
+  <!-- Required libraries for Search Box (jQuery, jQuery UI, Select2) -->
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
   <style>
     * {
       margin: 0;
@@ -2935,7 +2944,8 @@
                   .careerClass,
                   .educationClass,
                   .ckbox,
-                  .ingClass {
+                  .ingClass,
+                  .replaceClass {
                     margin-right: 5px;
                     vertical-align: middle;
                   }
@@ -2959,6 +2969,11 @@
                     background: #f9f9f9;
                     padding: 5px;
                     display: none;
+                  }
+
+                  /* 추가된 스타일 */
+                  #search_type {
+                    height: 30px;
                   }
                 </style>
                 <div id="content">
@@ -2986,13 +3001,12 @@
                         $('#org_name').val('').trigger('change');
                         $('input[name="ing"]').removeAttr('checked');
                         $('#tit01').val('');
+                        // Reload lists
+                        loadJobs();
                       }
 
                       function fn_search() {
-                        //학력정보를 선택하면 학력정보 구분 값 필수로 입력받게 
-                        // Note: jQuery dependency exists in user code. Assuming jQuery is loaded or adding it might be needed.
-                        // For now sticking to user request 'insert html'.
-                        // Ideally should convert to Vanilla JS if jQuery not present.
+                        //학력정보를 선택하면 학력정보 구분 값 필수로 입력받게
                         if (typeof $ !== 'undefined') {
                           if ($('input[name=education]').is(":checked") == true) {
                             if ($('input[name=eduType]').is(":checked") == false) {
@@ -3000,12 +3014,13 @@
                               return;
                             }
                           }
-                          // Form submission blocked for demo
                           alert('검색 기능은 현재 준비중입니다.');
-                          // var f = document.frm;
-                          // f.action = "/recruit.do";
-                          // f.pageNo.value = "1";
-                          // f.submit();
+                          /*
+                          var f = document.frm;
+                          f.action = "/recruit.do";
+                          f.pageNo.value = "1";
+                          f.submit();
+                          */
                         } else {
                           console.warn('jQuery not loaded');
                           alert('검색 기능은 현재 준비중입니다.');
@@ -3017,9 +3032,31 @@
                         if (detail.style.display === 'none') detail.style.display = 'block';
                         else detail.style.display = 'none';
                       }
+
+                      function jobDetailOpen() {
+                        $("#detailOpenImg").html("<a href='#' onclick='jobDetailClose()'><img src='/images/content/btn_searchClose.gif' alt='상세검색 닫기' />");
+                        $("#jobDetailDiv").slideDown();
+                        $("#detailCon").slideDown("slow");
+                      }
+
+                      function jobDetailClose() {
+                        $("#detailOpenImg").html("<a href='#' onclick='jobDetailOpen()'><img src='/images/content/btn_searchOpen.gif' alt='상세검색 열기' /></a>");
+                        $("#jobDetailDiv").slideUp();
+                        $("#detailCon").slideUp("fast");
+                      }
+
+                      function fnEnterEvent(e, fn) {
+                        if (e.keyCode == 13) {
+                          eval(fn);
+                          return false;
+                        }
+                        else {
+                          return true;
+                        }
+                      }
                     </script>
 
-                    <form id="frm" name="frm" method="get" onsubmit="return false;">
+                    <form id="frm" name="frm" method="get">
                       <input type="hidden" name="pageNo" id="pageNo" value="1" />
                       <input type="hidden" name="idx" id="idx" />
                       <div class="tb_round02">
@@ -3032,6 +3069,7 @@
                             <col style="width: auto" />
                           </colgroup>
                           <tbody>
+
                             <tr>
                               <th class="round_t">등록일</th>
                               <td colspan="3">
@@ -3087,7 +3125,20 @@
                                             class="ckbox detailClass" value="R600008" id="bun01_08" /><label
                                             for="bun01_08"><span id="R600008">문화·예술·디자인·방송</span></label></td>
                                       </tr>
-                                      <!-- [중략] 나머지 NCS 직무 생략 않고 원래대로 넣으려면 너무 김. 일단 주요 항목만 넣거나 사용자 요청대로 다 넣음 -->
+                                      <tr>
+                                        <td class="left"><input name="detail_code" type="checkbox"
+                                            class="ckbox detailClass" value="R600009" id="bun01_09" /><label
+                                            for="bun01_09"><span id="R600009">운전·운송</span></label></td>
+                                        <td class="left"><input name="detail_code" type="checkbox"
+                                            class="ckbox detailClass" value="R600010" id="bun01_10" /><label
+                                            for="bun01_10"><span id="R600010">영업판매</span></label></td>
+                                        <td class="left"><input name="detail_code" type="checkbox"
+                                            class="ckbox detailClass" value="R600011" id="bun01_11" /><label
+                                            for="bun01_11"><span id="R600011">경비·청소</span></label></td>
+                                        <td class="left"><input name="detail_code" type="checkbox"
+                                            class="ckbox detailClass" value="R600012" id="bun01_12" /><label
+                                            for="bun01_12"><span id="R600012">이용·숙박·여행·오락·스포츠</span></label></td>
+                                      </tr>
                                       <tr>
                                         <td class="left"><input name="detail_code" type="checkbox"
                                             class="ckbox detailClass" value="R600013" id="bun01_13" /><label
@@ -3116,12 +3167,33 @@
                                             class="ckbox detailClass" value="R600020" id="bun01_20" /><label
                                             for="bun01_20"><span id="R600020">정보통신</span></label></td>
                                       </tr>
+                                      <tr>
+                                        <td class="left"><input name="detail_code" type="checkbox"
+                                            class="ckbox detailClass" value="R600021" id="bun01_21" /><label
+                                            for="bun01_21"><span id="R600021">식품가공</span></label></td>
+                                        <td class="left"><input name="detail_code" type="checkbox"
+                                            class="ckbox detailClass" value="R600022" id="bun01_22" /><label
+                                            for="bun01_22"><span id="R600022">인쇄·목재·가구·공예</span></label></td>
+                                        <td class="left"><input name="detail_code" type="checkbox"
+                                            class="ckbox detailClass" value="R600023" id="bun01_23" /><label
+                                            for="bun01_23"><span id="R600023">환경·에너지·안전</span></label></td>
+                                        <td class="left"><input name="detail_code" type="checkbox"
+                                            class="ckbox detailClass" value="R600024" id="bun01_24" /><label
+                                            for="bun01_24"><span id="R600024">농림어업</span></label></td>
+                                      </tr>
+                                      <tr>
+                                        <td class="left" colspan="1"><input name="detail_code" type="checkbox"
+                                            class="ckbox detailClass" value="R600025" id="bun01_25" /><label
+                                            for="bun01_25"><span id="R600025">연구</span></label></td>
+                                        <td class="left" colspan="3"></td>
+                                      </tr>
                                     </tbody>
                                   </table>
                                 </div>
                               </td>
                             </tr>
                             <tr>
+
                               <th scope="row">근무지</th>
                               <td colspan="3">
                                 <input name="location" type="checkbox" class="ckbox locationClass" id="location00"
@@ -3136,57 +3208,248 @@
                                   value="R3013" /><label for="location04">대구광역시</label>
                                 <input name="location" type="checkbox" class="ckbox locationClass" id="location05"
                                   value="R3014" /><label for="location05">부산광역시</label>
-                                <!-- 추가 지역 생략 없이 최대한 넣음 -->
+                                <input name="location" type="checkbox" class="ckbox locationClass" id="location06"
+                                  value="R3015" /><label for="location06">광주광역시</label>
+                                <input name="location" type="checkbox" class="ckbox locationClass" id="location07"
+                                  value="R3016" /><label for="location07">울산광역시</label>
                                 <input name="location" type="checkbox" class="ckbox locationClass" id="location08"
-                                  value="R3017" /><label for="location08">경기도</label>
+                                  value="R3017" /><label for="location08">경기도</label><br />
+                                <input name="location" type="checkbox" class="ckbox locationClass" id="location09"
+                                  value="R3018" /><label for="location09">강원도</label>
+                                <input name="location" type="checkbox" class="ckbox locationClass" id="location10"
+                                  value="R3019" /><label for="location10">충청남도</label>
+                                <input name="location" type="checkbox" class="ckbox locationClass" id="location11"
+                                  value="R3020" /><label for="location11">충청북도</label>
+                                <input name="location" type="checkbox" class="ckbox locationClass" id="location12"
+                                  value="R3021" /><label for="location12">경상북도</label>
+                                <input name="location" type="checkbox" class="ckbox locationClass" id="location13"
+                                  value="R3022" /><label for="location13">경상남도</label>
+                                <input name="location" type="checkbox" class="ckbox locationClass" id="location14"
+                                  value="R3023" /><label for="location14">전라남도</label>
+                                <input name="location" type="checkbox" class="ckbox locationClass" id="location15"
+                                  value="R3024" /><label for="location15">전라북도</label>
+                                <input name="location" type="checkbox" class="ckbox locationClass" id="location16"
+                                  value="R3025" /><label for="location16">제주특별자치도</label>
                                 <input name="location" type="checkbox" class="ckbox locationClass" id="location17"
                                   value="R3026" /><label for="location17">세종특별자치시</label>
                               </td>
                             </tr>
-                            <!-- 나머지 필드들 -->
+                            <tr>
+                              <th scope="row">근무분야</th>
+                              <td colspan="3">
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_1"
+                                  value="R8010" /><label for="area_1">일반직</label>
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_2"
+                                  value="R8011" /><label for="area_2">행정직</label>
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_3"
+                                  value="R8012" /><label for="area_3">경영직</label>
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_4"
+                                  value="R8013" /><label for="area_4">사무직</label>
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_5"
+                                  value="R8014" /><label for="area_5">관리직</label>
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_6"
+                                  value="R8015" /><label for="area_6">연구직</label>
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_7"
+                                  value="R8016" /><label for="area_7">기술직</label>
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_8"
+                                  value="R8017" /><label for="area_8">시설직</label>
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_9"
+                                  value="R8018" /><label for="area_9">전산직</label>
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_10"
+                                  value="R8019" /><label for="area_10">교수직</label>
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_11"
+                                  value="R8020" /><label for="area_11">의사직</label>
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_12"
+                                  value="R8021" /><label for="area_12">간호직</label>
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_13"
+                                  value="R8022" /><label for="area_13">약무직</label>
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_14"
+                                  value="R8023" /><label for="area_14">보건직</label>
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_15"
+                                  value="R8024" /><label for="area_15">위생직</label>
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_16"
+                                  value="R8025" /><label for="area_16">기능직</label>
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_17"
+                                  value="R8026" /><label for="area_17">운영직</label>
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_18"
+                                  value="R8027" /><label for="area_18">공무직</label>
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_19"
+                                  value="R8028" /><label for="area_19">안전직</label>
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_20"
+                                  value="R8029" /><label for="area_20">교원직</label>
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_21"
+                                  value="R8030" /><label for="area_21">별정직</label>
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_22"
+                                  value="R8031" /><label for="area_22">계약직</label>
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_23"
+                                  value="R8032" /><label for="area_23">전문직</label>
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_24"
+                                  value="R8033" /><label for="area_24">운영직</label>
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_25"
+                                  value="R8034" /><label for="area_25">상담직</label>
+
+                                <input name="area" type="checkbox" class="ckbox areaListClass" id="area_26"
+                                  value="R8099" /><label for="area_26">기타</label>
+
+                              </td>
+                            </tr>
                             <tr>
                               <th scope="row"><label for="de01">고용형태</label></th>
                               <td>
                                 <input name="work_type" type="checkbox" class="ckbox workClass" value="R1010"
-                                  id="de01"><label for="de01">정규직</label>
+                                  id="de01" /><label for="de01">정규직</label>
+
+                                <input name="work_type" type="checkbox" class="ckbox workClass" value="R1030"
+                                  id="de03" /><label for="de03">무기계약직</label>
                                 <input name="work_type" type="checkbox" class="ckbox workClass" value="R1040"
-                                  id="de04"><label for="de04">비정규직</label>
+                                  id="de04" /><label for="de04">비정규직</label>
+                                <input name="work_type" type="checkbox" class="ckbox workClass" value="R1060"
+                                  id="de05" /><label for="de05">청년인턴(체험형)</label>
+                                <input name="work_type" type="checkbox" class="ckbox workClass" value="R1070"
+                                  id="de06" /><label for="de06">청년인턴(채용형)</label>
                               </td>
                               <th scope="row">채용구분</th>
-                              <td>
+                              <td style="width:105px;">
                                 <input name="career" value="R2010" type="checkbox" class="ckbox careerClass"
-                                  id="sa01"><label for="sa01">신입</label>
+                                  id="sa01" /><label for="sa01">신입</label>
                                 <input name="career" value="R2020" type="checkbox" class="ckbox careerClass"
-                                  id="sa02"><label for="sa02">경력</label>
+                                  id="sa02" /><label for="sa02">경력</label><br />
+                                <input name="career" value="R2030" type="checkbox" class="ckbox careerClass"
+                                  id="sa03" /><label for="sa03">신입+경력</label><br />
+                                <input name="career" value="R2040" type="checkbox" class="ckbox careerClass"
+                                  id="sa04" /><label for="sa04">외국인 전형</label>
+                              </td>
+                            </tr>
+                            <tr>
+                              <th scope="row"><label for="gi01">학력정보</label></th>
+                              <td colspan="3">
+                                <div style="text-align: center;float: left;">
+                                  <input type="checkbox" id="edu01" name="education" value="R7010"
+                                    class="ckbox educationClass"><label for="edu01">학력무관</label>
+                                  <input type="checkbox" id="edu02" name="education" value="R7020"
+                                    class="ckbox educationClass"><label for="edu02">중졸이하</label>
+                                  <input type="checkbox" id="edu03" name="education" value="R7030"
+                                    class="ckbox educationClass"><label for="edu03">고졸</label>
+                                  <input type="checkbox" id="edu04" name="education" value="R7040"
+                                    class="ckbox educationClass"><label for="edu04">대졸(2~3년)</label>
+                                  <input type="checkbox" id="edu05" name="education" value="R7050"
+                                    class="ckbox educationClass"><label for="edu05">대졸(4년)</label>
+                                  <input type="checkbox" id="edu06" name="education" value="R7060"
+                                    class="ckbox educationClass"><label for="edu06">석사</label>
+                                  <input type="checkbox" id="edu07" name="education" value="R7070"
+                                    class="ckbox educationClass"><label for="edu07">박사</label>
+                                </div>
+                                <span class="edu_line"></span>
+                                <div style="text-align: center;">
+                                  <input type="radio" id="single" name="eduType" value="single"><label
+                                    for="single">단일(AND)</label>
+                                  <input type="radio" id="multi" name="eduType" value="multi"><label
+                                    for="multi">중복(OR)</label </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <th scope="row"><label for="gi01">대체인력유무</label></th>
+                              <td colspan="3">
+                                <input name="replacement" value="Y" type="radio" class="ckbox replaceClass"
+                                  id="gi01" /><label for="gi01">예</label>
+                                <input name="replacement" value="N" type="radio" class="ckbox replaceClass"
+                                  id="gi02" /><label for="gi02">아니오</label>
                               </td>
                             </tr>
                             <tr>
                               <th class="bg_st1">기관유형</th>
                               <td colspan="3" class="bg_inp03">
-                                <select title="기관유형 선택" name="org_type" id="org_type" style="width:290px; padding:4px;">
+                                <select title="기관유형 선택" name="org_type" id="org_type"
+                                  style="width:290px; border:none; border-radius: 15px; padding:4px 16px;">
                                   <option selected="selected" value="">전체</option>
                                   <option value="A2001">공기업(시장형)</option>
                                   <option value="A2002">공기업(준시장형)</option>
+                                  <option value="A2003">준정부기관(기금관리형)</option>
+                                  <option value="A2004">준정부기관(위탁집행형)</option>
                                   <option value="A2005">기타공공기관</option>
                                 </select>
                               </td>
                             </tr>
                             <tr>
+                              <th scope="row"><label for="org_name">기관명</label></th>
+                              <td class="bg_inp03"
+                                style="padding-left: 28px; padding-top: 0px; padding-bottom: 5px; vertical-align: middle;">
+
+                                <select id="org_name" name="org_name" style="width: 300px; margin: 0 auto;">
+                                  <option value="">전체</option>
+                                </select>
+
+                              </td>
+                              <th scope="row">상태</th>
+                              <td style="width:118px;">
+                                <input name="ing" type="checkbox" class="ckbox ingClass" value="2" id="ju02" /><label
+                                  for="ju02">진행중</label>
+                                <input name="ing" type="checkbox" class="ckbox ingClass" value="3" id="ju03" /><label
+                                  for="ju03">마감</label>
+                              </td>
+                            </tr>
+                            <tr>
                               <th scope="row" class="bt round_b"><label for="tit01">키워드</label></th>
                               <td colspan="3" class="bt bg_inp02">
+                                <select title="키워드 선택" name="search_type" id="search_type"
+                                  style="width:175px; border:1px solid #ddd; border-radius: 5px; padding:4px 16px;">
+                                  <option selected="selected" value="">전체</option>
+                                  <option value="title">제목</option>
+                                  <option value="treat_con">우대조건</option>
+                                  <option value="elig">응시자격</option>
+                                  <option value="pref_con">우대내용</option>
+                                </select>
                                 <input type="text" placeholder="키워드를 입력해주세요." id="tit01" name="keyword" class="inps01"
-                                  style="width:70%; padding:5px;">
+                                  style="width:70%; padding:0 0 0 5px !important;" value=''
+                                  onkeypress="return fnEnterEvent(event,'fn_search()');" />
                               </td>
                             </tr>
                           </tbody>
                         </table>
                       </div>
 
+                      <div class="ser_open" id="detailOpenImg">
+                        <a href="javascript:;" onclick="jobDetailOpen()"><img src="/images/content/btn_searchOpen.gif"
+                            alt="상세검색 열기" /></a>
+                      </div>
+                      <!-- 상세검색 열기 전 끝 -->
+
+                      <span
+                        style="color:#191919; position:relative; top:0px; display:block;height:25px; text-align:center; padding-top:40px; width:80%;margin:0 auto;">*1건의
+                        공고에 여러 직렬 채용을 동시에 공고하는 경우가 있으므로 검색조건을 이용하여 검색한 후 <br> 각 공공기관의 채용공고문 내용을 확인하여 자격조건, 우대조건을 확인하시기
+                        바랍니다</span>
+
                       <div class="center mt_35 mb_30">
                         <a class="btn type_03 icon_01" href="javascript:fn_search();"><span class="icon"></span><span
                             class="text">검색</span></a>&nbsp;&nbsp;<a class="btn type_04 icon_02"
                           href="javascript:fn_reset();"><span class="icon"></span><span class="text">초기화</span></a>
                       </div>
+
                     </form>
                   </div>
                 </div>
@@ -4837,13 +5100,100 @@
         const mgmtHeader = document.getElementById('job-mgmt-header');
         if (mgmtHeader) mgmtHeader.style.display = isAdmin ? 'table-cell' : 'none';
 
-        // 클라이언트 사이드 필터링
+        // 클라이언트 사이드 필터링 (검색 조건 적용)
         const filteredDocs = [];
+
+        // 검색 조건 가져오기
+        let sKeyword = '';
+        const keywordInput = document.getElementById('tit01');
+        if (keywordInput) sKeyword = keywordInput.value.toLowerCase().trim();
+
+        // jQuery Select2 값 가져오기 (jQuery가 로드되지 않았을 경우 대비)
+        let sOrgName = '';
+        if (typeof $ !== 'undefined' && $('#org_name').length > 0) {
+          sOrgName = $('#org_name').val();
+        } else {
+          const orgSelect = document.getElementById('org_name');
+          if (orgSelect) sOrgName = orgSelect.value;
+        }
+
+        // 근무지 (일반 checkbox)
+        const sLocations = [];
+        const locChecks = document.querySelectorAll('input[name="location"]:checked');
+        locChecks.forEach(el => {
+          // label text 가져오기
+          const label = document.querySelector('label[for="' + el.id + '"]');
+          if (label) sLocations.push(label.innerText.trim());
+        });
+
+        // 고용형태 (checkbox)
+        const sWorkTypes = [];
+        const workChecks = document.querySelectorAll('input[name="work_type"]:checked');
+        workChecks.forEach(el => {
+          const label = document.querySelector('label[for="' + el.id + '"]');
+          if (label) sWorkTypes.push(label.innerText.trim());
+        });
+
         querySnapshot.forEach((docSnap) => {
           const d = docSnap.data();
-          const cat = d.category || 'public'; // 카테고리가 없으면 'public'으로 간주 (기존 데이터 호환)
+          const cat = d.category || 'public'; // 카테고리가 없으면 'public'으로 간주 
+
           if (cat === window.currentJobCategory) {
-            filteredDocs.push({ ...d, id: docSnap.id });
+            let isMatch = true;
+
+            // 1. 키워드 필터 (제목, 기관명, 내용)
+            if (sKeyword) {
+              const title = (d.title || '').toLowerCase();
+              const company = (d.company || '').toLowerCase();
+              // const content = (d.content || '').toLowerCase(); // 내용 검색은 데이터 양에 따라 느릴 수 있어 제외하거나 포함
+              if (!title.includes(sKeyword) && !company.includes(sKeyword)) {
+                isMatch = false;
+              }
+            }
+
+            // 2. 기관명 필터 (Select2)
+            if (isMatch && sOrgName && sOrgName !== '') {
+              // 정확히 일치하거나 포함되는 경우
+              if (!(d.company || '').includes(sOrgName)) {
+                isMatch = false;
+              }
+            }
+
+            // 3. 근무지 필터
+            if (isMatch && sLocations.length > 0) {
+              const loc = d.location || '';
+              // 선택된 지역 중 하나라도 포함되면 통과
+              const locMatch = sLocations.some(sl => loc.includes(sl));
+              if (!locMatch) isMatch = false;
+            }
+
+            // 4. 고용형태 필터
+            if (isMatch && sWorkTypes.length > 0) {
+              const jobType = d.jobType || '';
+              const typeMatch = sWorkTypes.some(st => jobType.includes(st));
+              if (!typeMatch) isMatch = false;
+            }
+
+            // 5. 상태 필터 (2: 진행중, 3: 마감)
+            if (isMatch && sStatus.length > 0) {
+              // 오늘 날짜 (YYYY-MM-DD)
+              const today = new Date().toISOString().split('T')[0];
+              const dead = (d.deadline && d.deadline.length > 0) ? d.deadline : '9999-12-31';
+              const isClosed = (dead < today);
+
+              // '진행중'만 선택(2), 마감 제외
+              if (sStatus.includes('2') && !sStatus.includes('3')) {
+                if (isClosed) isMatch = false;
+              }
+              // '마감'만 선택(3), 진행중 제외
+              else if (sStatus.includes('3') && !sStatus.includes('2')) {
+                if (!isClosed) isMatch = false;
+              }
+            }
+
+            if (isMatch) {
+              filteredDocs.push({ ...d, id: docSnap.id });
+            }
           }
         });
 
@@ -5099,6 +5449,66 @@
         });
       });
     });
+    // --- Search Box Initialization & Logic ---
+    $(document).ready(function () {
+      // 1. Datepicker Initialization
+      $("#s_date, #e_date").datepicker({
+        dateFormat: 'yy.mm.dd',
+        prevText: '이전 달',
+        nextText: '다음 달',
+        monthNames: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+        monthNamesShort: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+        dayNames: ['일', '월', '화', '수', '목', '금', '토'],
+        dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
+        dayNamesMin: ['일', '월', '화', '수', '목', '금', '토'],
+        showMonthAfterYear: true,
+        yearSuffix: '년',
+        changeMonth: true,
+        changeYear: true
+      });
+
+      // 2. Select2 Initialization (Organization Name)
+      // Placeholder data - User should replace this with actual organization list
+      var orgData = [
+        { id: '', text: '전체' },
+        { id: '한국전력공사', text: '한국전력공사' },
+        { id: '국민건강보험공단', text: '국민건강보험공단' },
+        { id: '국민연금공단', text: '국민연금공단' },
+        { id: '한국토지주택공사', text: '한국토지주택공사' },
+        { id: '한국수자원공사', text: '한국수자원공사' },
+        { id: '한국가스공사', text: '한국가스공사' },
+        { id: '인천국제공항공사', text: '인천국제공항공사' },
+        { id: '한국도로공사', text: '한국도로공사' },
+        { id: '한국공항공사', text: '한국공항공사' },
+        { id: '한국철도공사', text: '한국철도공사' }
+      ];
+
+      $('#org_name').select2({
+        data: orgData,
+        width: '300px',
+        placeholder: "기관명을 선택하세요",
+        allowClear: true
+      });
+
+      // Update jobResult when checkboxes are clicked
+      $('input[name="detail_code"]').on('change', function () {
+        var checkedCount = $('input[name="detail_code"]:checked').length;
+        if (checkedCount > 0) {
+          $('#jobResult').html(checkedCount + "개 직종 선택됨");
+          $('#jobResult').removeClass('bg_inp01').addClass('bg_inp02'); // Example class change
+        } else {
+          $('#jobResult').html("원하시는 직종을 선택하세요.");
+          $('#jobResult').addClass('bg_inp01');
+        }
+      });
+    });
+
+    // Override fn_search to use our loadJobs logic
+    window.fn_search = function () {
+      // loadJobs will read the input values
+      console.log('Search triggered');
+      loadJobs();
+    };
   </script>
 </body>
 
