@@ -2799,7 +2799,7 @@
                 <th style="width: 120px;">근무지</th>
                 <th style="width: 120px;">마감일</th>
                 <th style="width: 120px;">등록일</th>
-                <th style="width: 180px;">관리</th>
+                <th id="job-mgmt-header" style="width: 180px; display:none;">관리</th>
               </tr>
             </thead>
             <tbody id="jobTableBody">
@@ -2943,20 +2943,27 @@
             <aside class="board-sidebar">
               <h3>게시판</h3>
               <ul>
-                <li><a href="#" onclick="switchStoryBoard('free'); return false;" id="story-menu-free" class="active">자유게시판</a></li>
-                <li><a href="#" onclick="switchStoryBoard('consulting'); return false;" id="story-menu-consulting">취업상담실</a></li>
+                <li><a href="#" onclick="switchStoryBoard('free'); return false;" id="story-menu-free"
+                    class="active">자유게시판</a></li>
+                <li><a href="#" onclick="switchStoryBoard('consulting'); return false;"
+                    id="story-menu-consulting">취업상담실</a></li>
                 <li><a href="#" onclick="switchStoryBoard('study'); return false;" id="story-menu-study">스터디 모집</a></li>
-                <li><a href="#" onclick="switchStoryBoard('ncs-review'); return false;" id="story-menu-ncs-review">NCS 후기</a></li>
-                <li><a href="#" onclick="switchStoryBoard('interview'); return false;" id="story-menu-interview">면접 후기</a></li>
-                <li><a href="#" onclick="switchStoryBoard('success'); return false;" id="story-menu-success">최종합격 수기</a></li>
-                <li><a href="#" onclick="switchStoryBoard('expert'); return false;" id="story-menu-expert">현직자/전문가</a></li>
+                <li><a href="#" onclick="switchStoryBoard('ncs-review'); return false;" id="story-menu-ncs-review">NCS
+                    후기</a></li>
+                <li><a href="#" onclick="switchStoryBoard('interview'); return false;" id="story-menu-interview">면접
+                    후기</a></li>
+                <li><a href="#" onclick="switchStoryBoard('success'); return false;" id="story-menu-success">최종합격 수기</a>
+                </li>
+                <li><a href="#" onclick="switchStoryBoard('expert'); return false;" id="story-menu-expert">현직자/전문가</a>
+                </li>
               </ul>
             </aside>
 
             <!-- 오른쪽 게시판 컨텐츠 -->
             <div class="board-content">
               <!-- 게시판 테이블 -->
-              <div id="storyBoardTable" style="background:white; padding:2rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+              <div id="storyBoardTable"
+                style="background:white; padding:2rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
                 <table class="board-table" id="storyTable">
                   <thead>
                     <tr>
@@ -2974,7 +2981,8 @@
               </div>
 
               <!-- 게시판별 준비중 메시지 -->
-              <div id="storyBoardMessage" class="board-message" style="display:none; background:white; padding:3rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+              <div id="storyBoardMessage" class="board-message"
+                style="display:none; background:white; padding:3rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
                 <h3>준비 중입니다</h3>
                 <p>곧 새로운 게시판이 오픈됩니다!</p>
               </div>
@@ -3012,6 +3020,12 @@
               style="background:#f9f9f9; padding:1rem; border-radius:8px; display:none;">
               <strong>💾 첨부파일:</strong> <a id="story-detail-attachment-link" href="#" target="_blank"
                 style="color:#3498db; text-decoration:underline; margin-left:5px;"></a>
+            </div>
+
+            <!-- 삭제 버튼 영역 (권한 있을 때만 표시) -->
+            <div id="story-detail-actions" style="margin-top: 2rem; text-align: right; display: none;">
+              <button id="btn-delete-story" class="btn-delete"
+                style="padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: bold; background: #e74c3c; color: white; border: none; cursor: pointer;">삭제</button>
             </div>
           </div>
         </div>
@@ -3596,6 +3610,17 @@
           }
         } catch (e) { console.error("Admin check failed", e); }
 
+        // 전역 변수에 역할 저장
+        try {
+          const snap = await getDoc(doc(db, 'users', user.uid));
+          if (snap.exists()) {
+            window.currentUserRole = snap.data().role;
+          }
+        } catch (e) { }
+
+        // 권한에 따른 UI 업데이트
+        if (typeof loadJobs === 'function') loadJobs();
+
       } else {
         // 로그아웃 상태
         if (loginBtn) {
@@ -3975,6 +4000,21 @@
       }
     }
 
+    // 이야기 삭제 함수
+    window.deleteStory = async function (id) {
+      if (!confirm('정말 삭제하시겠습니까?')) return;
+      try {
+        await deleteDoc(doc(db, 'stories', id));
+        alert('✅ 삭제되었습니다.');
+        // 상세화면 숨기고 목록 보이기
+        document.getElementById('story-detail-section').style.display = 'none';
+        document.getElementById('story-board-section').style.display = 'block';
+        loadStories();
+      } catch (e) {
+        alert('삭제 실패: ' + e.message);
+      }
+    }
+
     // 게시판 전환 함수
     window.switchStoryBoard = function (boardType) {
       // 사이드바 메뉴 활성화 상태 변경
@@ -3982,11 +4022,11 @@
       menuItems.forEach(item => item.classList.remove('active'));
       const activeMenu = document.getElementById('story-menu-' + boardType);
       if (activeMenu) activeMenu.classList.add('active');
-      
+
       // 게시판 타입에 따라 표시 제어
       const boardTable = document.getElementById('storyBoardTable');
       const boardMessage = document.getElementById('storyBoardMessage');
-      
+
       if (boardType === 'free') {
         // 자유게시판: 기존 스토리 게시판 표시
         if (boardTable) boardTable.style.display = 'block';
@@ -4031,6 +4071,29 @@
         attArea.style.display = 'block';
       } else {
         attArea.style.display = 'none';
+      }
+
+      // 4. 권한 체크 및 삭제 버튼 제어
+      const actionsDiv = document.getElementById('story-detail-actions');
+      const deleteBtn = document.getElementById('btn-delete-story');
+      const currentUser = window.auth.currentUser;
+
+      let canDelete = false;
+      if (currentUser) {
+        // 전역 role 확인 (admin)
+        if (window.currentUserRole === 'admin') canDelete = true;
+        // 본인 글 확인
+        else if (data.authorUid && currentUser.uid === data.authorUid) canDelete = true;
+      }
+
+      if (actionsDiv && deleteBtn) {
+        if (canDelete) {
+          actionsDiv.style.display = 'block';
+          // 클릭 이벤트 바인딩 (익명함수 사용해 id 전달)
+          deleteBtn.onclick = function () { deleteStory(id); };
+        } else {
+          actionsDiv.style.display = 'none';
+        }
       }
     }
 
@@ -4260,25 +4323,24 @@
           return;
         }
 
+        // 관리자 여부에 따라 '관리' 헤더 표시 제어
+        const isAdmin = (window.currentUserRole === 'admin');
+        const mgmtHeader = document.getElementById('job-mgmt-header');
+        if (mgmtHeader) mgmtHeader.style.display = isAdmin ? 'table-cell' : 'none';
+
         querySnapshot.forEach((docSnap) => {
           const job = docSnap.data();
           const tr = document.createElement('tr');
 
           const createdDate = job.createdAt ? new Date(job.createdAt.seconds * 1000).toLocaleDateString('ko-KR') : '-';
 
-          // 데이터 준비 (이스케이프 처리 주의)
+          // 데이터 준비
           const safeTitle = escapeHtml(job.title).replace(/'/g, "\\'");
-          const safeCompany = escapeHtml(job.company).replace(/'/g, "\\'");
-          const safeContent = (job.content || '').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n');
-          const safeImageUrl = (job.imageUrl || '').replace(/'/g, "\\'");
-          const safeDetailUrl = (job.detailUrl || '').replace(/'/g, "\\'");
-          const safeJobType = (job.jobType || '').replace(/'/g, "\\'");
-          const safeLocation = (job.location || '').replace(/'/g, "\\'");
-          const safeContentImageUrl = (job.contentImageUrl || '').replace(/'/g, "\\'");
-          const safeAttachmentName = (job.attachmentName || '').replace(/'/g, "\\'");
-          const safeAttachmentUrl = (job.attachmentUrl || '').replace(/'/g, "\\'");
-          // 데이터 캐싱
+
           window.jobsData[docSnap.id] = { ...job, id: docSnap.id, createdDate: createdDate };
+
+          // 관리자일 때만 관리 버튼 보이기
+          const mgmtStyle = isAdmin ? '' : 'display:none;';
 
           tr.innerHTML = `
                 <td><img src="${job.imageUrl || './logo.png'}" class="job-image" alt="로고"></td>
@@ -4290,7 +4352,7 @@
                 <td>${job.location || '-'}</td>
                 <td>${job.deadline || '-'}</td>
                 <td>${createdDate}</td>
-                <td>
+                <td style="${mgmtStyle}">
                     <button class="btn-edit" onclick="openEditModal('${docSnap.id}')">수정</button>
                     <button class="btn-delete" onclick="deleteJob('${docSnap.id}')">삭제</button>
                 </td>
