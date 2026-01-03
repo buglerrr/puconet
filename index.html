@@ -260,6 +260,8 @@
       justify-content: flex-end;
       align-items: center;
       padding: .4rem 20px;
+      padding-right: calc(20px + 0px);
+      /* 사이드바 끝과 정렬 */
       background: transparent !important;
       /* 검은 바를 컨테이너에만 */
       border: none !important;
@@ -268,13 +270,16 @@
       /* 본문(프리미엄+사이드바) 폭과 맞춤 */
       margin: 0 auto;
       /* 가운데 정렬 */
-
+      box-sizing: border-box;
     }
 
     .global-nav-links {
       list-style: none;
       display: flex;
       gap: 1.25rem;
+      margin-right: 113px;
+      /* 메뉴를 왼쪽으로 이동하여 사이드바 끝과 정렬 */
+      padding-right: 0;
     }
 
     .global-nav a {
