@@ -2734,7 +2734,7 @@
         <div class="board-container">
           <div class="board-header">
             <h1 class="board-title">채용정보 상세</h1>
-            <button class="btn-add" onclick="showBoard()">목록으로</button>
+            <button class="btn-add" onclick="showBoard()" style="display:none;">목록으로</button>
           </div>
 
           <div class="detail-content-box"
@@ -2762,6 +2762,9 @@
                 <strong>💾 첨부파일:</strong> <a id="detail-attachment-link" href="#" target="_blank"
                   style="color:#3498db; text-decoration:underline;"></a>
               </div>
+              <button onclick="showBoard()" class="cta-button"
+                style="background:#3498db; margin-right:10px; border:none; color:white; padding: 10px 20px; border-radius: 5px; cursor: pointer;">목록으로
+                돌아가기</button>
               <a id="detail-link" href="#" target="_blank" class="cta-button" style="display:none;">채용 사이트 방문</a>
             </div>
           </div>
@@ -2995,7 +2998,7 @@
       <div id="story-detail-section" style="display:none; width:100%;">
         <div class="container" style="max-width:1000px; margin:0 auto;">
           <button onclick="backToStoryList()"
-            style="margin-bottom:1rem; background:none; border:none; font-size:1.1rem; cursor:pointer; color:#555;">&larr;
+            style="display:none; margin-bottom:1rem; background:none; border:none; font-size:1.1rem; cursor:pointer; color:#555;">&larr;
             목록으로 돌아가기</button>
           <div style="background:white; padding:3rem; border-radius:10px; box-shadow:0 2px 20px rgba(0,0,0,0.05);">
             <div style="border-bottom:1px solid #eee; padding-bottom:1rem; margin-bottom:2rem;">
@@ -3022,10 +3025,16 @@
                 style="color:#3498db; text-decoration:underline; margin-left:5px;"></a>
             </div>
 
-            <!-- 삭제 버튼 영역 (권한 있을 때만 표시) -->
-            <div id="story-detail-actions" style="margin-top: 2rem; text-align: right; display: none;">
+            <!-- 하단 액션 버튼 영역 (목록으로 / 삭제) -->
+            <div id="story-detail-actions" style="margin-top: 2rem; text-align: right;">
+              <!-- 목록으로 돌아가기 (항상 표시) -->
+              <button onclick="backToStoryList()" class="btn-delete"
+                style="padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: bold; background: #3498db; color: white; border: none; cursor: pointer; margin-right: 10px;">목록으로
+                돌아가기</button>
+
+              <!-- 삭제 버튼 (권한 있을 때만 표시) -->
               <button id="btn-delete-story" class="btn-delete"
-                style="padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: bold; background: #e74c3c; color: white; border: none; cursor: pointer;">삭제</button>
+                style="padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: bold; background: #e74c3c; color: white; border: none; cursor: pointer; display: none;">삭제</button>
             </div>
           </div>
         </div>
@@ -4086,13 +4095,16 @@
         else if (data.authorUid && currentUser.uid === data.authorUid) canDelete = true;
       }
 
+
       if (actionsDiv && deleteBtn) {
+        // 컨테이너는 항상 보임 (목록으로 버튼 때문)
+        actionsDiv.style.display = 'block';
+
         if (canDelete) {
-          actionsDiv.style.display = 'block';
-          // 클릭 이벤트 바인딩 (익명함수 사용해 id 전달)
+          deleteBtn.style.display = 'inline-block';
           deleteBtn.onclick = function () { deleteStory(id); };
         } else {
-          actionsDiv.style.display = 'none';
+          deleteBtn.style.display = 'none';
         }
       }
     }
