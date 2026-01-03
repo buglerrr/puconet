@@ -261,19 +261,20 @@
       align-items: center;
       padding: .4rem 20px;
       background: transparent !important;
+      /* 검은 바를 컨테이너에만 */
       border: none !important;
       width: 100%;
       max-width: 1480px;
+      /* 본문(프리미엄+사이드바) 폭과 맞춤 */
       margin: 0 auto;
-      box-sizing: border-box;
+      /* 가운데 정렬 */
+
     }
 
     .global-nav-links {
       list-style: none;
       display: flex;
       gap: 1.25rem;
-      margin: 0;
-      padding: 0;
     }
 
     .global-nav a {
@@ -859,20 +860,6 @@
       margin-right: auto;
     }
 
-    /* === 글로벌 네비와 사이드바 수직 정렬 보장 === */
-    .global-nav .container,
-    .content-with-sidebar-wrapper {
-      max-width: 1480px !important;
-      padding-left: 20px !important;
-      padding-right: 20px !important;
-    }
-
-    /* 글로벌 네비 메뉴가 사이드바 오른쪽 끝과 정확히 정렬되도록 */
-    .global-nav-links {
-      margin-right: 0;
-      padding-right: 0;
-    }
-
     /* === v19: Premium logo max-fit (keep aspect, fill cell as much as possible) === */
     #features .job-card .banner-image {
       width: 100% !important;
@@ -1092,7 +1079,6 @@
       max-width: 1480px;
       margin: 0 auto;
       padding: 0 20px;
-      box-sizing: border-box;
     }
 
     .main-content-area {
@@ -1677,7 +1663,12 @@
     }
     */
 
-    /* === 상단 글로벌 네비게이션 정렬 - 이미 위에서 정의됨 === */
+    /* === 상단 글로벌 네비게이션 정렬 (오른쪽 정렬) === */
+    .global-nav .container {
+      display: flex;
+      justify-content: flex-end;
+      /* 오른쪽 끝으로 정렬 */
+    }
 
     /* 반응형 */
     @media (max-width: 768px) {
