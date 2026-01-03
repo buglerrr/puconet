@@ -2038,12 +2038,12 @@
         <nav>
           <button aria-label="메뉴 열기" class="menu-toggle" type="button">메뉴</button>
           <div class="nav-links">
-            <a href="#" onclick="showBoard(); return false;">채용정보</a>
-            <a href="#" onclick="alert('준비 중입니다.'); return false;">공공게시판</a>
-            <a href="#">공공기관 뉴스</a>
-            <a href="#" onclick="alert('준비 중입니다.'); return false;">공모전 소식</a>
-            <a href="#" onclick="showStoryBoard(); return false;" style="color: #666; font-weight:bold;">취업 이야기</a>
-            <a href="#">마이메뉴</a>
+            <a href="#" onclick="checkLoginAndExecute(showBoard, '채용정보를 보려면 로그인이 필요합니다.'); return false;">채용정보</a>
+            <a href="#" onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '공공게시판을 보려면 로그인이 필요합니다.'); return false;">공공게시판</a>
+            <a href="#" onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '공공기관 뉴스를 보려면 로그인이 필요합니다.'); return false;">공공기관 뉴스</a>
+            <a href="#" onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '공모전 소식을 보려면 로그인이 필요합니다.'); return false;">공모전 소식</a>
+            <a href="#" onclick="checkLoginAndExecute(showStoryBoard, '취업 이야기를 보려면 로그인이 필요합니다.'); return false;" style="color: #666; font-weight:bold;">취업 이야기</a>
+            <a href="#" onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '마이메뉴를 보려면 로그인이 필요합니다.'); return false;">마이메뉴</a>
           </div>
         </nav>
       </div>
@@ -3259,6 +3259,16 @@
   <script>
     (function () {
       function openPopup(url) {
+        // 로그인 체크 추가
+        const user = window.auth?.currentUser;
+        if (!user) {
+          alert('채용정보를 보려면 로그인이 필요합니다. 회원가입 후 이용해주세요.');
+          if (window.openLoginModal) {
+            window.openLoginModal();
+          }
+          return;
+        }
+
         if (!url) {
           alert('이 배너에 연결할 채용 웹사이트 주소(URL)를 data-url 속성에 넣어주세요.');
           return;
@@ -4240,6 +4250,20 @@
   </script>
 
   <script>
+    // 로그인 체크 함수
+    window.checkLoginAndExecute = function(callback, message) {
+      const user = window.auth?.currentUser;
+      if (!user) {
+        alert(message || '로그인이 필요한 서비스입니다. 회원가입 후 이용해주세요.');
+        window.openLoginModal();
+        return false;
+      }
+      if (typeof callback === 'function') {
+        callback();
+      }
+      return true;
+    }
+
     // 메인 화면으로 돌아가는 함수
     window.goHome = function () {
       restoreSidebar(); // 사이드바 복구
@@ -4650,6 +4674,39 @@
     }
     // 페이지 로드 완료 시 loadJobs 실행
     window.addEventListener('DOMContentLoaded', loadJobs);
+
+    // 페이지 로드 시 학술연구정보 및 교육과정 배너에 로그인 체크 추가
+    window.addEventListener('DOMContentLoaded', function() {
+      // 학술연구정보 배너들에 로그인 체크 추가
+      const researchBanners = document.querySelectorAll('.research-sidebar .bannerList a, .research-sidebar .hbn-row-image a');
+      researchBanners.forEach(function(banner) {
+        banner.addEventListener('click', function(e) {
+          const user = window.auth?.currentUser;
+          if (!user) {
+            e.preventDefault();
+            alert('학술연구정보를 보려면 로그인이 필요합니다. 회원가입 후 이용해주세요.');
+            if (window.openLoginModal) {
+              window.openLoginModal();
+            }
+          }
+        });
+      });
+
+      // 교육과정 배너들에 로그인 체크 추가
+      const eduBanners = document.querySelectorAll('.edu-banner');
+      eduBanners.forEach(function(banner) {
+        banner.addEventListener('click', function(e) {
+          const user = window.auth?.currentUser;
+          if (!user) {
+            e.preventDefault();
+            alert('교육과정 정보를 보려면 로그인이 필요합니다. 회원가입 후 이용해주세요.');
+            if (window.openLoginModal) {
+              window.openLoginModal();
+            }
+          }
+        });
+      });
+    });
   </script>
 </body>
 
