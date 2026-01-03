@@ -18,13 +18,15 @@
       line-height: 1.6;
       color: #333;
       background-color: #ffffff;
-      min-width: 1520px;
-      /* 고정 너비 설정 */
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .container {
-      width: 1480px;
-      /* max-width -> width 로 변경하여 완전 고정 */
+      width: 100%;
+      max-width: 1480px;
       margin: 0 auto;
       padding: 0 20px;
     }
@@ -36,6 +38,9 @@
       position: sticky;
       top: 0;
       z-index: 100;
+      width: 100%;
+      display: flex;
+      justify-content: center;
     }
 
     .header-content {
@@ -121,6 +126,13 @@
     /* 섹션 스타일 */
     .section {
       padding: 4rem 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .section > .container {
+      width: 100%;
     }
 
     .section-title {
@@ -238,16 +250,21 @@
       color: #000 !important;
       /* 기본 글자색을 검정으로 */
       font-size: 17px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
     }
 
     .global-nav .container {
       display: flex;
       justify-content: flex-end;
       align-items: center;
-      padding: .4rem 100px .4rem 20px;
+      padding: .4rem 20px;
       background: transparent !important;
       /* 검은 바를 컨테이너에만 */
-      border: none !important max-width: 1300px;
+      border: none !important;
+      width: 100%;
+      max-width: 1480px;
       /* 본문(프리미엄+사이드바) 폭과 맞춤 */
       margin: 0 auto;
       /* 가운데 정렬 */
@@ -813,15 +830,34 @@
     .site-footer {
       margin-top: .25rem !important;
       padding: .25rem 0 !important;
+      width: 100%;
+      display: flex;
+      justify-content: center;
     }
 
     .site-footer .container {
+      width: 100%;
       max-width: 1480px !important;
       /* Global container width */
       margin: 0 auto !important;
       padding: 0 20px !important;
       /* Global container padding */
       text-align: left !important;
+    }
+
+    /* === 전체 레이아웃 중앙 정렬 강화 === */
+    body > * {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    header, 
+    .global-nav,
+    .content-with-sidebar-wrapper,
+    .section,
+    .site-footer {
+      margin-left: auto;
+      margin-right: auto;
     }
 
     /* === v19: Premium logo max-fit (keep aspect, fill cell as much as possible) === */
@@ -1039,7 +1075,8 @@
     .content-with-sidebar-wrapper {
       display: flex;
       gap: 1rem;
-      max-width: 1400px;
+      width: 100%;
+      max-width: 1480px;
       margin: 0 auto;
       padding: 0 20px;
     }
