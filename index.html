@@ -3449,18 +3449,78 @@
                         </tr>
                         
                         <tr>
+                          <th>근무분야</th>
+                          <td colspan="3">
+                            <input type="checkbox" name="area" value="일반직" id="area01"><label for="area01">일반직</label>
+                            <input type="checkbox" name="area" value="행정직" id="area02"><label for="area02">행정직</label>
+                            <input type="checkbox" name="area" value="경영직" id="area03"><label for="area03">경영직</label>
+                            <input type="checkbox" name="area" value="사무직" id="area04"><label for="area04">사무직</label>
+                            <input type="checkbox" name="area" value="관리직" id="area05"><label for="area05">관리직</label>
+                            <input type="checkbox" name="area" value="연구직" id="area06"><label for="area06">연구직</label>
+                            <input type="checkbox" name="area" value="기술직" id="area07"><label for="area07">기술직</label>
+                            <input type="checkbox" name="area" value="시설직" id="area08"><label for="area08">시설직</label>
+                            <input type="checkbox" name="area" value="전산직" id="area09"><label for="area09">전산직</label><br>
+                            <input type="checkbox" name="area" value="교수직" id="area10"><label for="area10">교수직</label>
+                            <input type="checkbox" name="area" value="의사직" id="area11"><label for="area11">의사직</label>
+                            <input type="checkbox" name="area" value="간호직" id="area12"><label for="area12">간호직</label>
+                            <input type="checkbox" name="area" value="약무직" id="area13"><label for="area13">약무직</label>
+                            <input type="checkbox" name="area" value="보건직" id="area14"><label for="area14">보건직</label>
+                            <input type="checkbox" name="area" value="위생직" id="area15"><label for="area15">위생직</label>
+                            <input type="checkbox" name="area" value="기능직" id="area16"><label for="area16">기능직</label>
+                            <input type="checkbox" name="area" value="운영직" id="area17"><label for="area17">운영직</label>
+                            <input type="checkbox" name="area" value="공무직" id="area18"><label for="area18">공무직</label><br>
+                            <input type="checkbox" name="area" value="안전직" id="area19"><label for="area19">안전직</label>
+                            <input type="checkbox" name="area" value="교원직" id="area20"><label for="area20">교원직</label>
+                            <input type="checkbox" name="area" value="별정직" id="area21"><label for="area21">별정직</label>
+                            <input type="checkbox" name="area" value="계약직" id="area22"><label for="area22">계약직</label>
+                            <input type="checkbox" name="area" value="전문직" id="area23"><label for="area23">전문직</label>
+                            <input type="checkbox" name="area" value="상담직" id="area24"><label for="area24">상담직</label>
+                            <input type="checkbox" name="area" value="기타" id="area25"><label for="area25">기타</label>
+                          </td>
+                        </tr>
+                        
+                        <tr>
                           <th>고용형태</th>
                           <td>
                             <input type="checkbox" name="work_type" value="정규직" id="work01"><label for="work01">정규직</label>
                             <input type="checkbox" name="work_type" value="무기계약직" id="work02"><label for="work02">무기계약직</label>
                             <input type="checkbox" name="work_type" value="비정규직" id="work03"><label for="work03">비정규직</label>
-                            <input type="checkbox" name="work_type" value="청년인턴" id="work04"><label for="work04">청년인턴</label>
+                            <input type="checkbox" name="work_type" value="청년인턴(체험형)" id="work04"><label for="work04">청년인턴(체험형)</label>
+                            <input type="checkbox" name="work_type" value="청년인턴(채용형)" id="work05"><label for="work05">청년인턴(채용형)</label>
                           </td>
                           <th>채용구분</th>
                           <td>
                             <input type="checkbox" name="career" value="신입" id="career01"><label for="career01">신입</label>
-                            <input type="checkbox" name="career" value="경력" id="career02"><label for="career02">경력</label>
-                            <input type="checkbox" name="career" value="신입+경력" id="career03"><label for="career03">신입+경력</label>
+                            <input type="checkbox" name="career" value="경력" id="career02"><label for="career02">경력</label><br>
+                            <input type="checkbox" name="career" value="신입+경력" id="career03"><label for="career03">신입+경력</label><br>
+                            <input type="checkbox" name="career" value="외국인 전형" id="career04"><label for="career04">외국인 전형</label>
+                          </td>
+                        </tr>
+                        
+                        <tr>
+                          <th>학력정보</th>
+                          <td colspan="3">
+                            <div style="float: left; margin-right: 20px;">
+                              <input type="checkbox" name="education" value="학력무관" id="edu01"><label for="edu01">학력무관</label>
+                              <input type="checkbox" name="education" value="중졸이하" id="edu02"><label for="edu02">중졸이하</label>
+                              <input type="checkbox" name="education" value="고졸" id="edu03"><label for="edu03">고졸</label>
+                              <input type="checkbox" name="education" value="대졸(2~3년)" id="edu04"><label for="edu04">대졸(2~3년)</label>
+                              <input type="checkbox" name="education" value="대졸(4년)" id="edu05"><label for="edu05">대졸(4년)</label>
+                              <input type="checkbox" name="education" value="석사" id="edu06"><label for="edu06">석사</label>
+                              <input type="checkbox" name="education" value="박사" id="edu07"><label for="edu07">박사</label>
+                            </div>
+                            <div style="border-left: 1px solid #dee2e6; padding-left: 20px; display: inline-block;">
+                              <input type="radio" name="eduType" value="single" id="eduSingle"><label for="eduSingle">단일(AND)</label>
+                              <input type="radio" name="eduType" value="multi" id="eduMulti"><label for="eduMulti">중복(OR)</label>
+                            </div>
+                          </td>
+                        </tr>
+                        
+                        <tr>
+                          <th>대체인력유무</th>
+                          <td colspan="3">
+                            <input type="radio" name="replacement" value="Y" id="replace01"><label for="replace01">예</label>
+                            <input type="radio" name="replacement" value="N" id="replace02"><label for="replace02">아니오</label>
                           </td>
                         </tr>
                         
@@ -3479,12 +3539,28 @@
                         </tr>
                         
                         <tr>
+                          <th>기관명</th>
+                          <td>
+                            <select name="org_name" id="org_name" style="width: 300px;">
+                              <option value="">전체</option>
+                            </select>
+                          </td>
+                          <th>상태</th>
+                          <td>
+                            <input type="checkbox" name="ing" value="진행중" id="ing01"><label for="ing01">진행중</label>
+                            <input type="checkbox" name="ing" value="마감" id="ing02"><label for="ing02">마감</label>
+                          </td>
+                        </tr>
+                        
+                        <tr>
                           <th>키워드</th>
                           <td colspan="3">
                             <select name="search_type" id="search_type" style="width: 150px; margin-right: 10px;">
-                              <option value="all">전체</option>
+                              <option value="">전체</option>
                               <option value="title">제목</option>
-                              <option value="company">기관명</option>
+                              <option value="treat_con">우대조건</option>
+                              <option value="elig">응시자격</option>
+                              <option value="pref_con">우대내용</option>
                             </select>
                             <input type="text" name="keyword" id="keyword" placeholder="키워드를 입력해주세요" style="width: calc(100% - 170px);">
                           </td>
@@ -5403,9 +5479,15 @@
         e_date: document.getElementById('e_date').value,
         detail_codes: Array.from(document.querySelectorAll('input[name="detail_code"]:checked')).map(el => el.value),
         locations: Array.from(document.querySelectorAll('input[name="location"]:checked')).map(el => el.value),
+        areas: Array.from(document.querySelectorAll('input[name="area"]:checked')).map(el => el.value),
         work_types: Array.from(document.querySelectorAll('input[name="work_type"]:checked')).map(el => el.value),
         careers: Array.from(document.querySelectorAll('input[name="career"]:checked')).map(el => el.value),
+        educations: Array.from(document.querySelectorAll('input[name="education"]:checked')).map(el => el.value),
+        eduType: document.querySelector('input[name="eduType"]:checked')?.value || '',
+        replacement: document.querySelector('input[name="replacement"]:checked')?.value || '',
         org_type: document.getElementById('org_type').value,
+        org_name: document.getElementById('org_name').value,
+        ings: Array.from(document.querySelectorAll('input[name="ing"]:checked')).map(el => el.value),
         search_type: document.getElementById('search_type').value,
         keyword: document.getElementById('keyword').value
       };
@@ -5542,13 +5624,19 @@
       document.getElementById('s_date').value = '';
       document.getElementById('e_date').value = '';
       document.getElementById('org_type').value = '';
-      document.getElementById('search_type').value = 'all';
+      document.getElementById('org_name').value = '';
+      document.getElementById('search_type').value = '';
       document.getElementById('keyword').value = '';
       
       document.querySelectorAll('input[name="detail_code"]').forEach(el => el.checked = false);
       document.querySelectorAll('input[name="location"]').forEach(el => el.checked = false);
+      document.querySelectorAll('input[name="area"]').forEach(el => el.checked = false);
       document.querySelectorAll('input[name="work_type"]').forEach(el => el.checked = false);
       document.querySelectorAll('input[name="career"]').forEach(el => el.checked = false);
+      document.querySelectorAll('input[name="education"]').forEach(el => el.checked = false);
+      document.querySelectorAll('input[name="eduType"]').forEach(el => el.checked = false);
+      document.querySelectorAll('input[name="replacement"]').forEach(el => el.checked = false);
+      document.querySelectorAll('input[name="ing"]').forEach(el => el.checked = false);
       
       // 직종 선택 박스 초기화
       document.getElementById('jobDetailSelector').textContent = '원하시는 직종을 선택하세요.';
