@@ -2808,7 +2808,7 @@
                   <tr>
                     <td style="padding:0.5rem; font-weight:600; color:#495057;">학력조건</td>
                     <td id="detail-education" style="padding:0.5rem; color:#212529;">-</td>
-                    <td style="padding:0.5rem; font-weight:600; color:#495057;">공고종료일</td>
+                    <td style="padding:0.5rem; font-weight:600; color:#495057;">마감일</td>
                     <td id="detail-closing-date" style="padding:0.5rem; color:#212529;">-</td>
                   </tr>
                   <tr>
@@ -2939,7 +2939,7 @@
               <input type="text" id="add_employment_type" placeholder="예: 정규직, 무기계약직">
             </div>
             <div class="form-group">
-              <label>근무지</label>
+              <label>근무지역</label>
               <input type="text" id="add_location" placeholder="예: 서울, 인천, 대전 (콤마로 구분)">
             </div>
             <div class="form-group">
@@ -2965,10 +2965,6 @@
               <input type="text" id="add_education" placeholder="예: 학력무관, 대졸(4년) 이상">
             </div>
             <div class="form-group">
-              <label>공고종료일</label>
-              <input type="date" id="add_closing_date">
-            </div>
-            <div class="form-group">
               <label>우대조건</label>
               <textarea id="add_preference" rows="3" placeholder="예: 보훈대상자, 장애인, 이공계 전공자 우대" style="resize:vertical;"></textarea>
             </div>
@@ -2978,7 +2974,7 @@
               <input type="text" id="add_image_url" placeholder="예: ./logo.png 또는 https://...">
             </div>
             <div class="form-group">
-              <label>채용공고 상세 URL (선택)</label>
+              <label>원본공고URL</label>
               <input type="text" id="add_detail_url" placeholder="예: https://...">
             </div>
             <div class="form-group">
@@ -3019,7 +3015,7 @@
               <input type="text" id="edit_employment_type" placeholder="예: 정규직, 무기계약직">
             </div>
             <div class="form-group">
-              <label>근무지</label>
+              <label>근무지역</label>
               <input type="text" id="edit_location" placeholder="예: 서울, 인천, 대전 (콤마로 구분)">
             </div>
             <div class="form-group">
@@ -3045,10 +3041,6 @@
               <input type="text" id="edit_education" placeholder="예: 학력무관, 대졸(4년) 이상">
             </div>
             <div class="form-group">
-              <label>공고종료일</label>
-              <input type="date" id="edit_closing_date">
-            </div>
-            <div class="form-group">
               <label>우대조건</label>
               <textarea id="edit_preference" rows="3" placeholder="예: 보훈대상자, 장애인, 이공계 전공자 우대" style="resize:vertical;"></textarea>
             </div>
@@ -3058,7 +3050,7 @@
               <input type="text" id="edit_image_url">
             </div>
             <div class="form-group">
-              <label>채용공고 상세 URL (선택)</label>
+              <label>원본공고URL</label>
               <input type="text" id="edit_detail_url">
             </div>
             <div class="form-group">
@@ -4715,7 +4707,6 @@
       document.getElementById('edit_career_type').value = job.careerType || '';
       document.getElementById('edit_recruitment_count').value = job.recruitmentCount || '';
       document.getElementById('edit_education').value = job.education || '';
-      document.getElementById('edit_closing_date').value = job.closingDate || '';
       document.getElementById('edit_preference').value = job.preference || '';
 
       // 파일 input 초기화 (보안상 값 설정 불가)
@@ -4787,13 +4778,15 @@
 
         const employmentTypeValue = document.getElementById('add_employment_type').value;
         
+        const deadlineValue = document.getElementById('add_deadline').value;
+        
         const data = {
           title: document.getElementById('add_title').value,
           company: document.getElementById('add_company').value,
           employmentType: employmentTypeValue,
           jobType: employmentTypeValue, // 호환성을 위해 jobType에도 동일한 값 저장
           location: document.getElementById('add_location').value,
-          deadline: document.getElementById('add_deadline').value,
+          deadline: deadlineValue,
           imageUrl: document.getElementById('add_image_url').value,
           detailUrl: document.getElementById('add_detail_url').value,
           content: document.getElementById('add_content').value,
@@ -4805,7 +4798,7 @@
           careerType: document.getElementById('add_career_type').value,
           recruitmentCount: document.getElementById('add_recruitment_count').value,
           education: document.getElementById('add_education').value,
-          closingDate: document.getElementById('add_closing_date').value,
+          closingDate: deadlineValue, // 마감일과 동일하게 설정
           preference: document.getElementById('add_preference').value,
           category: window.currentJobCategory, // 현재 카테고리 저장
           createdAt: window.Timestamp.now()
@@ -4834,6 +4827,7 @@
         const attachmentFile = document.getElementById('edit_attachment_file').files[0];
 
         const employmentTypeValue = document.getElementById('edit_employment_type').value;
+        const deadlineValue = document.getElementById('edit_deadline').value;
 
         // 기존 데이터 유지를 위해 업데이트할 필드만 구성
         const data = {
@@ -4842,7 +4836,7 @@
           employmentType: employmentTypeValue,
           jobType: employmentTypeValue, // 호환성을 위해 jobType에도 동일한 값 저장
           location: document.getElementById('edit_location').value,
-          deadline: document.getElementById('edit_deadline').value,
+          deadline: deadlineValue,
           imageUrl: document.getElementById('edit_image_url').value,
           detailUrl: document.getElementById('edit_detail_url').value,
           content: document.getElementById('edit_content').value,
@@ -4851,7 +4845,7 @@
           careerType: document.getElementById('edit_career_type').value,
           recruitmentCount: document.getElementById('edit_recruitment_count').value,
           education: document.getElementById('edit_education').value,
-          closingDate: document.getElementById('edit_closing_date').value,
+          closingDate: deadlineValue, // 마감일과 동일하게 설정
           preference: document.getElementById('edit_preference').value
         };
 
