@@ -2897,11 +2897,10 @@
                     <tr>
                       <th style="width: 80px;">로고</th>
                       <th style="width: 150px;">기관명</th>
-                      <th>제목</th>
+                      <th style="min-width: 350px;">제목</th>
                       <th style="width: 100px;">고용유형</th>
                       <th style="width: 120px;">근무지</th>
                       <th style="width: 120px;">마감일</th>
-                      <th style="width: 120px;">등록일</th>
                       <th id="job-mgmt-header" style="width: 180px; display:none;">관리</th>
                     </tr>
                   </thead>
@@ -4661,7 +4660,6 @@
                 <td>${displayEmploymentType}</td>
                 <td>${displayLocation}</td>
                 <td>${job.deadline || '-'}</td>
-                <td>${createdDate}</td>
                 <td style="${mgmtStyle}">
                     <button class="btn-edit" onclick="openEditModal('${job.id}')">수정</button>
                     <button class="btn-delete" onclick="deleteJob('${job.id}')">삭제</button>
