@@ -2898,7 +2898,7 @@
                       <th style="width: 80px;">로고</th>
                       <th style="width: 150px;">기관명</th>
                       <th>제목</th>
-                      <th style="width: 100px;">고용형태</th>
+                      <th style="width: 100px;">고용유형</th>
                       <th style="width: 120px;">근무지</th>
                       <th style="width: 120px;">마감일</th>
                       <th style="width: 120px;">등록일</th>
@@ -2928,7 +2928,7 @@
           <h2>📝 채용정보 등록</h2>
           <form onsubmit="addJob(event)">
             <div class="form-group">
-              <label>제목 *</label>
+              <label>채용공고제목 *</label>
               <input type="text" id="add_title" required placeholder="예: 2025년 상반기 신입사원 채용">
             </div>
             <div class="form-group">
@@ -2936,12 +2936,12 @@
               <input type="text" id="add_company" required placeholder="예: 한국전력공사">
             </div>
             <div class="form-group">
-              <label>고용형태</label>
-              <input type="text" id="add_job_type" placeholder="예: 정규직">
+              <label>고용유형</label>
+              <input type="text" id="add_employment_type" placeholder="예: 정규직, 무기계약직">
             </div>
             <div class="form-group">
               <label>근무지</label>
-              <input type="text" id="add_location" placeholder="예: 서울">
+              <input type="text" id="add_location" placeholder="예: 서울, 인천, 대전 (콤마로 구분)">
             </div>
             <div class="form-group">
               <label>마감일</label>
@@ -2951,11 +2951,7 @@
             <!-- 추가 필드들 -->
             <div class="form-group">
               <label>NCS코드명</label>
-              <input type="text" id="add_ncs_code" placeholder="예: 02010101 경영기획">
-            </div>
-            <div class="form-group">
-              <label>고용유형</label>
-              <input type="text" id="add_employment_type" placeholder="예: 정규직, 무기계약직">
+              <input type="text" id="add_ncs_code" placeholder="예: 경영.회계.사무, 건설, 기계 (콤마로 구분)">
             </div>
             <div class="form-group">
               <label>채용구분</label>
@@ -3012,7 +3008,7 @@
           <form onsubmit="updateJob(event)">
             <input type="hidden" id="edit_id">
             <div class="form-group">
-              <label>제목 *</label>
+              <label>채용공고제목 *</label>
               <input type="text" id="edit_title" required>
             </div>
             <div class="form-group">
@@ -3020,12 +3016,12 @@
               <input type="text" id="edit_company" required>
             </div>
             <div class="form-group">
-              <label>고용형태</label>
-              <input type="text" id="edit_job_type">
+              <label>고용유형</label>
+              <input type="text" id="edit_employment_type" placeholder="예: 정규직, 무기계약직">
             </div>
             <div class="form-group">
               <label>근무지</label>
-              <input type="text" id="edit_location">
+              <input type="text" id="edit_location" placeholder="예: 서울, 인천, 대전 (콤마로 구분)">
             </div>
             <div class="form-group">
               <label>마감일</label>
@@ -3035,11 +3031,7 @@
             <!-- 추가 필드들 -->
             <div class="form-group">
               <label>NCS코드명</label>
-              <input type="text" id="edit_ncs_code" placeholder="예: 02010101 경영기획">
-            </div>
-            <div class="form-group">
-              <label>고용유형</label>
-              <input type="text" id="edit_employment_type" placeholder="예: 정규직, 무기계약직">
+              <input type="text" id="edit_ncs_code" placeholder="예: 경영.회계.사무, 건설, 기계 (콤마로 구분)">
             </div>
             <div class="form-group">
               <label>채용구분</label>
@@ -4508,14 +4500,16 @@
       if (detailSection) detailSection.style.display = 'block';
 
       // 데이터 바인딩
+      const displayEmploymentType = job.employmentType || job.jobType || '채용';
+      
       document.getElementById('detail-title').textContent = job.title;
       document.getElementById('detail-company').textContent = job.company;
-      document.getElementById('detail-date').textContent = '등록일: ' + job.createdDate + (job.location ? ' | 근무지: ' + job.location : '');
-      document.getElementById('detail-badge').textContent = job.jobType || '채용';
+      document.getElementById('detail-date').textContent = '등록일: ' + job.createdDate + (job.location ? ' | 근무지: ' + formatLocation(job.location) : '');
+      document.getElementById('detail-badge').textContent = displayEmploymentType;
 
       // 추가 정보 바인딩
-      document.getElementById('detail-ncs-code').textContent = job.ncsCode || '-';
-      document.getElementById('detail-employment-type').textContent = job.employmentType || job.jobType || '-';
+      document.getElementById('detail-ncs-code').textContent = formatNcsCode(job.ncsCode);
+      document.getElementById('detail-employment-type').textContent = displayEmploymentType;
       document.getElementById('detail-career-type').textContent = job.careerType || '-';
       document.getElementById('detail-recruitment-count').textContent = job.recruitmentCount || '-';
       document.getElementById('detail-education').textContent = job.education || '-';
@@ -4582,6 +4576,7 @@
       const linkBtn = document.getElementById('detail-link');
       if (job.detailUrl) {
         linkBtn.href = job.detailUrl;
+        linkBtn.target = '_blank'; // 새 창으로 열기
         linkBtn.style.display = 'inline-block';
         linkBtn.textContent = '채용 사이트 방문';
       } else {
@@ -4644,6 +4639,8 @@
 
           // 데이터 준비
           const safeTitle = escapeHtml(job.title).replace(/'/g, "\\'");
+          const displayEmploymentType = job.employmentType || job.jobType || '-';
+          const displayLocation = formatLocation(job.location);
 
           window.jobsData[job.id] = { ...job, createdDate: createdDate };
 
@@ -4656,8 +4653,8 @@
                 <td>
                     <a href="#" onclick="viewDetail('${job.id}'); return false;" style="text-decoration:none; color:#2c3e50; font-weight:600; display:block;">${escapeHtml(job.title)}</a>
                 </td>
-                <td>${job.jobType || '-'}</td>
-                <td>${job.location || '-'}</td>
+                <td>${displayEmploymentType}</td>
+                <td>${displayLocation}</td>
                 <td>${job.deadline || '-'}</td>
                 <td>${createdDate}</td>
                 <td style="${mgmtStyle}">
@@ -4703,7 +4700,7 @@
       document.getElementById('edit_id').value = id;
       document.getElementById('edit_title').value = job.title;
       document.getElementById('edit_company').value = job.company;
-      document.getElementById('edit_job_type').value = job.jobType || '';
+      document.getElementById('edit_employment_type').value = job.employmentType || job.jobType || '';
       document.getElementById('edit_location').value = job.location || '';
       document.getElementById('edit_deadline').value = job.deadline || '';
       document.getElementById('edit_image_url').value = job.imageUrl || '';
@@ -4712,7 +4709,6 @@
       
       // 추가 필드들
       document.getElementById('edit_ncs_code').value = job.ncsCode || '';
-      document.getElementById('edit_employment_type').value = job.employmentType || '';
       document.getElementById('edit_career_type').value = job.careerType || '';
       document.getElementById('edit_recruitment_count').value = job.recruitmentCount || '';
       document.getElementById('edit_education').value = job.education || '';
@@ -4724,6 +4720,24 @@
       document.getElementById('edit_attachment_file').value = '';
 
       editModal.style.display = 'block';
+    }
+
+    // NCS코드명 포맷팅 함수
+    function formatNcsCode(ncsCode) {
+      if (!ncsCode) return '-';
+      const items = ncsCode.split(',').map(item => item.trim()).filter(item => item);
+      if (items.length === 0) return '-';
+      if (items.length <= 2) return items.join(', ');
+      return items[0] + ' 외 ' + (items.length - 1) + '개 항목';
+    }
+
+    // 근무지역 포맷팅 함수
+    function formatLocation(location) {
+      if (!location) return '-';
+      const items = location.split(',').map(item => item.trim()).filter(item => item);
+      if (items.length === 0) return '-';
+      if (items.length <= 2) return items.join(', ');
+      return items[0] + ', ' + items[1] + ' 외 ' + (items.length - 2) + '개 지역';
     }
 
     // 파일 업로드 헬퍼
@@ -4768,10 +4782,13 @@
           attachmentName = attachmentFile.name;
         }
 
+        const employmentTypeValue = document.getElementById('add_employment_type').value;
+        
         const data = {
           title: document.getElementById('add_title').value,
           company: document.getElementById('add_company').value,
-          jobType: document.getElementById('add_job_type').value,
+          employmentType: employmentTypeValue,
+          jobType: employmentTypeValue, // 호환성을 위해 jobType에도 동일한 값 저장
           location: document.getElementById('add_location').value,
           deadline: document.getElementById('add_deadline').value,
           imageUrl: document.getElementById('add_image_url').value,
@@ -4782,7 +4799,6 @@
           attachmentName: attachmentName,
           // 추가 필드들
           ncsCode: document.getElementById('add_ncs_code').value,
-          employmentType: document.getElementById('add_employment_type').value,
           careerType: document.getElementById('add_career_type').value,
           recruitmentCount: document.getElementById('add_recruitment_count').value,
           education: document.getElementById('add_education').value,
@@ -4814,11 +4830,14 @@
         const contentImageFile = document.getElementById('edit_content_image').files[0];
         const attachmentFile = document.getElementById('edit_attachment_file').files[0];
 
+        const employmentTypeValue = document.getElementById('edit_employment_type').value;
+
         // 기존 데이터 유지를 위해 업데이트할 필드만 구성
         const data = {
           title: document.getElementById('edit_title').value,
           company: document.getElementById('edit_company').value,
-          jobType: document.getElementById('edit_job_type').value,
+          employmentType: employmentTypeValue,
+          jobType: employmentTypeValue, // 호환성을 위해 jobType에도 동일한 값 저장
           location: document.getElementById('edit_location').value,
           deadline: document.getElementById('edit_deadline').value,
           imageUrl: document.getElementById('edit_image_url').value,
@@ -4826,7 +4845,6 @@
           content: document.getElementById('edit_content').value,
           // 추가 필드들
           ncsCode: document.getElementById('edit_ncs_code').value,
-          employmentType: document.getElementById('edit_employment_type').value,
           careerType: document.getElementById('edit_career_type').value,
           recruitmentCount: document.getElementById('edit_recruitment_count').value,
           education: document.getElementById('edit_education').value,
