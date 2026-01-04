@@ -2785,9 +2785,41 @@
               <span id="detail-badge" class="badge"
                 style="background:#3498db; color:white; padding:0.3rem 0.6rem; border-radius:4px; font-size:0.8rem;"></span>
               <h2 id="detail-title" style="font-size:1.8rem; margin:0.5rem 0; color:#2c3e50;"></h2>
-              <div style="color:#7f8c8d; font-size:0.95rem;">
+              <div style="color:#7f8c8d; font-size:0.95rem; margin-bottom:1rem;">
                 <span id="detail-company" style="font-weight:bold; margin-right:10px;"></span>
                 <span id="detail-date"></span>
+              </div>
+              
+              <!-- 추가 정보 테이블 -->
+              <div style="background:#f8f9fa; padding:1rem; border-radius:8px; margin-top:1rem;">
+                <table style="width:100%; border-collapse:collapse;">
+                  <tr>
+                    <td style="padding:0.5rem; width:20%; font-weight:600; color:#495057;">NCS코드명</td>
+                    <td id="detail-ncs-code" style="padding:0.5rem; width:30%; color:#212529;">-</td>
+                    <td style="padding:0.5rem; width:20%; font-weight:600; color:#495057;">고용유형</td>
+                    <td id="detail-employment-type" style="padding:0.5rem; width:30%; color:#212529;">-</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:0.5rem; font-weight:600; color:#495057;">채용구분</td>
+                    <td id="detail-career-type" style="padding:0.5rem; color:#212529;">-</td>
+                    <td style="padding:0.5rem; font-weight:600; color:#495057;">채용인원</td>
+                    <td id="detail-recruitment-count" style="padding:0.5rem; color:#212529;">-</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:0.5rem; font-weight:600; color:#495057;">학력조건</td>
+                    <td id="detail-education" style="padding:0.5rem; color:#212529;">-</td>
+                    <td style="padding:0.5rem; font-weight:600; color:#495057;">공고종료일</td>
+                    <td id="detail-closing-date" style="padding:0.5rem; color:#212529;">-</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:0.5rem; font-weight:600; color:#495057;">우대조건</td>
+                    <td colspan="3" id="detail-preference" style="padding:0.5rem; color:#212529;">-</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:0.5rem; font-weight:600; color:#495057;">마감까지</td>
+                    <td colspan="3" id="detail-days-left" style="padding:0.5rem; color:#e74c3c; font-weight:600;">-</td>
+                  </tr>
+                </table>
               </div>
             </div>
 
@@ -2915,6 +2947,37 @@
               <label>마감일</label>
               <input type="date" id="add_deadline">
             </div>
+            
+            <!-- 추가 필드들 -->
+            <div class="form-group">
+              <label>NCS코드명</label>
+              <input type="text" id="add_ncs_code" placeholder="예: 02010101 경영기획">
+            </div>
+            <div class="form-group">
+              <label>고용유형</label>
+              <input type="text" id="add_employment_type" placeholder="예: 정규직, 무기계약직">
+            </div>
+            <div class="form-group">
+              <label>채용구분</label>
+              <input type="text" id="add_career_type" placeholder="예: 신입, 경력, 신입·경력">
+            </div>
+            <div class="form-group">
+              <label>채용인원</label>
+              <input type="text" id="add_recruitment_count" placeholder="예: 0명, 00명 내외">
+            </div>
+            <div class="form-group">
+              <label>학력조건</label>
+              <input type="text" id="add_education" placeholder="예: 학력무관, 대졸(4년) 이상">
+            </div>
+            <div class="form-group">
+              <label>공고종료일</label>
+              <input type="date" id="add_closing_date">
+            </div>
+            <div class="form-group">
+              <label>우대조건</label>
+              <textarea id="add_preference" rows="3" placeholder="예: 보훈대상자, 장애인, 이공계 전공자 우대" style="resize:vertical;"></textarea>
+            </div>
+            
             <div class="form-group">
               <label>로고 이미지 URL</label>
               <input type="text" id="add_image_url" placeholder="예: ./logo.png 또는 https://...">
@@ -2968,6 +3031,37 @@
               <label>마감일</label>
               <input type="date" id="edit_deadline">
             </div>
+            
+            <!-- 추가 필드들 -->
+            <div class="form-group">
+              <label>NCS코드명</label>
+              <input type="text" id="edit_ncs_code" placeholder="예: 02010101 경영기획">
+            </div>
+            <div class="form-group">
+              <label>고용유형</label>
+              <input type="text" id="edit_employment_type" placeholder="예: 정규직, 무기계약직">
+            </div>
+            <div class="form-group">
+              <label>채용구분</label>
+              <input type="text" id="edit_career_type" placeholder="예: 신입, 경력, 신입·경력">
+            </div>
+            <div class="form-group">
+              <label>채용인원</label>
+              <input type="text" id="edit_recruitment_count" placeholder="예: 0명, 00명 내외">
+            </div>
+            <div class="form-group">
+              <label>학력조건</label>
+              <input type="text" id="edit_education" placeholder="예: 학력무관, 대졸(4년) 이상">
+            </div>
+            <div class="form-group">
+              <label>공고종료일</label>
+              <input type="date" id="edit_closing_date">
+            </div>
+            <div class="form-group">
+              <label>우대조건</label>
+              <textarea id="edit_preference" rows="3" placeholder="예: 보훈대상자, 장애인, 이공계 전공자 우대" style="resize:vertical;"></textarea>
+            </div>
+            
             <div class="form-group">
               <label>로고 이미지 URL</label>
               <input type="text" id="edit_image_url">
@@ -2975,6 +3069,14 @@
             <div class="form-group">
               <label>채용공고 상세 URL (선택)</label>
               <input type="text" id="edit_detail_url">
+            </div>
+            <div class="form-group">
+              <label>내용 이미지 (JPG 등)</label>
+              <input type="file" id="edit_content_image" accept="image/*">
+            </div>
+            <div class="form-group">
+              <label>첨부파일</label>
+              <input type="file" id="edit_attachment_file">
             </div>
             <div class="form-group">
               <label>상세 내용 (글쓰기)</label>
@@ -4411,6 +4513,38 @@
       document.getElementById('detail-date').textContent = '등록일: ' + job.createdDate + (job.location ? ' | 근무지: ' + job.location : '');
       document.getElementById('detail-badge').textContent = job.jobType || '채용';
 
+      // 추가 정보 바인딩
+      document.getElementById('detail-ncs-code').textContent = job.ncsCode || '-';
+      document.getElementById('detail-employment-type').textContent = job.employmentType || job.jobType || '-';
+      document.getElementById('detail-career-type').textContent = job.careerType || '-';
+      document.getElementById('detail-recruitment-count').textContent = job.recruitmentCount || '-';
+      document.getElementById('detail-education').textContent = job.education || '-';
+      document.getElementById('detail-closing-date').textContent = job.closingDate || job.deadline || '-';
+      document.getElementById('detail-preference').textContent = job.preference || '-';
+      
+      // 마감까지 남은 일 계산
+      const daysLeftEl = document.getElementById('detail-days-left');
+      if (job.deadline) {
+        const today = new Date();
+        const deadlineDate = new Date(job.deadline);
+        const diffTime = deadlineDate - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays < 0) {
+          daysLeftEl.textContent = '마감됨';
+          daysLeftEl.style.color = '#6c757d';
+        } else if (diffDays === 0) {
+          daysLeftEl.textContent = 'D-Day';
+          daysLeftEl.style.color = '#e74c3c';
+        } else {
+          daysLeftEl.textContent = 'D-' + diffDays + ' (' + diffDays + '일 남음)';
+          daysLeftEl.style.color = diffDays <= 7 ? '#e74c3c' : '#28a745';
+        }
+      } else {
+        daysLeftEl.textContent = '-';
+        daysLeftEl.style.color = '#6c757d';
+      }
+
       // 내용 (줄바꿈 처리)
       const content = job.content || '';
       document.getElementById('detail-desc').innerHTML = content ? content.replace(/\n/g, '<br>') : '내용이 없습니다.';
@@ -4575,6 +4709,15 @@
       document.getElementById('edit_image_url').value = job.imageUrl || '';
       document.getElementById('edit_detail_url').value = job.detailUrl || '';
       document.getElementById('edit_content').value = job.content || '';
+      
+      // 추가 필드들
+      document.getElementById('edit_ncs_code').value = job.ncsCode || '';
+      document.getElementById('edit_employment_type').value = job.employmentType || '';
+      document.getElementById('edit_career_type').value = job.careerType || '';
+      document.getElementById('edit_recruitment_count').value = job.recruitmentCount || '';
+      document.getElementById('edit_education').value = job.education || '';
+      document.getElementById('edit_closing_date').value = job.closingDate || '';
+      document.getElementById('edit_preference').value = job.preference || '';
 
       // 파일 input 초기화 (보안상 값 설정 불가)
       document.getElementById('edit_content_image').value = '';
@@ -4637,6 +4780,14 @@
           contentImageUrl: contentImageUrl,
           attachmentUrl: attachmentUrl,
           attachmentName: attachmentName,
+          // 추가 필드들
+          ncsCode: document.getElementById('add_ncs_code').value,
+          employmentType: document.getElementById('add_employment_type').value,
+          careerType: document.getElementById('add_career_type').value,
+          recruitmentCount: document.getElementById('add_recruitment_count').value,
+          education: document.getElementById('add_education').value,
+          closingDate: document.getElementById('add_closing_date').value,
+          preference: document.getElementById('add_preference').value,
           category: window.currentJobCategory, // 현재 카테고리 저장
           createdAt: window.Timestamp.now()
         };
@@ -4672,7 +4823,15 @@
           deadline: document.getElementById('edit_deadline').value,
           imageUrl: document.getElementById('edit_image_url').value,
           detailUrl: document.getElementById('edit_detail_url').value,
-          content: document.getElementById('edit_content').value
+          content: document.getElementById('edit_content').value,
+          // 추가 필드들
+          ncsCode: document.getElementById('edit_ncs_code').value,
+          employmentType: document.getElementById('edit_employment_type').value,
+          careerType: document.getElementById('edit_career_type').value,
+          recruitmentCount: document.getElementById('edit_recruitment_count').value,
+          education: document.getElementById('edit_education').value,
+          closingDate: document.getElementById('edit_closing_date').value,
+          preference: document.getElementById('edit_preference').value
         };
 
         /* window.uploadFile 이미 수정됨 */
