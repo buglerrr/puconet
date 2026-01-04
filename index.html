@@ -2859,9 +2859,14 @@
             <aside class="board-sidebar">
               <h3>기관유형</h3>
               <ul>
-                <li><a href="#" onclick="switchBoard('public'); return false;" id="board-menu-public"
-                    class="active">공기업</a></li>
-                <li><a href="#" onclick="switchBoard('quasi-gov'); return false;" id="board-menu-quasi-gov">준정부기관</a>
+                <li><a href="#" onclick="switchBoard('market-public'); return false;" id="board-menu-market-public"
+                    class="active">공기업(시장형)</a></li>
+                <li><a href="#" onclick="switchBoard('quasi-market-public'); return false;" id="board-menu-quasi-market-public">공기업(준시장형)</a>
+                </li>
+                <li><a href="#" onclick="switchBoard('fund-quasi'); return false;"
+                    id="board-menu-fund-quasi">준정부기관(기금관리형)</a></li>
+                <li><a href="#" onclick="switchBoard('entrust-quasi'); return false;"
+                    id="board-menu-entrust-quasi">준정부기관(위탁집행형)</a>
                 </li>
                 <li><a href="#" onclick="switchBoard('other-public'); return false;"
                     id="board-menu-other-public">기타공공기관</a></li>
@@ -3704,7 +3709,7 @@
     window.jobsData = {}; // 전역 데이터 저장소
 
     // --- Global Current Category (Default) ---
-    window.currentJobCategory = 'public'; // 채용정보 기본: 공기업
+    window.currentJobCategory = 'market-public'; // 채용정보 기본: 공기업(시장형)
     window.currentStoryCategory = 'free';  // 취업이야기 기본: 자유게시판
 
 
@@ -4445,8 +4450,8 @@
       const boardSection = document.getElementById('board-section');
       if (boardSection) {
         boardSection.style.display = 'block';
-        // 기본적으로 공기업 게시판으로 시작
-        switchBoard('public');
+        // 기본적으로 공기업(시장형) 게시판으로 시작
+        switchBoard('market-public');
       }
 
       const userSection = document.getElementById('user-manage-section');
