@@ -1805,6 +1805,24 @@
       font-size: 1rem;
     }
 
+    /* 페이지 제목 배너 (사이드바 위) */
+    .page-title-banner {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding: 1.5rem 2rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.25);
+    }
+
+    .page-title-banner h1 {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 1px;
+    }
+
     /* 게시판 제목 배너 */
     .board-title-banner {
       text-align: center;
@@ -1821,6 +1839,18 @@
       font-weight: 700;
       color: #ffffff;
       letter-spacing: 0.5px;
+    }
+
+    /* 테이블 셀 줄바꿈 방지 */
+    .board-table td {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* 제목 셀만 줄바꿈 허용 */
+    .board-table td:nth-child(3) {
+      white-space: normal;
     }
 
     /* 페이지네이션 */
@@ -2960,6 +2990,11 @@
       <!-- 게시판 섹션 (숨김 상태로 시작) -->
       <div id="board-section" style="display:none; width:100%;">
         <div class="container" style="max-width:1400px; margin:0 auto;">
+          <!-- 페이지 제목 배너 -->
+          <div class="page-title-banner">
+            <h1>채용정보</h1>
+          </div>
+
           <!-- 게시판 레이아웃: 사이드바 + 컨텐츠 -->
           <div class="board-layout">
             <!-- 왼쪽 사이드바 (세부 메뉴) -->
@@ -2967,7 +3002,7 @@
               <!-- 채용형태별 그룹 -->
               <h3>채용형태별</h3>
               <ul>
-                <li><a href="#" onclick="switchBoard('intern'); return false;" id="board-menu-intern" class="active">인턴</a></li>
+                <li><a href="#" onclick="switchBoard('intern'); return false;" id="board-menu-intern">인턴</a></li>
                 <li><a href="#" onclick="switchBoard('entry-level'); return false;" id="board-menu-entry-level">신입</a></li>
                 <li><a href="#" onclick="switchBoard('experienced'); return false;" id="board-menu-experienced">경력</a></li>
                 <li><a href="#" onclick="switchBoard('regular'); return false;" id="board-menu-regular">정규직</a></li>
@@ -2977,7 +3012,7 @@
               <!-- 기관유형별 그룹 -->
               <h3>기관유형별</h3>
               <ul>
-                <li><a href="#" onclick="switchBoard('market-public'); return false;" id="board-menu-market-public">공기업(시장형)</a></li>
+                <li><a href="#" onclick="switchBoard('market-public'); return false;" id="board-menu-market-public" class="active">공기업(시장형)</a></li>
                 <li><a href="#" onclick="switchBoard('quasi-market-public'); return false;" id="board-menu-quasi-market-public">공기업(준시장형)</a>
                 </li>
                 <li><a href="#" onclick="switchBoard('fund-quasi'); return false;"
@@ -2999,7 +3034,7 @@
             <div class="board-content">
               <!-- 게시판 제목 배너 -->
               <div class="board-title-banner">
-                <h2 id="currentBoardTitle">인턴</h2>
+                <h2 id="currentBoardTitle">공기업(시장형)</h2>
               </div>
 
               <!-- 게시판 테이블 -->
@@ -3842,7 +3877,7 @@
     window.jobsData = {}; // 전역 데이터 저장소
 
     // --- Global Current Category (Default) ---
-    window.currentJobCategory = 'intern'; // 채용정보 기본: 인턴
+    window.currentJobCategory = 'market-public'; // 채용정보 기본: 공기업(시장형)
     window.currentStoryCategory = 'free';  // 취업이야기 기본: 자유게시판
 
 
@@ -4785,7 +4820,7 @@
         totalJobs = [];
         querySnapshot.forEach((docSnap) => {
           const d = docSnap.data();
-          const cat = d.category || 'public';
+          const cat = d.category || 'market-public'; // 카테고리가 없으면 기본값
           if (cat === window.currentJobCategory) {
             totalJobs.push({ ...d, id: docSnap.id });
           }
@@ -4794,6 +4829,8 @@
         if (totalJobs.length === 0) {
           loading.style.display = 'none';
           if (emptyState) emptyState.style.display = 'block';
+          if (paginationContainer) paginationContainer.style.display = 'none';
+          if (bottomAddButton) bottomAddButton.style.display = 'none';
           return;
         }
 
@@ -4856,7 +4893,14 @@
 
       const totalPages = Math.ceil(totalJobs.length / itemsPerPage);
       
-      if (totalPages <= 1) {
+      // 테스트: 1페이지만 있어도 표시
+      if (totalPages < 1) {
+        document.getElementById('pagination').style.display = 'none';
+        return;
+      }
+
+      // 페이지가 1개만 있을 때는 페이지네이션 숨김
+      if (totalPages === 1) {
         document.getElementById('pagination').style.display = 'none';
         return;
       }
