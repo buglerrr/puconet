@@ -4963,6 +4963,12 @@
         if (querySnapshot.empty) {
           loading.style.display = 'none';
           if (emptyState) emptyState.style.display = 'block';
+          
+          // 전체 데이터가 없어도 관리자에게는 등록 버튼 표시
+          const isAdmin = (window.currentUserRole === 'admin');
+          if (bottomAddButton) {
+            bottomAddButton.style.display = isAdmin ? 'block' : 'none';
+          }
           return;
         }
 
@@ -4990,8 +4996,12 @@
           loading.style.display = 'none';
           if (emptyState) emptyState.style.display = 'block';
           if (paginationContainer) paginationContainer.style.display = 'none';
-          if (bottomAddButton) bottomAddButton.style.display = 'none';
           if (bulkDeleteButtons) bulkDeleteButtons.style.display = 'none';
+          
+          // 데이터가 없어도 관리자에게는 등록 버튼 표시
+          if (bottomAddButton) {
+            bottomAddButton.style.display = isAdmin ? 'block' : 'none';
+          }
           return;
         }
 
