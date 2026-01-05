@@ -125,10 +125,15 @@
       box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
     }
 
+    /* 채용 사이트 방문 버튼 특별 스타일 */
+    #detail-link {
+      background: #e74c3c !important;
+    }
+
     #detail-link:hover {
       background: #c0392b !important;
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+      box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
     }
 
     /* 섹션 스타일 */
@@ -3081,7 +3086,9 @@
                 style="background:#3498db; margin-right:10px; border:none; color:white; padding: 10px 20px; border-radius: 5px; cursor: pointer;">목록으로
                 돌아가기</button>
               <a id="detail-link" href="#" target="_blank" rel="noopener noreferrer" class="cta-button" 
-                style="display:none; background:#e74c3c; color:white; padding: 10px 20px; border-radius: 5px; text-decoration:none; font-weight:600; transition: all 0.2s;">채용 사이트 방문 →</a>
+                style="display:none; background:#e74c3c; color:white; padding:12px 24px; border-radius:5px; text-decoration:none; font-weight:bold; font-size:1.05rem;">
+                채용 사이트 방문 →
+              </a>
             </div>
           </div>
         </div>
@@ -4922,9 +4929,9 @@
         attArea.style.display = 'none';
       }
 
-      // 외부 링크 버튼
+      // 외부 링크 버튼 (채용 사이트 방문)
       const linkBtn = document.getElementById('detail-link');
-      if (job.detailUrl && job.detailUrl !== '#') {
+      if (job.detailUrl && job.detailUrl !== '#' && job.detailUrl.startsWith('http')) {
         linkBtn.href = job.detailUrl;
         linkBtn.target = '_blank';
         linkBtn.rel = 'noopener noreferrer';
@@ -4934,8 +4941,10 @@
         };
         linkBtn.style.display = 'inline-block';
         linkBtn.textContent = '채용 사이트 방문 →';
+        console.log('채용 사이트 URL:', job.detailUrl);
       } else {
         linkBtn.style.display = 'none';
+        console.log('채용 사이트 URL 없음 또는 유효하지 않음:', job.detailUrl);
       }
 
       window.scrollTo(0, 0);
