@@ -2857,10 +2857,18 @@
           <div class="board-layout">
             <!-- 왼쪽 사이드바 (세부 메뉴) -->
             <aside class="board-sidebar">
-              <h3>기관유형</h3>
+              <!-- 채용정보 그룹 -->
+              <h3>채용정보</h3>
               <ul>
-                <li><a href="#" onclick="switchBoard('market-public'); return false;" id="board-menu-market-public"
-                    class="active">공기업(시장형)</a></li>
+                <li><a href="#" onclick="switchBoard('premium'); return false;" id="board-menu-premium" class="active">프리미엄</a></li>
+                <li><a href="#" onclick="switchBoard('recommended'); return false;" id="board-menu-recommended">추천</a></li>
+                <li><a href="#" onclick="switchBoard('major'); return false;" id="board-menu-major">주요</a></li>
+              </ul>
+              
+              <!-- 기관유형별 그룹 -->
+              <h3>기관유형별</h3>
+              <ul>
+                <li><a href="#" onclick="switchBoard('market-public'); return false;" id="board-menu-market-public">공기업(시장형)</a></li>
                 <li><a href="#" onclick="switchBoard('quasi-market-public'); return false;" id="board-menu-quasi-market-public">공기업(준시장형)</a>
                 </li>
                 <li><a href="#" onclick="switchBoard('fund-quasi'); return false;"
