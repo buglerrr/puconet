@@ -116,11 +116,19 @@
       text-decoration: none;
       border-radius: 5px;
       font-weight: bold;
-      transition: background 0.3s;
+      transition: all 0.3s;
     }
 
     .cta-button:hover {
       background: #c0392b;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+    }
+
+    #detail-link:hover {
+      background: #c0392b !important;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
     }
 
     /* 섹션 스타일 */
@@ -3072,7 +3080,8 @@
               <button onclick="showBoard()" class="cta-button"
                 style="background:#3498db; margin-right:10px; border:none; color:white; padding: 10px 20px; border-radius: 5px; cursor: pointer;">목록으로
                 돌아가기</button>
-              <a id="detail-link" href="#" target="_blank" rel="noopener noreferrer" class="cta-button" style="display:none;">채용 사이트 방문</a>
+              <a id="detail-link" href="#" target="_blank" rel="noopener noreferrer" class="cta-button" 
+                style="display:none; background:#e74c3c; color:white; padding: 10px 20px; border-radius: 5px; text-decoration:none; font-weight:600; transition: all 0.2s;">채용 사이트 방문 →</a>
             </div>
           </div>
         </div>
@@ -4915,16 +4924,16 @@
 
       // 외부 링크 버튼
       const linkBtn = document.getElementById('detail-link');
-      if (job.detailUrl) {
+      if (job.detailUrl && job.detailUrl !== '#') {
         linkBtn.href = job.detailUrl;
         linkBtn.target = '_blank';
-        linkBtn.rel = 'noopener noreferrer'; // 보안을 위한 속성
+        linkBtn.rel = 'noopener noreferrer';
         linkBtn.onclick = function(e) {
           e.preventDefault();
           window.open(job.detailUrl, '_blank', 'noopener,noreferrer');
         };
         linkBtn.style.display = 'inline-block';
-        linkBtn.textContent = '채용 사이트 방문';
+        linkBtn.textContent = '채용 사이트 방문 →';
       } else {
         linkBtn.style.display = 'none';
       }
