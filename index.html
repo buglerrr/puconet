@@ -1622,8 +1622,6 @@
       font-size: 1.5rem;
       margin-bottom: 1rem;
     }
-
-    /* === 레이아웃 정렬 수정 (Header - Main - Footer 수직선 맞춤) === */
     .content-with-sidebar-wrapper {
       display: flex;
       max-width: 1480px;
@@ -1709,51 +1707,79 @@
 
     /* 왼쪽 사이드바 (세부 메뉴) */
     .board-sidebar {
-      width: 220px;
+      width: 240px;
       flex-shrink: 0;
-      background: #f8f9fa;
-      border-radius: 8px;
-      padding: 1.5rem 0;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 1.25rem 0;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
       align-self: flex-start;
+      border: 1px solid #e9ecef;
     }
 
     .board-sidebar h3 {
-      padding: 0 1.5rem;
-      margin-bottom: 1rem;
-      font-size: 1.1rem;
-      color: #2c3e50;
+      padding: 0.75rem 1.25rem 0.5rem 1.25rem;
+      margin-bottom: 0.5rem;
+      margin-top: 0.75rem;
+      font-size: 0.85rem;
+      color: #6c757d;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid #e9ecef;
+      padding-bottom: 0.5rem;
+    }
+
+    .board-sidebar h3:first-child {
+      margin-top: 0;
     }
 
     .board-sidebar ul {
       list-style: none;
+      padding-bottom: 0.5rem;
     }
 
     .board-sidebar li {
-      margin: 0;
+      margin: 0.15rem 0.5rem;
     }
 
     .board-sidebar a {
       display: block;
-      padding: 0.9rem 1.5rem;
+      padding: 0.7rem 0.75rem;
       text-decoration: none;
       color: #495057;
       font-weight: 500;
-      transition: all 0.2s;
+      font-size: 0.95rem;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 8px;
       border-left: 3px solid transparent;
+      position: relative;
     }
 
     .board-sidebar a:hover {
-      background: #e9ecef;
+      background: linear-gradient(90deg, #f0f7ff 0%, #ffffff 100%);
       color: #3498db;
       border-left-color: #3498db;
+      transform: translateX(3px);
+      box-shadow: 0 2px 6px rgba(52, 152, 219, 0.1);
     }
 
     .board-sidebar a.active {
-      background: #e9ecef;
-      color: #3498db;
-      border-left-color: #3498db;
+      background: linear-gradient(90deg, #e3f2fd 0%, #f0f7ff 100%);
+      color: #2980b9;
+      border-left-color: #2980b9;
       font-weight: 600;
+      box-shadow: 0 2px 8px rgba(52, 152, 219, 0.15);
+    }
+
+    .board-sidebar a.active::after {
+      content: "●";
+      position: absolute;
+      right: 0.75rem;
+      color: #2980b9;
+      font-size: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
     }
 
     /* 오른쪽 게시판 컨텐츠 */
@@ -1777,6 +1803,122 @@
 
     .board-message p {
       font-size: 1rem;
+    }
+
+    /* 페이지 제목 배너 (사이드바 위) */
+    .page-title-banner {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding: 1.5rem 2rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.25);
+    }
+
+    .page-title-banner h1 {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 1px;
+    }
+
+    /* 게시판 제목 배너 */
+    .board-title-banner {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+    }
+
+    .board-title-banner h2 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.5px;
+    }
+
+    /* 테이블 셀 줄바꿈 방지 */
+    .board-table td {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* 제목 셀만 줄바꿈 허용 */
+    .board-table td:nth-child(3) {
+      white-space: normal;
+    }
+
+    /* 페이지네이션 */
+    .pagination-container {
+      margin-top: 2rem;
+      text-align: center;
+    }
+
+    .pagination {
+      display: inline-flex;
+      gap: 0.5rem;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .pagination button,
+    .pagination span {
+      min-width: 36px;
+      height: 36px;
+      padding: 0.5rem;
+      border: 1px solid #dee2e6;
+      background: white;
+      color: #495057;
+      cursor: pointer;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pagination button:hover:not(:disabled) {
+      background: #f8f9fa;
+      border-color: #3498db;
+      color: #3498db;
+    }
+
+    .pagination button.active {
+      background: #3498db;
+      border-color: #3498db;
+      color: white;
+      font-weight: 600;
+    }
+
+    .pagination button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .pagination .ellipsis {
+      border: none;
+      background: transparent;
+      cursor: default;
+    }
+
+    /* 하단 등록 버튼 */
+    .bottom-add-button {
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 2px solid #f1f3f5;
+      text-align: center;
+    }
+
+    .bottom-add-button .btn-add {
+      padding: 1rem 2.5rem;
+      font-size: 1.05rem;
     }
 
     .story-header {
@@ -2848,27 +2990,29 @@
       <!-- 게시판 섹션 (숨김 상태로 시작) -->
       <div id="board-section" style="display:none; width:100%;">
         <div class="container" style="max-width:1400px; margin:0 auto;">
-          <div class="story-header">
+          <!-- 페이지 제목 배너 -->
+          <div class="page-title-banner">
             <h1>채용정보</h1>
-            <button class="btn-add" onclick="openAddModal()">+ 채용정보 등록</button>
           </div>
 
           <!-- 게시판 레이아웃: 사이드바 + 컨텐츠 -->
           <div class="board-layout">
             <!-- 왼쪽 사이드바 (세부 메뉴) -->
             <aside class="board-sidebar">
-              <!-- 채용정보 그룹 -->
-              <h3>채용정보</h3>
+              <!-- 채용형태별 그룹 -->
+              <h3>채용형태별</h3>
               <ul>
-                <li><a href="#" onclick="switchBoard('premium'); return false;" id="board-menu-premium" class="active">프리미엄</a></li>
-                <li><a href="#" onclick="switchBoard('recommended'); return false;" id="board-menu-recommended">추천</a></li>
-                <li><a href="#" onclick="switchBoard('major'); return false;" id="board-menu-major">주요</a></li>
+                <li><a href="#" onclick="switchBoard('intern'); return false;" id="board-menu-intern">인턴</a></li>
+                <li><a href="#" onclick="switchBoard('entry-level'); return false;" id="board-menu-entry-level">신입</a></li>
+                <li><a href="#" onclick="switchBoard('experienced'); return false;" id="board-menu-experienced">경력</a></li>
+                <li><a href="#" onclick="switchBoard('regular'); return false;" id="board-menu-regular">정규직</a></li>
+                <li><a href="#" onclick="switchBoard('contract'); return false;" id="board-menu-contract">비정규직</a></li>
               </ul>
               
               <!-- 기관유형별 그룹 -->
               <h3>기관유형별</h3>
               <ul>
-                <li><a href="#" onclick="switchBoard('market-public'); return false;" id="board-menu-market-public">공기업(시장형)</a></li>
+                <li><a href="#" onclick="switchBoard('market-public'); return false;" id="board-menu-market-public" class="active">공기업(시장형)</a></li>
                 <li><a href="#" onclick="switchBoard('quasi-market-public'); return false;" id="board-menu-quasi-market-public">공기업(준시장형)</a>
                 </li>
                 <li><a href="#" onclick="switchBoard('fund-quasi'); return false;"
@@ -2888,6 +3032,11 @@
 
             <!-- 오른쪽 게시판 컨텐츠 -->
             <div class="board-content">
+              <!-- 게시판 제목 배너 -->
+              <div class="board-title-banner">
+                <h2 id="currentBoardTitle">공기업(시장형)</h2>
+              </div>
+
               <!-- 게시판 테이블 -->
               <div id="boardJobTable"
                 style="background:white; padding:2rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
@@ -2912,7 +3061,6 @@
                       <th style="width: 150px;">기관명</th>
                       <th style="min-width: 350px;">제목</th>
                       <th style="width: 100px;">고용유형</th>
-                      <th style="width: 120px;">근무지</th>
                       <th style="width: 120px;">마감일</th>
                       <th id="job-mgmt-header" style="width: 180px; display:none;">관리</th>
                     </tr>
@@ -2921,6 +3069,18 @@
                     <!-- Firebase에서 데이터를 가져와 여기에 표시됩니다 -->
                   </tbody>
                 </table>
+
+                <!-- 페이지네이션 -->
+                <div id="pagination" class="pagination-container" style="display: none;">
+                  <div class="pagination">
+                    <!-- 페이지 번호들이 여기에 동적으로 추가됩니다 -->
+                  </div>
+                </div>
+
+                <!-- 등록 버튼 (하단) -->
+                <div class="bottom-add-button" style="display: none;">
+                  <button class="btn-add" onclick="openAddModal()">+ 채용정보 등록</button>
+                </div>
               </div>
 
               <!-- 게시판별 준비중 메시지 -->
@@ -4473,21 +4633,43 @@
     window.switchBoard = function (boardType) {
       // 1. 현재 카테고리 업데이트
       window.currentJobCategory = boardType;
+      currentPage = 1; // 페이지 리셋
 
-      // 2. 사이드바 메뉴 활성화 상태 변경
+      // 2. 게시판 제목 업데이트
+      const boardTitles = {
+        'intern': '인턴',
+        'entry-level': '신입',
+        'experienced': '경력',
+        'regular': '정규직',
+        'contract': '비정규직',
+        'market-public': '공기업(시장형)',
+        'quasi-market-public': '공기업(준시장형)',
+        'fund-quasi': '준정부기관(기금관리형)',
+        'entrust-quasi': '준정부기관(위탁집행형)',
+        'other-public': '기타공공기관',
+        'local-public': '지방공기업',
+        'local-investment': '지방출자·출연기관'
+      };
+      
+      const titleElement = document.getElementById('currentBoardTitle');
+      if (titleElement) {
+        titleElement.textContent = boardTitles[boardType] || '채용정보';
+      }
+
+      // 3. 사이드바 메뉴 활성화 상태 변경
       const menuItems = document.querySelectorAll('.board-sidebar a');
       menuItems.forEach(item => item.classList.remove('active'));
       const activeMenu = document.getElementById('board-menu-' + boardType);
       if (activeMenu) activeMenu.classList.add('active');
 
-      // 3. 게시판 표시 (항상 표시)
+      // 4. 게시판 표시 (항상 표시)
       const boardTable = document.getElementById('boardJobTable');
       const boardMessage = document.getElementById('boardMessage');
 
       if (boardTable) boardTable.style.display = 'block';
       if (boardMessage) boardMessage.style.display = 'none';
 
-      // 4. 데이터 로드
+      // 5. 데이터 로드
       loadJobs();
     }
 
@@ -4596,11 +4778,18 @@
     }
 
     // 채용정보 목록 불러오기
+    // 페이지네이션 변수
+    let currentPage = 1;
+    const itemsPerPage = 20;
+    let totalJobs = [];
+
     async function loadJobs() {
       const loading = document.getElementById('loading');
       const emptyState = document.getElementById('emptyState');
       const jobTable = document.getElementById('jobTable');
       const tbody = document.getElementById('jobTableBody');
+      const paginationContainer = document.getElementById('pagination');
+      const bottomAddButton = document.querySelector('.bottom-add-button');
 
       if (!loading || !tbody) return;
 
@@ -4608,6 +4797,8 @@
         loading.style.display = 'block';
         if (emptyState) emptyState.style.display = 'none';
         if (jobTable) jobTable.style.display = 'none';
+        if (paginationContainer) paginationContainer.style.display = 'none';
+        if (bottomAddButton) bottomAddButton.style.display = 'none';
 
         const q = query(collection(db, 'jobs'), orderBy('createdAt', 'desc'));
         const querySnapshot = await getDocs(q);
@@ -4626,59 +4817,180 @@
         if (mgmtHeader) mgmtHeader.style.display = isAdmin ? 'table-cell' : 'none';
 
         // 클라이언트 사이드 필터링
-        const filteredDocs = [];
+        totalJobs = [];
         querySnapshot.forEach((docSnap) => {
           const d = docSnap.data();
-          const cat = d.category || 'public'; // 카테고리가 없으면 'public'으로 간주 (기존 데이터 호환)
+          const cat = d.category || 'market-public'; // 카테고리가 없으면 기본값
           if (cat === window.currentJobCategory) {
-            filteredDocs.push({ ...d, id: docSnap.id });
+            totalJobs.push({ ...d, id: docSnap.id });
           }
         });
 
-        if (filteredDocs.length === 0) {
+        if (totalJobs.length === 0) {
           loading.style.display = 'none';
           if (emptyState) emptyState.style.display = 'block';
+          if (paginationContainer) paginationContainer.style.display = 'none';
+          if (bottomAddButton) bottomAddButton.style.display = 'none';
           return;
         }
 
-        filteredDocs.forEach((job) => {
-          const tr = document.createElement('tr');
+        console.log('Total jobs loaded:', totalJobs.length);
+        console.log('Category:', window.currentJobCategory);
 
-          const createdDate = job.createdAt ? new Date(job.createdAt.seconds * 1000).toLocaleDateString('ko-KR') : '-';
-
-          // 데이터 준비
-          const safeTitle = escapeHtml(job.title).replace(/'/g, "\\'");
-          const displayEmploymentType = job.employmentType || job.jobType || '-';
-          const displayLocation = formatLocation(job.location);
-
-          window.jobsData[job.id] = { ...job, createdDate: createdDate };
-
-          // 관리자일 때만 관리 버튼 보이기
-          const mgmtStyle = isAdmin ? '' : 'display:none;';
-
-          tr.innerHTML = `
-                <td><img src="${job.imageUrl || './logo.png'}" class="job-image" alt="로고"></td>
-                <td>${job.company}</td>
-                <td>
-                    <a href="#" onclick="viewDetail('${job.id}'); return false;" style="text-decoration:none; color:#2c3e50; font-weight:600; display:block;">${escapeHtml(job.title)}</a>
-                </td>
-                <td>${displayEmploymentType}</td>
-                <td>${displayLocation}</td>
-                <td>${job.deadline || '-'}</td>
-                <td style="${mgmtStyle}">
-                    <button class="btn-edit" onclick="openEditModal('${job.id}')">수정</button>
-                    <button class="btn-delete" onclick="deleteJob('${job.id}')">삭제</button>
-                </td>
-            `;
-          tbody.appendChild(tr);
-        });
+        // 현재 페이지의 데이터만 표시
+        displayJobsForPage(currentPage, isAdmin);
 
         loading.style.display = 'none';
         if (jobTable) jobTable.style.display = 'table';
+        
+        // 페이지네이션은 데이터 개수와 관계없이 항상 렌더링 시도
+        renderPagination();
+        
+        // 관리자에게만 하단 버튼 표시
+        if (bottomAddButton) {
+          bottomAddButton.style.display = isAdmin ? 'block' : 'none';
+        }
 
       } catch (error) {
         console.error('데이터 로딩 실패:', error);
         if (loading) loading.style.display = 'none';
+      }
+    }
+
+    function displayJobsForPage(page, isAdmin) {
+      const tbody = document.getElementById('jobTableBody');
+      tbody.innerHTML = '';
+
+      const startIndex = (page - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const pageJobs = totalJobs.slice(startIndex, endIndex);
+
+      pageJobs.forEach((job) => {
+        const tr = document.createElement('tr');
+        const createdDate = job.createdAt ? new Date(job.createdAt.seconds * 1000).toLocaleDateString('ko-KR') : '-';
+        const displayEmploymentType = job.employmentType || job.jobType || '-';
+
+        window.jobsData[job.id] = { ...job, createdDate: createdDate };
+
+        const mgmtStyle = isAdmin ? '' : 'display:none;';
+
+        tr.innerHTML = `
+              <td><img src="${job.imageUrl || './logo.png'}" class="job-image" alt="로고"></td>
+              <td>${job.company}</td>
+              <td>
+                  <a href="#" onclick="viewDetail('${job.id}'); return false;" style="text-decoration:none; color:#2c3e50; font-weight:600; display:block;">${escapeHtml(job.title)}</a>
+              </td>
+              <td>${displayEmploymentType}</td>
+              <td>${job.deadline || '-'}</td>
+              <td style="${mgmtStyle}">
+                  <button class="btn-edit" onclick="openEditModal('${job.id}')">수정</button>
+                  <button class="btn-delete" onclick="deleteJob('${job.id}')">삭제</button>
+              </td>
+          `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderPagination() {
+      const paginationContainer = document.querySelector('.pagination');
+      const paginationWrapper = document.getElementById('pagination');
+      
+      if (!paginationContainer || !paginationWrapper) {
+        console.error('Pagination container not found');
+        return;
+      }
+
+      paginationContainer.innerHTML = '';
+
+      const totalPages = Math.ceil(totalJobs.length / itemsPerPage);
+      
+      console.log('Rendering pagination - Total pages:', totalPages, 'Current page:', currentPage);
+
+      // 1페이지만 있으면 페이지네이션 숨김
+      if (totalPages <= 1) {
+        paginationWrapper.style.display = 'none';
+        return;
+      }
+
+      // 2페이지 이상이면 페이지네이션 표시
+      paginationWrapper.style.display = 'block';
+
+      // 이전 버튼
+      const prevBtn = document.createElement('button');
+      prevBtn.textContent = '‹';
+      prevBtn.disabled = currentPage === 1;
+      prevBtn.onclick = () => goToPage(currentPage - 1);
+      paginationContainer.appendChild(prevBtn);
+
+      // 페이지 번호들
+      const maxVisiblePages = 10;
+      let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+      if (endPage - startPage < maxVisiblePages - 1) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+      }
+
+      // 첫 페이지 (1페이지가 범위 밖이면)
+      if (startPage > 1) {
+        const firstBtn = document.createElement('button');
+        firstBtn.textContent = '1';
+        firstBtn.onclick = () => goToPage(1);
+        paginationContainer.appendChild(firstBtn);
+
+        if (startPage > 2) {
+          const ellipsis = document.createElement('span');
+          ellipsis.textContent = '...';
+          ellipsis.className = 'ellipsis';
+          paginationContainer.appendChild(ellipsis);
+        }
+      }
+
+      // 중간 페이지들
+      for (let i = startPage; i <= endPage; i++) {
+        const pageBtn = document.createElement('button');
+        pageBtn.textContent = i;
+        if (i === currentPage) {
+          pageBtn.className = 'active';
+        }
+        pageBtn.onclick = () => goToPage(i);
+        paginationContainer.appendChild(pageBtn);
+      }
+
+      // 마지막 페이지 (마지막 페이지가 범위 밖이면)
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          const ellipsis = document.createElement('span');
+          ellipsis.textContent = '...';
+          ellipsis.className = 'ellipsis';
+          paginationContainer.appendChild(ellipsis);
+        }
+
+        const lastBtn = document.createElement('button');
+        lastBtn.textContent = totalPages;
+        lastBtn.onclick = () => goToPage(totalPages);
+        paginationContainer.appendChild(lastBtn);
+      }
+
+      // 다음 버튼
+      const nextBtn = document.createElement('button');
+      nextBtn.textContent = '›';
+      nextBtn.disabled = currentPage === totalPages;
+      nextBtn.onclick = () => goToPage(currentPage + 1);
+      paginationContainer.appendChild(nextBtn);
+    }
+
+    function goToPage(page) {
+      console.log('Going to page:', page);
+      currentPage = page;
+      const isAdmin = (window.currentUserRole === 'admin');
+      displayJobsForPage(currentPage, isAdmin);
+      renderPagination();
+      
+      // 테이블 상단으로 스크롤
+      const boardTable = document.getElementById('boardJobTable');
+      if (boardTable) {
+        boardTable.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
 
