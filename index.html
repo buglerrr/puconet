@@ -1371,6 +1371,7 @@
     .board-container {
       padding: 2rem 0;
       min-height: 70vh;
+      background: #f8f9fa;
     }
 
     .board-header {
@@ -1386,91 +1387,190 @@
     }
 
     .btn-add {
-      background: #3498db;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      padding: 0.75rem 1.5rem;
+      padding: 0.85rem 1.75rem;
       border: none;
-      border-radius: 5px;
+      border-radius: 12px;
       cursor: pointer;
-      font-weight: bold;
+      font-weight: 600;
       font-size: 1rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
     }
 
     .btn-add:hover {
-      background: #2980b9;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      background: linear-gradient(135deg, #5568d3 0%, #6a3e8f 100%);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.35);
+    }
+
+    .btn-add:active {
+      transform: translateY(-1px);
     }
 
     /* 테이블 스타일 */
     .board-table {
       width: 100%;
-      border-collapse: collapse;
-      background: white;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      border-radius: 8px;
-      overflow: hidden;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: transparent;
+      border-radius: 0;
+      overflow: visible;
     }
 
     .board-table th {
-      background: #f8f9fa;
-      padding: 1rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 1.25rem 1.5rem;
       text-align: left;
-      border-bottom: 2px solid #dee2e6;
+      border: none;
       font-weight: 600;
-      color: #495057;
+      color: #ffffff;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .board-table th:first-child {
+      border-radius: 12px 0 0 0;
+    }
+
+    .board-table th:last-child {
+      border-radius: 0 12px 0 0;
     }
 
     .board-table td {
-      padding: 1rem;
-      border-bottom: 1px solid #dee2e6;
+      padding: 1.5rem 1.5rem;
+      border: none;
+      background: #ffffff;
+      vertical-align: middle;
+    }
+
+    .board-table tbody tr {
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      margin-bottom: 0.5rem;
+    }
+
+    .board-table tbody tr::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      opacity: 0;
+      transition: opacity 0.3s;
     }
 
     .board-table tbody tr:hover {
-      background: #f8f9fa;
+      background: linear-gradient(90deg, #f8f9ff 0%, #ffffff 100%);
       cursor: pointer;
+      transform: translateX(8px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.12);
     }
 
-    .board-table tbody tr:last-child td {
-      border-bottom: none;
+    .board-table tbody tr:hover::before {
+      opacity: 1;
+    }
+
+    .board-table tbody tr td:first-child {
+      border-radius: 12px 0 0 12px;
+    }
+
+    .board-table tbody tr td:last-child {
+      border-radius: 0 12px 12px 0;
+    }
+
+    .board-table tbody tr + tr td {
+      border-top: 8px solid #f8f9fa;
     }
 
     .job-image {
-      width: 60px;
-      height: 60px;
+      width: 64px;
+      height: 64px;
       object-fit: contain;
-      border: 1px solid #e9ecef;
-      border-radius: 4px;
-      padding: 4px;
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      padding: 6px;
+      background: #ffffff;
+      transition: all 0.3s;
+    }
+
+    .board-table tbody tr:hover .job-image {
+      border-color: #667eea;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+      transform: scale(1.05);
     }
 
     .btn-edit,
     .btn-delete {
-      padding: 0.5rem 1rem;
+      padding: 0.6rem 1.2rem;
       margin-right: 0.5rem;
       border: none;
-      border-radius: 4px;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 0.9rem;
-      transition: all 0.2s;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
 
     .btn-edit {
-      background: #ffa94d;
+      background: linear-gradient(135deg, #ffa94d 0%, #ff8c42 100%);
       color: white;
     }
 
     .btn-edit:hover {
-      background: #ff922b;
+      background: linear-gradient(135deg, #ff922b 0%, #ff7700 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 146, 43, 0.3);
     }
 
     .btn-delete {
-      background: #e74c3c;
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
       color: white;
     }
 
     .btn-delete:hover {
-      background: #c0392b;
+      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+    }
+
+    /* 테이블 제목 셀 강조 */
+    .board-table td:nth-child(3) {
+      font-weight: 500;
+      color: #2c3e50;
+    }
+
+    /* 마감일 강조 */
+    .board-table td:nth-child(6) {
+      font-weight: 500;
+      color: #e74c3c;
+    }
+
+    /* 빈 상태 디자인 개선 */
+    .empty-state {
+      background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+      border-radius: 16px;
+      padding: 4rem 2rem;
+      text-align: center;
+      border: 2px dashed #d0d7de;
+    }
+
+    .empty-state h3 {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
     }
 
     /* 모달 스타일 */
@@ -1587,18 +1687,25 @@
     /* 로딩 스피너 */
     .loading {
       text-align: center;
-      padding: 2rem;
-      color: #95a5a6;
+      padding: 3rem;
+      color: #6c757d;
+    }
+
+    .loading p {
+      margin-top: 1rem;
+      font-weight: 500;
+      color: #667eea;
     }
 
     .spinner {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #3498db;
+      border: 4px solid rgba(102, 126, 234, 0.1);
+      border-top: 4px solid #667eea;
       border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
+      width: 48px;
+      height: 48px;
+      animation: spin 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
       margin: 0 auto;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
     }
 
     @keyframes spin {
@@ -1811,18 +1918,19 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 2rem;
-      padding: 0 1rem;
+      margin-bottom: 2.5rem;
+      padding: 0 0.5rem;
     }
 
     .story-header h1 {
       font-size: 2.5rem;
       font-weight: 800;
-      background: none;
-      -webkit-background-clip: unset;
-      -webkit-text-fill-color: initial;
-      color: #111;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       margin: 0;
+      letter-spacing: -0.5px;
     }
 
     .btn-write-story {
@@ -2885,12 +2993,14 @@
           <div class="board-layout">
             <!-- 왼쪽 사이드바 (세부 메뉴) -->
             <aside class="board-sidebar">
-              <!-- 채용정보 그룹 -->
-              <h3>채용정보</h3>
+              <!-- 채용형태별 그룹 -->
+              <h3>채용형태별</h3>
               <ul>
-                <li><a href="#" onclick="switchBoard('premium'); return false;" id="board-menu-premium" class="active">프리미엄</a></li>
-                <li><a href="#" onclick="switchBoard('recommended'); return false;" id="board-menu-recommended">추천</a></li>
-                <li><a href="#" onclick="switchBoard('major'); return false;" id="board-menu-major">주요</a></li>
+                <li><a href="#" onclick="switchBoard('intern'); return false;" id="board-menu-intern" class="active">인턴</a></li>
+                <li><a href="#" onclick="switchBoard('entry-level'); return false;" id="board-menu-entry-level">신입</a></li>
+                <li><a href="#" onclick="switchBoard('experienced'); return false;" id="board-menu-experienced">경력</a></li>
+                <li><a href="#" onclick="switchBoard('regular'); return false;" id="board-menu-regular">정규직</a></li>
+                <li><a href="#" onclick="switchBoard('contract'); return false;" id="board-menu-contract">비정규직</a></li>
               </ul>
               
               <!-- 기관유형별 그룹 -->
@@ -2918,7 +3028,7 @@
             <div class="board-content">
               <!-- 게시판 테이블 -->
               <div id="boardJobTable"
-                style="background:white; padding:2rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+                style="background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%); padding: 2.5rem; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #e9ecef;">
 
                 <!-- 로딩 상태 -->
                 <div id="loading" class="loading">
@@ -2953,7 +3063,7 @@
 
               <!-- 게시판별 준비중 메시지 -->
               <div id="boardMessage" class="board-message"
-                style="display:none; background:white; padding:3rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+                style="display:none; background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%); padding:4rem 3rem; border-radius:16px; box-shadow:0 4px 20px rgba(0,0,0,0.06); border: 2px dashed #d0d7de;">
                 <h3>준비 중입니다</h3>
                 <p>곧 새로운 게시판이 오픈됩니다!</p>
               </div>
