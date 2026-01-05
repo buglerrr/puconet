@@ -1436,12 +1436,14 @@
     }
 
     .job-image {
-      width: 60px;
-      height: 60px;
+      width: 55px;
+      height: 55px;
       object-fit: contain;
       border: 1px solid #e9ecef;
       border-radius: 4px;
       padding: 4px;
+      display: block;
+      margin: 0 auto;
     }
 
     .btn-edit,
@@ -1834,11 +1836,44 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      padding: 1rem;
+      vertical-align: middle;
     }
 
-    /* 제목 셀만 줄바꿈 허용 */
-    .board-table td:nth-child(3) {
+    /* 체크박스 셀 */
+    .board-table td.checkbox-cell {
+      text-align: center;
+      padding: 0.5rem;
+      width: 45px;
+    }
+
+    /* 로고 셀 */
+    .board-table td.logo-cell {
+      text-align: center;
+      padding: 0.5rem;
+    }
+
+    /* 기관명 셀 - 적절한 줄바꿈 허용 */
+    .board-table td.company-cell {
       white-space: normal;
+      word-break: keep-all;
+      line-height: 1.5;
+      min-width: 180px;
+      max-width: 220px;
+    }
+
+    /* 제목 셀 - 줄바꿈 허용 */
+    .board-table td.title-cell {
+      white-space: normal;
+      word-break: break-word;
+      line-height: 1.5;
+    }
+
+    /* 고용유형, 마감일 셀 */
+    .board-table td.employment-cell,
+    .board-table td.deadline-cell {
+      white-space: nowrap;
+      text-align: center;
     }
 
     /* 페이지네이션 */
@@ -3113,15 +3148,15 @@
                 <table class="board-table" id="jobTable" style="display: none;">
                   <thead>
                     <tr>
-                      <th id="checkbox-header" style="width: 50px; display:none;">
+                      <th id="checkbox-header" style="width: 45px; text-align: center; padding: 0.5rem; display:none;">
                         <input type="checkbox" id="selectAllJobs" onclick="toggleSelectAll()" title="전체 선택">
                       </th>
-                      <th style="width: 80px;">로고</th>
-                      <th style="width: 150px;">기관명</th>
-                      <th style="min-width: 350px;">제목</th>
-                      <th style="width: 100px;">고용유형</th>
-                      <th style="width: 120px;">마감일</th>
-                      <th id="job-mgmt-header" style="width: 180px; display:none;">관리</th>
+                      <th style="width: 70px; text-align: center;">로고</th>
+                      <th style="width: 200px; min-width: 180px;">기관명</th>
+                      <th style="min-width: 300px;">제목</th>
+                      <th style="width: 110px; text-align: center;">고용유형</th>
+                      <th style="width: 110px; text-align: center;">마감일</th>
+                      <th id="job-mgmt-header" style="width: 180px; text-align: center; display:none;">관리</th>
                     </tr>
                   </thead>
                   <tbody id="jobTableBody">
@@ -4999,18 +5034,18 @@
         window.jobsData[job.id] = { ...job, createdDate: createdDate };
 
         const mgmtStyle = isAdmin ? '' : 'display:none;';
-        const checkboxCell = isAdmin ? `<td style="text-align:center;"><input type="checkbox" class="job-checkbox" data-job-id="${job.id}" onchange="updateSelectedCount()"></td>` : '';
+        const checkboxCell = isAdmin ? `<td class="checkbox-cell" style="text-align:center;"><input type="checkbox" class="job-checkbox" data-job-id="${job.id}" onchange="updateSelectedCount()"></td>` : '';
 
         tr.innerHTML = `
               ${checkboxCell}
-              <td><img src="${job.imageUrl || './logo.png'}" class="job-image" alt="로고"></td>
-              <td>${job.company}</td>
-              <td>
+              <td class="logo-cell"><img src="${job.imageUrl || './logo.png'}" class="job-image" alt="로고"></td>
+              <td class="company-cell">${job.company}</td>
+              <td class="title-cell">
                   <a href="#" onclick="viewDetail('${job.id}'); return false;" style="text-decoration:none; color:#2c3e50; font-weight:600; display:block;">${escapeHtml(job.title)}</a>
               </td>
-              <td>${displayEmploymentType}</td>
-              <td>${job.deadline || '-'}</td>
-              <td style="${mgmtStyle}">
+              <td class="employment-cell">${displayEmploymentType}</td>
+              <td class="deadline-cell">${job.deadline || '-'}</td>
+              <td class="mgmt-cell" style="${mgmtStyle}">
                   <button class="btn-edit" onclick="openEditModal('${job.id}')">수정</button>
                   <button class="btn-delete" onclick="deleteJob('${job.id}')">삭제</button>
               </td>
