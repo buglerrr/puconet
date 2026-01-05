@@ -1909,6 +1909,74 @@
       font-size: 1.05rem;
     }
 
+    /* 일괄 삭제 버튼 영역 */
+    .bulk-delete-container {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      text-align: center;
+      background: #fff3cd;
+      border-radius: 8px;
+      border: 1px solid #ffc107;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .btn-bulk-delete {
+      background: #ff6b6b;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-bulk-delete:hover {
+      background: #ee5a52;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+    }
+
+    .btn-bulk-delete:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-delete-all {
+      background: #dc3545;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-delete-all:hover {
+      background: #c82333;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    }
+
+    /* 체크박스 스타일 */
+    .board-table input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: #3498db;
+    }
+
+    #selectedCount {
+      font-weight: 700;
+      color: #dc3545;
+    }
+
     .story-header {
       display: flex;
       justify-content: space-between;
@@ -3045,6 +3113,9 @@
                 <table class="board-table" id="jobTable" style="display: none;">
                   <thead>
                     <tr>
+                      <th id="checkbox-header" style="width: 50px; display:none;">
+                        <input type="checkbox" id="selectAllJobs" onclick="toggleSelectAll()" title="전체 선택">
+                      </th>
                       <th style="width: 80px;">로고</th>
                       <th style="width: 150px;">기관명</th>
                       <th style="min-width: 350px;">제목</th>
@@ -3057,6 +3128,16 @@
                     <!-- Firebase에서 데이터를 가져와 여기에 표시됩니다 -->
                   </tbody>
                 </table>
+
+                <!-- 일괄 삭제 버튼 영역 (관리자용) -->
+                <div id="bulkDeleteButtons" class="bulk-delete-container" style="display: none;">
+                  <button class="btn-bulk-delete" onclick="deleteSelectedJobs()">
+                    <span id="selectedCount">0</span>개 선택 삭제
+                  </button>
+                  <button class="btn-delete-all" onclick="deleteAllJobsInCategory()">
+                    현재 카테고리 전체 삭제
+                  </button>
+                </div>
 
                 <!-- 페이지네이션 -->
                 <div id="pagination" class="pagination-container" style="display: none;">
@@ -3815,6 +3896,57 @@
       </div>
     </div>
   </div>
+
+  <!--
+  ============================================
+  Firebase Firestore 보안 규칙 설정 가이드
+  ============================================
+  
+  삭제 기능이 작동하지 않는 경우, Firebase Console에서 Firestore 보안 규칙을 다음과 같이 설정해주세요:
+  
+  1. Firebase Console (https://console.firebase.google.com/) 접속
+  2. 프로젝트 선택 (recruit-board)
+  3. Firestore Database 메뉴 선택
+  4. 상단의 "규칙" 탭 클릭
+  5. 아래 규칙을 복사하여 붙여넣기:
+
+  rules_version = '2';
+  service cloud.firestore {
+    match /databases/{database}/documents {
+      
+      // users 컬렉션: 인증된 사용자만 읽기 가능, 자신의 문서만 쓰기 가능
+      match /users/{userId} {
+        allow read: if request.auth != null;
+        allow write: if request.auth != null && request.auth.uid == userId;
+      }
+      
+      // jobs 컬렉션: 모든 사용자 읽기 가능, 관리자만 쓰기/삭제 가능
+      match /jobs/{jobId} {
+        allow read: if true;
+        allow create, update, delete: if request.auth != null && 
+          exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      }
+      
+      // stories 컬렉션: 모든 사용자 읽기 가능, 인증된 사용자만 쓰기 가능
+      match /stories/{storyId} {
+        allow read: if true;
+        allow create: if request.auth != null;
+        allow update, delete: if request.auth != null && 
+          (resource.data.authorId == request.auth.uid || 
+           (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+            get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'));
+      }
+    }
+  }
+
+  6. "게시" 버튼 클릭하여 규칙 적용
+
+  주의: 위 규칙은 관리자(role='admin')만 채용정보를 삭제할 수 있도록 설정되어 있습니다.
+  관리자 계정 설정은 Firebase Console > Firestore Database > users 컬렉션에서
+  해당 사용자의 role 필드를 'admin'으로 설정해주세요.
+  ============================================
+  -->
 
   <script type="module">
     // Firebase 9 버전 SDK 가져오기
@@ -4802,7 +4934,12 @@
         // 관리자 여부에 따라 '관리' 헤더 표시 제어
         const isAdmin = (window.currentUserRole === 'admin');
         const mgmtHeader = document.getElementById('job-mgmt-header');
+        const checkboxHeader = document.getElementById('checkbox-header');
+        const bulkDeleteButtons = document.getElementById('bulkDeleteButtons');
+        
         if (mgmtHeader) mgmtHeader.style.display = isAdmin ? 'table-cell' : 'none';
+        if (checkboxHeader) checkboxHeader.style.display = isAdmin ? 'table-cell' : 'none';
+        if (bulkDeleteButtons) bulkDeleteButtons.style.display = isAdmin ? 'flex' : 'none';
 
         // 클라이언트 사이드 필터링
         totalJobs = [];
@@ -4819,6 +4956,7 @@
           if (emptyState) emptyState.style.display = 'block';
           if (paginationContainer) paginationContainer.style.display = 'none';
           if (bottomAddButton) bottomAddButton.style.display = 'none';
+          if (bulkDeleteButtons) bulkDeleteButtons.style.display = 'none';
           return;
         }
 
@@ -4861,8 +4999,10 @@
         window.jobsData[job.id] = { ...job, createdDate: createdDate };
 
         const mgmtStyle = isAdmin ? '' : 'display:none;';
+        const checkboxCell = isAdmin ? `<td style="text-align:center;"><input type="checkbox" class="job-checkbox" data-job-id="${job.id}" onchange="updateSelectedCount()"></td>` : '';
 
         tr.innerHTML = `
+              ${checkboxCell}
               <td><img src="${job.imageUrl || './logo.png'}" class="job-image" alt="로고"></td>
               <td>${job.company}</td>
               <td>
@@ -4877,6 +5017,9 @@
           `;
         tbody.appendChild(tr);
       });
+      
+      // 체크박스 상태 초기화
+      updateSelectedCount();
     }
 
     function renderPagination() {
@@ -5186,11 +5329,179 @@
       if (!confirm('❗ 정말 삭제하시겠습니까?')) return;
 
       try {
-        await deleteDoc(doc(db, 'jobs', id));
+        // 현재 사용자 확인
+        const currentUser = auth.currentUser;
+        if (!currentUser) {
+          alert('❌ 로그인이 필요합니다.');
+          return;
+        }
+
+        // 관리자 권한 확인
+        if (window.currentUserRole !== 'admin') {
+          alert('❌ 관리자 권한이 필요합니다.');
+          return;
+        }
+
+        console.log('Attempting to delete job:', id);
+        console.log('Current user:', currentUser.uid);
+        console.log('User role:', window.currentUserRole);
+
+        await window.deleteDoc(window.doc(window.db, 'jobs', id));
         alert('✅ 삭제되었습니다!');
         loadJobs();
       } catch (error) {
         console.error('삭제 실패:', error);
+        console.error('Error code:', error.code);
+        console.error('Error message:', error.message);
+        alert('삭제에 실패했습니다: ' + error.message);
+      }
+    }
+
+    // 전체 선택/해제
+    function toggleSelectAll() {
+      const selectAllCheckbox = document.getElementById('selectAllJobs');
+      const checkboxes = document.querySelectorAll('.job-checkbox');
+      
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = selectAllCheckbox.checked;
+      });
+      
+      updateSelectedCount();
+    }
+
+    // 선택된 항목 개수 업데이트
+    function updateSelectedCount() {
+      const checkboxes = document.querySelectorAll('.job-checkbox:checked');
+      const count = checkboxes.length;
+      const countElement = document.getElementById('selectedCount');
+      
+      if (countElement) {
+        countElement.textContent = count;
+      }
+      
+      // 전체 선택 체크박스 상태 업데이트
+      const selectAllCheckbox = document.getElementById('selectAllJobs');
+      const allCheckboxes = document.querySelectorAll('.job-checkbox');
+      
+      if (selectAllCheckbox && allCheckboxes.length > 0) {
+        selectAllCheckbox.checked = (count === allCheckboxes.length);
+        selectAllCheckbox.indeterminate = (count > 0 && count < allCheckboxes.length);
+      }
+    }
+
+    // 선택된 항목 삭제
+    async function deleteSelectedJobs() {
+      const checkboxes = document.querySelectorAll('.job-checkbox:checked');
+      
+      if (checkboxes.length === 0) {
+        alert('⚠️ 삭제할 항목을 선택해주세요.');
+        return;
+      }
+
+      if (!confirm(`❗ 선택한 ${checkboxes.length}개의 항목을 정말 삭제하시겠습니까?`)) {
+        return;
+      }
+
+      try {
+        // 현재 사용자 확인
+        const currentUser = auth.currentUser;
+        if (!currentUser) {
+          alert('❌ 로그인이 필요합니다.');
+          return;
+        }
+
+        // 관리자 권한 확인
+        if (window.currentUserRole !== 'admin') {
+          alert('❌ 관리자 권한이 필요합니다.');
+          return;
+        }
+
+        // 선택된 ID 수집
+        const idsToDelete = Array.from(checkboxes).map(cb => cb.dataset.jobId);
+        
+        console.log('Deleting jobs:', idsToDelete);
+
+        // Firebase에서 각 문서 삭제
+        const deletePromises = idsToDelete.map(id => 
+          window.deleteDoc(window.doc(window.db, 'jobs', id))
+        );
+
+        await Promise.all(deletePromises);
+        
+        alert(`✅ ${idsToDelete.length}개의 항목이 삭제되었습니다!`);
+        
+        // 전체 선택 해제
+        const selectAllCheckbox = document.getElementById('selectAllJobs');
+        if (selectAllCheckbox) selectAllCheckbox.checked = false;
+        
+        loadJobs();
+      } catch (error) {
+        console.error('일괄 삭제 실패:', error);
+        alert('삭제에 실패했습니다: ' + error.message);
+      }
+    }
+
+    // 현재 카테고리의 전체 항목 삭제
+    async function deleteAllJobsInCategory() {
+      if (totalJobs.length === 0) {
+        alert('⚠️ 삭제할 항목이 없습니다.');
+        return;
+      }
+
+      const categoryTitles = {
+        'intern': '인턴',
+        'entry-level': '신입',
+        'experienced': '경력',
+        'regular': '정규직',
+        'contract': '비정규직',
+        'market-public': '공기업(시장형)',
+        'quasi-market-public': '공기업(준시장형)',
+        'fund-quasi': '준정부기관(기금관리형)',
+        'entrust-quasi': '준정부기관(위탁집행형)',
+        'other-public': '기타공공기관',
+        'local-public': '지방공기업',
+        'local-investment': '지방출자·출연기관'
+      };
+
+      const currentCategoryTitle = categoryTitles[window.currentJobCategory] || '현재 카테고리';
+
+      if (!confirm(`🚨 경고: "${currentCategoryTitle}"의 모든 항목(${totalJobs.length}개)을 정말 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다!`)) {
+        return;
+      }
+
+      // 한 번 더 확인
+      if (!confirm(`⚠️ 최종 확인: 정말로 ${totalJobs.length}개의 항목을 모두 삭제하시겠습니까?`)) {
+        return;
+      }
+
+      try {
+        // 현재 사용자 확인
+        const currentUser = auth.currentUser;
+        if (!currentUser) {
+          alert('❌ 로그인이 필요합니다.');
+          return;
+        }
+
+        // 관리자 권한 확인
+        if (window.currentUserRole !== 'admin') {
+          alert('❌ 관리자 권한이 필요합니다.');
+          return;
+        }
+
+        console.log('Deleting all jobs in category:', window.currentJobCategory);
+        console.log('Total jobs to delete:', totalJobs.length);
+
+        // 모든 항목 삭제
+        const deletePromises = totalJobs.map(job => 
+          window.deleteDoc(window.doc(window.db, 'jobs', job.id))
+        );
+
+        await Promise.all(deletePromises);
+        
+        alert(`✅ ${totalJobs.length}개의 항목이 모두 삭제되었습니다!`);
+        loadJobs();
+      } catch (error) {
+        console.error('전체 삭제 실패:', error);
         alert('삭제에 실패했습니다: ' + error.message);
       }
     }
