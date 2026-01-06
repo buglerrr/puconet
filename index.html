@@ -905,6 +905,29 @@
       justify-content: flex-start !important;
     }
 
+    /* === Premium Carousel Styles === */
+    .premium-carousel-wrapper {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .premium-carousel-container {
+      display: flex;
+      transition: transform 0.6s ease-in-out;
+      width: 100%;
+    }
+
+    .premium-carousel-container .job-card {
+      flex: 0 0 calc(25% - 0.75rem);
+      margin-right: 1rem;
+      scroll-snap-align: start;
+    }
+
+    .premium-carousel-container .job-card:last-child {
+      margin-right: 0;
+    }
+
     /* 2) Lock the logo box to a fixed area and keep the logo itself from resizing unpredictably */
     #features .job-card .banner-image {
       background: #ffffff !important;
@@ -2346,40 +2369,42 @@
       <section class="section section--compact" id="features">
         <div class="container">
           <h2 class="section-title">프리미엄 채용정보 <span class="apply">상품신청&gt;</span></h2>
-          <div class="job-grid job-grid--premium">
-            <a aria-label="프리미엄 - 한국전력공사 채용공고 이동" class="job-card" data-url="https://recruit.incruit.com/i815/"
-              href="javascript:void(0)" role="button">
-              <img alt="독립기념관" class="banner-image" src="./독립기념관.png" />
-              <h3>독립기념관</h3>
-              <p>신입·경력 / 사무·전기</p>
-              <div class="deadline"><strong>마감:</strong> 2025.10.20 <span
-                  style="color:#e74c3c;font-weight:600;">D-3</span></div>
-            </a>
-            <a aria-label="프리미엄 - 한국수력원자력 채용공고 이동" class="job-card" data-url="https://kospo.machuda.kr"
-              href="javascript:void(0)" role="button">
-              <img alt="한국남부발전" class="banner-image" src="./한국남부발전.png" />
-              <h3>한국남부발전</h3>
-              <p>사무·기술</p>
-              <div class="deadline"><strong>마감:</strong> 2025.10.22 <span
-                  style="color:#e74c3c;font-weight:600;">D-5</span></div>
-            </a>
-            <a aria-label="프리미엄 - 한국도로공사 채용공고 이동" class="job-card" data-url="http://ksif.fairyhr.com/"
-              href="javascript:void(0)" role="button">
-              <img alt="세종학당재단" class="banner-image" src="./세종학당재단.png" />
-              <h3>세종학당재단</h3>
-              <p>토목·전기·통신</p>
-              <div class="deadline"><strong>마감:</strong> 2025.10.17 <span
-                  style="color:#e74c3c;font-weight:600;">D-0</span></div>
-            </a>
-            <a aria-label="프리미엄 - 국민건강보험공단 채용공고 이동" class="job-card"
-              data-url="https://www.nps.or.kr/pnsgdnc/hiregdnc/getOHAE0004M0List.do?menuId=MN24000969"
-              href="javascript:void(0)" role="button">
-              <img alt="국민연금공단" class="banner-image" src="./국민연금공단.png" />
-              <h3>국민연금공단</h3>
-              <p>청년인턴</p>
-              <div class="deadline"><strong>마감:</strong> 2025.10.16 <span
-                  style="color:#e74c3c;font-weight:600;">D-1</span></div>
-            </a>
+          <div class="premium-carousel-wrapper">
+            <div class="job-grid job-grid--premium premium-carousel-container">
+              <a aria-label="프리미엄 - 한국전력공사 채용공고 이동" class="job-card" data-url="https://recruit.incruit.com/i815/"
+                href="javascript:void(0)" role="button">
+                <img alt="독립기념관" class="banner-image" src="./독립기념관.png" />
+                <h3>독립기념관</h3>
+                <p>신입·경력 / 사무·전기</p>
+                <div class="deadline"><strong>마감:</strong> 2025.10.20 <span
+                    style="color:#e74c3c;font-weight:600;">D-3</span></div>
+              </a>
+              <a aria-label="프리미엄 - 한국수력원자력 채용공고 이동" class="job-card" data-url="https://kospo.machuda.kr"
+                href="javascript:void(0)" role="button">
+                <img alt="한국남부발전" class="banner-image" src="./한국남부발전.png" />
+                <h3>한국남부발전</h3>
+                <p>사무·기술</p>
+                <div class="deadline"><strong>마감:</strong> 2025.10.22 <span
+                    style="color:#e74c3c;font-weight:600;">D-5</span></div>
+              </a>
+              <a aria-label="프리미엄 - 한국도로공사 채용공고 이동" class="job-card" data-url="http://ksif.fairyhr.com/"
+                href="javascript:void(0)" role="button">
+                <img alt="세종학당재단" class="banner-image" src="./세종학당재단.png" />
+                <h3>세종학당재단</h3>
+                <p>토목·전기·통신</p>
+                <div class="deadline"><strong>마감:</strong> 2025.10.17 <span
+                    style="color:#e74c3c;font-weight:600;">D-0</span></div>
+              </a>
+              <a aria-label="프리미엄 - 국민건강보험공단 채용공고 이동" class="job-card"
+                data-url="https://www.nps.or.kr/pnsgdnc/hiregdnc/getOHAE0004M0List.do?menuId=MN24000969"
+                href="javascript:void(0)" role="button">
+                <img alt="국민연금공단" class="banner-image" src="./국민연금공단.png" />
+                <h3>국민연금공단</h3>
+                <p>청년인턴</p>
+                <div class="deadline"><strong>마감:</strong> 2025.10.16 <span
+                    style="color:#e74c3c;font-weight:600;">D-1</span></div>
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -3086,7 +3111,7 @@
                 style="background:#3498db; margin-right:10px; border:none; color:white; padding: 10px 20px; border-radius: 5px; cursor: pointer;">목록으로
                 돌아가기</button>
               <a id="detail-link" href="#" target="_blank" rel="noopener noreferrer" class="cta-button" 
-                style="display:inline-block; background:#e74c3c; color:white; padding:12px 24px; border-radius:5px; text-decoration:none; font-weight:bold; font-size:1.05rem;">
+                style="display:none; background:#e74c3c; color:white; padding:12px 24px; border-radius:5px; text-decoration:none; font-weight:bold; font-size:1.05rem;">
                 채용 사이트 방문 →
               </a>
             </div>
@@ -4929,17 +4954,9 @@
         attArea.style.display = 'none';
       }
 
-      // 외부 링크 버튼 (채용 사이트 방문) - 항상 표시
+      // 외부 링크 버튼 (채용 사이트 방문)
       const linkBtn = document.getElementById('detail-link');
-      
-      // detailUrl이 유효한지 확인
-      const hasValidUrl = job.detailUrl && 
-                         job.detailUrl !== '#' && 
-                         job.detailUrl !== '' &&
-                         (job.detailUrl.startsWith('http://') || job.detailUrl.startsWith('https://'));
-      
-      if (hasValidUrl) {
-        // 유효한 URL이 있는 경우
+      if (job.detailUrl && job.detailUrl !== '#' && job.detailUrl.startsWith('http')) {
         linkBtn.href = job.detailUrl;
         linkBtn.target = '_blank';
         linkBtn.rel = 'noopener noreferrer';
@@ -4948,22 +4965,11 @@
           window.open(job.detailUrl, '_blank', 'noopener,noreferrer');
         };
         linkBtn.style.display = 'inline-block';
-        linkBtn.style.opacity = '1';
-        linkBtn.style.cursor = 'pointer';
         linkBtn.textContent = '채용 사이트 방문 →';
-        console.log('✅ 채용 사이트 URL:', job.detailUrl);
+        console.log('채용 사이트 URL:', job.detailUrl);
       } else {
-        // URL이 없거나 유효하지 않은 경우에도 버튼은 표시하되 클릭 시 안내
-        linkBtn.href = '#';
-        linkBtn.onclick = function(e) {
-          e.preventDefault();
-          alert('⚠️ 채용 사이트 정보가 등록되지 않았습니다.\n관리자에게 문의해주세요.');
-        };
-        linkBtn.style.display = 'inline-block';
-        linkBtn.style.opacity = '0.6';
-        linkBtn.style.cursor = 'not-allowed';
-        linkBtn.textContent = '채용 사이트 정보 없음';
-        console.log('⚠️ 채용 사이트 URL 없음 또는 유효하지 않음:', job.detailUrl);
+        linkBtn.style.display = 'none';
+        console.log('채용 사이트 URL 없음 또는 유효하지 않음:', job.detailUrl);
       }
 
       window.scrollTo(0, 0);
@@ -5628,6 +5634,52 @@
           }
         });
       });
+    });
+
+    // === 프리미엄 채용정보 자동 캐러셀 === 
+    window.addEventListener('DOMContentLoaded', function() {
+      const carouselContainer = document.querySelector('.premium-carousel-container');
+      const cards = carouselContainer ? Array.from(carouselContainer.querySelectorAll('.job-card')) : [];
+      
+      if (!carouselContainer || cards.length === 0) return;
+      
+      const intervalTime = 5000; // 5초
+      let isTransitioning = false;
+      
+      function slideCarousel() {
+        if (isTransitioning) return;
+        isTransitioning = true;
+        
+        // 각 카드의 너비 + 마진을 계산
+        const cardWidth = cards[0].offsetWidth;
+        const gap = 16; // 1rem = 16px
+        const moveDistance = cardWidth + gap;
+        
+        // 왼쪽으로 이동하는 애니메이션 적용
+        carouselContainer.style.transition = 'transform 0.6s ease-in-out';
+        carouselContainer.style.transform = `translateX(-${moveDistance}px)`;
+        
+        // 애니메이션이 끝난 후
+        setTimeout(() => {
+          // transition 효과 제거
+          carouselContainer.style.transition = 'none';
+          
+          // 첫 번째 카드를 맨 뒤로 이동
+          const firstCard = carouselContainer.firstElementChild;
+          carouselContainer.appendChild(firstCard);
+          
+          // transform 초기화
+          carouselContainer.style.transform = 'translateX(0)';
+          
+          // 다음 애니메이션을 위해 transition 복원
+          setTimeout(() => {
+            isTransitioning = false;
+          }, 50);
+        }, 600); // transition 시간과 동일하게 설정
+      }
+      
+      // 5초마다 자동 슬라이드
+      setInterval(slideCarousel, intervalTime);
     });
   </script>
 </body>
