@@ -896,68 +896,6 @@
 
 
     /* === v20 overrides (premium banner fixed size & white logo area) === */
-    
-    /* === Event Banners (헤더 하단) === */
-    .event-banners-section {
-      width: 100%;
-      background: transparent;
-      padding: 0;
-      margin: 0;
-    }
-
-    .event-banners-wrapper {
-      width: 100%;
-      max-width: 1480px;
-      margin: 0 auto;
-      padding: 0 20px;
-      box-sizing: border-box;
-    }
-
-    .event-banners-container {
-      width: 100%;
-      display: flex;
-      flex-direction: row;
-      gap: 0;
-      box-sizing: border-box;
-      border: 1px solid #ced4da;
-      overflow: hidden;
-    }
-
-    .event-banner {
-      flex: 1;
-      height: 133px;
-      border: none;
-      border-right: 1px solid #ced4da;
-      overflow: hidden;
-      background: #ffffff;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      text-decoration: none;
-      display: block;
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    .event-banner:last-child {
-      border-right: none;
-    }
-
-    .event-banner:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      z-index: 1;
-      position: relative;
-    }
-
-    .event-banner img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-      background: #ffffff;
-    }
-
-    /* === v20 overrides (premium banner fixed size & white logo area) === */
     /* 1) Make all 4 premium cards have consistent, fixed height */
     #features .job-grid.job-grid--premium .job-card {
       height: 200px !important;
@@ -2426,24 +2364,6 @@
       </div>
     </div>
   </header>
-  
-  <!-- 이벤트 배너 섹션 -->
-  <section class="event-banners-section">
-    <div class="event-banners-wrapper">
-      <div class="event-banners-container">
-        <!-- 공공기관 채용박람회 배너 -->
-        <a class="event-banner" href="https://publicjob.kr" target="_blank" rel="noopener noreferrer">
-          <img src="./공공기관채용박람회_최종.png" alt="2026 공공기관 채용정보박람회">
-        </a>
-        
-        <!-- 여성 일자리 창출 박람회 배너 -->
-        <a class="event-banner" href="https://www.xn--vk1b79frteqrg8wgp6alze06m56x.com/" target="_blank" rel="noopener noreferrer">
-          <img src="./여성채용박람회_최종.png" alt="2026 공공기관 여성 일자리 창출 박람회">
-        </a>
-      </div>
-    </div>
-  </section>
-  
   <!-- 레이아웃 래퍼 시작 (사이드바 + 메인 콘텐츠) -->
   <div class="content-with-sidebar-wrapper">
     <!-- 메인 콘텐츠 영역 시작 -->
