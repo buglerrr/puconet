@@ -914,18 +914,15 @@
 
     .premium-carousel-container {
       display: flex;
+      gap: 1rem;
       transition: transform 0.6s ease-in-out;
       width: 100%;
     }
 
     .premium-carousel-container .job-card {
-      flex: 0 0 calc(25% - 0.75rem);
-      margin-right: 1rem;
+      flex: 0 0 calc((100% - 3rem) / 4);
+      /* 4개의 카드와 3개의 gap(1rem씩) */
       scroll-snap-align: start;
-    }
-
-    .premium-carousel-container .job-card:last-child {
-      margin-right: 0;
     }
 
     /* 2) Lock the logo box to a fixed area and keep the logo itself from resizing unpredictably */
@@ -5650,9 +5647,10 @@
         if (isTransitioning) return;
         isTransitioning = true;
         
-        // 각 카드의 너비 + 마진을 계산
+        // 각 카드의 실제 너비 + gap 계산
         const cardWidth = cards[0].offsetWidth;
-        const gap = 16; // 1rem = 16px
+        const computedStyle = window.getComputedStyle(carouselContainer);
+        const gap = parseFloat(computedStyle.gap) || 16; // gap 값 가져오기 (기본 16px)
         const moveDistance = cardWidth + gap;
         
         // 왼쪽으로 이동하는 애니메이션 적용
