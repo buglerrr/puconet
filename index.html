@@ -3135,6 +3135,15 @@
           <div class="board-layout">
             <!-- 왼쪽 사이드바 (세부 메뉴) -->
             <aside class="board-sidebar">
+              <!-- 주목할 공고 그룹 -->
+              <h3>주목할 공고</h3>
+              <ul>
+                <li><a href="#" onclick="switchBoard('premium'); return false;" id="board-menu-premium">프리미엄</a></li>
+                <li><a href="#" onclick="switchBoard('recommended'); return false;" id="board-menu-recommended">추천</a></li>
+                <li><a href="#" onclick="switchBoard('featured'); return false;" id="board-menu-featured">주요</a></li>
+                <li><a href="#" onclick="switchBoard('deadline-soon'); return false;" id="board-menu-deadline-soon">마감임박</a></li>
+              </ul>
+              
               <!-- 채용형태별 그룹 -->
               <h3>채용형태별</h3>
               <ul>
@@ -4846,6 +4855,10 @@
 
       // 2. 게시판 제목 업데이트
       const boardTitles = {
+        'premium': '프리미엄',
+        'recommended': '추천',
+        'featured': '주요',
+        'deadline-soon': '마감임박',
         'intern': '인턴',
         'entry-level': '신입',
         'experienced': '경력',
@@ -5550,6 +5563,10 @@
       }
 
       const categoryTitles = {
+        'premium': '프리미엄',
+        'recommended': '추천',
+        'featured': '주요',
+        'deadline-soon': '마감임박',
         'intern': '인턴',
         'entry-level': '신입',
         'experienced': '경력',
