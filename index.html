@@ -1893,24 +1893,40 @@
       min-width: 120px;
     }
 
-    /* 기관명 셀 - 적절한 줄바꿈 허용 */
+    /* 기관명 셀 - 한 줄로만 표시, 넘치면 ... */
     .board-table td.company-cell {
-      white-space: normal;
-      word-break: keep-all;
-      line-height: 1.5;
-      min-width: 180px;
-      max-width: 220px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 150px;
+      max-width: 180px;
     }
 
-    /* 제목 셀 - 줄바꿈 허용 */
+    /* 제목 셀 - 한 줄로만 표시, 넘치면 ... */
     .board-table td.title-cell {
-      white-space: normal;
-      word-break: break-word;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 350px;
       line-height: 1.5;
     }
 
-    /* 고용유형, 마감일 셀 */
-    .board-table td.employment-cell,
+    .board-table td.title-cell a {
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* 고용유형, 마감일 셀 - 한 줄로만 표시 */
+    .board-table td.employment-cell {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: center;
+      max-width: 100px;
+    }
+    
     .board-table td.deadline-cell {
       white-space: nowrap;
       text-align: center;
@@ -3111,7 +3127,7 @@
                 <strong>💾 첨부파일:</strong> <a id="detail-attachment-link" href="#" target="_blank"
                   style="color:#3498db; text-decoration:underline;"></a>
               </div>
-              <button onclick="showBoard()" class="cta-button"
+              <button onclick="goBackToJobList()" class="cta-button"
                 style="background:#3498db; margin-right:10px; border:none; color:white; padding: 10px 20px; border-radius: 5px; cursor: pointer;">목록으로
                 돌아가기</button>
               <a id="detail-link" href="#" target="_blank" rel="noopener noreferrer" class="cta-button" 
@@ -3475,6 +3491,12 @@
                     <!-- Stories load here -->
                   </tbody>
                 </table>
+                
+                <!-- 취업 이야기 페이지네이션 -->
+                <div id="storyPagination" class="pagination-container" style="display: none;">
+                  <div class="pagination story-pagination">
+                  </div>
+                </div>
               </div>
 
               <!-- 게시판별 준비중 메시지 -->
@@ -4407,7 +4429,7 @@
     }
 
     // === 취업 이야기 관련 로직 ===
-    window.showStoryBoard = async function (skipHistory = false) {
+    window.showStoryBoard = async function (skipHistory = false, category = null, page = 1) {
       // 1. 모든 다른 섹션 숨기기
       document.getElementById('features').style.display = 'none';
       document.getElementById('jobs').style.display = 'none';
@@ -4427,13 +4449,14 @@
       const storySection = document.getElementById('story-board-section');
       if (storySection) {
         storySection.style.display = 'block';
-        // 기본적으로 자유게시판으로 시작
-        switchStoryBoard('free', true);
+        // 지정된 카테고리로, 없으면 기본값 free
+        const targetCategory = category || 'free';
+        switchStoryBoard(targetCategory, true, page);
       }
 
       // 히스토리 추가 (뒤로가기 지원)
       if (!skipHistory) {
-        history.pushState({ section: 'story', category: 'free' }, '', '#story');
+        history.pushState({ section: 'story', category: category || 'free', page: page }, '', '#story');
       }
 
       window.scrollTo(0, 0);
@@ -4537,6 +4560,11 @@
       }
     }
 
+    // 취업 이야기 페이지네이션 변수
+    let storyCurrentPage = 1;
+    const storyItemsPerPage = 12;
+    let totalStories = [];
+
     window.loadStories = async function () {
       const tbody = document.getElementById('storyTableBody');
       if (!tbody) return;
@@ -4549,11 +4577,11 @@
 
         if (querySnapshot.empty) {
           tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:3rem; color:#888;">아직 이야기가 없습니다. 첫 번째 이야기를 들려주세요!</td></tr>';
+          document.getElementById('storyPagination').style.display = 'none';
           return;
         }
 
-        let index = 0;
-        // 클라이언트 사이드 필터링 및 인덱스 계산
+        // 클라이언트 사이드 필터링
         const filteredDocs = [];
         querySnapshot.forEach((docSnap) => {
           const d = docSnap.data();
@@ -4566,35 +4594,167 @@
 
         if (filteredDocs.length === 0) {
           tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:3rem; color:#888;">아직 이야기가 없습니다. 첫 번째 이야기를 들려주세요!</td></tr>';
+          document.getElementById('storyPagination').style.display = 'none';
           return;
         }
 
-        index = filteredDocs.length;
-
-        filteredDocs.forEach((data) => {
-          const docId = data.id;
-          const date = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : '-';
-
-          window.storiesData = window.storiesData || {};
-          window.storiesData[docId] = { ...data, dateString: date };
-
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td style="text-align:center;">${index--}</td>
-            <td>
-                <a href="#" onclick="viewStoryDetail('${docId}'); return false;" style="text-decoration:none; color:#333; font-weight:bold;">${escapeHtml(data.title)}</a>
-            </td>
-            <td style="text-align:center;">${escapeHtml(data.authorName)}</td>
-            <td style="text-align:center; color:#666;">${date}</td>
-            <td style="text-align:center;">❤️ ${data.likes || 0}</td>
-          `;
-          tbody.appendChild(tr);
-        });
+        // 전체 스토리 저장
+        totalStories = filteredDocs;
+        
+        // 페이지 유효성 검사 (현재 페이지가 총 페이지보다 크면 1페이지로)
+        const totalPages = Math.ceil(totalStories.length / storyItemsPerPage);
+        if (storyCurrentPage > totalPages) {
+          storyCurrentPage = 1;
+        }
+        
+        // 현재 페이지 표시
+        displayStoriesForPage(storyCurrentPage);
+        renderStoryPagination();
 
       } catch (err) {
         console.error(err);
         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:red;">데이터 로딩 실패</td></tr>';
       }
+    }
+
+    function displayStoriesForPage(page) {
+      const tbody = document.getElementById('storyTableBody');
+      tbody.innerHTML = '';
+
+      const startIndex = (page - 1) * storyItemsPerPage;
+      const endIndex = startIndex + storyItemsPerPage;
+      const pageStories = totalStories.slice(startIndex, endIndex);
+
+      // 번호 계산 (전체에서의 순번)
+      let displayIndex = totalStories.length - startIndex;
+
+      pageStories.forEach((data) => {
+        const docId = data.id;
+        const date = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : '-';
+
+        window.storiesData = window.storiesData || {};
+        window.storiesData[docId] = { ...data, dateString: date };
+
+        const titleText = escapeHtml(data.title);
+        const authorText = escapeHtml(data.authorName);
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="text-align:center;">${displayIndex--}</td>
+          <td class="title-cell" title="${titleText}">
+              <a href="#" onclick="viewStoryDetail('${docId}'); return false;" style="text-decoration:none; color:#333; font-weight:bold;">${titleText}</a>
+          </td>
+          <td style="text-align:center;">${authorText}</td>
+          <td style="text-align:center; color:#666;">${date}</td>
+          <td style="text-align:center;">❤️ ${data.likes || 0}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderStoryPagination() {
+      const paginationContainer = document.querySelector('.story-pagination');
+      const paginationWrapper = document.getElementById('storyPagination');
+      
+      if (!paginationContainer || !paginationWrapper) {
+        return;
+      }
+
+      paginationContainer.innerHTML = '';
+
+      const totalPages = Math.ceil(totalStories.length / storyItemsPerPage);
+
+      // 1페이지만 있으면 페이지네이션 숨김
+      if (totalPages <= 1) {
+        paginationWrapper.style.display = 'none';
+        return;
+      }
+
+      // 2페이지 이상이면 페이지네이션 표시
+      paginationWrapper.style.display = 'block';
+
+      // 이전 버튼
+      const prevBtn = document.createElement('button');
+      prevBtn.textContent = '‹';
+      prevBtn.disabled = storyCurrentPage === 1;
+      prevBtn.onclick = () => goToStoryPage(storyCurrentPage - 1);
+      paginationContainer.appendChild(prevBtn);
+
+      // 페이지 번호들
+      const maxVisiblePages = 10;
+      let startPage = Math.max(1, storyCurrentPage - Math.floor(maxVisiblePages / 2));
+      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+      if (endPage - startPage < maxVisiblePages - 1) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+      }
+
+      // 첫 페이지
+      if (startPage > 1) {
+        const firstBtn = document.createElement('button');
+        firstBtn.textContent = '1';
+        firstBtn.onclick = () => goToStoryPage(1);
+        paginationContainer.appendChild(firstBtn);
+
+        if (startPage > 2) {
+          const ellipsis = document.createElement('span');
+          ellipsis.textContent = '...';
+          ellipsis.className = 'ellipsis';
+          paginationContainer.appendChild(ellipsis);
+        }
+      }
+
+      // 중간 페이지들
+      for (let i = startPage; i <= endPage; i++) {
+        const pageBtn = document.createElement('button');
+        pageBtn.textContent = i;
+        if (i === storyCurrentPage) {
+          pageBtn.className = 'active';
+        }
+        pageBtn.onclick = () => goToStoryPage(i);
+        paginationContainer.appendChild(pageBtn);
+      }
+
+      // 마지막 페이지
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          const ellipsis = document.createElement('span');
+          ellipsis.textContent = '...';
+          ellipsis.className = 'ellipsis';
+          paginationContainer.appendChild(ellipsis);
+        }
+
+        const lastBtn = document.createElement('button');
+        lastBtn.textContent = totalPages;
+        lastBtn.onclick = () => goToStoryPage(totalPages);
+        paginationContainer.appendChild(lastBtn);
+      }
+
+      // 다음 버튼
+      const nextBtn = document.createElement('button');
+      nextBtn.textContent = '›';
+      nextBtn.disabled = storyCurrentPage === totalPages;
+      nextBtn.onclick = () => goToStoryPage(storyCurrentPage + 1);
+      paginationContainer.appendChild(nextBtn);
+    }
+
+    function goToStoryPage(page) {
+      const totalPages = Math.ceil(totalStories.length / storyItemsPerPage);
+      if (page < 1 || page > totalPages) return;
+      
+      storyCurrentPage = page;
+      displayStoriesForPage(page);
+      renderStoryPagination();
+      
+      // 히스토리 state 업데이트 (현재 페이지 정보 저장)
+      history.replaceState({ 
+        section: 'story', 
+        category: window.currentStoryCategory,
+        page: storyCurrentPage 
+      }, '', '#story-' + window.currentStoryCategory);
+      
+      // 스크롤 상단으로
+      document.getElementById('storyBoardTable').scrollIntoView({ behavior: 'smooth' });
     }
 
     // 이야기 삭제 함수
@@ -4613,29 +4773,32 @@
     }
 
     // 게시판 전환 함수
-    window.switchStoryBoard = function (boardType, skipHistory = false) {
+    window.switchStoryBoard = function (boardType, skipHistory = false, targetPage = 1) {
       // 1. 현재 카테고리 업데이트
       window.currentStoryCategory = boardType;
+      
+      // 2. 페이지 번호 설정
+      storyCurrentPage = targetPage;
 
-      // 2. 사이드바 메뉴 활성화 상태 변경
+      // 3. 사이드바 메뉴 활성화 상태 변경
       const menuItems = document.querySelectorAll('.board-sidebar a');
       menuItems.forEach(item => item.classList.remove('active'));
       const activeMenu = document.getElementById('story-menu-' + boardType);
       if (activeMenu) activeMenu.classList.add('active');
 
-      // 3. 게시판 표시 (준비중 메시지 로직 제거하고 항상 로딩)
+      // 4. 게시판 표시 (준비중 메시지 로직 제거하고 항상 로딩)
       const boardTable = document.getElementById('storyBoardTable');
       const boardMessage = document.getElementById('storyBoardMessage');
 
       if (boardTable) boardTable.style.display = 'block';
       if (boardMessage) boardMessage.style.display = 'none';
 
-      // 히스토리 추가 (뒤로가기 지원)
+      // 히스토리 추가 (뒤로가기 지원) - 페이지 번호 포함
       if (!skipHistory) {
-        history.pushState({ section: 'story', category: boardType }, '', '#story-' + boardType);
+        history.pushState({ section: 'story', category: boardType, page: storyCurrentPage }, '', '#story-' + boardType);
       }
 
-      // 4. 데이터 다시 로드 (변경된 카테고리 기준)
+      // 5. 데이터 다시 로드 (변경된 카테고리 기준)
       loadStories();
     }
 
@@ -4649,6 +4812,8 @@
 
       // 현재 보고 있는 스토리 ID 저장 (뒤로가기용)
       window.currentStoryId = id;
+      // 현재 페이지 번호 저장 (목록 복귀용)
+      window.lastStoryPage = storyCurrentPage;
 
       document.getElementById('story-detail-title').textContent = data.title;
       document.getElementById('story-detail-author').textContent = data.authorName;
@@ -4676,9 +4841,14 @@
         attArea.style.display = 'none';
       }
 
-      // 히스토리 추가 (뒤로가기 지원)
+      // 히스토리 추가 (뒤로가기 지원) - 페이지 번호 포함
       if (!skipHistory) {
-        history.pushState({ section: 'story-detail', storyId: id, category: window.currentStoryCategory }, '', '#story-detail-' + id);
+        history.pushState({ 
+          section: 'story-detail', 
+          storyId: id, 
+          category: window.currentStoryCategory,
+          page: storyCurrentPage  // 현재 페이지 번호 저장
+        }, '', '#story-detail-' + id);
       }
 
       // 4. 권한 체크 및 삭제 버튼 제어
@@ -4709,10 +4879,26 @@
     }
 
     window.backToStoryList = function () {
+      const savedPage = window.lastStoryPage || 1;
+      const savedCategory = window.currentStoryCategory || 'free';
+      
       document.getElementById('story-detail-section').style.display = 'none';
       document.getElementById('story-board-section').style.display = 'block';
-      // 히스토리 추가 (뒤로가기 지원)
-      history.pushState({ section: 'story', category: window.currentStoryCategory || 'free' }, '', '#story-' + (window.currentStoryCategory || 'free'));
+      
+      // 저장된 페이지로 이동
+      storyCurrentPage = savedPage;
+      displayStoriesForPage(savedPage);
+      renderStoryPagination();
+      
+      // 히스토리 추가 (뒤로가기 지원) - 페이지 번호 포함
+      history.pushState({ 
+        section: 'story', 
+        category: savedCategory,
+        page: savedPage 
+      }, '', '#story-' + savedCategory);
+      
+      // 스크롤 상단으로
+      window.scrollTo(0, 0);
     }
 
     // 회원 관리 관련 함수들
@@ -4852,7 +5038,7 @@
 
     // 화면 전환 함수
     // 화면 전환 함수 (채용정보 게시판) - Full Width 적용
-    window.showBoard = function (skipHistory = false) {
+    window.showBoard = function (skipHistory = false, category = null, page = 1) {
       // 사이드바 숨기기 (취업 이야기와 동일하게)
       const wrapper = document.querySelector('.content-with-sidebar-wrapper');
       if (wrapper) wrapper.classList.add('full-width-wrapper');
@@ -4877,8 +5063,9 @@
       const boardSection = document.getElementById('board-section');
       if (boardSection) {
         boardSection.style.display = 'block';
-        // 기본적으로 공기업(시장형) 게시판으로 시작
-        switchBoard('market-public', true);
+        // 지정된 카테고리로, 없으면 기본값 market-public
+        const targetCategory = category || 'market-public';
+        switchBoard(targetCategory, true, page);
       }
 
       const userSection = document.getElementById('user-manage-section');
@@ -4886,7 +5073,7 @@
 
       // 히스토리 추가 (뒤로가기 지원)
       if (!skipHistory) {
-        history.pushState({ section: 'board', category: 'market-public' }, '', '#board');
+        history.pushState({ section: 'board', category: category || 'market-public', page: page }, '', '#board');
       }
 
       // 스크롤 상단으로
@@ -4894,10 +5081,10 @@
     }
 
     // 채용정보 게시판 전환 함수
-    window.switchBoard = function (boardType, skipHistory = false) {
+    window.switchBoard = function (boardType, skipHistory = false, targetPage = 1) {
       // 1. 현재 카테고리 업데이트
       window.currentJobCategory = boardType;
-      currentPage = 1; // 페이지 리셋
+      currentPage = targetPage; // 지정된 페이지로 설정 (기본값 1)
 
       // 2. 게시판 제목 업데이트
       const boardTitles = {
@@ -4937,9 +5124,9 @@
       if (boardTable) boardTable.style.display = 'block';
       if (boardMessage) boardMessage.style.display = 'none';
 
-      // 히스토리 추가 (뒤로가기 지원)
+      // 히스토리 추가 (뒤로가기 지원) - 페이지 번호 포함
       if (!skipHistory) {
-        history.pushState({ section: 'board', category: boardType }, '', '#board-' + boardType);
+        history.pushState({ section: 'board', category: boardType, page: currentPage }, '', '#board-' + boardType);
       }
 
       // 5. 데이터 로드
@@ -4955,15 +5142,22 @@
       }
       // 현재 보고 있는 채용정보 ID 저장 (뒤로가기용)
       window.currentJobId = id;
+      // 현재 페이지 번호 저장 (목록 복귀용)
+      window.lastJobPage = currentPage;
 
       // 섹션 전환
       document.getElementById('board-section').style.display = 'none';
       const detailSection = document.getElementById('detail-section');
       if (detailSection) detailSection.style.display = 'block';
 
-      // 히스토리 추가 (뒤로가기 지원)
+      // 히스토리 추가 (뒤로가기 지원) - 페이지 번호 포함
       if (!skipHistory) {
-        history.pushState({ section: 'job-detail', jobId: id, category: window.currentJobCategory }, '', '#job-detail-' + id);
+        history.pushState({ 
+          section: 'job-detail', 
+          jobId: id, 
+          category: window.currentJobCategory,
+          page: currentPage  // 현재 페이지 번호 저장
+        }, '', '#job-detail-' + id);
       }
 
       // 데이터 바인딩
@@ -5060,10 +5254,37 @@
       window.scrollTo(0, 0);
     }
 
+    // 채용정보 목록으로 돌아가기 (저장된 페이지로)
+    window.goBackToJobList = function() {
+      const savedPage = window.lastJobPage || 1;
+      const savedCategory = window.currentJobCategory || 'market-public';
+      
+      // 상세 섹션 숨기기
+      document.getElementById('detail-section').style.display = 'none';
+      
+      // 게시판 섹션 보이기
+      document.getElementById('board-section').style.display = 'block';
+      
+      // 저장된 페이지로 이동
+      currentPage = savedPage;
+      displayJobsForPage(savedPage, window.currentUserRole === 'admin');
+      renderPagination();
+      
+      // 히스토리 추가 - 페이지 번호 포함
+      history.pushState({ 
+        section: 'board', 
+        category: savedCategory,
+        page: savedPage 
+      }, '', '#board-' + savedCategory);
+      
+      // 스크롤 상단으로
+      window.scrollTo(0, 0);
+    }
+
     // 채용정보 목록 불러오기
     // 페이지네이션 변수
     let currentPage = 1;
-    const itemsPerPage = 20;
+    const itemsPerPage = 12;
     let totalJobs = [];
 
     async function loadJobs() {
@@ -5174,14 +5395,18 @@
         const mgmtStyle = isAdmin ? '' : 'display:none;';
         const checkboxCell = isAdmin ? `<td class="checkbox-cell" style="text-align:center;"><input type="checkbox" class="job-checkbox" data-job-id="${job.id}" onchange="updateSelectedCount()"></td>` : '';
 
+        // 제목과 고용유형에 title 속성 추가 (마우스 오버시 전체 내용 표시)
+        const titleText = escapeHtml(job.title);
+        const companyText = escapeHtml(job.company);
+
         tr.innerHTML = `
               ${checkboxCell}
               <td class="logo-cell"><img src="${job.imageUrl || './logo.png'}" class="job-image" alt="로고"></td>
-              <td class="company-cell">${job.company}</td>
-              <td class="title-cell">
-                  <a href="#" onclick="viewDetail('${job.id}'); return false;" style="text-decoration:none; color:#2c3e50; font-weight:600; display:block;">${escapeHtml(job.title)}</a>
+              <td class="company-cell" title="${companyText}">${companyText}</td>
+              <td class="title-cell" title="${titleText}">
+                  <a href="#" onclick="viewDetail('${job.id}'); return false;" style="text-decoration:none; color:#2c3e50; font-weight:600;">${titleText}</a>
               </td>
-              <td class="employment-cell">${displayEmploymentType}</td>
+              <td class="employment-cell" title="${displayEmploymentType}">${displayEmploymentType}</td>
               <td class="deadline-cell">${job.deadline || '-'}</td>
               <td class="mgmt-cell" style="${mgmtStyle}">
                   <button class="btn-edit" onclick="openEditModal('${job.id}')">수정</button>
@@ -5290,6 +5515,13 @@
       const isAdmin = (window.currentUserRole === 'admin');
       displayJobsForPage(currentPage, isAdmin);
       renderPagination();
+      
+      // 히스토리 state 업데이트 (현재 페이지 정보 저장)
+      history.replaceState({ 
+        section: 'board', 
+        category: window.currentJobCategory,
+        page: currentPage 
+      }, '', '#board-' + window.currentJobCategory);
       
       // 테이블 상단으로 스크롤
       const boardTable = document.getElementById('boardJobTable');
@@ -5834,46 +6066,38 @@
         // 홈으로 이동
         window.goHome(true);
       } else if (state.section === 'board') {
-        // 채용정보 게시판으로 이동
-        window.showBoard(true);
-        if (state.category) {
-          window.switchBoard(state.category, true);
-        }
+        // 채용정보 게시판으로 이동 - 카테고리와 페이지를 직접 전달
+        const targetCategory = state.category || 'market-public';
+        const targetPage = state.page || 1;
+        window.showBoard(true, targetCategory, targetPage);
       } else if (state.section === 'job-detail') {
         // 채용정보 상세로 이동
+        const targetCategory = state.category || 'market-public';
+        const targetPage = state.page || 1;
+        
         if (state.jobId && window.jobsData && window.jobsData[state.jobId]) {
-          window.showBoard(true);
-          if (state.category) {
-            window.switchBoard(state.category, true);
-          }
+          window.showBoard(true, targetCategory, targetPage);
           viewDetail(state.jobId, true);
         } else {
-          // 데이터가 없으면 목록으로
-          window.showBoard(true);
-          if (state.category) {
-            window.switchBoard(state.category, true);
-          }
+          // 데이터가 없으면 목록으로 (저장된 페이지로)
+          window.showBoard(true, targetCategory, targetPage);
         }
       } else if (state.section === 'story') {
         // 취업 이야기 게시판으로 이동
-        window.showStoryBoard(true);
-        if (state.category) {
-          window.switchStoryBoard(state.category, true);
-        }
+        const targetCategory = state.category || 'free';
+        const targetPage = state.page || 1;
+        window.showStoryBoard(true, targetCategory, targetPage);
       } else if (state.section === 'story-detail') {
         // 스토리 상세로 이동
+        const targetCategory = state.category || 'free';
+        const targetPage = state.page || 1;
+        
         if (state.storyId && window.storiesData && window.storiesData[state.storyId]) {
-          window.showStoryBoard(true);
-          if (state.category) {
-            window.switchStoryBoard(state.category, true);
-          }
+          window.showStoryBoard(true, targetCategory, targetPage);
           window.viewStoryDetail(state.storyId, true);
         } else {
           // 데이터가 없으면 목록으로
-          window.showStoryBoard(true);
-          if (state.category) {
-            window.switchStoryBoard(state.category, true);
-          }
+          window.showStoryBoard(true, targetCategory, targetPage);
         }
       } else if (state.section === 'user-manage') {
         // 회원 관리로 이동
