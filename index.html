@@ -4407,7 +4407,7 @@
     }
 
     // === 취업 이야기 관련 로직 ===
-    window.showStoryBoard = async function () {
+    window.showStoryBoard = async function (skipHistory = false) {
       // 1. 모든 다른 섹션 숨기기
       document.getElementById('features').style.display = 'none';
       document.getElementById('jobs').style.display = 'none';
@@ -4428,8 +4428,14 @@
       if (storySection) {
         storySection.style.display = 'block';
         // 기본적으로 자유게시판으로 시작
-        switchStoryBoard('free');
+        switchStoryBoard('free', true);
       }
+
+      // 히스토리 추가 (뒤로가기 지원)
+      if (!skipHistory) {
+        history.pushState({ section: 'story', category: 'free' }, '', '#story');
+      }
+
       window.scrollTo(0, 0);
     }
 
@@ -4607,7 +4613,7 @@
     }
 
     // 게시판 전환 함수
-    window.switchStoryBoard = function (boardType) {
+    window.switchStoryBoard = function (boardType, skipHistory = false) {
       // 1. 현재 카테고리 업데이트
       window.currentStoryCategory = boardType;
 
@@ -4624,17 +4630,25 @@
       if (boardTable) boardTable.style.display = 'block';
       if (boardMessage) boardMessage.style.display = 'none';
 
+      // 히스토리 추가 (뒤로가기 지원)
+      if (!skipHistory) {
+        history.pushState({ section: 'story', category: boardType }, '', '#story-' + boardType);
+      }
+
       // 4. 데이터 다시 로드 (변경된 카테고리 기준)
       loadStories();
     }
 
-    window.viewStoryDetail = function (id) {
+    window.viewStoryDetail = function (id, skipHistory = false) {
       const data = window.storiesData[id];
       if (!data) return;
 
       document.getElementById('story-board-section').style.display = 'none';
       document.getElementById('story-detail-section').style.display = 'block';
       window.scrollTo(0, 0);
+
+      // 현재 보고 있는 스토리 ID 저장 (뒤로가기용)
+      window.currentStoryId = id;
 
       document.getElementById('story-detail-title').textContent = data.title;
       document.getElementById('story-detail-author').textContent = data.authorName;
@@ -4660,6 +4674,11 @@
         attArea.style.display = 'block';
       } else {
         attArea.style.display = 'none';
+      }
+
+      // 히스토리 추가 (뒤로가기 지원)
+      if (!skipHistory) {
+        history.pushState({ section: 'story-detail', storyId: id, category: window.currentStoryCategory }, '', '#story-detail-' + id);
       }
 
       // 4. 권한 체크 및 삭제 버튼 제어
@@ -4692,10 +4711,12 @@
     window.backToStoryList = function () {
       document.getElementById('story-detail-section').style.display = 'none';
       document.getElementById('story-board-section').style.display = 'block';
+      // 히스토리 추가 (뒤로가기 지원)
+      history.pushState({ section: 'story', category: window.currentStoryCategory || 'free' }, '', '#story-' + (window.currentStoryCategory || 'free'));
     }
 
     // 회원 관리 관련 함수들
-    window.showUserManagement = async function () {
+    window.showUserManagement = async function (skipHistory = false) {
       // 기존 섹션 숨기기
       document.getElementById('features').style.display = 'none';
       document.getElementById('jobs').style.display = 'none';
@@ -4706,11 +4727,26 @@
       const boardSection = document.getElementById('board-section');
       if (boardSection) boardSection.style.display = 'none';
 
+      const storySection = document.getElementById('story-board-section');
+      if (storySection) storySection.style.display = 'none';
+
+      const storyDetailSection = document.getElementById('story-detail-section');
+      if (storyDetailSection) storyDetailSection.style.display = 'none';
+
+      // 사이드바 숨기기
+      const wrapper = document.querySelector('.content-with-sidebar-wrapper');
+      if (wrapper) wrapper.classList.add('full-width-wrapper');
+
       // 회원 관리 섹션 보이기
       const userSection = document.getElementById('user-manage-section');
       if (userSection) {
         userSection.style.display = 'block';
         await loadUsers();
+      }
+
+      // 히스토리 추가 (뒤로가기 지원)
+      if (!skipHistory) {
+        history.pushState({ section: 'user-manage' }, '', '#user-manage');
       }
     }
 
@@ -4783,7 +4819,7 @@
     }
 
     // 메인 화면으로 돌아가는 함수
-    window.goHome = function () {
+    window.goHome = function (skipHistory = false) {
       restoreSidebar(); // 사이드바 복구
 
       // 모든 메인 섹션 보이기
@@ -4805,13 +4841,18 @@
       const userSection = document.getElementById('user-manage-section');
       if (userSection) userSection.style.display = 'none';
 
+      // 히스토리 추가 (뒤로가기 지원)
+      if (!skipHistory) {
+        history.pushState({ section: 'home' }, '', '#home');
+      }
+
       // 스크롤 상단으로
       window.scrollTo(0, 0);
     }
 
     // 화면 전환 함수
     // 화면 전환 함수 (채용정보 게시판) - Full Width 적용
-    window.showBoard = function () {
+    window.showBoard = function (skipHistory = false) {
       // 사이드바 숨기기 (취업 이야기와 동일하게)
       const wrapper = document.querySelector('.content-with-sidebar-wrapper');
       if (wrapper) wrapper.classList.add('full-width-wrapper');
@@ -4837,18 +4878,23 @@
       if (boardSection) {
         boardSection.style.display = 'block';
         // 기본적으로 공기업(시장형) 게시판으로 시작
-        switchBoard('market-public');
+        switchBoard('market-public', true);
       }
 
       const userSection = document.getElementById('user-manage-section');
       if (userSection) userSection.style.display = 'none';
+
+      // 히스토리 추가 (뒤로가기 지원)
+      if (!skipHistory) {
+        history.pushState({ section: 'board', category: 'market-public' }, '', '#board');
+      }
 
       // 스크롤 상단으로
       window.scrollTo(0, 0);
     }
 
     // 채용정보 게시판 전환 함수
-    window.switchBoard = function (boardType) {
+    window.switchBoard = function (boardType, skipHistory = false) {
       // 1. 현재 카테고리 업데이트
       window.currentJobCategory = boardType;
       currentPage = 1; // 페이지 리셋
@@ -4891,21 +4937,34 @@
       if (boardTable) boardTable.style.display = 'block';
       if (boardMessage) boardMessage.style.display = 'none';
 
+      // 히스토리 추가 (뒤로가기 지원)
+      if (!skipHistory) {
+        history.pushState({ section: 'board', category: boardType }, '', '#board-' + boardType);
+      }
+
       // 5. 데이터 로드
       loadJobs();
     }
 
     // 상세 보기 함수 (ID로 조회)
-    function viewDetail(id) {
+    function viewDetail(id, skipHistory = false) {
       const job = window.jobsData[id];
       if (!job) {
         alert('데이터를 찾을 수 없습니다.');
         return;
       }
+      // 현재 보고 있는 채용정보 ID 저장 (뒤로가기용)
+      window.currentJobId = id;
+
       // 섹션 전환
       document.getElementById('board-section').style.display = 'none';
       const detailSection = document.getElementById('detail-section');
       if (detailSection) detailSection.style.display = 'block';
+
+      // 히스토리 추가 (뒤로가기 지원)
+      if (!skipHistory) {
+        history.pushState({ section: 'job-detail', jobId: id, category: window.currentJobCategory }, '', '#job-detail-' + id);
+      }
 
       // 데이터 바인딩
       const displayEmploymentType = job.employmentType || job.jobType || '채용';
@@ -5715,6 +5774,114 @@
       
       // 5초마다 자동 슬라이드
       setInterval(slideCarousel, intervalTime);
+    });
+
+    // === 브라우저 뒤로가기/앞으로가기 지원 ===
+    // 초기 상태 설정
+    window.addEventListener('DOMContentLoaded', function() {
+      // 현재 URL 해시 확인
+      const hash = window.location.hash;
+      
+      if (!hash || hash === '' || hash === '#' || hash === '#home') {
+        // 홈 상태로 초기화 (replaceState로 현재 상태 교체)
+        history.replaceState({ section: 'home' }, '', '#home');
+      } else {
+        // URL 해시에 따라 해당 섹션으로 이동
+        handleHashNavigation(hash);
+      }
+    });
+
+    // 해시에 따른 네비게이션 처리
+    function handleHashNavigation(hash) {
+      if (hash.startsWith('#board-')) {
+        const category = hash.replace('#board-', '');
+        window.showBoard(true);
+        window.switchBoard(category, true);
+        history.replaceState({ section: 'board', category: category }, '', hash);
+      } else if (hash === '#board') {
+        window.showBoard(true);
+        history.replaceState({ section: 'board', category: 'market-public' }, '', hash);
+      } else if (hash.startsWith('#story-detail-')) {
+        // 스토리 상세는 데이터 로드가 필요하므로 스토리 목록으로 이동
+        window.showStoryBoard(true);
+        history.replaceState({ section: 'story', category: 'free' }, '', '#story');
+      } else if (hash.startsWith('#story-')) {
+        const category = hash.replace('#story-', '');
+        window.showStoryBoard(true);
+        window.switchStoryBoard(category, true);
+        history.replaceState({ section: 'story', category: category }, '', hash);
+      } else if (hash === '#story') {
+        window.showStoryBoard(true);
+        history.replaceState({ section: 'story', category: 'free' }, '', hash);
+      } else if (hash.startsWith('#job-detail-')) {
+        // 채용정보 상세는 데이터 로드가 필요하므로 채용정보 목록으로 이동
+        window.showBoard(true);
+        history.replaceState({ section: 'board', category: 'market-public' }, '', '#board');
+      } else if (hash === '#user-manage') {
+        window.showUserManagement(true);
+        history.replaceState({ section: 'user-manage' }, '', hash);
+      } else {
+        // 기본: 홈으로
+        history.replaceState({ section: 'home' }, '', '#home');
+      }
+    }
+
+    // 뒤로가기/앞으로가기 이벤트 처리
+    window.addEventListener('popstate', function(event) {
+      const state = event.state;
+      
+      if (!state || state.section === 'home') {
+        // 홈으로 이동
+        window.goHome(true);
+      } else if (state.section === 'board') {
+        // 채용정보 게시판으로 이동
+        window.showBoard(true);
+        if (state.category) {
+          window.switchBoard(state.category, true);
+        }
+      } else if (state.section === 'job-detail') {
+        // 채용정보 상세로 이동
+        if (state.jobId && window.jobsData && window.jobsData[state.jobId]) {
+          window.showBoard(true);
+          if (state.category) {
+            window.switchBoard(state.category, true);
+          }
+          viewDetail(state.jobId, true);
+        } else {
+          // 데이터가 없으면 목록으로
+          window.showBoard(true);
+          if (state.category) {
+            window.switchBoard(state.category, true);
+          }
+        }
+      } else if (state.section === 'story') {
+        // 취업 이야기 게시판으로 이동
+        window.showStoryBoard(true);
+        if (state.category) {
+          window.switchStoryBoard(state.category, true);
+        }
+      } else if (state.section === 'story-detail') {
+        // 스토리 상세로 이동
+        if (state.storyId && window.storiesData && window.storiesData[state.storyId]) {
+          window.showStoryBoard(true);
+          if (state.category) {
+            window.switchStoryBoard(state.category, true);
+          }
+          window.viewStoryDetail(state.storyId, true);
+        } else {
+          // 데이터가 없으면 목록으로
+          window.showStoryBoard(true);
+          if (state.category) {
+            window.switchStoryBoard(state.category, true);
+          }
+        }
+      } else if (state.section === 'user-manage') {
+        // 회원 관리로 이동
+        window.showUserManagement(true);
+      } else {
+        // 기본: 홈으로
+        window.goHome(true);
+      }
     });
   </script>
 </body>
