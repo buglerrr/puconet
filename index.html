@@ -1886,11 +1886,14 @@
       width: 45px;
     }
 
-    /* 로고 셀 */
-    .board-table td.logo-cell {
+    /* 연번 셀 */
+    .board-table td.seq-cell {
       text-align: center;
       padding: 0.5rem;
-      min-width: 120px;
+      width: 50px;
+      min-width: 50px;
+      font-weight: 500;
+      color: #666;
     }
 
     /* 기관명 셀 - 한 줄로만 표시, 넘치면 ... */
@@ -2362,7 +2365,7 @@
         <div class="logo">
           <a href="#" onclick="window.goHome(); return false;"
             style="text-decoration:none; display:flex; align-items:center;">
-            <img alt="브레인넷 로고" src="./올공 CI.png" style="height:50px;width:auto;object-fit:contain;" />
+            <img alt="브레인넷 로고" src="./CI2.png" style="height:50px;width:auto;object-fit:contain;" />
             <div class="logo-text"></div>
           </a>
         </div>
@@ -3221,11 +3224,11 @@
                       <th id="checkbox-header" style="width: 45px; text-align: center; padding: 0.5rem; display:none;">
                         <input type="checkbox" id="selectAllJobs" onclick="toggleSelectAll()" title="전체 선택">
                       </th>
-                      <th style="width: 70px; text-align: center;">로고</th>
-                      <th style="width: 200px; min-width: 180px;">기관명</th>
-                      <th style="min-width: 300px;">제목</th>
-                      <th style="width: 110px; text-align: center;">고용유형</th>
-                      <th style="width: 110px; text-align: center;">마감일</th>
+                      <th style="width: 50px; text-align: center;">연번</th>
+                      <th style="width: 180px; min-width: 160px;">기관명</th>
+                      <th style="min-width: 350px;">제목</th>
+                      <th style="width: 130px; text-align: center;">고용유형</th>
+                      <th style="width: 100px; text-align: center;">마감일</th>
                       <th id="job-mgmt-header" style="width: 180px; text-align: center; display:none;">관리</th>
                     </tr>
                   </thead>
@@ -5385,7 +5388,7 @@
       const endIndex = startIndex + itemsPerPage;
       const pageJobs = totalJobs.slice(startIndex, endIndex);
 
-      pageJobs.forEach((job) => {
+      pageJobs.forEach((job, index) => {
         const tr = document.createElement('tr');
         const createdDate = job.createdAt ? new Date(job.createdAt.seconds * 1000).toLocaleDateString('ko-KR') : '-';
         const displayEmploymentType = job.employmentType || job.jobType || '-';
@@ -5398,10 +5401,13 @@
         // 제목과 고용유형에 title 속성 추가 (마우스 오버시 전체 내용 표시)
         const titleText = escapeHtml(job.title);
         const companyText = escapeHtml(job.company);
+        
+        // 연번 계산 (전체 개수에서 현재 순서를 빼서 역순으로)
+        const seqNumber = totalJobs.length - startIndex - index;
 
         tr.innerHTML = `
               ${checkboxCell}
-              <td class="logo-cell"><img src="${job.imageUrl || './logo.png'}" class="job-image" alt="로고"></td>
+              <td class="seq-cell">${seqNumber}</td>
               <td class="company-cell" title="${companyText}">${companyText}</td>
               <td class="title-cell" title="${titleText}">
                   <a href="#" onclick="viewDetail('${job.id}'); return false;" style="text-decoration:none; color:#2c3e50; font-weight:600;">${titleText}</a>
