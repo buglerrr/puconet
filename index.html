@@ -18,15 +18,25 @@
       line-height: 1.6;
       color: #333;
       background-color: #ffffff;
+      /* Force fixed width layout context */
+      min-width: 1600px;
       width: 100%;
+      margin: 0;
+
+      /* Use flex to center the content horizontally */
       display: flex;
       flex-direction: column;
       align-items: center;
+
+      overflow-x: auto;
+      padding-left: 40px;
+      /* Added to shift layout slightly right */
     }
 
     .container {
-      width: 100%;
-      max-width: 1480px;
+      width: 1480px;
+      /* Remove max-width to prevent shrinking */
+      /* max-width: 1480px; */
       margin: 0 auto;
       padding: 0 20px;
     }
@@ -144,7 +154,7 @@
       justify-content: center;
     }
 
-    .section > .container {
+    .section>.container {
       width: 100%;
     }
 
@@ -226,6 +236,8 @@
     }
 
     /* Responsive columns */
+    /* Responsive columns - DISABLED for fixed layout */
+    /*
     @media (max-width: 1024px) {
       .job-grid {
         grid-template-columns: repeat(3, 1fr);
@@ -243,6 +255,7 @@
         grid-template-columns: 1fr;
       }
     }
+    */
 
     /* 푸터 */
     footer {
@@ -864,12 +877,12 @@
     }
 
     /* === 전체 레이아웃 중앙 정렬 강화 === */
-    body > * {
+    body>* {
       width: 100%;
       max-width: 100%;
     }
 
-    header, 
+    header,
     .global-nav,
     .content-with-sidebar-wrapper,
     .section,
@@ -1659,6 +1672,7 @@
       font-size: 1.5rem;
       margin-bottom: 1rem;
     }
+
     .content-with-sidebar-wrapper {
       display: flex;
       max-width: 1480px;
@@ -1929,7 +1943,7 @@
       text-align: center;
       max-width: 100px;
     }
-    
+
     .board-table td.deadline-cell {
       white-space: nowrap;
       text-align: center;
@@ -2373,11 +2387,18 @@
           <button aria-label="메뉴 열기" class="menu-toggle" type="button">메뉴</button>
           <div class="nav-links">
             <a href="#" onclick="checkLoginAndExecute(showBoard, '채용정보를 보려면 로그인이 필요합니다.'); return false;">채용정보</a>
-            <a href="#" onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '공공게시판을 보려면 로그인이 필요합니다.'); return false;">공공게시판</a>
-            <a href="#" onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '공공기관 뉴스를 보려면 로그인이 필요합니다.'); return false;">공공기관 뉴스</a>
-            <a href="#" onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '공모전 소식을 보려면 로그인이 필요합니다.'); return false;">공모전 소식</a>
-            <a href="#" onclick="checkLoginAndExecute(showStoryBoard, '취업 이야기를 보려면 로그인이 필요합니다.'); return false;" style="color: #666; font-weight:bold;">취업 이야기</a>
-            <a href="#" onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '마이메뉴를 보려면 로그인이 필요합니다.'); return false;">마이메뉴</a>
+            <a href="#"
+              onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '공공게시판을 보려면 로그인이 필요합니다.'); return false;">공공게시판</a>
+            <a href="#"
+              onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '공공기관 뉴스를 보려면 로그인이 필요합니다.'); return false;">공공기관
+              뉴스</a>
+            <a href="#"
+              onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '공모전 소식을 보려면 로그인이 필요합니다.'); return false;">공모전
+              소식</a>
+            <a href="#" onclick="checkLoginAndExecute(showStoryBoard, '취업 이야기를 보려면 로그인이 필요합니다.'); return false;"
+              style="color: #666; font-weight:bold;">취업 이야기</a>
+            <a href="#"
+              onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '마이메뉴를 보려면 로그인이 필요합니다.'); return false;">마이메뉴</a>
           </div>
         </nav>
       </div>
@@ -3083,7 +3104,7 @@
                 <span id="detail-company" style="font-weight:bold; margin-right:10px;"></span>
                 <span id="detail-date"></span>
               </div>
-              
+
               <!-- 추가 정보 테이블 -->
               <div style="background:#f8f9fa; padding:1rem; border-radius:8px; margin-top:1rem;">
                 <table style="width:100%; border-collapse:collapse;">
@@ -3133,7 +3154,7 @@
               <button onclick="goBackToJobList()" class="cta-button"
                 style="background:#3498db; margin-right:10px; border:none; color:white; padding: 10px 20px; border-radius: 5px; cursor: pointer;">목록으로
                 돌아가기</button>
-              <a id="detail-link" href="#" target="_blank" rel="noopener noreferrer" class="cta-button" 
+              <a id="detail-link" href="#" target="_blank" rel="noopener noreferrer" class="cta-button"
                 style="display:none; background:#e74c3c; color:white; padding:12px 24px; border-radius:5px; text-decoration:none; font-weight:bold; font-size:1.05rem;">
                 채용 사이트 방문 →
               </a>
@@ -3158,26 +3179,32 @@
               <h3>주목할 공고</h3>
               <ul>
                 <li><a href="#" onclick="switchBoard('premium'); return false;" id="board-menu-premium">프리미엄</a></li>
-                <li><a href="#" onclick="switchBoard('recommended'); return false;" id="board-menu-recommended">추천</a></li>
+                <li><a href="#" onclick="switchBoard('recommended'); return false;" id="board-menu-recommended">추천</a>
+                </li>
                 <li><a href="#" onclick="switchBoard('featured'); return false;" id="board-menu-featured">주요</a></li>
-                <li><a href="#" onclick="switchBoard('deadline-soon'); return false;" id="board-menu-deadline-soon">마감임박</a></li>
+                <li><a href="#" onclick="switchBoard('deadline-soon'); return false;"
+                    id="board-menu-deadline-soon">마감임박</a></li>
               </ul>
-              
+
               <!-- 채용형태별 그룹 -->
               <h3>채용형태별</h3>
               <ul>
                 <li><a href="#" onclick="switchBoard('intern'); return false;" id="board-menu-intern">인턴</a></li>
-                <li><a href="#" onclick="switchBoard('entry-level'); return false;" id="board-menu-entry-level">신입</a></li>
-                <li><a href="#" onclick="switchBoard('experienced'); return false;" id="board-menu-experienced">경력</a></li>
+                <li><a href="#" onclick="switchBoard('entry-level'); return false;" id="board-menu-entry-level">신입</a>
+                </li>
+                <li><a href="#" onclick="switchBoard('experienced'); return false;" id="board-menu-experienced">경력</a>
+                </li>
                 <li><a href="#" onclick="switchBoard('regular'); return false;" id="board-menu-regular">정규직</a></li>
                 <li><a href="#" onclick="switchBoard('contract'); return false;" id="board-menu-contract">비정규직</a></li>
               </ul>
-              
+
               <!-- 기관유형별 그룹 -->
               <h3>기관유형별</h3>
               <ul>
-                <li><a href="#" onclick="switchBoard('market-public'); return false;" id="board-menu-market-public" class="active">공기업(시장형)</a></li>
-                <li><a href="#" onclick="switchBoard('quasi-market-public'); return false;" id="board-menu-quasi-market-public">공기업(준시장형)</a>
+                <li><a href="#" onclick="switchBoard('market-public'); return false;" id="board-menu-market-public"
+                    class="active">공기업(시장형)</a></li>
+                <li><a href="#" onclick="switchBoard('quasi-market-public'); return false;"
+                    id="board-menu-quasi-market-public">공기업(준시장형)</a>
                 </li>
                 <li><a href="#" onclick="switchBoard('fund-quasi'); return false;"
                     id="board-menu-fund-quasi">준정부기관(기금관리형)</a></li>
@@ -3296,7 +3323,7 @@
               <label>마감일</label>
               <input type="date" id="add_deadline">
             </div>
-            
+
             <!-- 추가 필드들 -->
             <div class="form-group">
               <label>NCS코드명</label>
@@ -3316,9 +3343,10 @@
             </div>
             <div class="form-group">
               <label>우대조건</label>
-              <textarea id="add_preference" rows="3" placeholder="예: 보훈대상자, 장애인, 이공계 전공자 우대" style="resize:vertical;"></textarea>
+              <textarea id="add_preference" rows="3" placeholder="예: 보훈대상자, 장애인, 이공계 전공자 우대"
+                style="resize:vertical;"></textarea>
             </div>
-            
+
             <div class="form-group">
               <label>로고 이미지 URL</label>
               <input type="text" id="add_image_url" placeholder="예: ./logo.png 또는 https://...">
@@ -3372,7 +3400,7 @@
               <label>마감일</label>
               <input type="date" id="edit_deadline">
             </div>
-            
+
             <!-- 추가 필드들 -->
             <div class="form-group">
               <label>NCS코드명</label>
@@ -3392,9 +3420,10 @@
             </div>
             <div class="form-group">
               <label>우대조건</label>
-              <textarea id="edit_preference" rows="3" placeholder="예: 보훈대상자, 장애인, 이공계 전공자 우대" style="resize:vertical;"></textarea>
+              <textarea id="edit_preference" rows="3" placeholder="예: 보훈대상자, 장애인, 이공계 전공자 우대"
+                style="resize:vertical;"></textarea>
             </div>
-            
+
             <div class="form-group">
               <label>로고 이미지 URL</label>
               <input type="text" id="edit_image_url">
@@ -3494,7 +3523,7 @@
                     <!-- Stories load here -->
                   </tbody>
                 </table>
-                
+
                 <!-- 취업 이야기 페이지네이션 -->
                 <div id="storyPagination" class="pagination-container" style="display: none;">
                   <div class="pagination story-pagination">
@@ -4603,13 +4632,13 @@
 
         // 전체 스토리 저장
         totalStories = filteredDocs;
-        
+
         // 페이지 유효성 검사 (현재 페이지가 총 페이지보다 크면 1페이지로)
         const totalPages = Math.ceil(totalStories.length / storyItemsPerPage);
         if (storyCurrentPage > totalPages) {
           storyCurrentPage = 1;
         }
-        
+
         // 현재 페이지 표시
         displayStoriesForPage(storyCurrentPage);
         renderStoryPagination();
@@ -4658,7 +4687,7 @@
     function renderStoryPagination() {
       const paginationContainer = document.querySelector('.story-pagination');
       const paginationWrapper = document.getElementById('storyPagination');
-      
+
       if (!paginationContainer || !paginationWrapper) {
         return;
       }
@@ -4744,18 +4773,18 @@
     function goToStoryPage(page) {
       const totalPages = Math.ceil(totalStories.length / storyItemsPerPage);
       if (page < 1 || page > totalPages) return;
-      
+
       storyCurrentPage = page;
       displayStoriesForPage(page);
       renderStoryPagination();
-      
+
       // 히스토리 state 업데이트 (현재 페이지 정보 저장)
-      history.replaceState({ 
-        section: 'story', 
+      history.replaceState({
+        section: 'story',
         category: window.currentStoryCategory,
-        page: storyCurrentPage 
+        page: storyCurrentPage
       }, '', '#story-' + window.currentStoryCategory);
-      
+
       // 스크롤 상단으로
       document.getElementById('storyBoardTable').scrollIntoView({ behavior: 'smooth' });
     }
@@ -4779,7 +4808,7 @@
     window.switchStoryBoard = function (boardType, skipHistory = false, targetPage = 1) {
       // 1. 현재 카테고리 업데이트
       window.currentStoryCategory = boardType;
-      
+
       // 2. 페이지 번호 설정
       storyCurrentPage = targetPage;
 
@@ -4846,9 +4875,9 @@
 
       // 히스토리 추가 (뒤로가기 지원) - 페이지 번호 포함
       if (!skipHistory) {
-        history.pushState({ 
-          section: 'story-detail', 
-          storyId: id, 
+        history.pushState({
+          section: 'story-detail',
+          storyId: id,
           category: window.currentStoryCategory,
           page: storyCurrentPage  // 현재 페이지 번호 저장
         }, '', '#story-detail-' + id);
@@ -4884,22 +4913,22 @@
     window.backToStoryList = function () {
       const savedPage = window.lastStoryPage || 1;
       const savedCategory = window.currentStoryCategory || 'free';
-      
+
       document.getElementById('story-detail-section').style.display = 'none';
       document.getElementById('story-board-section').style.display = 'block';
-      
+
       // 저장된 페이지로 이동
       storyCurrentPage = savedPage;
       displayStoriesForPage(savedPage);
       renderStoryPagination();
-      
+
       // 히스토리 추가 (뒤로가기 지원) - 페이지 번호 포함
-      history.pushState({ 
-        section: 'story', 
+      history.pushState({
+        section: 'story',
         category: savedCategory,
-        page: savedPage 
+        page: savedPage
       }, '', '#story-' + savedCategory);
-      
+
       // 스크롤 상단으로
       window.scrollTo(0, 0);
     }
@@ -4988,7 +5017,7 @@
 
   <script>
     // 로그인 체크 함수 (임시 비활성화 - 테스트용)
-    window.checkLoginAndExecute = function(callback, message) {
+    window.checkLoginAndExecute = function (callback, message) {
       // ===== 로그인 체크 임시 비활성화 =====
       /*
       const user = window.auth?.currentUser;
@@ -4999,7 +5028,7 @@
       }
       */
       // ===== 로그인 체크 비활성화 끝 =====
-      
+
       // 로그인 체크 없이 바로 callback 실행
       if (typeof callback === 'function') {
         callback();
@@ -5108,7 +5137,7 @@
         'local-public': '지방공기업',
         'local-investment': '지방출자·출연기관'
       };
-      
+
       const titleElement = document.getElementById('currentBoardTitle');
       if (titleElement) {
         titleElement.textContent = boardTitles[boardType] || '채용정보';
@@ -5155,9 +5184,9 @@
 
       // 히스토리 추가 (뒤로가기 지원) - 페이지 번호 포함
       if (!skipHistory) {
-        history.pushState({ 
-          section: 'job-detail', 
-          jobId: id, 
+        history.pushState({
+          section: 'job-detail',
+          jobId: id,
           category: window.currentJobCategory,
           page: currentPage  // 현재 페이지 번호 저장
         }, '', '#job-detail-' + id);
@@ -5165,7 +5194,7 @@
 
       // 데이터 바인딩
       const displayEmploymentType = job.employmentType || job.jobType || '채용';
-      
+
       document.getElementById('detail-title').textContent = job.title;
       document.getElementById('detail-company').textContent = job.company;
       document.getElementById('detail-date').textContent = '등록일: ' + job.createdDate + (job.location ? ' | 근무지: ' + formatLocation(job.location) : '');
@@ -5179,7 +5208,7 @@
       document.getElementById('detail-education').textContent = job.education || '-';
       document.getElementById('detail-closing-date').textContent = job.closingDate || job.deadline || '-';
       document.getElementById('detail-preference').textContent = job.preference || '-';
-      
+
       // 마감까지 남은 일 계산
       const daysLeftEl = document.getElementById('detail-days-left');
       if (job.deadline) {
@@ -5187,7 +5216,7 @@
         const deadlineDate = new Date(job.deadline);
         const diffTime = deadlineDate - today;
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
+
         if (diffDays < 0) {
           daysLeftEl.textContent = '마감됨';
           daysLeftEl.style.color = '#6c757d';
@@ -5242,7 +5271,7 @@
         linkBtn.href = job.detailUrl;
         linkBtn.target = '_blank';
         linkBtn.rel = 'noopener noreferrer';
-        linkBtn.onclick = function(e) {
+        linkBtn.onclick = function (e) {
           e.preventDefault();
           window.open(job.detailUrl, '_blank', 'noopener,noreferrer');
         };
@@ -5258,28 +5287,28 @@
     }
 
     // 채용정보 목록으로 돌아가기 (저장된 페이지로)
-    window.goBackToJobList = function() {
+    window.goBackToJobList = function () {
       const savedPage = window.lastJobPage || 1;
       const savedCategory = window.currentJobCategory || 'market-public';
-      
+
       // 상세 섹션 숨기기
       document.getElementById('detail-section').style.display = 'none';
-      
+
       // 게시판 섹션 보이기
       document.getElementById('board-section').style.display = 'block';
-      
+
       // 저장된 페이지로 이동
       currentPage = savedPage;
       displayJobsForPage(savedPage, window.currentUserRole === 'admin');
       renderPagination();
-      
+
       // 히스토리 추가 - 페이지 번호 포함
-      history.pushState({ 
-        section: 'board', 
+      history.pushState({
+        section: 'board',
         category: savedCategory,
-        page: savedPage 
+        page: savedPage
       }, '', '#board-' + savedCategory);
-      
+
       // 스크롤 상단으로
       window.scrollTo(0, 0);
     }
@@ -5315,7 +5344,7 @@
         if (querySnapshot.empty) {
           loading.style.display = 'none';
           if (emptyState) emptyState.style.display = 'block';
-          
+
           // 전체 데이터가 없어도 관리자에게는 등록 버튼 표시
           const isAdmin = (window.currentUserRole === 'admin');
           if (bottomAddButton) {
@@ -5329,7 +5358,7 @@
         const mgmtHeader = document.getElementById('job-mgmt-header');
         const checkboxHeader = document.getElementById('checkbox-header');
         const bulkDeleteButtons = document.getElementById('bulkDeleteButtons');
-        
+
         if (mgmtHeader) mgmtHeader.style.display = isAdmin ? 'table-cell' : 'none';
         if (checkboxHeader) checkboxHeader.style.display = isAdmin ? 'table-cell' : 'none';
         if (bulkDeleteButtons) bulkDeleteButtons.style.display = isAdmin ? 'flex' : 'none';
@@ -5349,7 +5378,7 @@
           if (emptyState) emptyState.style.display = 'block';
           if (paginationContainer) paginationContainer.style.display = 'none';
           if (bulkDeleteButtons) bulkDeleteButtons.style.display = 'none';
-          
+
           // 데이터가 없어도 관리자에게는 등록 버튼 표시
           if (bottomAddButton) {
             bottomAddButton.style.display = isAdmin ? 'block' : 'none';
@@ -5365,10 +5394,10 @@
 
         loading.style.display = 'none';
         if (jobTable) jobTable.style.display = 'table';
-        
+
         // 페이지네이션은 데이터 개수와 관계없이 항상 렌더링 시도
         renderPagination();
-        
+
         // 관리자에게만 하단 버튼 표시
         if (bottomAddButton) {
           bottomAddButton.style.display = isAdmin ? 'block' : 'none';
@@ -5401,7 +5430,7 @@
         // 제목과 고용유형에 title 속성 추가 (마우스 오버시 전체 내용 표시)
         const titleText = escapeHtml(job.title);
         const companyText = escapeHtml(job.company);
-        
+
         // 연번 계산 (전체 개수에서 현재 순서를 빼서 역순으로)
         const seqNumber = totalJobs.length - startIndex - index;
 
@@ -5421,7 +5450,7 @@
           `;
         tbody.appendChild(tr);
       });
-      
+
       // 체크박스 상태 초기화
       updateSelectedCount();
     }
@@ -5429,7 +5458,7 @@
     function renderPagination() {
       const paginationContainer = document.querySelector('.pagination');
       const paginationWrapper = document.getElementById('pagination');
-      
+
       if (!paginationContainer || !paginationWrapper) {
         console.error('Pagination container not found');
         return;
@@ -5438,7 +5467,7 @@
       paginationContainer.innerHTML = '';
 
       const totalPages = Math.ceil(totalJobs.length / itemsPerPage);
-      
+
       console.log('Rendering pagination - Total pages:', totalPages, 'Current page:', currentPage);
 
       // 1페이지만 있으면 페이지네이션 숨김
@@ -5521,14 +5550,14 @@
       const isAdmin = (window.currentUserRole === 'admin');
       displayJobsForPage(currentPage, isAdmin);
       renderPagination();
-      
+
       // 히스토리 state 업데이트 (현재 페이지 정보 저장)
-      history.replaceState({ 
-        section: 'board', 
+      history.replaceState({
+        section: 'board',
         category: window.currentJobCategory,
-        page: currentPage 
+        page: currentPage
       }, '', '#board-' + window.currentJobCategory);
-      
+
       // 테이블 상단으로 스크롤
       const boardTable = document.getElementById('boardJobTable');
       if (boardTable) {
@@ -5568,7 +5597,7 @@
       document.getElementById('edit_image_url').value = job.imageUrl || '';
       document.getElementById('edit_detail_url').value = job.detailUrl || '';
       document.getElementById('edit_content').value = job.content || '';
-      
+
       // 추가 필드들
       document.getElementById('edit_ncs_code').value = job.ncsCode || '';
       document.getElementById('edit_career_type').value = job.careerType || '';
@@ -5644,9 +5673,9 @@
         }
 
         const employmentTypeValue = document.getElementById('add_employment_type').value;
-        
+
         const deadlineValue = document.getElementById('add_deadline').value;
-        
+
         const data = {
           title: document.getElementById('add_title').value,
           company: document.getElementById('add_company').value,
@@ -5772,11 +5801,11 @@
     function toggleSelectAll() {
       const selectAllCheckbox = document.getElementById('selectAllJobs');
       const checkboxes = document.querySelectorAll('.job-checkbox');
-      
+
       checkboxes.forEach(checkbox => {
         checkbox.checked = selectAllCheckbox.checked;
       });
-      
+
       updateSelectedCount();
     }
 
@@ -5785,15 +5814,15 @@
       const checkboxes = document.querySelectorAll('.job-checkbox:checked');
       const count = checkboxes.length;
       const countElement = document.getElementById('selectedCount');
-      
+
       if (countElement) {
         countElement.textContent = count;
       }
-      
+
       // 전체 선택 체크박스 상태 업데이트
       const selectAllCheckbox = document.getElementById('selectAllJobs');
       const allCheckboxes = document.querySelectorAll('.job-checkbox');
-      
+
       if (selectAllCheckbox && allCheckboxes.length > 0) {
         selectAllCheckbox.checked = (count === allCheckboxes.length);
         selectAllCheckbox.indeterminate = (count > 0 && count < allCheckboxes.length);
@@ -5803,7 +5832,7 @@
     // 선택된 항목 삭제
     async function deleteSelectedJobs() {
       const checkboxes = document.querySelectorAll('.job-checkbox:checked');
-      
+
       if (checkboxes.length === 0) {
         alert('⚠️ 삭제할 항목을 선택해주세요.');
         return;
@@ -5829,22 +5858,22 @@
 
         // 선택된 ID 수집
         const idsToDelete = Array.from(checkboxes).map(cb => cb.dataset.jobId);
-        
+
         console.log('Deleting jobs:', idsToDelete);
 
         // Firebase에서 각 문서 삭제
-        const deletePromises = idsToDelete.map(id => 
+        const deletePromises = idsToDelete.map(id =>
           window.deleteDoc(window.doc(window.db, 'jobs', id))
         );
 
         await Promise.all(deletePromises);
-        
+
         alert(`✅ ${idsToDelete.length}개의 항목이 삭제되었습니다!`);
-        
+
         // 전체 선택 해제
         const selectAllCheckbox = document.getElementById('selectAllJobs');
         if (selectAllCheckbox) selectAllCheckbox.checked = false;
-        
+
         loadJobs();
       } catch (error) {
         console.error('일괄 삭제 실패:', error);
@@ -5907,12 +5936,12 @@
         console.log('Total jobs to delete:', totalJobs.length);
 
         // 모든 항목 삭제
-        const deletePromises = totalJobs.map(job => 
+        const deletePromises = totalJobs.map(job =>
           window.deleteDoc(window.doc(window.db, 'jobs', job.id))
         );
 
         await Promise.all(deletePromises);
-        
+
         alert(`✅ ${totalJobs.length}개의 항목이 모두 삭제되었습니다!`);
         loadJobs();
       } catch (error) {
@@ -5931,7 +5960,7 @@
     window.addEventListener('DOMContentLoaded', loadJobs);
 
     // 페이지 로드 시 학술연구정보 및 교육과정 배너에 로그인 체크 추가 (임시 비활성화 - 테스트용)
-    window.addEventListener('DOMContentLoaded', function() {
+    window.addEventListener('DOMContentLoaded', function () {
       // ===== 로그인 체크 임시 비활성화 =====
       /*
       // 학술연구정보 배너들에 로그인 체크 추가
@@ -5968,58 +5997,58 @@
     });
 
     // === 프리미엄 채용정보 자동 캐러셀 === 
-    window.addEventListener('DOMContentLoaded', function() {
+    window.addEventListener('DOMContentLoaded', function () {
       const carouselContainer = document.querySelector('.premium-carousel-container');
       const cards = carouselContainer ? Array.from(carouselContainer.querySelectorAll('.job-card')) : [];
-      
+
       if (!carouselContainer || cards.length === 0) return;
-      
+
       const intervalTime = 5000; // 5초
       let isTransitioning = false;
-      
+
       function slideCarousel() {
         if (isTransitioning) return;
         isTransitioning = true;
-        
+
         // 각 카드의 실제 너비 + gap 계산
         const cardWidth = cards[0].offsetWidth;
         const computedStyle = window.getComputedStyle(carouselContainer);
         const gap = parseFloat(computedStyle.gap) || 16; // gap 값 가져오기 (기본 16px)
         const moveDistance = cardWidth + gap;
-        
+
         // 왼쪽으로 이동하는 애니메이션 적용
         carouselContainer.style.transition = 'transform 0.6s ease-in-out';
         carouselContainer.style.transform = `translateX(-${moveDistance}px)`;
-        
+
         // 애니메이션이 끝난 후
         setTimeout(() => {
           // transition 효과 제거
           carouselContainer.style.transition = 'none';
-          
+
           // 첫 번째 카드를 맨 뒤로 이동
           const firstCard = carouselContainer.firstElementChild;
           carouselContainer.appendChild(firstCard);
-          
+
           // transform 초기화
           carouselContainer.style.transform = 'translateX(0)';
-          
+
           // 다음 애니메이션을 위해 transition 복원
           setTimeout(() => {
             isTransitioning = false;
           }, 50);
         }, 600); // transition 시간과 동일하게 설정
       }
-      
+
       // 5초마다 자동 슬라이드
       setInterval(slideCarousel, intervalTime);
     });
 
     // === 브라우저 뒤로가기/앞으로가기 지원 ===
     // 초기 상태 설정
-    window.addEventListener('DOMContentLoaded', function() {
+    window.addEventListener('DOMContentLoaded', function () {
       // 현재 URL 해시 확인
       const hash = window.location.hash;
-      
+
       if (!hash || hash === '' || hash === '#' || hash === '#home') {
         // 홈 상태로 초기화 (replaceState로 현재 상태 교체)
         history.replaceState({ section: 'home' }, '', '#home');
@@ -6065,9 +6094,9 @@
     }
 
     // 뒤로가기/앞으로가기 이벤트 처리
-    window.addEventListener('popstate', function(event) {
+    window.addEventListener('popstate', function (event) {
       const state = event.state;
-      
+
       if (!state || state.section === 'home') {
         // 홈으로 이동
         window.goHome(true);
@@ -6080,7 +6109,7 @@
         // 채용정보 상세로 이동
         const targetCategory = state.category || 'market-public';
         const targetPage = state.page || 1;
-        
+
         if (state.jobId && window.jobsData && window.jobsData[state.jobId]) {
           window.showBoard(true, targetCategory, targetPage);
           viewDetail(state.jobId, true);
@@ -6097,7 +6126,7 @@
         // 스토리 상세로 이동
         const targetCategory = state.category || 'free';
         const targetPage = state.page || 1;
-        
+
         if (state.storyId && window.storiesData && window.storiesData[state.storyId]) {
           window.showStoryBoard(true, targetCategory, targetPage);
           window.viewStoryDetail(state.storyId, true);
