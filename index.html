@@ -2323,6 +2323,190 @@
       margin-top: 0.5rem;
     }
 
+    /* === 게시글 상세 페이지 === */
+    .story-detail-card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      margin-bottom: 1.25rem;
+    }
+    .story-detail-head {
+      padding: 1.5rem 1.75rem 1.1rem;
+      border-bottom: 1px solid #f0f2f5;
+    }
+    .story-detail-head h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #1a202c;
+      margin: 0.5rem 0 0.75rem 0;
+      line-height: 1.45;
+    }
+    .story-detail-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.83rem;
+      color: #a0aec0;
+    }
+    .story-detail-meta-row .meta-name {
+      color: #4a5568;
+      font-weight: 600;
+    }
+    .story-detail-meta-row .meta-sep { color: #e2e8f0; }
+    .story-detail-body {
+      padding: 1.75rem;
+      font-size: 0.97rem;
+      line-height: 1.85;
+      color: #2d3748;
+      white-space: pre-wrap;
+      min-height: 120px;
+      border-bottom: 1px solid #f0f2f5;
+    }
+    /* 추천/스크랩/목록 버튼 행 */
+    .story-detail-actions-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      padding: 1rem 1.75rem;
+      flex-wrap: wrap;
+    }
+    .detail-action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0.45rem 1.1rem;
+      border-radius: 50px;
+      border: 1px solid #e2e8f0;
+      background: white;
+      font-size: 0.84rem;
+      color: #4a5568;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .detail-action-btn:hover { background: #f0f4ff; border-color: #3b82f6; color: #3b82f6; }
+    .detail-action-btn.active { background: #fff5f5; border-color: #e53e3e; color: #e53e3e; }
+    .detail-list-btn {
+      padding: 0.45rem 1.1rem;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+      background: white;
+      font-size: 0.84rem;
+      color: #4a5568;
+      cursor: pointer;
+      margin-left: auto;
+    }
+    .detail-list-btn:hover { background: #f8f9fa; }
+    .detail-delete-btn {
+      padding: 0.45rem 1.1rem;
+      border-radius: 6px;
+      border: none;
+      background: #e53e3e;
+      color: white;
+      font-size: 0.84rem;
+      cursor: pointer;
+    }
+    /* 댓글 카드 */
+    .story-comments-card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+    .story-comments-header {
+      padding: 0.9rem 1.75rem;
+      border-bottom: 1px solid #f0f2f5;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #1a202c;
+    }
+    .story-comments-header span { color: #3b82f6; margin-left: 4px; }
+    .comment-item {
+      padding: 0.9rem 1.75rem;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    .comment-item:last-child { border-bottom: none; }
+    .comment-item-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 0.4rem;
+    }
+    .comment-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .comment-author { font-size: 0.85rem; font-weight: 600; color: #2d3748; }
+    .comment-date { font-size: 0.78rem; color: #a0aec0; margin-left: auto; }
+    .comment-body {
+      font-size: 0.88rem;
+      color: #4a5568;
+      line-height: 1.65;
+      padding-left: 36px;
+      white-space: pre-wrap;
+    }
+    .comment-input-wrap {
+      padding: 1rem 1.75rem 1.25rem;
+      background: #f8f9fb;
+      border-top: 1px solid #e2e8f0;
+    }
+    .comment-input-wrap textarea {
+      width: 100%;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.9rem;
+      font-family: inherit;
+      resize: none;
+      line-height: 1.6;
+      background: white;
+      box-sizing: border-box;
+      outline: none;
+    }
+    .comment-input-wrap textarea:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
+    }
+    .comment-input-footer {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-top: 0.6rem;
+      gap: 0.75rem;
+    }
+    .comment-char-count { font-size: 0.78rem; color: #a0aec0; }
+    .comment-submit-btn {
+      padding: 0.5rem 1.25rem;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .comment-submit-btn:hover { background: #2563eb; }
+    .comment-empty {
+      text-align: center;
+      padding: 2rem;
+      color: #a0aec0;
+      font-size: 0.88rem;
+    }
+
     .story-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -3968,47 +4152,93 @@
 
       <!-- 이야기 상세 보기 섹션 -->
       <div id="story-detail-section" style="display:none; width:100%;">
-        <div class="container" style="max-width:1000px; margin:0 auto;">
-          <button onclick="backToStoryList()"
-            style="display:none; margin-bottom:1rem; background:none; border:none; font-size:1.1rem; cursor:pointer; color:#555;">&larr;
-            목록으로 돌아가기</button>
-          <div style="background:white; padding:3rem; border-radius:10px; box-shadow:0 2px 20px rgba(0,0,0,0.05);">
-            <div style="border-bottom:1px solid #eee; padding-bottom:1rem; margin-bottom:2rem;">
-              <h1 id="story-detail-title" style="margin:0 0 1rem 0; font-size:2rem; color:#222;"></h1>
-              <div style="display:flex; justify-content:space-between; color:#666;">
-                <div>
-                  <span id="story-detail-author" style="font-weight:bold; margin-right:10px;"></span>
-                  <span id="story-detail-date"></span>
-                </div>
-                <div id="story-detail-likes"></div>
+        <div class="container" style="max-width:1400px; margin:0 auto; padding-top:1.5rem; padding-bottom:3rem;">
+          <div class="board-layout">
+
+            <!-- 왼쪽 사이드바 -->
+            <aside class="board-sidebar story-sidebar">
+              <div class="story-sidebar-head">
+                <h2>💼 취업 이야기</h2>
+                <p>공기업 취업 커뮤니티</p>
               </div>
-            </div>
+              <ul>
+                <li><a href="#" onclick="switchStoryBoard('free'); return false;" id="detail-menu-free"><span>🗒️</span> 자유게시판</a></li>
+                <li><a href="#" onclick="switchStoryBoard('consulting'); return false;" id="detail-menu-consulting"><span>💬</span> 취업상담실</a></li>
+                <li><a href="#" onclick="switchStoryBoard('study'); return false;" id="detail-menu-study"><span>📚</span> 스터디 모집</a></li>
+                <li><a href="#" onclick="switchStoryBoard('ncs-review'); return false;" id="detail-menu-ncs-review"><span>📝</span> NCS 후기</a></li>
+                <li><a href="#" onclick="switchStoryBoard('interview'); return false;" id="detail-menu-interview"><span>🎤</span> 면접 후기</a></li>
+                <li><a href="#" onclick="switchStoryBoard('success'); return false;" id="detail-menu-success"><span>🏆</span> 최종합격 수기</a></li>
+                <li><a href="#" onclick="switchStoryBoard('expert'); return false;" id="detail-menu-expert"><span>👨‍💼</span> 현직자/전문가</a></li>
+              </ul>
+            </aside>
 
-            <div id="story-detail-content"
-              style="font-size:1.1rem; line-height:1.8; color:#333; white-space: pre-wrap; margin-bottom:2rem;"></div>
+            <!-- 오른쪽 본문 -->
+            <div class="board-content">
 
-            <div id="story-detail-image-area" style="text-align:center; margin-bottom:2rem; display:none;">
-              <img id="story-detail-image" src="" style="max-width:100%; border-radius:8px;">
-            </div>
+              <!-- 게시글 카드 -->
+              <div class="story-detail-card">
+                <!-- 헤더: 카테고리 뱃지 + 제목 + 메타정보 -->
+                <div class="story-detail-head">
+                  <span id="story-detail-cat-badge" class="story-cat-tag"></span>
+                  <h1 id="story-detail-title"></h1>
+                  <div class="story-detail-meta-row">
+                    <span class="meta-name" id="story-detail-author"></span>
+                    <span class="meta-sep">|</span>
+                    <span id="story-detail-date"></span>
+                    <span class="meta-sep">|</span>
+                    <span>조회 <span id="story-detail-views">0</span></span>
+                  </div>
+                </div>
 
-            <div id="story-detail-attachment-area"
-              style="background:#f9f9f9; padding:1rem; border-radius:8px; display:none;">
-              <strong>💾 첨부파일:</strong> <a id="story-detail-attachment-link" href="#" target="_blank"
-                style="color:#3498db; text-decoration:underline; margin-left:5px;"></a>
-            </div>
+                <!-- 본문 -->
+                <div id="story-detail-content" class="story-detail-body"></div>
 
-            <!-- 하단 액션 버튼 영역 (목록으로 / 삭제) -->
-            <div id="story-detail-actions" style="margin-top: 2rem; text-align: right;">
-              <!-- 목록으로 돌아가기 (항상 표시) -->
-              <button onclick="backToStoryList()" class="btn-delete"
-                style="padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: bold; background: #3498db; color: white; border: none; cursor: pointer; margin-right: 10px;">목록으로
-                돌아가기</button>
+                <!-- 이미지 -->
+                <div id="story-detail-image-area" style="text-align:center; padding:0 1.75rem 1.75rem; display:none;">
+                  <img id="story-detail-image" src="" style="max-width:100%; border-radius:8px;">
+                </div>
 
-              <!-- 삭제 버튼 (권한 있을 때만 표시) -->
-              <button id="btn-delete-story" class="btn-delete"
-                style="padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: bold; background: #e74c3c; color: white; border: none; cursor: pointer; display: none;">삭제</button>
-            </div>
-          </div>
+                <!-- 첨부파일 -->
+                <div id="story-detail-attachment-area"
+                  style="margin:0 1.75rem 1.75rem; background:#f9f9f9; padding:1rem; border-radius:8px; display:none;">
+                  <strong>💾 첨부파일:</strong>
+                  <a id="story-detail-attachment-link" href="#" target="_blank"
+                    style="color:#3498db; text-decoration:underline; margin-left:5px;"></a>
+                </div>
+
+                <!-- 액션 버튼 (추천 / 스크랩 / 목록 / 삭제) -->
+                <div class="story-detail-actions-row" id="story-detail-actions">
+                  <button class="detail-action-btn" id="detail-like-btn" onclick="likeDetailStory()">
+                    ❤️ 추천 <span id="detail-like-count">0</span>
+                  </button>
+                  <button class="detail-action-btn" id="detail-scrap-btn" onclick="scrapDetailStory()">
+                    🔖 스크랩 <span id="detail-scrap-count">0</span>
+                  </button>
+                  <button class="detail-list-btn" onclick="backToStoryList()">목록</button>
+                  <button class="detail-delete-btn" id="btn-delete-story" style="display:none;">삭제</button>
+                </div>
+              </div>
+
+              <!-- 댓글 카드 -->
+              <div class="story-comments-card">
+                <div class="story-comments-header">댓글 <span id="comment-count">0</span></div>
+                <div id="story-comments-list">
+                  <div class="comment-empty">댓글이 없습니다. 첫 댓글을 남겨보세요!</div>
+                </div>
+                <!-- 댓글 입력창 -->
+                <div class="comment-input-wrap">
+                  <textarea id="comment-content" rows="3"
+                    placeholder="댓글을 작성하세요. (최대 500자)" maxlength="500"
+                    oninput="updateCommentCount(this)"></textarea>
+                  <div class="comment-input-footer">
+                    <span class="comment-char-count"><span id="comment-char-count">0</span>/500</span>
+                    <button class="comment-submit-btn" onclick="submitComment()">등록</button>
+                  </div>
+                </div>
+              </div>
+
+            </div><!-- /board-content -->
+          </div><!-- /board-layout -->
         </div>
       </div>
 
@@ -5235,6 +5465,113 @@
       document.getElementById('storyBoardTable').scrollIntoView({ behavior: 'smooth' });
     }
 
+    // === 댓글 기능 ===
+    async function loadComments(storyId) {
+      const listEl = document.getElementById('story-comments-list');
+      const countEl = document.getElementById('comment-count');
+      if (!listEl) return;
+
+      listEl.innerHTML = '<div class="comment-empty">댓글을 불러오는 중...</div>';
+      try {
+        const commentsRef = collection(db, 'stories', storyId, 'comments');
+        const q = query(commentsRef, orderBy('createdAt', 'asc'));
+        const snap = await getDocs(q);
+
+        if (snap.empty) {
+          listEl.innerHTML = '<div class="comment-empty">아직 댓글이 없습니다. 첫 댓글을 남겨보세요!</div>';
+          if (countEl) countEl.textContent = 0;
+          return;
+        }
+
+        if (countEl) countEl.textContent = snap.size;
+        listEl.innerHTML = '';
+        snap.forEach((docSnap) => {
+          const c = docSnap.data();
+          const date = c.createdAt
+            ? new Date(c.createdAt.seconds * 1000).toLocaleDateString('ko-KR', { year: '2-digit', month: '2-digit', day: '2-digit' })
+            : '-';
+          const initial = (c.authorName || '?')[0].toUpperCase();
+          const item = document.createElement('div');
+          item.className = 'comment-item';
+          item.innerHTML = `
+            <div class="comment-item-head">
+              <div class="comment-avatar">${initial}</div>
+              <span class="comment-author">${escapeHtml(c.authorName || '익명')}</span>
+              <span class="comment-date">${date}</span>
+            </div>
+            <div class="comment-body">${escapeHtml(c.content)}</div>
+          `;
+          listEl.appendChild(item);
+        });
+      } catch (err) {
+        console.error(err);
+        listEl.innerHTML = '<div class="comment-empty">댓글 로딩 실패</div>';
+      }
+    }
+
+    window.submitComment = async function () {
+      const storyId = window.currentStoryId;
+      if (!storyId) return;
+      const currentUser = window.auth.currentUser;
+      if (!currentUser) { alert('댓글을 작성하려면 로그인이 필요합니다.'); return; }
+
+      const contentEl = document.getElementById('comment-content');
+      const content = (contentEl.value || '').trim();
+      if (!content) { alert('댓글 내용을 입력해주세요.'); return; }
+
+      let authorName = currentUser.displayName || currentUser.email.split('@')[0];
+      try {
+        const userDocSnap = await getDoc(doc(db, 'users', currentUser.uid));
+        if (userDocSnap.exists() && userDocSnap.data().nickname) authorName = userDocSnap.data().nickname;
+      } catch (e) {}
+
+      try {
+        const commentsRef = collection(db, 'stories', storyId, 'comments');
+        await addDoc(commentsRef, {
+          authorName, authorUid: currentUser.uid, content,
+          createdAt: Timestamp.now(), likes: 0
+        });
+        contentEl.value = '';
+        const charCount = document.getElementById('comment-char-count');
+        if (charCount) charCount.textContent = '0';
+        await loadComments(storyId);
+      } catch (err) {
+        alert('댓글 등록 실패: ' + err.message);
+      }
+    }
+
+    window.updateCommentCount = function (el) {
+      const c = document.getElementById('comment-char-count');
+      if (c) c.textContent = el.value.length;
+    }
+
+    window.likeDetailStory = async function () {
+      const storyId = window.currentStoryId;
+      if (!storyId) return;
+      const currentUser = window.auth.currentUser;
+      if (!currentUser) { alert('로그인이 필요합니다.'); return; }
+      try {
+        const storyRef = doc(db, 'stories', storyId);
+        const snap = await getDoc(storyRef);
+        if (!snap.exists()) return;
+        const newLikes = (snap.data().likes || 0) + 1;
+        await updateDoc(storyRef, { likes: newLikes });
+        document.getElementById('detail-like-count').textContent = newLikes;
+        if (window.storiesData && window.storiesData[storyId]) window.storiesData[storyId].likes = newLikes;
+        document.getElementById('detail-like-btn').classList.add('active');
+      } catch (err) { alert('오류: ' + err.message); }
+    }
+
+    window.scrapDetailStory = function () {
+      const btn = document.getElementById('detail-scrap-btn');
+      if (btn) {
+        btn.classList.toggle('active');
+        const countEl = document.getElementById('detail-scrap-count');
+        if (countEl) countEl.textContent = btn.classList.contains('active')
+          ? (parseInt(countEl.textContent || 0) + 1) : Math.max(0, parseInt(countEl.textContent || 0) - 1);
+      }
+    }
+
     // 이야기 삭제 함수
     window.deleteStory = async function (id) {
       if (!confirm('정말 삭제하시겠습니까?')) return;
@@ -5264,13 +5601,15 @@
       const activeMenu = document.getElementById('story-menu-' + boardType);
       if (activeMenu) activeMenu.classList.add('active');
 
-      // 3-1. 카테고리 타이틀 즉시 업데이트
+      // 3-1. 카테고리 타이틀 즉시 업데이트 + 상세 사이드바 동기화
       const _catLabels = {
         free: '자유게시판', consulting: '취업상담실', study: '스터디 모집',
         'ncs-review': 'NCS 후기', interview: '면접 후기', success: '최종합격 수기', expert: '현직자/전문가'
       };
       const _titleEl = document.getElementById('storyBoardCategoryTitle');
       if (_titleEl) _titleEl.textContent = _catLabels[boardType] || boardType;
+      const _detailMenu = document.getElementById('detail-menu-' + boardType);
+      if (_detailMenu) _detailMenu.classList.add('active');
 
       // 4. 게시판 표시 (준비중 메시지 로직 제거하고 항상 로딩)
       const boardTable = document.getElementById('storyBoardTable');
@@ -5296,26 +5635,33 @@
       document.getElementById('story-detail-section').style.display = 'block';
       window.scrollTo(0, 0);
 
-      // 현재 보고 있는 스토리 ID 저장 (뒤로가기용)
       window.currentStoryId = id;
-      // 현재 페이지 번호 저장 (목록 복귀용)
       window.lastStoryPage = storyCurrentPage;
 
+      // 카테고리 뱃지 설정
+      const _catLabels = {
+        free: '자유게시판', consulting: '취업상담실', study: '스터디 모집',
+        'ncs-review': 'NCS 후기', interview: '면접 후기', success: '최종합격 수기', expert: '현직자/전문가'
+      };
+      const dataCat = data.category || 'free';
+      const badge = document.getElementById('story-detail-cat-badge');
+      if (badge) { badge.textContent = _catLabels[dataCat] || dataCat; badge.className = 'story-cat-tag cat-' + dataCat; }
+
+      // 기본 정보 채우기
       document.getElementById('story-detail-title').textContent = data.title;
       document.getElementById('story-detail-author').textContent = data.authorName;
       document.getElementById('story-detail-date').textContent = data.dateString;
-      document.getElementById('story-detail-likes').textContent = `❤️ ${data.likes || 0}`;
       document.getElementById('story-detail-content').textContent = data.content;
+      document.getElementById('detail-like-count').textContent = data.likes || 0;
+      document.getElementById('detail-scrap-count').textContent = data.scraps || 0;
 
+      // 이미지
       const imgArea = document.getElementById('story-detail-image-area');
       const img = document.getElementById('story-detail-image');
-      if (data.imageUrl) {
-        img.src = data.imageUrl;
-        imgArea.style.display = 'block';
-      } else {
-        imgArea.style.display = 'none';
-      }
+      if (data.imageUrl) { img.src = data.imageUrl; imgArea.style.display = 'block'; }
+      else { imgArea.style.display = 'none'; }
 
+      // 첨부파일
       const attArea = document.getElementById('story-detail-attachment-area');
       const attLink = document.getElementById('story-detail-attachment-link');
       if (data.attachmentUrl) {
@@ -5323,44 +5669,43 @@
         attLink.textContent = data.attachmentName || '첨부파일 다운로드';
         attLink.setAttribute('download', data.attachmentName || 'file');
         attArea.style.display = 'block';
-      } else {
-        attArea.style.display = 'none';
-      }
+      } else { attArea.style.display = 'none'; }
 
-      // 히스토리 추가 (뒤로가기 지원) - 페이지 번호 포함
+      // 상세 사이드바 활성화
+      document.querySelectorAll('#story-detail-section .board-sidebar a').forEach(a => a.classList.remove('active'));
+      const detailMenu = document.getElementById('detail-menu-' + dataCat);
+      if (detailMenu) detailMenu.classList.add('active');
+
+      // 댓글 로드
+      loadComments(id);
+
+      // 댓글 입력창 초기화
+      const commentInput = document.getElementById('comment-content');
+      if (commentInput) commentInput.value = '';
+      const charCount = document.getElementById('comment-char-count');
+      if (charCount) charCount.textContent = '0';
+
+      // 히스토리
       if (!skipHistory) {
         history.pushState({
-          section: 'story-detail',
-          storyId: id,
-          category: window.currentStoryCategory,
-          page: storyCurrentPage  // 현재 페이지 번호 저장
+          section: 'story-detail', storyId: id,
+          category: window.currentStoryCategory, page: storyCurrentPage
         }, '', '#story-detail-' + id);
       }
 
-      // 4. 권한 체크 및 삭제 버튼 제어
+      // 삭제 버튼 권한 체크
       const actionsDiv = document.getElementById('story-detail-actions');
       const deleteBtn = document.getElementById('btn-delete-story');
       const currentUser = window.auth.currentUser;
-
       let canDelete = false;
       if (currentUser) {
-        // 전역 role 확인 (admin)
         if (window.currentUserRole === 'admin') canDelete = true;
-        // 본인 글 확인
         else if (data.authorUid && currentUser.uid === data.authorUid) canDelete = true;
       }
-
-
       if (actionsDiv && deleteBtn) {
-        // 컨테이너는 항상 보임 (목록으로 버튼 때문)
-        actionsDiv.style.display = 'block';
-
-        if (canDelete) {
-          deleteBtn.style.display = 'inline-block';
-          deleteBtn.onclick = function () { deleteStory(id); };
-        } else {
-          deleteBtn.style.display = 'none';
-        }
+        actionsDiv.style.display = 'flex';
+        if (canDelete) { deleteBtn.style.display = 'inline-block'; deleteBtn.onclick = function () { deleteStory(id); }; }
+        else { deleteBtn.style.display = 'none'; }
       }
     }
 
