@@ -5595,6 +5595,13 @@
       // 2. 페이지 번호 설정
       storyCurrentPage = targetPage;
 
+      // 상세 페이지에서 호출된 경우 목록으로 화면 전환
+      const detailSection = document.getElementById('story-detail-section');
+      if (detailSection && detailSection.style.display !== 'none') {
+        detailSection.style.display = 'none';
+        document.getElementById('story-board-section').style.display = 'block';
+      }
+
       // 3. 사이드바 메뉴 활성화 상태 변경
       const menuItems = document.querySelectorAll('.board-sidebar a');
       menuItems.forEach(item => item.classList.remove('active'));
