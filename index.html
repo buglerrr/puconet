@@ -4944,7 +4944,7 @@
   <script type="module">
     // Firebase 9 버전 SDK 가져오기
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, orderBy, query, Timestamp, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, orderBy, query, Timestamp, setDoc, getDoc, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
     import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
@@ -4976,6 +4976,7 @@
     window.orderBy = orderBy;
     window.query = query;
     window.Timestamp = Timestamp;
+    window.limit = limit; // limit 함수 전역 노출 추가
     window.storage = storage;
     window.ref = ref;
     window.Timestamp = Timestamp;
@@ -5541,7 +5542,8 @@
           <span class="col-num">${displayIndex--}</span>
           <span class="col-title">
             <span class="story-cat-tag cat-${dataCat}">${catLabel}</span>
-            <a href="#" onclick="viewStoryDetail('${docId}'); event.stopPropagation(); return false;" title="${titleText}">${titleText} ${(data.commentCount && data.commentCount > 0) ? `<span class="comment-count-display">[${data.commentCount}]</span>` : ''}</a>
+            <span class="story-cat-tag cat-${dataCat}">${catLabel}</span>
+            <a href="#" onclick="viewStoryDetail('${docId}'); event.stopPropagation(); return false;" title="${titleText}">${titleText} ${(data.commentCount && data.commentCount > 0) ? `<span class="comment-count-display">(${data.commentCount})</span>` : ''}</a>
           </span>
           <span class="col-author">${authorText}</span>
           <span class="col-date">${date}</span>
@@ -5838,6 +5840,18 @@
 
       // 5. 데이터 다시 로드 (변경된 카테고리 기준)
       loadStories();
+    }
+
+    window.backToStoryList = function () {
+      const detailSection = document.getElementById('story-detail-section');
+      if (detailSection) detailSection.style.display = 'none';
+
+      const boardSection = document.getElementById('story-board-section');
+      if (boardSection) boardSection.style.display = 'block';
+
+      // 댓글 수 업데이트 등을 위해 목록 다시 로드
+      loadStories();
+      window.scrollTo(0, 0);
     }
 
     window.viewStoryDetail = function (id, skipHistory = false) {
@@ -6967,27 +6981,42 @@
         event.target.style.display = 'none';
       }
     }
-    // 페이지 로드 완료 시 loadJobs 및 checkNewPosts 실행
-    window.addEventListener('DOMContentLoaded', async () => {
-      await loadJobs();
-      checkNewPosts();
-    });
+      // 페이지 로드 완료 시 loadJobs 및 checkNewPosts 실행 (모듈 스크립트라 DOMContentLoaded 불필요 가능성 있음, 바로 실행)
+      (async function init() {
+        // DOM 요소가 확실히 로드디된 후 실행 보장 (requestAnimationFrame 등 사용 가능하나, defer script면 충분)
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', async () => {
+            await loadJobs();
+            checkNewPosts();
+          });
+        } else {
+          await loadJobs();
+          checkNewPosts();
+        }
+      })();
 
-    // 새 글(3일 이내) 체크 함수
+    // 새 글(3일 이내) 체크 함수 (인덱스 문제 회피를 위해 JS 필터링 사용)
     async function checkNewPosts() {
-      // 3일 전 타임스탬프 계산
       const threeDaysAgo = new Date();
       threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-      const timestamp = window.Timestamp.fromDate(threeDaysAgo);
+      // 타임스탬프 변환 (window.Timestamp가 없을 경우 대비)
+      const threshold = threeDaysAgo;
 
       try {
-        // 1. 채용공고(jobs) 체크
-        const jobQuery = query(collection(db, 'jobs'), where('createdAt', '>=', timestamp));
+        // 1. 채용공고(jobs) 체크 - 최근 50개 가져와서 JS로 필터링
+        // where 절 없이 orderBy만 사용하면 기본 인덱스로 동작함
+        const jobQuery = query(collection(db, 'jobs'), orderBy('createdAt', 'desc'), window.limit ? window.limit(50) : limit(50));
         const jobSnapshot = await getDocs(jobQuery);
         const newJobCategories = new Set();
+
         jobSnapshot.forEach(doc => {
           const data = doc.data();
-          if (data.category) newJobCategories.add(data.category);
+          if (data.createdAt) {
+            const created = data.createdAt.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
+            if (created >= threshold) {
+              if (data.category) newJobCategories.add(data.category);
+            }
+          }
         });
 
         // 사이드바 메뉴에 배지 추가
@@ -7003,13 +7032,19 @@
         });
 
         // 2. 취업이야기(stories) 체크
-        const storyQuery = query(collection(db, 'stories'), where('createdAt', '>=', timestamp));
+        const storyQuery = query(collection(db, 'stories'), orderBy('createdAt', 'desc'), window.limit ? window.limit(50) : limit(50));
         const storySnapshot = await getDocs(storyQuery);
         const newStoryCategories = new Set();
+
         storySnapshot.forEach(doc => {
           const data = doc.data();
-          const cat = data.category || 'free';
-          newStoryCategories.add(cat);
+          if (data.createdAt) {
+            const created = data.createdAt.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
+            if (created >= threshold) {
+              const cat = data.category || 'free';
+              newStoryCategories.add(cat);
+            }
+          }
         });
 
         // 사이드바 메뉴에 배지 추가
