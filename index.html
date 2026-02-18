@@ -1873,6 +1873,48 @@
       margin-left: 4px;
     }
 
+
+    /* Social Login Buttons */
+    .btn-social {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 10px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.2s;
+    }
+
+    .btn-social:hover {
+      opacity: 0.9;
+    }
+
+    .btn-kakao {
+      background-color: #FEE500;
+      color: #000000;
+    }
+
+    .btn-naver {
+      background-color: #03C75A;
+      color: #FFFFFF;
+    }
+
+    .btn-apple {
+      background-color: #000000;
+      color: #FFFFFF;
+    }
+
+    .btn-google {
+      background-color: #FFFFFF;
+      color: #444444;
+      border: 1px solid #dddddd;
+    }
+
     /* 오른쪽 게시판 컨텐츠 */
     .board-content {
       flex: 1;
@@ -4558,11 +4600,56 @@
   <section class="section" id="support" style="padding:2rem 0;"></section>
 
   <!-- 로그인 모달 -->
+  <!-- 로그인 모달 (소셜 로그인 중심) -->
   <div id="loginModal" class="modal">
-    <div class="modal-content" style="max-width: 400px;">
+    <div class="modal-content" style="max-width: 400px; text-align: center;">
       <span class="close" onclick="closeLoginModal()">&times;</span>
-      <h2>로그인</h2>
-      <form onsubmit="handleLogin(event)">
+
+      <!-- CI 로고 -->
+      <div style="margin-bottom: 2rem;">
+        <img src="./logo.png" alt="로고" style="height: 40px;">
+      </div>
+
+      <div class="social-login-buttons">
+        <!-- 카카오 -->
+        <button onclick="handleSocialLogin('kakao')" class="btn-social btn-kakao">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right:8px;">
+            <path
+              d="M12 3C5.9 3 1 6.6 1 11.2c0 2.8 1.8 5.3 4.6 6.9-.2.8-1.5 5.3-1.6 5.6 0 0 .2.1.4.1.2 0 3.3-2.2 3.8-2.6 1.2.3 2.5.5 3.8.5 6.1 0 11-3.6 11-8.2C23 6.6 18.1 3 12 3z" />
+          </svg>
+          카카오톡으로 로그인
+        </button>
+
+        <!-- 애플 -->
+        <button onclick="handleSocialLogin('apple')" class="btn-social btn-apple">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right:8px;">
+            <path
+              d="M17.05 19.09c-1.35 1.95-2.73 3.92-4.86 3.95-2.12.03-2.69-1.25-5.04-1.25-2.36 0-3.09 1.22-5.06 1.26-2.03.04-3.58-2.04-4.87-4.08-2.65-4.15-2.25-10.37 2.19-12.06 2.18-.84 4.25-.17 5.56.33 1.34.52 3.23.63 5.32-.36 1.48-.69 2.83-2.1 3.59-3.26-3.17 1.28-4.99 4.38-4.32 7.7 1.86.15 3.34-1.2 3.99-2.82.69-1.58.11-3.32-.23-4.52zM15.42 16.96c-.32 2.37 2.44 3.58 2.51 3.63-.02.06-.39 1.34-1.3 2.65-.79 1.15-1.61 2.29-2.91 2.31-1.28.02-1.7-.76-3.16-.76-1.47 0-1.92.74-3.14.78-1.26.04-2.23-1.27-3.03-2.43-1.66-2.4-2.93-6.79-1.23-9.74.84-1.46 2.36-2.39 4-2.42 1.26-.03 2.45.85 3.22 1.15.77.3 2.22-.81 3.75-.7 1.57.11 2.76.64 3.74 2.07-.07.05-2.25 1.31-2.25 3.91 0 3.12 2.72 4.19 2.8 4.22-.05.15-.33 1.95-1.23 3.27-1.12 1.62-2.31 2.17-2.77 2.06z" />
+          </svg>
+          Apple로 로그인
+        </button>
+
+        <!-- 네이버 -->
+        <button onclick="handleSocialLogin('naver')" class="btn-social btn-naver">
+          <span style="font-weight:900; margin-right:8px; display:inline-block; width:20px;">N</span>
+          네이버로 로그인
+        </button>
+
+        <!-- 구글 (Gmail) -->
+        <button onclick="handleGoogleLogin()" class="btn-social btn-google">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+            style="width: 18px; height: 18px; margin-right:8px;">
+          Gmail로 로그인
+        </button>
+      </div>
+
+      <div class="login-divider" style="margin: 2rem 0; position: relative; border-bottom: 1px solid #eee;">
+        <span
+          style="background: #fff; padding: 0 10px; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); color: #888; font-size: 0.8rem;">또는
+          이메일로 로그인</span>
+      </div>
+
+      <form onsubmit="handleLogin(event)" style="text-align: left;">
         <div class="form-group">
           <label>이메일</label>
           <input type="email" id="login_email" required placeholder="이메일을 입력하세요">
@@ -4572,16 +4659,7 @@
           <input type="password" id="login_password" required placeholder="비밀번호를 입력하세요">
         </div>
         <div style="text-align: right; margin-top: 20px;">
-          <button type="submit" class="btn-submit">로그인</button>
-          <button type="button" class="btn-cancel" onclick="closeLoginModal()">취소</button>
-        </div>
-        <div style="text-align: center; margin-top: 1rem; border-top: 1px solid #eee; padding-top: 1rem;">
-          <button type="button" onclick="handleGoogleLogin()"
-            style="background: #fff; color: #444; border: 1px solid #ddd; padding: 0.75rem; border-radius: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 100%; font-weight: bold; gap: 10px;">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-              style="width: 18px; height: 18px;">
-            Google로 시작하기
-          </button>
+          <button type="submit" class="btn-submit" style="width:100%;">로그인</button>
         </div>
       </form>
     </div>
@@ -4946,7 +5024,7 @@
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, orderBy, query, Timestamp, setDoc, getDoc, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
     import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, GoogleAuthProvider, signInWithPopup, OAuthProvider } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
     // Firebase 설정
     // App Nickname: puco
@@ -5222,6 +5300,39 @@
       }
     }
 
+    window.handleSocialLogin = async function (providerName) {
+      let provider;
+      try {
+        if (providerName === 'apple') {
+          provider = new OAuthProvider('apple.com');
+          provider.addScope('email');
+          provider.addScope('name');
+        } else if (providerName === 'kakao') {
+          // 카카오: Firebase Console에서 OIDC 공급업체 설정 필요 (provider ID: oidc.kakao)
+          provider = new OAuthProvider('oidc.kakao');
+        } else if (providerName === 'naver') {
+          // 네이버: Firebase Console에서 OIDC 공급업체 설정 필요 (provider ID: oidc.naver)
+          provider = new OAuthProvider('oidc.naver');
+        }
+
+        if (provider) {
+          await signInWithPopup(auth, provider);
+          alert('✅ 로그인되었습니다.');
+          closeLoginModal();
+          closeSignupModal();
+        }
+      } catch (err) {
+        console.error(err);
+        let msg = '로그인 실패: ' + err.message;
+        if (err.code === 'auth/operation-not-allowed') {
+          msg = '해당 로그인 방법이 활성화되지 않았습니다. 관리자에게 문의하세요.';
+        } else if (err.code === 'auth/invalid-provider-id') {
+          msg = '설정되지 않은 공급업체 ID입니다. (OIDC 설정 필요)';
+        }
+        alert(msg);
+      }
+    }
+
     window.togglePasswordVisibility = function (id) {
       const input = document.getElementById(id);
       if (input.type === "password") {
@@ -5358,7 +5469,7 @@
 
     window.openWriteStoryModal = function () {
       if (!window.auth.currentUser) {
-        alert('로그인이 필요한 서비스입니다.');
+        // alert 없음, 바로 로그인 모달
         window.openLoginModal();
         return;
       }
