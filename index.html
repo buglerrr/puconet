@@ -2132,7 +2132,182 @@
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
     }
 
-
+    /* === 취업 이야기 게시판 - 링커리어 스타일 === */
+    .story-sidebar {
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 12px !important;
+      overflow: hidden !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+      padding: 0 !important;
+      align-self: flex-start;
+      position: sticky;
+      top: 80px;
+    }
+    .story-sidebar-head {
+      background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+      padding: 1.2rem 1.25rem;
+      color: white;
+    }
+    .story-sidebar-head h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin: 0 0 0.2rem 0;
+    }
+    .story-sidebar-head p {
+      font-size: 0.75rem;
+      margin: 0;
+      opacity: 0.85;
+    }
+    .story-sidebar ul {
+      padding: 0.5rem 0 !important;
+    }
+    .story-sidebar li {
+      margin: 0 !important;
+    }
+    .story-sidebar a {
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      padding: 0.65rem 1.25rem !important;
+      border-radius: 0 !important;
+      border-left: 3px solid transparent !important;
+      font-size: 0.9rem !important;
+      color: #4a5568 !important;
+      font-weight: 500 !important;
+      transform: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+    }
+    .story-sidebar a:hover {
+      background: #eff6ff !important;
+      color: #3b82f6 !important;
+      border-left-color: #3b82f6 !important;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+    .story-sidebar a.active {
+      background: #eff6ff !important;
+      color: #3b82f6 !important;
+      border-left-color: #3b82f6 !important;
+      font-weight: 700 !important;
+    }
+    .story-sidebar a.active::after {
+      display: none !important;
+    }
+    /* 게시글 목록 컨테이너 */
+    .story-list-wrapper {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+    .story-list-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.25rem;
+      border-bottom: 2px solid #3b82f6;
+      background: white;
+    }
+    .story-list-top h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #1a202c;
+      margin: 0;
+    }
+    .story-list-top .post-count {
+      font-size: 0.82rem;
+      color: #a0aec0;
+    }
+    /* 게시글 아이템 */
+    .story-post-item {
+      display: flex;
+      flex-direction: column;
+      padding: 0.95rem 1.25rem;
+      border-bottom: 1px solid #f0f2f5;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .story-post-item:last-child {
+      border-bottom: none;
+    }
+    .story-post-item:hover {
+      background: #fafbff;
+    }
+    .story-post-item-row1 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 0.3rem;
+    }
+    .story-cat-tag {
+      flex-shrink: 0;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .story-cat-tag.cat-free        { background: #f3f4f6; color: #6b7280; }
+    .story-cat-tag.cat-consulting  { background: #eff6ff; color: #3b82f6; }
+    .story-cat-tag.cat-study       { background: #ecfdf5; color: #059669; }
+    .story-cat-tag.cat-ncs-review  { background: #fff7ed; color: #ea580c; }
+    .story-cat-tag.cat-interview   { background: #faf5ff; color: #7c3aed; }
+    .story-cat-tag.cat-success     { background: #fef2f2; color: #dc2626; }
+    .story-cat-tag.cat-expert      { background: #f0fdfa; color: #0d9488; }
+    .story-post-title-link {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #1a202c;
+      text-decoration: none;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+    }
+    .story-post-title-link:hover {
+      color: #3b82f6;
+    }
+    .story-post-excerpt {
+      font-size: 0.83rem;
+      color: #718096;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-bottom: 0.35rem;
+    }
+    .story-post-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.78rem;
+      color: #a0aec0;
+    }
+    .story-post-meta .meta-author {
+      color: #4a5568;
+      font-weight: 500;
+    }
+    .meta-dot {
+      width: 3px;
+      height: 3px;
+      background: #cbd5e0;
+      border-radius: 50%;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    .story-post-meta .meta-likes {
+      color: #e53e3e;
+    }
+    .story-empty-box {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: #a0aec0;
+    }
+    .story-empty-box p {
+      font-size: 0.95rem;
+      margin-top: 0.5rem;
+    }
 
     .story-grid {
       display: grid;
@@ -3724,49 +3899,36 @@
           <!-- 게시판 레이아웃: 사이드바 + 컨텐츠 -->
           <div class="board-layout">
             <!-- 왼쪽 사이드바 (세부 메뉴) -->
-            <aside class="board-sidebar">
-              <h3>게시판</h3>
+            <aside class="board-sidebar story-sidebar">
+              <div class="story-sidebar-head">
+                <h2>💼 취업 이야기</h2>
+                <p>공기업 취업 커뮤니티</p>
+              </div>
               <ul>
-                <li><a href="#" onclick="switchStoryBoard('free'); return false;" id="story-menu-free"
-                    class="active">자유게시판</a></li>
-                <li><a href="#" onclick="switchStoryBoard('consulting'); return false;"
-                    id="story-menu-consulting">취업상담실</a></li>
-                <li><a href="#" onclick="switchStoryBoard('study'); return false;" id="story-menu-study">스터디 모집</a></li>
-                <li><a href="#" onclick="switchStoryBoard('ncs-review'); return false;" id="story-menu-ncs-review">NCS
-                    후기</a></li>
-                <li><a href="#" onclick="switchStoryBoard('interview'); return false;" id="story-menu-interview">면접
-                    후기</a></li>
-                <li><a href="#" onclick="switchStoryBoard('success'); return false;" id="story-menu-success">최종합격 수기</a>
-                </li>
-                <li><a href="#" onclick="switchStoryBoard('expert'); return false;" id="story-menu-expert">현직자/전문가</a>
-                </li>
+                <li><a href="#" onclick="switchStoryBoard('free'); return false;" id="story-menu-free" class="active"><span>🗒️</span> 자유게시판</a></li>
+                <li><a href="#" onclick="switchStoryBoard('consulting'); return false;" id="story-menu-consulting"><span>💬</span> 취업상담실</a></li>
+                <li><a href="#" onclick="switchStoryBoard('study'); return false;" id="story-menu-study"><span>📚</span> 스터디 모집</a></li>
+                <li><a href="#" onclick="switchStoryBoard('ncs-review'); return false;" id="story-menu-ncs-review"><span>📝</span> NCS 후기</a></li>
+                <li><a href="#" onclick="switchStoryBoard('interview'); return false;" id="story-menu-interview"><span>🎤</span> 면접 후기</a></li>
+                <li><a href="#" onclick="switchStoryBoard('success'); return false;" id="story-menu-success"><span>🏆</span> 최종합격 수기</a></li>
+                <li><a href="#" onclick="switchStoryBoard('expert'); return false;" id="story-menu-expert"><span>👨‍💼</span> 현직자/전문가</a></li>
               </ul>
             </aside>
 
             <!-- 오른쪽 게시판 컨텐츠 -->
             <div class="board-content">
-              <!-- 게시판 테이블 -->
-              <div id="storyBoardTable"
-                style="background:white; padding:2rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
-                <table class="board-table" id="storyTable">
-                  <thead>
-                    <tr>
-                      <th style="width: 60px;">번호</th>
-                      <th>제목</th>
-                      <th style="width: 120px;">작성자</th>
-                      <th style="width: 120px;">작성일</th>
-                      <th style="width: 80px;">좋아요</th>
-                    </tr>
-                  </thead>
-                  <tbody id="storyTableBody">
-                    <!-- Stories load here -->
-                  </tbody>
-                </table>
-
+              <!-- 게시글 목록 -->
+              <div id="storyBoardTable" class="story-list-wrapper">
+                <div class="story-list-top">
+                  <h3 id="storyBoardCategoryTitle">자유게시판</h3>
+                  <span class="post-count" id="storyPostCount"></span>
+                </div>
+                <div id="storyTableBody">
+                  <!-- Stories load here -->
+                </div>
                 <!-- 취업 이야기 페이지네이션 -->
                 <div id="storyPagination" class="pagination-container" style="display: none;">
-                  <div class="pagination story-pagination">
-                  </div>
+                  <div class="pagination story-pagination"></div>
                 </div>
               </div>
 
@@ -4848,7 +5010,7 @@
         tbody.innerHTML = ''; // 클리어
 
         if (querySnapshot.empty) {
-          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:3rem; color:#888;">아직 이야기가 없습니다. 첫 번째 이야기를 들려주세요!</td></tr>';
+          tbody.innerHTML = '<div class="story-empty-box"><p>아직 이야기가 없습니다.<br>첫 번째 이야기를 들려주세요! ✏️</p></div>';
           document.getElementById('storyPagination').style.display = 'none';
           return;
         }
@@ -4865,7 +5027,7 @@
         });
 
         if (filteredDocs.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:3rem; color:#888;">아직 이야기가 없습니다. 첫 번째 이야기를 들려주세요!</td></tr>';
+          tbody.innerHTML = '<div class="story-empty-box"><p>아직 이야기가 없습니다.<br>첫 번째 이야기를 들려주세요! ✏️</p></div>';
           document.getElementById('storyPagination').style.display = 'none';
           return;
         }
@@ -4885,7 +5047,7 @@
 
       } catch (err) {
         console.error(err);
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:red;">데이터 로딩 실패</td></tr>';
+        tbody.innerHTML = '<div class="story-empty-box"><p style="color:#e53e3e;">데이터 로딩 실패. 새로고침을 시도해주세요.</p></div>';
       }
     }
 
@@ -4897,30 +5059,51 @@
       const endIndex = startIndex + storyItemsPerPage;
       const pageStories = totalStories.slice(startIndex, endIndex);
 
-      // 번호 계산 (전체에서의 순번)
-      let displayIndex = totalStories.length - startIndex;
+      const catLabels = {
+        free: '자유게시판', consulting: '취업상담실', study: '스터디 모집',
+        'ncs-review': 'NCS 후기', interview: '면접 후기', success: '최종합격 수기', expert: '현직자/전문가'
+      };
+
+      // 카테고리 타이틀 및 글 수 업데이트
+      const currentCat = window.currentStoryCategory || 'free';
+      const titleEl = document.getElementById('storyBoardCategoryTitle');
+      if (titleEl) titleEl.textContent = catLabels[currentCat] || currentCat;
+      const countEl = document.getElementById('storyPostCount');
+      if (countEl) countEl.textContent = `총 ${totalStories.length}개`;
 
       pageStories.forEach((data) => {
         const docId = data.id;
-        const date = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : '-';
+        const date = data.createdAt
+          ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' })
+          : '-';
 
         window.storiesData = window.storiesData || {};
         window.storiesData[docId] = { ...data, dateString: date };
 
         const titleText = escapeHtml(data.title);
         const authorText = escapeHtml(data.authorName);
+        const rawContent = data.content ? data.content.replace(/\n/g, ' ') : '';
+        const excerptText = rawContent ? escapeHtml(rawContent.substring(0, 80)) + (rawContent.length > 80 ? '…' : '') : '';
+        const dataCat = data.category || 'free';
+        const catLabel = catLabels[dataCat] || dataCat;
 
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td style="text-align:center;">${displayIndex--}</td>
-          <td class="title-cell" title="${titleText}">
-              <a href="#" onclick="viewStoryDetail('${docId}'); return false;" style="text-decoration:none; color:#333; font-weight:bold;">${titleText}</a>
-          </td>
-          <td style="text-align:center;">${authorText}</td>
-          <td style="text-align:center; color:#666;">${date}</td>
-          <td style="text-align:center;">❤️ ${data.likes || 0}</td>
+        const item = document.createElement('div');
+        item.className = 'story-post-item';
+        item.innerHTML = `
+          <div class="story-post-item-row1">
+            <span class="story-cat-tag cat-${dataCat}">${catLabel}</span>
+            <a href="#" onclick="viewStoryDetail('${docId}'); return false;" class="story-post-title-link" title="${titleText}">${titleText}</a>
+          </div>
+          ${excerptText ? `<div class="story-post-excerpt">${excerptText}</div>` : ''}
+          <div class="story-post-meta">
+            <span class="meta-author">${authorText}</span>
+            <span class="meta-dot"></span>
+            <span>${date}</span>
+            <span class="meta-dot"></span>
+            <span class="meta-likes">❤️ ${data.likes || 0}</span>
+          </div>
         `;
-        tbody.appendChild(tr);
+        tbody.appendChild(item);
       });
     }
 
@@ -5057,6 +5240,14 @@
       menuItems.forEach(item => item.classList.remove('active'));
       const activeMenu = document.getElementById('story-menu-' + boardType);
       if (activeMenu) activeMenu.classList.add('active');
+
+      // 3-1. 카테고리 타이틀 즉시 업데이트
+      const _catLabels = {
+        free: '자유게시판', consulting: '취업상담실', study: '스터디 모집',
+        'ncs-review': 'NCS 후기', interview: '면접 후기', success: '최종합격 수기', expert: '현직자/전문가'
+      };
+      const _titleEl = document.getElementById('storyBoardCategoryTitle');
+      if (_titleEl) _titleEl.textContent = _catLabels[boardType] || boardType;
 
       // 4. 게시판 표시 (준비중 메시지 로직 제거하고 항상 로딩)
       const boardTable = document.getElementById('storyBoardTable');
