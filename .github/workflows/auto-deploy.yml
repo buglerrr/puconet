@@ -1,0 +1,31 @@
+name: Claude Code Auto Deploy
+
+# claude/ 로 시작하는 브랜치에 push 되면 자동 실행
+on:
+  push:
+    branches:
+      - 'claude/**'
+
+permissions:
+  contents: write
+
+jobs:
+  auto-merge-to-main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 코드 가져오기
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Git 사용자 설정
+        run: |
+          git config user.name "Claude Code Bot"
+          git config user.email "claude-bot@github.com"
+
+      - name: main 브랜치에 자동 머지 & 배포
+        run: |
+          git checkout main
+          git merge origin/${{ github.ref_name }} --no-ff -m "Auto deploy from ${{ github.ref_name }}"
+          git push origin main
