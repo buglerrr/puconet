@@ -3167,6 +3167,267 @@
       color: #2980b9;
       font-weight: bold;
     }
+
+    /* ======= 공공기관 뉴스 (ViewPlus 스타일) ======= */
+    .news-banner {
+      background: linear-gradient(135deg, #5b2c8e 0%, #3a5ccc 50%, #2890d8 100%);
+      padding: 40px 40px 30px;
+      color: #fff;
+      margin-bottom: 0;
+    }
+
+    .news-banner .deco-title {
+      display: inline-block;
+      border: 2px solid rgba(255, 255, 255, 0.7);
+      border-radius: 20px;
+      padding: 4px 16px;
+      font-size: 14px;
+      margin-bottom: 16px;
+      font-weight: 600;
+    }
+
+    .news-banner .banner-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0 0 10px;
+      letter-spacing: -0.5px;
+    }
+
+    .news-banner .search-count {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.75);
+    }
+
+    .news-board-container {
+      display: flex;
+      gap: 30px;
+      padding: 30px 40px;
+      max-width: 100%;
+      background: #fff;
+    }
+
+    .news-main-articles {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .news-article-item {
+      display: flex;
+      gap: 20px;
+      padding: 24px 0;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .news-article-item:first-child {
+      padding-top: 0;
+    }
+
+    .news-article-item:hover {
+      background: #fafbfc;
+    }
+
+    .news-article-item .article-thumb {
+      width: 160px;
+      height: 110px;
+      min-width: 160px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #f0f0f0;
+    }
+
+    .news-article-item .article-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .news-article-item .article-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .news-article-item .article-info h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #222;
+      margin: 0 0 8px;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .news-article-item .article-info .article-desc {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.6;
+      margin: 0 0 10px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .news-article-item .article-info .article-date {
+      font-size: 13px;
+      color: #999;
+    }
+
+    /* 뉴스 오른쪽 사이드바 */
+    .news-aside {
+      width: 300px;
+      min-width: 300px;
+    }
+
+    .news-aside .aside-section {
+      margin-bottom: 24px;
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .news-aside .aside-section dt {
+      font-size: 16px;
+      font-weight: 700;
+      color: #222;
+      padding: 16px 18px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .news-aside .aside-link-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .news-aside .aside-link-list li {
+      border-bottom: 1px solid #f5f5f5;
+    }
+
+    .news-aside .aside-link-list li:last-child {
+      border-bottom: none;
+    }
+
+    .news-aside .aside-link-list a {
+      display: block;
+      padding: 12px 18px;
+      font-size: 14px;
+      color: #333;
+      text-decoration: none;
+      line-height: 1.5;
+      transition: background 0.15s;
+    }
+
+    .news-aside .aside-link-list a:hover {
+      background: #f8f9fa;
+      color: #3498db;
+    }
+
+    .news-aside .aside-banner {
+      margin-bottom: 24px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .news-aside .aside-banner img {
+      width: 100%;
+      display: block;
+    }
+
+    .news-aside .popular-job-item {
+      display: flex;
+      flex-direction: column;
+      padding: 12px 18px;
+      border-bottom: 1px solid #f5f5f5;
+    }
+
+    .news-aside .popular-job-item:last-child {
+      border-bottom: none;
+    }
+
+    .news-aside .popular-job-item .pj-company {
+      font-size: 12px;
+      color: #3498db;
+      margin-bottom: 4px;
+    }
+
+    .news-aside .popular-job-item .pj-title {
+      font-size: 14px;
+      color: #333;
+      line-height: 1.4;
+      margin-bottom: 4px;
+    }
+
+    .news-aside .popular-job-item .pj-type {
+      font-size: 12px;
+      color: #999;
+    }
+
+    .news-aside .popular-job-item .pj-dday {
+      display: inline-block;
+      background: #f0f0f0;
+      color: #666;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 3px;
+      margin-left: auto;
+    }
+
+    .news-pagination {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      padding: 30px 0;
+    }
+
+    .news-pagination button {
+      border: 1px solid #ddd;
+      background: #fff;
+      padding: 8px 14px;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.15s;
+    }
+
+    .news-pagination button:hover {
+      background: #f5f5f5;
+    }
+
+    .news-pagination button.active {
+      background: #3498db;
+      color: #fff;
+      border-color: #3498db;
+    }
+
+    .news-pagination button:disabled {
+      color: #ccc;
+      cursor: default;
+    }
+
+    @media (max-width: 900px) {
+      .news-board-container {
+        flex-direction: column;
+        padding: 20px;
+      }
+
+      .news-aside {
+        width: 100%;
+        min-width: auto;
+      }
+
+      .news-article-item .article-thumb {
+        width: 120px;
+        height: 80px;
+        min-width: 120px;
+      }
+    }
   </style>
 </head>
 
@@ -3199,13 +3460,14 @@
           <div class="nav-links">
             <a href="#" onclick="checkLoginAndExecute(showBoard, '채용정보를 보려면 로그인이 필요합니다.'); return false;">채용정보</a>
             <a href="#"
-              onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '공공게시판을 보려면 로그인이 필요합니다.'); return false;">공공기관정보</a>
-            <a href="#"
-              onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '공공기관 뉴스를 보려면 로그인이 필요합니다.'); return false;">공공기관뉴스</a>
+              onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '공공게시판을 보려면 로그인이 필요합니다.'); return false;">공공게시판</a>
+            <a href="#" onclick="checkLoginAndExecute(showNewsBoard, '공공기관 뉴스를 보려면 로그인이 필요합니다.'); return false;">공공기관
+              뉴스</a>
             <a href="#"
               onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '공모전 소식을 보려면 로그인이 필요합니다.'); return false;">공모전
               소식</a>
-            <a href="#" onclick="checkLoginAndExecute(showStoryBoard, '취업 이야기를 보려면 로그인이 필요합니다.'); return false;">취업이야기</a>
+            <a href="#" onclick="checkLoginAndExecute(showStoryBoard, '취업 이야기를 보려면 로그인이 필요합니다.'); return false;"
+              style="color: #666; font-weight:bold;">취업 이야기</a>
             <a href="#"
               onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '마이메뉴를 보려면 로그인이 필요합니다.'); return false;">마이메뉴</a>
           </div>
@@ -4514,6 +4776,133 @@
         </div>
       </div>
 
+
+      <!-- ========== 공공기관 뉴스 섹션 (ViewPlus 스타일) ========== -->
+      <div id="news-section" style="display:none;">
+        <!-- 배너 -->
+        <div class="news-banner">
+          <div class="deco-title">공공기관 뉴스</div>
+          <h2 class="banner-title">공공기관 동향과 채용 트렌드를 한눈에</h2>
+          <div class="search-count">검색결과 <span id="newsTotalCnt">6</span> 건</div>
+        </div>
+
+        <!-- 본문 -->
+        <div class="news-board-container">
+          <!-- 왼쪽: 기사 리스트 -->
+          <div class="news-main-articles" id="newsListBody">
+
+            <div class="news-article-item">
+              <div class="article-thumb"><img src="./logo.png" alt="뉴스 이미지"></div>
+              <div class="article-info">
+                <h3>한국전력공사, 2026년 상반기 신입사원 대규모 공개채용 발표</h3>
+                <p class="article-desc">한국전력공사는 2026년 상반기 신입사원 공개채용을 발표했다. 이번 채용은 사무, 기술, 연구 등 다양한 분야에서 진행되며, 지원 자격은 학력
+                  무관으로 폭넓은 기회를 제공한다.</p>
+                <span class="article-date">2026-02-18</span>
+              </div>
+            </div>
+
+            <div class="news-article-item">
+              <div class="article-thumb"><img src="./logo.png" alt="뉴스 이미지"></div>
+              <div class="article-info">
+                <h3>공공기관 경영평가 결과 발표…최우수 기관은?</h3>
+                <p class="article-desc">기획재정부는 2025년도 공공기관 경영평가 결과를 발표했다. 올해 최우수 등급을 받은 기관과 주요 평가 지표에 대해 분석한다.</p>
+                <span class="article-date">2026-02-15</span>
+              </div>
+            </div>
+
+            <div class="news-article-item">
+              <div class="article-thumb"><img src="./logo.png" alt="뉴스 이미지"></div>
+              <div class="article-info">
+                <h3>국민연금공단, 청년인턴 200명 모집…지원 방법은?</h3>
+                <p class="article-desc">국민연금공단이 청년인턴 200명을 모집한다고 밝혔다. 이번 인턴은 6개월간 근무하며, 우수 인턴에게는 정규직 전환 기회가 주어진다.</p>
+                <span class="article-date">2026-02-12</span>
+              </div>
+            </div>
+
+            <div class="news-article-item">
+              <div class="article-thumb"><img src="./logo.png" alt="뉴스 이미지"></div>
+              <div class="article-info">
+                <h3>한국수력원자력, AI 기반 안전관리 시스템 도입 추진</h3>
+                <p class="article-desc">[비즈니스포스트] 한국수력원자력이 AI 기반 원전 안전관리 시스템을 도입한다. 이를 통해 실시간 위험 감지와 예방 정비 효율을 높인다는
+                  계획이다.</p>
+                <span class="article-date">2026-02-10</span>
+              </div>
+            </div>
+
+            <div class="news-article-item">
+              <div class="article-thumb"><img src="./logo.png" alt="뉴스 이미지"></div>
+              <div class="article-info">
+                <h3>공공기관 지방이전 10년…성과와 과제 점검</h3>
+                <p class="article-desc">공공기관 지방이전이 시작된 지 10년이 지났다. 혁신도시를 중심으로 한 지역 경제 활성화 성과와 앞으로의 과제를 살펴본다.</p>
+                <span class="article-date">2026-02-08</span>
+              </div>
+            </div>
+
+            <div class="news-article-item">
+              <div class="article-thumb"><img src="./logo.png" alt="뉴스 이미지"></div>
+              <div class="article-info">
+                <h3>세종학당재단, 글로벌 한국어 교육 확대 위한 채용 진행</h3>
+                <p class="article-desc">세종학당재단은 해외 한국어 교육 수요 증가에 대응하기 위해 신규 직원을 채용한다. 토목, 전기, 통신 분야 등의 전문 인력을 모집 중이다.
+                </p>
+                <span class="article-date">2026-02-05</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 오른쪽: 사이드바 -->
+          <div class="news-aside">
+            <!-- 많이 본 뉴스 -->
+            <dl class="aside-section">
+              <dt>많이 본 공공기관 뉴스</dt>
+              <ul class="aside-link-list">
+                <li><a href="#">한국전력공사 상반기 대규모 채용 발표</a></li>
+                <li><a href="#">공공기관 경영평가 결과 발표…최우수 기관은?</a></li>
+                <li><a href="#">국민연금공단, 청년인턴 200명 모집</a></li>
+                <li><a href="#">한국수력원자력, AI 안전관리 시스템 도입</a></li>
+                <li><a href="#">공공기관 지방이전 10년 성과 점검</a></li>
+              </ul>
+            </dl>
+
+            <!-- 배너 -->
+            <div class="aside-banner">
+              <a href="#"><img src="./올공 CI.png" alt="배너 광고"
+                  style="background:#f0f0f0; padding: 20px; border: 1px solid #eee; border-radius: 8px;"></a>
+            </div>
+
+            <!-- 실시간 인기 공고 -->
+            <dl class="aside-section">
+              <dt>실시간 인기 공고</dt>
+              <div class="popular-job-item">
+                <span class="pj-company">한국전력공사</span>
+                <span class="pj-title">2025년 하반기 대졸수준 채용공고</span>
+                <span class="pj-type">정규직/3년이상 <span class="pj-dday">D-11</span></span>
+              </div>
+              <div class="popular-job-item">
+                <span class="pj-company">국민연금공단</span>
+                <span class="pj-title">청년인턴 200명 공개 모집</span>
+                <span class="pj-type">인턴 <span class="pj-dday">D-7</span></span>
+              </div>
+              <div class="popular-job-item">
+                <span class="pj-company">한국수력원자력(주)</span>
+                <span class="pj-title">2025 하반기 신입사원(대졸) 공채</span>
+                <span class="pj-type">정규직/4년이상 <span class="pj-dday">D-5</span></span>
+              </div>
+            </dl>
+          </div>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div class="news-pagination" id="newsPagination">
+          <button disabled>‹</button>
+          <button class="active">1</button>
+          <button>2</button>
+          <button>3</button>
+          <button>›</button>
+        </div>
+      </div>
+      <!-- ========== /공공기관 뉴스 섹션 끝 ========== -->
+
       <!-- 메인 콘텐츠 영역 끝 -->
     </div>
 
@@ -5439,6 +5828,8 @@
       if (boardSection) boardSection.style.display = 'none';
       const userSection = document.getElementById('user-manage-section');
       if (userSection) userSection.style.display = 'none';
+      const newsSection = document.getElementById('news-section');
+      if (newsSection) newsSection.style.display = 'none';
 
       // 2. 사이드바 숨기기 (Wrapper에 클래스 추가로 제어)
       const wrapper = document.querySelector('.content-with-sidebar-wrapper');
@@ -5472,6 +5863,9 @@
 
       const storyDetailSection = document.getElementById('story-detail-section');
       if (storyDetailSection) storyDetailSection.style.display = 'none';
+
+      const newsSection = document.getElementById('news-section');
+      if (newsSection) newsSection.style.display = 'none';
     }
 
     window.openWriteStoryModal = function () {
@@ -6095,6 +6489,9 @@
       const storyDetailSection = document.getElementById('story-detail-section');
       if (storyDetailSection) storyDetailSection.style.display = 'none';
 
+      const newsSection = document.getElementById('news-section');
+      if (newsSection) newsSection.style.display = 'none';
+
       // 사이드바 숨기기
       const wrapper = document.querySelector('.content-with-sidebar-wrapper');
       if (wrapper) wrapper.classList.add('full-width-wrapper');
@@ -6203,6 +6600,10 @@
       const userSection = document.getElementById('user-manage-section');
       if (userSection) userSection.style.display = 'none';
 
+      // 뉴스 섹션 숨기기
+      const newsSection = document.getElementById('news-section');
+      if (newsSection) newsSection.style.display = 'none';
+
       // 히스토리 추가 (뒤로가기 지원)
       if (!skipHistory) {
         history.pushState({ section: 'home' }, '', '#home');
@@ -6235,6 +6636,10 @@
       const storyDetailSection = document.getElementById('story-detail-section');
       if (storyDetailSection) storyDetailSection.style.display = 'none';
 
+      // 뉴스 섹션 숨기기
+      const newsSection = document.getElementById('news-section');
+      if (newsSection) newsSection.style.display = 'none';
+
       // 게시판 섹션 보이기
       const boardSection = document.getElementById('board-section');
       if (boardSection) {
@@ -6253,6 +6658,43 @@
       }
 
       // 스크롤 상단으로
+      window.scrollTo(0, 0);
+    }
+
+    // === 공공기관 뉴스 보기 ===
+    window.showNewsBoard = function (skipHistory = false) {
+      // 사이드바 숨기기
+      const wrapper = document.querySelector('.content-with-sidebar-wrapper');
+      if (wrapper) wrapper.classList.add('full-width-wrapper');
+
+      // 모든 메인 섹션 숨기기
+      document.getElementById('features').style.display = 'none';
+      document.getElementById('jobs').style.display = 'none';
+      document.getElementById('general-jobs').style.display = 'none';
+      document.getElementById('edu-courses').style.display = 'none';
+      document.getElementById('detail-section').style.display = 'none';
+
+      const boardSection = document.getElementById('board-section');
+      if (boardSection) boardSection.style.display = 'none';
+
+      const storySection = document.getElementById('story-board-section');
+      if (storySection) storySection.style.display = 'none';
+
+      const storyDetailSection = document.getElementById('story-detail-section');
+      if (storyDetailSection) storyDetailSection.style.display = 'none';
+
+      const userSection = document.getElementById('user-manage-section');
+      if (userSection) userSection.style.display = 'none';
+
+      // 뉴스 섹션 보이기
+      const newsSection = document.getElementById('news-section');
+      if (newsSection) newsSection.style.display = 'block';
+
+      // 히스토리 추가 (뒤로가기 지원)
+      if (!skipHistory) {
+        history.pushState({ section: 'news' }, '', '#news');
+      }
+
       window.scrollTo(0, 0);
     }
 
@@ -7310,6 +7752,9 @@
       } else if (hash === '#user-manage') {
         window.showUserManagement(true);
         history.replaceState({ section: 'user-manage' }, '', hash);
+      } else if (hash === '#news') {
+        window.showNewsBoard(true);
+        history.replaceState({ section: 'news' }, '', hash);
       } else {
         // 기본: 홈으로
         history.replaceState({ section: 'home' }, '', '#home');
@@ -7360,6 +7805,9 @@
       } else if (state.section === 'user-manage') {
         // 회원 관리로 이동
         window.showUserManagement(true);
+      } else if (state.section === 'news') {
+        // 공공기관 뉴스로 이동
+        window.showNewsBoard(true);
       } else {
         // 기본: 홈으로
         window.goHome(true);
