@@ -45,7 +45,7 @@
     /* 헤더 스타일 */
     header {
       background: #f8f9fa;
-      border-bottom: 1px solid #e1e1e1;
+      border-bottom: 2px solid #3498db;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       position: sticky;
       top: 0;
@@ -896,6 +896,15 @@
     }
 
     /* === v19: Premium logo max-fit (keep aspect, fill cell as much as possible) === */
+
+    /* [헤더 좌측 공백 제거 및 선 연장] */
+    header {
+      width: calc(100% + 40px) !important;
+      max-width: none !important;
+      margin-left: -40px !important;
+      margin-right: 0 !important;
+    }
+
     #features .job-card .banner-image {
       width: 100% !important;
       height: auto !important;
