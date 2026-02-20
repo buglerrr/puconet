@@ -1924,8 +1924,116 @@
       border: 1px solid #dddddd;
     }
 
+    /* ===== 채용정보 게시판 사이드바 ===== */
+    .board-sidebar {
+      width: 200px;
+      min-width: 200px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      align-self: flex-start;
+      position: sticky;
+      top: 80px;
+    }
+
+    /* 사이드바 상단 타이틀 배너 */
+    .board-sidebar .page-title-banner {
+      background: linear-gradient(135deg, #1e3a5f 0%, #2a5298 100%);
+      padding: 1.1rem;
+      text-align: center;
+      margin-bottom: 0;
+      border-radius: 0;
+    }
+
+    .board-sidebar .page-title-banner h1 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 1px;
+      margin: 0;
+    }
+
+    /* 그룹 헤더 */
+    .board-sidebar .sidebar-group-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #94a3b8;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.9rem 1rem 0.3rem;
+      margin: 0;
+    }
+
+    .board-sidebar .sidebar-group-header:not(:first-of-type) {
+      border-top: 1px solid #f1f5f9;
+      margin-top: 0.3rem;
+    }
+
+    /* 항목 ul/li */
+    .board-sidebar ul {
+      list-style: none;
+      margin: 0;
+      padding: 0 0 0.4rem 0;
+    }
+
+    .board-sidebar li {
+      margin: 0;
+    }
+
+    /* 항목 링크 */
+    .board-sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0.5rem 1rem;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: #374151;
+      border-left: 3px solid transparent;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      background: transparent;
+    }
+
+    .board-sidebar a:hover {
+      background: #eff6ff;
+      color: #2563eb;
+      border-left-color: #2563eb;
+    }
+
+    .board-sidebar a.active {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border-left-color: #1d4ed8;
+      font-weight: 700;
+    }
+
+    /* NEW 배지 */
+    .board-sidebar .new-mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #ef4444;
+      color: #fff;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 4px;
+      margin-left: 2px;
+      letter-spacing: 0;
+      line-height: 1.6;
+    }
+
+    /* ===== 채용정보 게시판 사이드바 끝 ===== */
+
     /* 오른쪽 게시판 컨텐츠 */
     .board-content {
+
       flex: 1;
       min-width: 0;
     }
@@ -3644,7 +3752,7 @@
           <div class="nav-links">
             <a href="#" onclick="checkLoginAndExecute(showBoard, '채용정보를 보려면 로그인이 필요합니다.'); return false;">채용정보</a>
             <a href="#"
-              onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '공공게시판을 보려면 로그인이 필요합니다.'); return false;">공공기관교육</a>
+              onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '공공게시판을 보려면 로그인이 필요합니다.'); return false;">공공게시판</a>
             <a href="#" onclick="checkLoginAndExecute(showNewsBoard, '공공기관 뉴스를 보려면 로그인이 필요합니다.'); return false;">공공기관
               뉴스</a>
             <a href="#"
@@ -4426,23 +4534,14 @@
           <div class="board-layout">
             <!-- 왼쪽 사이드바 (세부 메뉴) -->
             <aside class="board-sidebar">
-              <!-- 페이지 제목 배너 (Moved inside) -->
+              <!-- 상단 타이틀 -->
               <div class="page-title-banner">
                 <h1>채용정보</h1>
               </div>
 
-              <!-- 주목할 공고 그룹 -->
-              <h3 style="display: flex; align-items: center; gap: 8px;">
-                <!-- Star Icon -->
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <polygon
-                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
-                  </polygon>
-                </svg>
-                주목할 공고
-              </h3>
-              <ul class="sidebar-grid-2">
+              <!-- ① 주요 채용정보 -->
+              <p class="sidebar-group-header">주요 채용정보</p>
+              <ul>
                 <li><a href="#" onclick="switchBoard('premium'); return false;" id="board-menu-premium">프리미엄</a></li>
                 <li><a href="#" onclick="switchBoard('recommended'); return false;" id="board-menu-recommended">추천</a>
                 </li>
@@ -4451,17 +4550,9 @@
                     id="board-menu-deadline-soon">마감임박</a></li>
               </ul>
 
-              <!-- 채용형태별 그룹 -->
-              <h3 style="display: flex; align-items: center; gap: 8px;">
-                <!-- User Icon -->
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                채용형태별
-              </h3>
-              <ul class="sidebar-grid-mixed">
+              <!-- ② 채용형태별 -->
+              <p class="sidebar-group-header">채용형태별</p>
+              <ul>
                 <li><a href="#" onclick="switchBoard('intern'); return false;" id="board-menu-intern">인턴</a></li>
                 <li><a href="#" onclick="switchBoard('entry-level'); return false;" id="board-menu-entry-level">신입</a>
                 </li>
@@ -4471,41 +4562,26 @@
                 <li><a href="#" onclick="switchBoard('contract'); return false;" id="board-menu-contract">비정규직</a></li>
               </ul>
 
-              <!-- 기관유형별 그룹 -->
-              <h3 style="display: flex; align-items: center; gap: 8px;">
-                <!-- Building Icon -->
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
-                  <line x1="9" y1="22" x2="9" y2="22.01"></line>
-                  <line x1="15" y1="22" x2="15" y2="22.01"></line>
-                  <line x1="12" y1="22" x2="12" y2="22.01"></line>
-                  <line x1="12" y1="2" x2="12" y2="22"></line>
-                  <line x1="4" y1="10" x2="20" y2="10"></line>
-                  <line x1="4" y1="16" x2="20" y2="16"></line>
-                </svg>
-                기관유형별
-              </h3>
+              <!-- ③ 기관유형별 -->
+              <p class="sidebar-group-header">기관유형별</p>
               <ul>
                 <li><a href="#" onclick="switchBoard('market-public'); return false;" id="board-menu-market-public"
                     class="active">공기업(시장형)</a></li>
                 <li><a href="#" onclick="switchBoard('quasi-market-public'); return false;"
-                    id="board-menu-quasi-market-public">공기업(준시장형)</a>
-                </li>
+                    id="board-menu-quasi-market-public">공기업(준시장형)</a></li>
                 <li><a href="#" onclick="switchBoard('fund-quasi'); return false;"
-                    id="board-menu-fund-quasi">준정부기관(기금관리형)</a></li>
+                    id="board-menu-fund-quasi">준정부(기금관리형)</a></li>
                 <li><a href="#" onclick="switchBoard('entrust-quasi'); return false;"
-                    id="board-menu-entrust-quasi">준정부기관(위탁집행형)</a>
-                </li>
+                    id="board-menu-entrust-quasi">준정부(위탁집행형)</a></li>
                 <li><a href="#" onclick="switchBoard('other-public'); return false;"
                     id="board-menu-other-public">기타공공기관</a></li>
                 <li><a href="#" onclick="switchBoard('local-public'); return false;"
-                    id="board-menu-local-public">지방공기업</a>
-                </li>
+                    id="board-menu-local-public">지방공기업</a></li>
                 <li><a href="#" onclick="switchBoard('local-investment'); return false;"
                     id="board-menu-local-investment">지방출자·출연기관</a></li>
               </ul>
             </aside>
+
 
             <!-- 오른쪽 게시판 컨텐츠 -->
             <div class="board-content">
@@ -4766,7 +4842,7 @@
         <div class="container" style="max-width:1400px; margin:0 auto;">
           <div class="story-header">
             <h1>취업 이야기</h1>
-            <button class="btn-write-story" onclick="openWriteStoryModal()">✏️ 이야기 쓰기</button>
+            <button class="btn-write-story" onclick="openWriteStoryModal()">✏️ 글 올리기</button>
           </div>
 
           <!-- 게시판 레이아웃: 사이드바 + 컨텐츠 -->
