@@ -3428,6 +3428,190 @@
         min-width: 120px;
       }
     }
+
+    /* === 뉴스 관리자 버튼 === */
+    .news-banner-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .btn-write-news {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      border: 2px solid rgba(255, 255, 255, 0.7);
+      padding: 8px 20px;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-write-news:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* === 뉴스 상세보기 섹션 === */
+    #news-detail-section {
+      background: #fff;
+    }
+
+    .news-detail-banner {
+      background: linear-gradient(135deg, #5b2c8e 0%, #3a5ccc 50%, #2890d8 100%);
+      padding: 28px 40px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .news-detail-banner .deco-title {
+      display: inline-block;
+      border: 2px solid rgba(255, 255, 255, 0.7);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .news-detail-banner .back-btn {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+
+    .news-detail-banner .back-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .news-detail-body {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 30px;
+    }
+
+    .news-detail-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: #111;
+      line-height: 1.4;
+      margin: 0 0 12px;
+    }
+
+    .news-detail-meta {
+      font-size: 13px;
+      color: #999;
+      margin-bottom: 28px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .news-detail-content-area {
+      font-size: 16px;
+      color: #333;
+      line-height: 1.9;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .news-detail-img-area {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .news-detail-img-area img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+
+    .news-detail-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+
+    .btn-news-edit {
+      background: #ffa94d;
+      color: white;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-news-edit:hover {
+      background: #ff922b;
+    }
+
+    .btn-news-delete {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-news-delete:hover {
+      background: #c0392b;
+    }
+
+    .btn-news-back {
+      background: #6c757d;
+      color: white;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-news-back:hover {
+      background: #5a6268;
+    }
+
+    /* 뉴스 로딩/빈상태 */
+    .news-loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: #aaa;
+    }
+
+    .news-empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: #aaa;
+      font-size: 1rem;
+    }
+
+    /* 뉴스 기사 클릭 가능 강조 */
+    .news-article-item h3:hover {
+      color: #3498db;
+      text-decoration: underline;
+    }
   </style>
 </head>
 
@@ -4781,86 +4965,37 @@
       <div id="news-section" style="display:none;">
         <!-- 배너 -->
         <div class="news-banner">
-          <div class="deco-title">공공기관 뉴스</div>
-          <h2 class="banner-title">공공기관 동향과 채용 트렌드를 한눈에</h2>
-          <div class="search-count">검색결과 <span id="newsTotalCnt">6</span> 건</div>
+          <div class="news-banner-row">
+            <div>
+              <div class="deco-title">공공기관 뉴스</div>
+              <h2 class="banner-title">공공기관 동향과 채용 트렌드를 한눈에</h2>
+              <div class="search-count">총 <span id="newsTotalCnt">0</span>건</div>
+            </div>
+            <button class="btn-write-news" id="btnWriteNews" onclick="openAddNewsModal()" style="display:none;">
+              ✏️ 뉴스 작성
+            </button>
+          </div>
         </div>
 
         <!-- 본문 -->
         <div class="news-board-container">
           <!-- 왼쪽: 기사 리스트 -->
-          <div class="news-main-articles" id="newsListBody">
-
-            <div class="news-article-item">
-              <div class="article-thumb"><img src="./logo.png" alt="뉴스 이미지"></div>
-              <div class="article-info">
-                <h3>한국전력공사, 2026년 상반기 신입사원 대규모 공개채용 발표</h3>
-                <p class="article-desc">한국전력공사는 2026년 상반기 신입사원 공개채용을 발표했다. 이번 채용은 사무, 기술, 연구 등 다양한 분야에서 진행되며, 지원 자격은 학력
-                  무관으로 폭넓은 기회를 제공한다.</p>
-                <span class="article-date">2026-02-18</span>
-              </div>
-            </div>
-
-            <div class="news-article-item">
-              <div class="article-thumb"><img src="./logo.png" alt="뉴스 이미지"></div>
-              <div class="article-info">
-                <h3>공공기관 경영평가 결과 발표…최우수 기관은?</h3>
-                <p class="article-desc">기획재정부는 2025년도 공공기관 경영평가 결과를 발표했다. 올해 최우수 등급을 받은 기관과 주요 평가 지표에 대해 분석한다.</p>
-                <span class="article-date">2026-02-15</span>
-              </div>
-            </div>
-
-            <div class="news-article-item">
-              <div class="article-thumb"><img src="./logo.png" alt="뉴스 이미지"></div>
-              <div class="article-info">
-                <h3>국민연금공단, 청년인턴 200명 모집…지원 방법은?</h3>
-                <p class="article-desc">국민연금공단이 청년인턴 200명을 모집한다고 밝혔다. 이번 인턴은 6개월간 근무하며, 우수 인턴에게는 정규직 전환 기회가 주어진다.</p>
-                <span class="article-date">2026-02-12</span>
-              </div>
-            </div>
-
-            <div class="news-article-item">
-              <div class="article-thumb"><img src="./logo.png" alt="뉴스 이미지"></div>
-              <div class="article-info">
-                <h3>한국수력원자력, AI 기반 안전관리 시스템 도입 추진</h3>
-                <p class="article-desc">[비즈니스포스트] 한국수력원자력이 AI 기반 원전 안전관리 시스템을 도입한다. 이를 통해 실시간 위험 감지와 예방 정비 효율을 높인다는
-                  계획이다.</p>
-                <span class="article-date">2026-02-10</span>
-              </div>
-            </div>
-
-            <div class="news-article-item">
-              <div class="article-thumb"><img src="./logo.png" alt="뉴스 이미지"></div>
-              <div class="article-info">
-                <h3>공공기관 지방이전 10년…성과와 과제 점검</h3>
-                <p class="article-desc">공공기관 지방이전이 시작된 지 10년이 지났다. 혁신도시를 중심으로 한 지역 경제 활성화 성과와 앞으로의 과제를 살펴본다.</p>
-                <span class="article-date">2026-02-08</span>
-              </div>
-            </div>
-
-            <div class="news-article-item">
-              <div class="article-thumb"><img src="./logo.png" alt="뉴스 이미지"></div>
-              <div class="article-info">
-                <h3>세종학당재단, 글로벌 한국어 교육 확대 위한 채용 진행</h3>
-                <p class="article-desc">세종학당재단은 해외 한국어 교육 수요 증가에 대응하기 위해 신규 직원을 채용한다. 토목, 전기, 통신 분야 등의 전문 인력을 모집 중이다.
-                </p>
-                <span class="article-date">2026-02-05</span>
-              </div>
-            </div>
-
+          <div class="news-main-articles">
+            <!-- 로딩 상태 -->
+            <div id="newsLoading" class="news-loading">⏳ 뉴스를 불러오는 중...</div>
+            <!-- 빈 상태 -->
+            <div id="newsEmpty" class="news-empty" style="display:none;">📭 등록된 뉴스가 없습니다.</div>
+            <!-- 동적 기사 목록 -->
+            <div id="newsListBody"></div>
           </div>
 
           <!-- 오른쪽: 사이드바 -->
           <div class="news-aside">
-            <!-- 많이 본 뉴스 -->
+            <!-- 최신 뉴스 -->
             <dl class="aside-section">
-              <dt>많이 본 공공기관 뉴스</dt>
-              <ul class="aside-link-list">
-                <li><a href="#">한국전력공사 상반기 대규모 채용 발표</a></li>
-                <li><a href="#">공공기관 경영평가 결과 발표…최우수 기관은?</a></li>
-                <li><a href="#">국민연금공단, 청년인턴 200명 모집</a></li>
-                <li><a href="#">한국수력원자력, AI 안전관리 시스템 도입</a></li>
-                <li><a href="#">공공기관 지방이전 10년 성과 점검</a></li>
+              <dt>최신 공공기관 뉴스</dt>
+              <ul class="aside-link-list" id="newsAsideList">
+                <li style="padding:12px 18px; color:#aaa; font-size:13px;">불러오는 중...</li>
               </ul>
             </dl>
 
@@ -4870,7 +5005,7 @@
                   style="background:#f0f0f0; padding: 20px; border: 1px solid #eee; border-radius: 8px;"></a>
             </div>
 
-            <!-- 실시간 인기 공고 -->
+            <!-- 실시간 인기 공고 (정적) -->
             <dl class="aside-section">
               <dt>실시간 인기 공고</dt>
               <div class="popular-job-item">
@@ -4893,15 +5028,77 @@
         </div>
 
         <!-- 페이지네이션 -->
-        <div class="news-pagination" id="newsPagination">
-          <button disabled>‹</button>
-          <button class="active">1</button>
-          <button>2</button>
-          <button>3</button>
-          <button>›</button>
-        </div>
+        <div class="news-pagination" id="newsPagination" style="display:none;"></div>
       </div>
       <!-- ========== /공공기관 뉴스 섹션 끝 ========== -->
+
+      <!-- ========== 공공기관 뉴스 상세보기 섹션 ========== -->
+      <div id="news-detail-section" style="display:none;">
+        <div class="news-detail-banner">
+          <div class="deco-title">공공기관 뉴스</div>
+          <button class="back-btn" onclick="backToNewsList()">← 뉴스 목록</button>
+        </div>
+        <div class="news-detail-body">
+          <h1 class="news-detail-title" id="newsDetailTitle"></h1>
+          <div class="news-detail-meta">
+            <span id="newsDetailDate"></span>
+          </div>
+          <!-- 이미지 영역 -->
+          <div id="newsDetailImgArea" class="news-detail-img-area" style="display:none;">
+            <img id="newsDetailImg" src="" alt="뉴스 이미지">
+          </div>
+          <!-- 본문 -->
+          <div id="newsDetailContent" class="news-detail-content-area"></div>
+          <!-- 액션 버튼 -->
+          <div class="news-detail-actions">
+            <button class="btn-news-back" onclick="backToNewsList()">← 목록으로</button>
+            <button class="btn-news-edit" id="btnNewsEdit" onclick="openEditNewsModal()" style="display:none;">✏️
+              수정</button>
+            <button class="btn-news-delete" id="btnNewsDelete" onclick="deleteCurrentNews()" style="display:none;">🗑️
+              삭제</button>
+          </div>
+        </div>
+      </div>
+      <!-- ========== /뉴스 상세보기 섹션 끝 ========== -->
+
+      <!-- ========== 뉴스 글쓰기/수정 모달 ========== -->
+      <div id="newsModal" class="modal">
+        <div class="modal-content" style="max-width:600px;">
+          <h2 id="newsModalTitle">✏️ 뉴스 작성</h2>
+          <form onsubmit="handleSubmitNews(event)">
+            <input type="hidden" id="news_edit_id">
+            <div class="form-group">
+              <label>제목 *</label>
+              <input type="text" id="news_title" required placeholder="뉴스 제목을 입력하세요">
+            </div>
+            <div class="form-group">
+              <label>요약 (목록에 표시)</label>
+              <textarea id="news_desc" rows="3" placeholder="뉴스 요약 내용을 입력하세요" style="resize:vertical;"></textarea>
+            </div>
+            <div class="form-group">
+              <label>본문 내용</label>
+              <textarea id="news_content" rows="10" placeholder="뉴스 본문을 자유롭게 작성하세요" style="resize:vertical;"></textarea>
+            </div>
+            <div class="form-group">
+              <label>대표 이미지 업로드</label>
+              <input type="file" id="news_image" accept="image/*">
+              <div id="news_current_img" style="margin-top:6px; font-size:13px; color:#666;"></div>
+            </div>
+            <div class="form-group">
+              <label>날짜</label>
+              <input type="date" id="news_date">
+            </div>
+            <div style="text-align:right; margin-top:20px;">
+              <button type="submit" class="btn-submit">저장</button>
+              <button type="button" class="btn-cancel" onclick="closeNewsModal()">취소</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <!-- ========== /뉴스 모달 끝 ========== -->
+
+
+
 
       <!-- 메인 콘텐츠 영역 끝 -->
     </div>
@@ -6554,7 +6751,395 @@
     // 페이지 로드 시 데이터 불러오기
     // 페이지 로드 시 데이터 불러오기 - 제거됨 (하단 스크립트에서 호출)
     // loadJobs();
+
+    // ==================== 공공기관 뉴스 게시판 ====================
+
+    // 뉴스 게시판 전역 상태
+    let newsCurrentPage = 1;
+    const newsItemsPerPage = 8;
+    let allNewsData = [];
+    let currentNewsId = null; // 현재 상세보기 중인 뉴스 ID
+
+    // showNewsBoard: 뉴스 섹션 표시 + 데이터 로드
+    window.showNewsBoard = async function (skipHistory = false) {
+      // 1. 모든 다른 섹션 숨기기
+      ['features', 'jobs', 'general-jobs', 'edu-courses', 'detail-section'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+      ['board-section', 'user-manage-section', 'story-board-section',
+        'story-detail-section', 'news-detail-section'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = 'none';
+        });
+
+      // 2. 사이드바 복구 (뉴스는 사이드바 있는 레이아웃 사용)
+      const wrapper = document.querySelector('.content-with-sidebar-wrapper');
+      if (wrapper) wrapper.classList.remove('full-width-wrapper');
+
+      // 3. 뉴스 섹션 보이기 + 로드
+      const newsSection = document.getElementById('news-section');
+      if (newsSection) {
+        newsSection.style.display = 'block';
+        await loadNews();
+      }
+
+      // 4. 관리자 버튼 표시
+      const btnWrite = document.getElementById('btnWriteNews');
+      if (btnWrite) {
+        btnWrite.style.display = (window.currentUserRole === 'admin') ? 'inline-flex' : 'none';
+      }
+
+      // 5. 히스토리 추가 (뒤로가기 지원)
+      if (!skipHistory) {
+        history.pushState({ section: 'news' }, '', '#news');
+      }
+      window.scrollTo(0, 0);
+    };
+
+    // loadNews: Firestore에서 뉴스 기사 로드
+    window.loadNews = async function () {
+      const listBody = document.getElementById('newsListBody');
+      const loading = document.getElementById('newsLoading');
+      const empty = document.getElementById('newsEmpty');
+      const pagination = document.getElementById('newsPagination');
+      const totalCnt = document.getElementById('newsTotalCnt');
+
+      if (!listBody) return;
+
+      // 로딩 상태
+      if (loading) loading.style.display = 'block';
+      if (empty) empty.style.display = 'none';
+      listBody.innerHTML = '';
+      if (pagination) pagination.style.display = 'none';
+
+      try {
+        const q = window.query(
+          window.collection(window.db, 'news'),
+          window.orderBy('createdAt', 'desc')
+        );
+        const snapshot = await window.getDocs(q);
+
+        if (loading) loading.style.display = 'none';
+
+        if (snapshot.empty) {
+          if (empty) empty.style.display = 'block';
+          if (totalCnt) totalCnt.textContent = '0';
+          renderNewsAside([]);
+          return;
+        }
+
+        allNewsData = [];
+        snapshot.forEach(docSnap => {
+          allNewsData.push({ id: docSnap.id, ...docSnap.data() });
+        });
+
+        if (totalCnt) totalCnt.textContent = allNewsData.length;
+
+        // 페이지 유효성
+        const totalPages = Math.ceil(allNewsData.length / newsItemsPerPage);
+        if (newsCurrentPage > totalPages) newsCurrentPage = 1;
+
+        displayNewsPage(newsCurrentPage);
+        renderNewsPagination();
+        renderNewsAside(allNewsData.slice(0, 5));
+
+      } catch (err) {
+        console.error('뉴스 로딩 오류:', err);
+        if (loading) loading.style.display = 'none';
+        listBody.innerHTML = '<div class="news-empty" style="display:block;">⚠️ 데이터 로딩 실패. 새로고침을 시도해주세요.</div>';
+      }
+    };
+
+    // 뉴스 목록 페이지 렌더링
+    function displayNewsPage(page) {
+      const listBody = document.getElementById('newsListBody');
+      if (!listBody) return;
+      listBody.innerHTML = '';
+
+      const start = (page - 1) * newsItemsPerPage;
+      const end = start + newsItemsPerPage;
+      const pageData = allNewsData.slice(start, end);
+
+      pageData.forEach(data => {
+        const dateStr = data.createdAt
+          ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' })
+          : (data.date || '-');
+
+        const thumbHtml = data.imageUrl
+          ? `<img src="${escapeHtml(data.imageUrl)}" alt="뉴스 이미지">`
+          : `<div style="background:#e2e8f0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:2rem;">📰</div>`;
+
+        const item = document.createElement('div');
+        item.className = 'news-article-item';
+        item.style.cursor = 'pointer';
+        item.onclick = function () { viewNewsDetail(data.id); };
+        item.innerHTML = `
+          <div class="article-thumb">${thumbHtml}</div>
+          <div class="article-info">
+            <h3>${escapeHtml(data.title || '')}</h3>
+            <p class="article-desc">${escapeHtml(data.desc || data.content?.substring(0, 150) || '')}</p>
+            <span class="article-date">${dateStr}</span>
+          </div>
+        `;
+        listBody.appendChild(item);
+      });
+    }
+
+    // 뉴스 페이지네이션 렌더링
+    function renderNewsPagination() {
+      const container = document.getElementById('newsPagination');
+      if (!container) return;
+
+      const totalPages = Math.ceil(allNewsData.length / newsItemsPerPage);
+      if (totalPages <= 1) { container.style.display = 'none'; return; }
+
+      container.style.display = 'flex';
+      container.innerHTML = '';
+
+      const prevBtn = document.createElement('button');
+      prevBtn.textContent = '‹';
+      prevBtn.disabled = newsCurrentPage === 1;
+      prevBtn.onclick = () => goToNewsPage(newsCurrentPage - 1);
+      container.appendChild(prevBtn);
+
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        if (i === newsCurrentPage) btn.className = 'active';
+        btn.onclick = () => goToNewsPage(i);
+        container.appendChild(btn);
+      }
+
+      const nextBtn = document.createElement('button');
+      nextBtn.textContent = '›';
+      nextBtn.disabled = newsCurrentPage === totalPages;
+      nextBtn.onclick = () => goToNewsPage(newsCurrentPage + 1);
+      container.appendChild(nextBtn);
+    }
+
+    function goToNewsPage(page) {
+      const totalPages = Math.ceil(allNewsData.length / newsItemsPerPage);
+      if (page < 1 || page > totalPages) return;
+      newsCurrentPage = page;
+      displayNewsPage(page);
+      renderNewsPagination();
+      window.scrollTo(0, 0);
+    }
+
+    // 사이드바 최신 뉴스 렌더링
+    function renderNewsAside(newsArr) {
+      const aside = document.getElementById('newsAsideList');
+      if (!aside) return;
+      if (!newsArr || newsArr.length === 0) {
+        aside.innerHTML = '<li style="padding:12px 18px; color:#aaa; font-size:13px;">뉴스가 없습니다.</li>';
+        return;
+      }
+      aside.innerHTML = newsArr.map(n =>
+        `<li><a href="#" onclick="viewNewsDetail('${n.id}'); return false;">${escapeHtml(n.title || '')}</a></li>`
+      ).join('');
+    }
+
+    // viewNewsDetail: 뉴스 상세보기
+    window.viewNewsDetail = function (id, skipHistory = false) {
+      const data = allNewsData.find(n => n.id === id);
+      if (!data) return;
+
+      currentNewsId = id;
+
+      // 섹션 전환
+      document.getElementById('news-section').style.display = 'none';
+      document.getElementById('news-detail-section').style.display = 'block';
+      window.scrollTo(0, 0);
+
+      // 제목, 날짜
+      const dateStr = data.createdAt
+        ? new Date(data.createdAt.seconds * 1000).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' })
+        : (data.date || '-');
+      document.getElementById('newsDetailTitle').textContent = data.title || '';
+      document.getElementById('newsDetailDate').textContent = dateStr;
+
+      // 이미지
+      const imgArea = document.getElementById('newsDetailImgArea');
+      const img = document.getElementById('newsDetailImg');
+      if (data.imageUrl) { img.src = data.imageUrl; imgArea.style.display = 'block'; }
+      else { imgArea.style.display = 'none'; }
+
+      // 본문 (줄바꿈 보존)
+      const contentEl = document.getElementById('newsDetailContent');
+      contentEl.innerHTML = (data.content || '').replace(/\n/g, '<br>');
+
+      // 관리자 버튼
+      const btnEdit = document.getElementById('btnNewsEdit');
+      const btnDelete = document.getElementById('btnNewsDelete');
+      const isAdmin = window.currentUserRole === 'admin';
+      if (btnEdit) btnEdit.style.display = isAdmin ? 'inline-block' : 'none';
+      if (btnDelete) btnDelete.style.display = isAdmin ? 'inline-block' : 'none';
+
+      // 히스토리
+      if (!skipHistory) {
+        history.pushState({ section: 'news-detail', newsId: id }, '', '#news-detail-' + id);
+      }
+    };
+
+    // backToNewsList: 뉴스 목록으로 돌아가기
+    window.backToNewsList = function () {
+      document.getElementById('news-detail-section').style.display = 'none';
+      document.getElementById('news-section').style.display = 'block';
+      currentNewsId = null;
+      history.pushState({ section: 'news' }, '', '#news');
+      window.scrollTo(0, 0);
+    };
+
+    // openAddNewsModal: 뉴스 작성 모달 열기
+    window.openAddNewsModal = function () {
+      const modal = document.getElementById('newsModal');
+      if (!modal) return;
+      document.getElementById('newsModalTitle').textContent = '✏️ 뉴스 작성';
+      document.getElementById('news_edit_id').value = '';
+      document.getElementById('news_title').value = '';
+      document.getElementById('news_desc').value = '';
+      document.getElementById('news_content').value = '';
+      document.getElementById('news_image').value = '';
+      document.getElementById('news_current_img').textContent = '';
+      document.getElementById('news_date').value = new Date().toISOString().slice(0, 10);
+      modal.style.display = 'block';
+    };
+
+    // openEditNewsModal: 뉴스 수정 모달 열기
+    window.openEditNewsModal = function () {
+      if (!currentNewsId) return;
+      const data = allNewsData.find(n => n.id === currentNewsId);
+      if (!data) return;
+
+      const modal = document.getElementById('newsModal');
+      if (!modal) return;
+      document.getElementById('newsModalTitle').textContent = '✏️ 뉴스 수정';
+      document.getElementById('news_edit_id').value = currentNewsId;
+      document.getElementById('news_title').value = data.title || '';
+      document.getElementById('news_desc').value = data.desc || '';
+      document.getElementById('news_content').value = data.content || '';
+      document.getElementById('news_image').value = '';
+      const imgInfo = document.getElementById('news_current_img');
+      if (imgInfo) imgInfo.textContent = data.imageUrl ? '※ 기존 이미지 있음 (새 파일 업로드 시 교체)' : '';
+      const dateVal = data.createdAt
+        ? new Date(data.createdAt.seconds * 1000).toISOString().slice(0, 10)
+        : (data.date || '');
+      document.getElementById('news_date').value = dateVal;
+      modal.style.display = 'block';
+    };
+
+    // closeNewsModal: 뉴스 모달 닫기
+    window.closeNewsModal = function () {
+      const modal = document.getElementById('newsModal');
+      if (modal) modal.style.display = 'none';
+    };
+
+    // handleSubmitNews: 뉴스 저장 (작성/수정 통합)
+    window.handleSubmitNews = async function (e) {
+      e.preventDefault();
+      const user = window.auth.currentUser;
+      if (!user || window.currentUserRole !== 'admin') {
+        alert('관리자 권한이 필요합니다.');
+        return;
+      }
+
+      const editId = document.getElementById('news_edit_id').value;
+      const title = document.getElementById('news_title').value.trim();
+      const desc = document.getElementById('news_desc').value.trim();
+      const content = document.getElementById('news_content').value.trim();
+      const imageFile = document.getElementById('news_image').files[0];
+      const dateVal = document.getElementById('news_date').value;
+
+      if (!title) { alert('제목을 입력해주세요.'); return; }
+
+      try {
+        let imageUrl = '';
+
+        // 기존 수정 시 기존 이미지 URL 유지
+        if (editId) {
+          const existing = allNewsData.find(n => n.id === editId);
+          if (existing) imageUrl = existing.imageUrl || '';
+        }
+
+        // 새 이미지 업로드
+        if (imageFile) {
+          imageUrl = await window.uploadFile(imageFile, 'news_images');
+        }
+
+        const docData = {
+          title,
+          desc,
+          content,
+          imageUrl,
+          date: dateVal,
+          authorUid: user.uid,
+          updatedAt: window.Timestamp.now()
+        };
+
+        if (editId) {
+          // 수정
+          const ref = window.doc(window.db, 'news', editId);
+          await window.updateDoc(ref, docData);
+          alert('✅ 뉴스가 수정되었습니다.');
+        } else {
+          // 신규 작성
+          docData.createdAt = window.Timestamp.now();
+          await window.addDoc(window.collection(window.db, 'news'), docData);
+          alert('✅ 뉴스가 등록되었습니다.');
+        }
+
+        closeNewsModal();
+
+        // 상세보기 중이었으면 목록, 아니면 현재 위치 유지
+        if (editId && document.getElementById('news-detail-section').style.display !== 'none') {
+          await loadNews();
+          viewNewsDetail(editId, true);
+        } else {
+          newsCurrentPage = 1;
+          await loadNews();
+          // 섹션 전환
+          document.getElementById('news-detail-section').style.display = 'none';
+          document.getElementById('news-section').style.display = 'block';
+        }
+
+      } catch (err) {
+        console.error(err);
+        alert('저장 실패: ' + err.message);
+      }
+    };
+
+    // deleteCurrentNews: 현재 상세보기 중인 뉴스 삭제
+    window.deleteCurrentNews = async function () {
+      if (!currentNewsId) return;
+      if (!confirm('정말 삭제하시겠습니까?')) return;
+      if (window.currentUserRole !== 'admin') {
+        alert('관리자 권한이 필요합니다.');
+        return;
+      }
+      try {
+        await window.deleteDoc(window.doc(window.db, 'news', currentNewsId));
+        alert('✅ 삭제되었습니다.');
+        backToNewsList();
+        newsCurrentPage = 1;
+        await loadNews();
+        document.getElementById('news-section').style.display = 'block';
+      } catch (err) {
+        alert('삭제 실패: ' + err.message);
+      }
+    };
+
+    // restoreSidebar에 news-detail-section 숨김 추가 보완 (기존에 없으면)
+    const _origRestoreSidebar = window.restoreSidebar;
+    window.restoreSidebar = function () {
+      _origRestoreSidebar && _origRestoreSidebar();
+      const nd = document.getElementById('news-detail-section');
+      if (nd) nd.style.display = 'none';
+    };
+
+    // ==================== /공공기관 뉴스 게시판 끝 ====================
   </script>
+
 
   <script>
     // 로그인 체크 함수 (임시 비활성화 - 테스트용)
@@ -6661,42 +7246,8 @@
       window.scrollTo(0, 0);
     }
 
-    // === 공공기관 뉴스 보기 ===
-    window.showNewsBoard = function (skipHistory = false) {
-      // 사이드바 숨기기
-      const wrapper = document.querySelector('.content-with-sidebar-wrapper');
-      if (wrapper) wrapper.classList.add('full-width-wrapper');
 
-      // 모든 메인 섹션 숨기기
-      document.getElementById('features').style.display = 'none';
-      document.getElementById('jobs').style.display = 'none';
-      document.getElementById('general-jobs').style.display = 'none';
-      document.getElementById('edu-courses').style.display = 'none';
-      document.getElementById('detail-section').style.display = 'none';
 
-      const boardSection = document.getElementById('board-section');
-      if (boardSection) boardSection.style.display = 'none';
-
-      const storySection = document.getElementById('story-board-section');
-      if (storySection) storySection.style.display = 'none';
-
-      const storyDetailSection = document.getElementById('story-detail-section');
-      if (storyDetailSection) storyDetailSection.style.display = 'none';
-
-      const userSection = document.getElementById('user-manage-section');
-      if (userSection) userSection.style.display = 'none';
-
-      // 뉴스 섹션 보이기
-      const newsSection = document.getElementById('news-section');
-      if (newsSection) newsSection.style.display = 'block';
-
-      // 히스토리 추가 (뒤로가기 지원)
-      if (!skipHistory) {
-        history.pushState({ section: 'news' }, '', '#news');
-      }
-
-      window.scrollTo(0, 0);
-    }
 
     // 채용정보 게시판 전환 함수
     window.switchBoard = function (boardType, skipHistory = false, targetPage = 1) {
@@ -7808,11 +8359,17 @@
       } else if (state.section === 'news') {
         // 공공기관 뉴스로 이동
         window.showNewsBoard(true);
+      } else if (state.section === 'news-detail') {
+        // 뉴스 상세보기로 이동
+        window.showNewsBoard(true).then && window.showNewsBoard(true);
+        // allNewsData에 데이터가 로드된 후 상세보기
+        // (loadNews가 async이므로 showNewsBoard 내부에서 로드됨)
       } else {
         // 기본: 홈으로
         window.goHome(true);
       }
     });
+
   </script>
 </body>
 
