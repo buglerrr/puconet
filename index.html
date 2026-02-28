@@ -7,6 +7,9 @@
   <meta content="width=1520" name="viewport" />
   <title>브레인넷 - 공기업 취업 플랫폼</title>
   <!-- Claude Code 연동 테스트 -->
+  <!-- 카카오 JavaScript SDK -->
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js"
+    integrity="sha384-DKYJZ8NLiK8MN4/C5P2vDU9ohUMOQ/d4ezGMHOTOwNVF4bqJ26fCOE1jah7osEC" crossorigin="anonymous"></script>
   <style>
     * {
       margin: 0;
@@ -6128,16 +6131,136 @@
       }
     }
 
+    // ===== 카카오 SDK 초기화 =====
+    // 📌 아래 JavaScript 키를 https://developers.kakao.com 에서 발급받은 키로 교체하세요.
+    //    1) https://developers.kakao.com 접속 → 앱 만들기
+    //    2) 앱 설정 → 플랫폼 → Web → 사이트 도메인 등록 (예: https://your-domain.com)
+    //    3) 앱 키 → JavaScript 키 복사
+    //    4) 카카오 로그인 → 활성화 → 동의항목에서 '이메일' 필수동의 설정
+    if (typeof Kakao !== 'undefined' && !Kakao.isInitialized()) {
+      Kakao.init('aaf27df789f6bd796b2766ac0afc75aa'); // ← 여기에 카카오 JavaScript 키 입력
+      console.log('카카오 SDK 초기화:', Kakao.isInitialized());
+    }
+
+    // ===== 카카오톡 로그인/가입 처리 (카카오 SDK 직접 사용) =====
+    window.handleKakaoAuth = async function () {
+      try {
+        // 1단계: 카카오 로그인 팝업 (사용자가 카카오 아이디/비밀번호 입력)
+        await new Promise((resolve, reject) => {
+          Kakao.Auth.login({
+            scope: 'profile_nickname,account_email',
+            success: function (authObj) {
+              console.log('카카오 인증 성공:', authObj);
+              resolve(authObj);
+            },
+            fail: function (err) {
+              console.error('카카오 인증 실패:', err);
+              reject(err);
+            }
+          });
+        });
+
+        // 2단계: 카카오 사용자 정보 가져오기
+        const userInfo = await new Promise((resolve, reject) => {
+          Kakao.API.request({
+            url: '/v2/user/me',
+            success: function (res) {
+              console.log('카카오 사용자 정보:', res);
+              resolve(res);
+            },
+            fail: function (err) {
+              reject(err);
+            }
+          });
+        });
+
+        const kakaoId = userInfo.id;
+        const kakaoAccount = userInfo.kakao_account || {};
+        const email = kakaoAccount.email;
+        const nickname = kakaoAccount.profile?.nickname || '';
+        const profileImage = kakaoAccount.profile?.profile_image_url || '';
+
+        // 이메일이 없으면 가입 불가
+        if (!email) {
+          alert('⚠️ 카카오 계정에 이메일이 등록되어 있지 않습니다.\n카카오 계정 설정에서 이메일을 등록한 후 다시 시도해주세요.');
+          return;
+        }
+
+        // 3단계: Firebase 계정 처리 (카카오 이메일로 자동 가입/로그인)
+        const kakaoPassword = 'Kko@' + kakaoId + '!Bn2025'; // 카카오 ID 기반 고유 비밀번호
+
+        try {
+          // 이미 가입된 사용자인지 로그인 시도
+          const userCredential = await signInWithEmailAndPassword(auth, email, kakaoPassword);
+          // 프로필 정보 업데이트
+          if (nickname || profileImage) {
+            await updateProfile(userCredential.user, {
+              displayName: nickname || userCredential.user.displayName,
+              photoURL: profileImage || userCredential.user.photoURL
+            });
+          }
+          alert('✅ 카카오톡으로 로그인되었습니다. (' + (nickname || email) + '님)');
+        } catch (loginErr) {
+          // 가입되지 않은 사용자 → 신규 가입
+          if (loginErr.code === 'auth/user-not-found' || loginErr.code === 'auth/invalid-credential') {
+            try {
+              const newUser = await createUserWithEmailAndPassword(auth, email, kakaoPassword);
+              await updateProfile(newUser.user, {
+                displayName: nickname || email.split('@')[0],
+                photoURL: profileImage
+              });
+
+              // Firestore에 카카오 가입 정보 저장
+              await setDoc(doc(db, 'users', newUser.user.uid), {
+                email: email,
+                name: nickname || email.split('@')[0],
+                photoURL: profileImage,
+                role: 'user',
+                provider: 'kakao',
+                kakaoId: String(kakaoId),
+                createdAt: Timestamp.now(),
+                lastLoginAt: Timestamp.now()
+              });
+
+              alert('✅ 카카오톡으로 가입되었습니다! (' + (nickname || email) + '님)\n자동으로 로그인되었습니다.');
+            } catch (signupErr) {
+              if (signupErr.code === 'auth/email-already-in-use') {
+                alert('⚠️ 이 이메일(' + email + ')은 이미 다른 방식으로 가입되어 있습니다.\n해당 이메일로 직접 로그인해주세요.');
+              } else {
+                throw signupErr;
+              }
+            }
+          } else {
+            throw loginErr;
+          }
+        }
+
+        closeLoginModal();
+        closeSignupModal();
+
+      } catch (err) {
+        console.error('카카오 로그인/가입 실패:', err);
+        if (err.error === 'access_denied') {
+          // 사용자가 카카오 로그인 팝업에서 취소
+          return;
+        }
+        alert('카카오톡 연동에 실패했습니다: ' + (err.message || err.error_description || JSON.stringify(err)));
+      }
+    }
+
+    // ===== 소셜 로그인 통합 핸들러 =====
     window.handleSocialLogin = async function (providerName) {
+      // 카카오는 별도 SDK로 처리
+      if (providerName === 'kakao') {
+        return window.handleKakaoAuth();
+      }
+
       let provider;
       try {
         if (providerName === 'apple') {
           provider = new OAuthProvider('apple.com');
           provider.addScope('email');
           provider.addScope('name');
-        } else if (providerName === 'kakao') {
-          // 카카오: Firebase Console에서 OIDC 공급업체 설정 필요 (provider ID: oidc.kakao)
-          provider = new OAuthProvider('oidc.kakao');
         } else if (providerName === 'naver') {
           // 네이버: Firebase Console에서 OIDC 공급업체 설정 필요 (provider ID: oidc.naver)
           provider = new OAuthProvider('oidc.naver');
