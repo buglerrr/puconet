@@ -2011,7 +2011,7 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
       align-self: flex-start;
       position: sticky;
-      top: 80px;
+      top: 115px; /* 상단 헤더(약 110px) 아래 고정 */
     }
 
     /* 사이드바 상단 타이틀 배너 */
@@ -2107,103 +2107,125 @@
 
     /* ===== 채용정보 게시판 사이드바 끝 ===== */
 
-    /* ===== 채용정보 필터 패널 ===== */
-    .job-filter-panel {
-      display: flex;
-      flex-direction: column;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      overflow: hidden;
-      background: #fff;
-      margin-bottom: 1rem;
-    }
-
-    .filter-row {
-      display: flex;
-      align-items: flex-start;
-      border-bottom: 1px solid #f0f4f8;
-      min-height: 46px;
-    }
-
-    .filter-row:last-child {
-      border-bottom: none;
-    }
-
-    .filter-row-label {
-      width: 80px;
-      min-width: 80px;
-      padding: 10px 10px;
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: #374151;
-      background: #f8fafc;
-      border-right: 1px solid #e2e8f0;
-      display: flex;
-      align-items: center;
-      line-height: 1.3;
-    }
-
-    .filter-scroll-area {
-      flex: 1;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      padding: 8px 10px;
-      max-height: 110px;
-      overflow-y: auto;
-      align-content: flex-start;
-    }
-
-    .filter-scroll-area::-webkit-scrollbar {
-      width: 5px;
-    }
-    .filter-scroll-area::-webkit-scrollbar-track {
-      background: #f1f5f9;
-    }
-    .filter-scroll-area::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 4px;
-    }
-    .filter-scroll-area::-webkit-scrollbar-thumb:hover {
-      background: #94a3b8;
-    }
-
-    .filter-chip {
-      display: inline-flex;
-      align-items: center;
-      padding: 4px 10px;
-      font-size: 0.8rem;
-      border-radius: 4px;
-      background: #f1f5f9;
-      color: #495057;
-      border: 1px solid #dee2e6;
-      cursor: pointer;
-      user-select: none;
-      transition: all 0.15s;
-      white-space: nowrap;
-      line-height: 1.5;
-    }
-
-    .filter-chip:hover {
-      background: #e7f0fd;
-      border-color: #93c5fd;
-      color: #1d4ed8;
-    }
-
-    .filter-chip.checked {
-      background: #1d4ed8;
-      border-color: #1d4ed8;
-      color: #fff;
-      font-weight: 600;
-    }
-
+    /* ===== 채용정보 필터 패널 (컬럼형) ===== */
     .filter-top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 0.75rem 1rem;
-      border-bottom: 1px solid #e2e8f0;
       background: #fff;
+      border: 1px solid #d0d0d0;
+      border-bottom: 1px solid #e5e5e5;
+      border-radius: 4px 4px 0 0;
+    }
+
+    .job-filter-panel {
+      display: flex;
+      border: 1px solid #d0d0d0;
+      border-top: none;
+      background: #fff;
+      overflow: hidden;
+      margin-bottom: 0;
+    }
+
+    .filter-col {
+      flex: 1;
+      min-width: 0;
+      border-right: 1px solid #e0e0e0;
+    }
+
+    .filter-col:last-child {
+      border-right: none;
+    }
+
+    .filter-col-header {
+      padding: 8px 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #222;
+      background: #f5f5f5;
+      border-bottom: 1px solid #e0e0e0;
+      letter-spacing: -0.2px;
+    }
+
+    .filter-col-items {
+      max-height: 170px;
+      overflow-y: auto;
+      padding: 2px 0;
+    }
+
+    .filter-col-items::-webkit-scrollbar {
+      width: 4px;
+    }
+    .filter-col-items::-webkit-scrollbar-track { background: #f8f8f8; }
+    .filter-col-items::-webkit-scrollbar-thumb { background: #c8c8c8; border-radius: 3px; }
+    .filter-col-items::-webkit-scrollbar-thumb:hover { background: #a0a0a0; }
+
+    .filter-item {
+      display: block;
+      padding: 5px 10px;
+      font-size: 0.82rem;
+      color: #444;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: background 0.1s, color 0.1s;
+      user-select: none;
+      line-height: 1.5;
+    }
+
+    .filter-item:hover {
+      background: #eef4ff;
+      color: #1553b5;
+    }
+
+    .filter-item.selected {
+      color: #1553b5;
+      font-weight: 700;
+      background: #f0f5ff;
+    }
+
+    /* 검색 조건 안내 메시지 */
+    .filter-hint-row {
+      padding: 7px 12px;
+      font-size: 0.82rem;
+      color: #999;
+      border-top: 1px solid #e8e8e8;
+      background: #fdfdfd;
+      border: 1px solid #d0d0d0;
+      border-top: none;
+      border-radius: 0 0 4px 4px;
+    }
+
+    /* ===== 필터 클릭 전 안내 ===== */
+    .filter-guide-msg {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: #94a3b8;
+      border: 2px dashed #e2e8f0;
+      border-radius: 8px;
+      margin-top: 1rem;
+    }
+    .filter-guide-msg .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .filter-guide-msg p { font-size: 0.95rem; }
+
+    /* 관리자 일괄 삭제 바 */
+    #adminBulkBar {
+      display: none;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      padding: 0.6rem 1rem;
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+    }
+    #adminBulkBar .admin-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #856404;
     }
     /* ===== 채용정보 필터 패널 끝 ===== */
 
@@ -4832,10 +4854,33 @@
                       <button onclick="resetJobFilters()" style="background:#6c757d; color:white; border:none; padding:0.45rem 0.9rem; border-radius:4px; cursor:pointer; font-size:0.88rem; font-weight:600;">초기화</button>
                     </div>
                   </div>
-                  <!-- 카테고리별 필터 패널 -->
+                  <!-- 카테고리별 필터 패널 (컬럼형) -->
                   <div id="dynamic-filters">
                     <!-- 필터 패널이 JavaScript에 의해 동적으로 생성될 영역 -->
                   </div>
+                  <!-- 검색 조건 안내 -->
+                  <div id="filterHintRow" class="filter-hint-row" style="display:none;">
+                    검색 조건을 설정해주세요.
+                  </div>
+                </div>
+
+                <!-- 관리자 일괄 삭제 바 (테이블 바로 위, 관리자 로그인 시만 표시) -->
+                <div id="adminBulkBar">
+                  <span class="admin-label">🔧 관리자 모드</span>
+                  <input type="checkbox" id="selectAllJobsAdmin" onclick="toggleSelectAllAdmin()" title="전체 선택" style="width:18px;height:18px;cursor:pointer;accent-color:#3498db;">
+                  <label for="selectAllJobsAdmin" style="font-size:0.85rem;font-weight:600;color:#664d03;cursor:pointer;">전체 선택</label>
+                  <button class="btn-bulk-delete" onclick="deleteSelectedJobs()" style="padding:0.4rem 0.9rem;font-size:0.84rem;">
+                    선택(<span id="selectedCount">0</span>개) 삭제
+                  </button>
+                  <button class="btn-delete-all" onclick="deleteAllJobsInCategory()" style="padding:0.4rem 0.9rem;font-size:0.84rem;">
+                    현재 목록 전체 삭제
+                  </button>
+                </div>
+
+                <!-- 필터 클릭 전 안내 메시지 -->
+                <div id="filterGuideMsg" class="filter-guide-msg">
+                  <div class="icon">🔍</div>
+                  <p>왼쪽 메뉴에서 <strong>채용 유형</strong>을 선택하거나<br>위 <strong>필터를 클릭</strong>하면 채용공고 목록이 표시됩니다.</p>
                 </div>
 
                 <!-- 빈 상태 -->
@@ -6120,6 +6165,10 @@
           const snap = await getDoc(doc(db, 'users', user.uid));
           if (snap.exists()) {
             window.currentUserRole = snap.data().role;
+          }
+          // 관리자 이메일 fallback: Firestore role 무관하게 관리자 처리
+          if (user.email === 'ilovetruman@gmail.com') {
+            window.currentUserRole = 'admin';
           }
         } catch (e) { }
 
@@ -8093,30 +8142,7 @@
 
       if (!loading || !tbody) return;
 
-      const currentCategory = window.currentJobCategory || 'market-public';
       const now = Date.now();
-      const cached = _jobsCache.get(currentCategory);
-
-      // ── 캐시 HIT: Firestore 없이 즉시 표시 ──
-      if (cached && (now - cached.ts < JOBS_CACHE_TTL)) {
-        totalJobs = cached.jobs;
-        const isAdmin = (window.currentUserRole === 'admin');
-        const mgmtHeader = document.getElementById('job-mgmt-header');
-        const checkboxHeader = document.getElementById('checkbox-header');
-        const bulkDeleteButtons = document.getElementById('bulkDeleteButtons');
-        if (mgmtHeader) mgmtHeader.style.display = isAdmin ? 'table-cell' : 'none';
-        if (checkboxHeader) checkboxHeader.style.display = isAdmin ? 'table-cell' : 'none';
-        if (bulkDeleteButtons) bulkDeleteButtons.style.display = isAdmin ? 'flex' : 'none';
-        loading.style.display = 'none';
-        if (emptyState) emptyState.style.display = totalJobs.length === 0 ? 'block' : 'none';
-        if (jobTable) jobTable.style.display = totalJobs.length === 0 ? 'none' : 'table';
-        if (totalJobs.length > 0) {
-          displayJobsForPage(currentPage, isAdmin);
-          renderPagination();
-        }
-        if (bottomAddButton) bottomAddButton.style.display = isAdmin ? 'block' : 'none';
-        return;
-      }
 
       try {
         loading.style.display = 'block';
@@ -8124,95 +8150,56 @@
         if (jobTable) jobTable.style.display = 'none';
         if (paginationContainer) paginationContainer.style.display = 'none';
         if (bottomAddButton) bottomAddButton.style.display = 'none';
-        
-        let shouldFetch = true;
-        
-        // 전체 캐시 활용
+
+        // filterGuideMsg: 로딩 중에는 숨김
+        const filterGuideMsg = document.getElementById('filterGuideMsg');
+        if (filterGuideMsg) filterGuideMsg.style.display = 'none';
+
+        // ── 전체 캐시 활용 ──
         const allCached = _jobsCache.get('_all_jobs');
         if (allCached && (now - allCached.ts < JOBS_CACHE_TTL)) {
-            allRawJobs = allCached.jobs;
-            shouldFetch = false;
+          allRawJobs = allCached.jobs;
+        } else {
+          const q = query(collection(db, 'jobs'), orderBy('createdAt', 'desc'));
+          const querySnapshot = await getDocs(q);
+          allRawJobs = [];
+          if (!querySnapshot.empty) {
+            querySnapshot.forEach((docSnap) => {
+              const d = docSnap.data();
+              allRawJobs.push({ ...d, id: docSnap.id });
+            });
+          }
+          _jobsCache.set('_all_jobs', { jobs: [...allRawJobs], ts: now });
         }
 
-        if (shouldFetch) {
-            const q = query(collection(db, 'jobs'), orderBy('createdAt', 'desc'));
-            const querySnapshot = await getDocs(q);
-
-            allRawJobs = [];
-            if (!querySnapshot.empty) {
-                querySnapshot.forEach((docSnap) => {
-                    const d = docSnap.data();
-                    allRawJobs.push({ ...d, id: docSnap.id });
-                });
-            }
-            // 캐시에 저장
-            _jobsCache.set('_all_jobs', { jobs: [...allRawJobs], ts: now });
-        }
-
+        loading.style.display = 'none';
         tbody.innerHTML = '';
 
         if (allRawJobs.length === 0) {
-          loading.style.display = 'none';
           if (emptyState) emptyState.style.display = 'block';
-
-          // 전체 데이터가 없어도 관리자에게는 등록 버튼 표시
-          const isAdmin = (window.currentUserRole === 'admin');
-          if (bottomAddButton) {
-            bottomAddButton.style.display = isAdmin ? 'block' : 'none';
-          }
+          const isAdm = (window.currentUserRole === 'admin') ||
+                        (window.auth && window.auth.currentUser && window.auth.currentUser.email === 'ilovetruman@gmail.com');
+          if (bottomAddButton) bottomAddButton.style.display = isAdm ? 'block' : 'none';
           return;
         }
 
-        // 관리자 여부에 따라 '관리' 헤더 표시 제어
-        const isAdmin = (window.currentUserRole === 'admin');
-        const mgmtHeader = document.getElementById('job-mgmt-header');
-        const checkboxHeader = document.getElementById('checkbox-header');
-        const bulkDeleteButtons = document.getElementById('bulkDeleteButtons');
+        // 필터 UI 생성
+        renderJobFilters();
 
-        if (mgmtHeader) mgmtHeader.style.display = isAdmin ? 'table-cell' : 'none';
-        if (checkboxHeader) checkboxHeader.style.display = isAdmin ? 'table-cell' : 'none';
-        if (bulkDeleteButtons) bulkDeleteButtons.style.display = isAdmin ? 'flex' : 'none';
-
-        // 클라이언트 사이드 필터링 및 렌더링 호출
-        renderJobFilters(); // 동적 필터 UI 생성
-        
-        // 사이드바 카테고리가 갱신된 경우, 카테고리 필터에 반영
+        // 사이드바 카테고리가 있으면 카테고리 필터에 반영
         if (window.currentJobCategory) {
-            currentFilters.category = [window.currentJobCategory];
+          currentFilters.category = [window.currentJobCategory];
         } else {
-            currentFilters.category = [];
-        }
-        applyJobFilters(); // 필터 로직 적용 (totalJobs 구성)
-
-        if (totalJobs.length === 0) {
-          loading.style.display = 'none';
-          if (emptyState) emptyState.style.display = 'block';
-          if (paginationContainer) paginationContainer.style.display = 'none';
-          if (bulkDeleteButtons) bulkDeleteButtons.style.display = 'none';
-
-          // 데이터가 없어도 관리자에게는 등록 버튼 표시
-          if (bottomAddButton) {
-            bottomAddButton.style.display = isAdmin ? 'block' : 'none';
-          }
-          return;
+          currentFilters.category = [];
         }
 
-        console.log('Total jobs loaded:', totalJobs.length);
-        console.log('Category:', window.currentJobCategory);
+        // applyJobFilters가 테이블 표시/숨김, adminBulkBar, filterGuideMsg 모두 처리
+        applyJobFilters();
 
-        // 현재 페이지의 데이터만 표시
-        displayJobsForPage(currentPage, isAdmin);
-
-        loading.style.display = 'none';
-        if (jobTable) jobTable.style.display = 'table';
-
-        // 페이지네이션은 데이터 개수와 관계없이 항상 렌더링 시도
-        renderPagination();
-
-        // 관리자에게만 하단 버튼 표시
-        if (bottomAddButton) {
-          bottomAddButton.style.display = isAdmin ? 'block' : 'none';
-        }
+        // 관리자 등록 버튼
+        const isAdmin2 = (window.currentUserRole === 'admin') ||
+                         (window.auth && window.auth.currentUser && window.auth.currentUser.email === 'ilovetruman@gmail.com');
+        if (bottomAddButton) bottomAddButton.style.display = isAdmin2 ? 'block' : 'none';
 
       } catch (error) {
         console.error('데이터 로딩 실패:', error);
@@ -8295,17 +8282,17 @@
         if (job.ncsCode) ncsSet.add(job.ncsCode);
       });
 
-      // 필터 칩 생성 함수 (스크롤 패널 방식)
-      function createFilterRow(title, key, valuesArray, nameMapper) {
+      // 컬럼 생성 함수 (이미지 스타일 - 세로 스크롤 목록)
+      function createFilterCol(title, key, valuesArray, nameMapper) {
         if (!valuesArray || valuesArray.length === 0) return '';
-        let html = `<div class="filter-row">`;
-        html += `<div class="filter-row-label">${title}</div>`;
-        html += `<div class="filter-scroll-area">`;
+        let html = `<div class="filter-col">`;
+        html += `<div class="filter-col-header">${title}</div>`;
+        html += `<div class="filter-col-items">`;
         valuesArray.forEach(val => {
           const displayVal = nameMapper ? (nameMapper(val) || val) : val;
-          const isChecked = currentFilters[key].includes(val);
-          html += `<label class="filter-chip${isChecked ? ' checked' : ''}">
-                     <input type="checkbox" value="${val}" data-filter-key="${key}" onchange="updateFilterState(this)" ${isChecked ? 'checked' : ''} style="display:none;">
+          const isSel = currentFilters[key].includes(val);
+          html += `<label class="filter-item${isSel ? ' selected' : ''}">
+                     <input type="checkbox" value="${val}" data-filter-key="${key}" onchange="updateFilterState(this)" ${isSel ? 'checked' : ''} style="display:none;">
                      <span>${displayVal}</span>
                    </label>`;
         });
@@ -8313,24 +8300,24 @@
         return html;
       }
 
-      // 기관유형: catNames 순서대로 정렬
+      // 기관유형: 고정 순서
       const catOrdered = VALID_CATEGORIES.filter(c => cats.has(c));
       // 학력: 고정 순서
       const eduOrdered = EDU_CANONICAL.filter(e => eduSet.has(e));
-      // 근무지역: MAJOR_CITIES 순서대로
+      // 근무지역: MAJOR_CITIES 순서
       const locOrdered = MAJOR_CITIES.filter(c => locCities.has(c));
-      // 나머지: 알파벳/가나다 정렬
+      // 나머지: 가나다 정렬
       const carsArr = Array.from(cars).sort();
       const empsArr = Array.from(emps).sort();
       const ncsArr = Array.from(ncsSet).sort();
 
       let _h = '<div class="job-filter-panel">';
-      _h += createFilterRow('기관유형', 'category', catOrdered, v => catNames[v] || v);
-      _h += createFilterRow('채용구분', 'careerType', carsArr);
-      _h += createFilterRow('학력조건', 'education', eduOrdered);
-      _h += createFilterRow('고용유형', 'employmentType', empsArr);
-      _h += createFilterRow('근무지역', 'location', locOrdered);
-      _h += createFilterRow('NCS 코드명', 'ncsCode', ncsArr);
+      _h += createFilterCol('기관유형', 'category', catOrdered, v => catNames[v] || v);
+      _h += createFilterCol('채용구분', 'careerType', carsArr);
+      _h += createFilterCol('학력조건', 'education', eduOrdered);
+      _h += createFilterCol('고용유형', 'employmentType', empsArr);
+      _h += createFilterCol('근무지역', 'location', locOrdered);
+      _h += createFilterCol('NCS 코드명', 'ncsCode', ncsArr);
       _h += '</div>';
 
       container.innerHTML = _h;
@@ -8339,13 +8326,13 @@
     window.updateFilterState = function(chk) {
       const key = chk.getAttribute('data-filter-key');
       const val = chk.value;
-      const chip = chk.closest('label.filter-chip');
+      const item = chk.closest('label.filter-item');
       if (chk.checked) {
         if (!currentFilters[key].includes(val)) currentFilters[key].push(val);
-        if (chip) chip.classList.add('checked');
+        if (item) item.classList.add('selected');
       } else {
         currentFilters[key] = currentFilters[key].filter(v => v !== val);
-        if (chip) chip.classList.remove('checked');
+        if (item) item.classList.remove('selected');
       }
       applyJobFilters();
     };
@@ -8354,6 +8341,42 @@
       // 검색어 수집
       const searchInput = document.getElementById('jobSearchInput');
       currentFilters.keyword = searchInput ? searchInput.value.trim().toLowerCase() : '';
+
+      // 활성 필터 여부 확인
+      const hasFilter =
+        currentFilters.keyword ||
+        currentFilters.category.length > 0 ||
+        currentFilters.careerType.length > 0 ||
+        currentFilters.education.length > 0 ||
+        currentFilters.employmentType.length > 0 ||
+        currentFilters.location.length > 0 ||
+        currentFilters.ncsCode.length > 0;
+
+      const jobTable = document.getElementById('jobTable');
+      const emptyState = document.getElementById('emptyState');
+      const filterGuideMsg = document.getElementById('filterGuideMsg');
+      const filterHintRow = document.getElementById('filterHintRow');
+      const paginationContainer = document.getElementById('pagination');
+      const adminBulkBar = document.getElementById('adminBulkBar');
+      const isAdmin = (window.currentUserRole === 'admin') ||
+                      (window.auth && window.auth.currentUser && window.auth.currentUser.email === 'ilovetruman@gmail.com');
+
+      // 필터 미선택 시 → 안내 메시지 표시, 테이블 숨김
+      if (!hasFilter) {
+        if (jobTable) jobTable.style.display = 'none';
+        if (emptyState) emptyState.style.display = 'none';
+        if (filterGuideMsg) filterGuideMsg.style.display = 'block';
+        if (filterHintRow) filterHintRow.style.display = 'none';
+        if (paginationContainer) paginationContainer.style.display = 'none';
+        if (adminBulkBar) adminBulkBar.style.display = 'none';
+        const cntEl = document.getElementById('jobTotalCnt');
+        if (cntEl) cntEl.textContent = '0';
+        return;
+      }
+
+      // 필터 선택됨 → 안내 숨기고 필터링
+      if (filterGuideMsg) filterGuideMsg.style.display = 'none';
+      if (filterHintRow) filterHintRow.style.display = 'block';
 
       totalJobs = allRawJobs.filter(job => {
           // 키워드
@@ -8390,27 +8413,28 @@
       const cntEl = document.getElementById('jobTotalCnt');
       if (cntEl) cntEl.textContent = totalJobs.length;
 
-      // 캐시 저장 위치(사이드바 클릭용 변수) 유지
-      _jobsCache.set(window.currentJobCategory || 'all', { jobs: [...totalJobs], ts: Date.now() });
-
       currentPage = 1;
-      const isAdmin = (window.currentUserRole === 'admin');
-      
-      const jobTable = document.getElementById('jobTable');
-      const emptyState = document.getElementById('emptyState');
-      
+
+      // adminBulkBar 표시 (isAdmin은 위에서 선언됨)
+      if (adminBulkBar) adminBulkBar.style.display = isAdmin ? 'flex' : 'none';
+
       if (totalJobs.length === 0) {
           if (jobTable) jobTable.style.display = 'none';
           if (emptyState) emptyState.style.display = 'block';
           document.getElementById('jobTableBody').innerHTML = '';
-          const paginationContainer = document.getElementById('pagination');
-          if(paginationContainer) paginationContainer.style.display = 'none';
+          if (paginationContainer) paginationContainer.style.display = 'none';
           return;
       }
-      
+
       if (jobTable) jobTable.style.display = 'table';
       if (emptyState) emptyState.style.display = 'none';
-      
+
+      // 관리 컬럼 표시 여부
+      const mgmtHeader = document.getElementById('job-mgmt-header');
+      const checkboxHeader = document.getElementById('checkbox-header');
+      if (mgmtHeader) mgmtHeader.style.display = isAdmin ? 'table-cell' : 'none';
+      if (checkboxHeader) checkboxHeader.style.display = isAdmin ? 'table-cell' : 'none';
+
       displayJobsForPage(currentPage, isAdmin);
       renderPagination();
     };
@@ -8429,14 +8453,14 @@
       const searchInput = document.getElementById('jobSearchInput');
       if (searchInput) searchInput.value = '';
 
-      // 칩 UI 동기화
-      document.querySelectorAll('#dynamic-filters label.filter-chip').forEach(chip => {
-        const chk = chip.querySelector('input[type="checkbox"]');
+      // 필터 아이템 UI 동기화
+      document.querySelectorAll('#dynamic-filters label.filter-item').forEach(item => {
+        const chk = item.querySelector('input[type="checkbox"]');
         if (!chk) return;
         const key = chk.getAttribute('data-filter-key');
         const shouldCheck = (key === 'category' && window.currentJobCategory && chk.value === window.currentJobCategory);
         chk.checked = shouldCheck;
-        chip.classList.toggle('checked', shouldCheck);
+        item.classList.toggle('selected', shouldCheck);
       });
 
       applyJobFilters();
@@ -8810,7 +8834,8 @@
         }
 
         // 관리자 권한 확인
-        if (window.currentUserRole !== 'admin') {
+        const isAdminDel = window.currentUserRole === 'admin' || currentUser.email === 'ilovetruman@gmail.com';
+        if (!isAdminDel) {
           alert('❌ 관리자 권한이 필요합니다.');
           return;
         }
@@ -8834,31 +8859,33 @@
     function toggleSelectAll() {
       const selectAllCheckbox = document.getElementById('selectAllJobs');
       const checkboxes = document.querySelectorAll('.job-checkbox');
-
       checkboxes.forEach(checkbox => {
-        checkbox.checked = selectAllCheckbox.checked;
+        checkbox.checked = selectAllCheckbox ? selectAllCheckbox.checked : false;
       });
-
       updateSelectedCount();
     }
+
+    // 관리자 바의 전체 선택 (adminBulkBar용)
+    window.toggleSelectAllAdmin = function() {
+      const adminChk = document.getElementById('selectAllJobsAdmin');
+      const checkboxes = document.querySelectorAll('.job-checkbox');
+      checkboxes.forEach(cb => { cb.checked = adminChk ? adminChk.checked : false; });
+      updateSelectedCount();
+    };
 
     // 선택된 항목 개수 업데이트
     function updateSelectedCount() {
       const checkboxes = document.querySelectorAll('.job-checkbox:checked');
       const count = checkboxes.length;
       const countElement = document.getElementById('selectedCount');
+      if (countElement) countElement.textContent = count;
 
-      if (countElement) {
-        countElement.textContent = count;
-      }
-
-      // 전체 선택 체크박스 상태 업데이트
-      const selectAllCheckbox = document.getElementById('selectAllJobs');
+      // 관리자 바 체크박스 동기화
+      const adminChk = document.getElementById('selectAllJobsAdmin');
       const allCheckboxes = document.querySelectorAll('.job-checkbox');
-
-      if (selectAllCheckbox && allCheckboxes.length > 0) {
-        selectAllCheckbox.checked = (count === allCheckboxes.length);
-        selectAllCheckbox.indeterminate = (count > 0 && count < allCheckboxes.length);
+      if (adminChk && allCheckboxes.length > 0) {
+        adminChk.checked = (count === allCheckboxes.length);
+        adminChk.indeterminate = (count > 0 && count < allCheckboxes.length);
       }
     }
 
@@ -8884,7 +8911,8 @@
         }
 
         // 관리자 권한 확인
-        if (window.currentUserRole !== 'admin') {
+        const isAdminBulk = window.currentUserRole === 'admin' || currentUser.email === 'ilovetruman@gmail.com';
+        if (!isAdminBulk) {
           alert('❌ 관리자 권한이 필요합니다.');
           return;
         }
