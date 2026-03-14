@@ -2107,6 +2107,106 @@
 
     /* ===== 채용정보 게시판 사이드바 끝 ===== */
 
+    /* ===== 채용정보 필터 패널 ===== */
+    .job-filter-panel {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+      margin-bottom: 1rem;
+    }
+
+    .filter-row {
+      display: flex;
+      align-items: flex-start;
+      border-bottom: 1px solid #f0f4f8;
+      min-height: 46px;
+    }
+
+    .filter-row:last-child {
+      border-bottom: none;
+    }
+
+    .filter-row-label {
+      width: 80px;
+      min-width: 80px;
+      padding: 10px 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #374151;
+      background: #f8fafc;
+      border-right: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      line-height: 1.3;
+    }
+
+    .filter-scroll-area {
+      flex: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      padding: 8px 10px;
+      max-height: 110px;
+      overflow-y: auto;
+      align-content: flex-start;
+    }
+
+    .filter-scroll-area::-webkit-scrollbar {
+      width: 5px;
+    }
+    .filter-scroll-area::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .filter-scroll-area::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    .filter-scroll-area::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      font-size: 0.8rem;
+      border-radius: 4px;
+      background: #f1f5f9;
+      color: #495057;
+      border: 1px solid #dee2e6;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s;
+      white-space: nowrap;
+      line-height: 1.5;
+    }
+
+    .filter-chip:hover {
+      background: #e7f0fd;
+      border-color: #93c5fd;
+      color: #1d4ed8;
+    }
+
+    .filter-chip.checked {
+      background: #1d4ed8;
+      border-color: #1d4ed8;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .filter-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #e2e8f0;
+      background: #fff;
+    }
+    /* ===== 채용정보 필터 패널 끝 ===== */
+
     /* 오른쪽 게시판 컨텐츠 */
     .board-content {
 
@@ -4685,8 +4785,7 @@
               <!-- ③ 기관유형별 -->
               <p class="sidebar-group-header">기관유형별</p>
               <ul>
-                <li><a href="#" onclick="switchBoard('market-public'); return false;" id="board-menu-market-public"
-                    class="active">공기업(시장형)</a></li>
+                <li><a href="#" onclick="switchBoard('market-public'); return false;" id="board-menu-market-public">공기업(시장형)</a></li>
                 <li><a href="#" onclick="switchBoard('quasi-market-public'); return false;"
                     id="board-menu-quasi-market-public">공기업(준시장형)</a></li>
                 <li><a href="#" onclick="switchBoard('fund-quasi'); return false;"
@@ -4707,7 +4806,7 @@
             <div class="board-content">
               <!-- 게시판 제목 배너 -->
               <div class="board-title-banner">
-                <h2 id="currentBoardTitle">공기업(시장형)</h2>
+                <h2 id="currentBoardTitle">채용정보 전체</h2>
               </div>
 
               <!-- 게시판 테이블 -->
@@ -4720,21 +4819,22 @@
                   <p>로딩 중...</p>
                 </div>
 
-                <!-- 다중 필터 영역 (새로 추가) -->
-                <div class="job-filter-container" style="background:#f8f9fa; padding:1.5rem; border-radius:8px; margin-bottom:1rem; border:1px solid #e9ecef;">
-                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid #dee2e6; padding-bottom:1rem;">
-                    <div style="font-size:1.1rem; font-weight:bold; color:#2c3e50;">
+                <!-- 다중 필터 영역 -->
+                <div style="margin-bottom:1rem;">
+                  <!-- 검색바 + 건수 -->
+                  <div class="filter-top-bar" style="border:1px solid #e2e8f0; border-radius:8px 8px 0 0; border-bottom:none;">
+                    <div style="font-size:1rem; font-weight:700; color:#2c3e50;">
                       총 <span id="jobTotalCnt" style="color:#e74c3c;">0</span>건
                     </div>
-                    <div style="display:flex; gap:10px;">
-                      <input type="text" id="jobSearchInput" placeholder="기업명, 공고제목 등 검색" style="padding:0.5rem; border:1px solid #ced4da; border-radius:4px; width:250px;">
-                      <button onclick="applyJobFilters()" style="background:#3498db; color:white; border:none; padding:0.5rem 1rem; border-radius:4px; cursor:pointer; font-weight:bold;">검색</button>
-                      <button onclick="resetJobFilters()" style="background:#6c757d; color:white; border:none; padding:0.5rem 1rem; border-radius:4px; cursor:pointer; font-weight:bold;">초기화</button>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                      <input type="text" id="jobSearchInput" placeholder="기업명, 공고제목 등 검색" style="padding:0.45rem 0.75rem; border:1px solid #ced4da; border-radius:4px; width:230px; font-size:0.88rem;">
+                      <button onclick="applyJobFilters()" style="background:#3498db; color:white; border:none; padding:0.45rem 0.9rem; border-radius:4px; cursor:pointer; font-size:0.88rem; font-weight:600;">검색</button>
+                      <button onclick="resetJobFilters()" style="background:#6c757d; color:white; border:none; padding:0.45rem 0.9rem; border-radius:4px; cursor:pointer; font-size:0.88rem; font-weight:600;">초기화</button>
                     </div>
                   </div>
-                  
-                  <div id="dynamic-filters" style="display:flex; flex-direction:column; gap:1rem;">
-                    <!-- 필터 파트들이 JavaScript에 의해 동적으로 생성될 영역 -->
+                  <!-- 카테고리별 필터 패널 -->
+                  <div id="dynamic-filters">
+                    <!-- 필터 패널이 JavaScript에 의해 동적으로 생성될 영역 -->
                   </div>
                 </div>
 
@@ -5918,7 +6018,7 @@
     window.jobsData = {}; // 전역 데이터 저장소
 
     // --- Global Current Category (Default) ---
-    window.currentJobCategory = 'market-public'; // 채용정보 기본: 공기업(시장형)
+    window.currentJobCategory = null; // 채용정보 기본: 전체
     window.currentStoryCategory = 'free';  // 취업이야기 기본: 자유게시판
 
 
@@ -7757,9 +7857,8 @@
       const boardSection = document.getElementById('board-section');
       if (boardSection) {
         boardSection.style.display = 'block';
-        // 지정된 카테고리로, 없으면 기본값 market-public
-        const targetCategory = category || 'market-public';
-        switchBoard(targetCategory, true, page);
+        // 지정된 카테고리로, 없으면 전체 표시
+        switchBoard(category || null, true, page);
       }
 
       const userSection = document.getElementById('user-manage-section');
@@ -7767,7 +7866,7 @@
 
       // 히스토리 추가 (뒤로가기 지원)
       if (!skipHistory) {
-        history.pushState({ section: 'board', category: category || 'market-public', page: page }, '', '#board');
+        history.pushState({ section: 'board', category: category || null, page: page }, '', '#board');
       }
 
       // 스크롤 상단으로
@@ -7805,7 +7904,7 @@
 
       const titleElement = document.getElementById('currentBoardTitle');
       if (titleElement) {
-        titleElement.textContent = boardTitles[boardType] || '채용정보';
+        titleElement.textContent = boardType ? (boardTitles[boardType] || '채용정보') : '채용정보 전체';
       }
 
       // 3. 사이드바 메뉴 활성화 상태 변경
@@ -7823,7 +7922,7 @@
 
       // 히스토리 추가 (뒤로가기 지원) - 페이지 번호 포함
       if (!skipHistory) {
-        history.pushState({ section: 'board', category: boardType, page: currentPage }, '', '#board-' + boardType);
+        history.pushState({ section: 'board', category: boardType, page: currentPage }, '', boardType ? '#board-' + boardType : '#board');
       }
 
       // 5. 데이터 로드
@@ -7956,7 +8055,7 @@
       if (window.history.length > 1) {
         history.back();
       } else {
-        const savedCategory = window.currentJobCategory || 'market-public';
+        const savedCategory = window.currentJobCategory || null;
         const savedPage = window.lastJobPage || 1;
         window.showBoard(false, savedCategory, savedPage);
       }
@@ -8121,68 +8220,132 @@
       }
     }
 
+    // ── 학력 정규화 ──
+    const EDU_CANONICAL = ['고졸', '대졸(2~3년)', '대졸(4년)', '석사', '박사', '학력무관'];
+
+    function normalizeEducation(edu) {
+      if (!edu) return [];
+      const result = new Set();
+      const items = edu.split(/[,，、\/]/).map(e => e.trim()).filter(Boolean);
+      items.forEach(item => {
+        if (item.includes('박사')) { result.add('박사'); }
+        else if (item.includes('석사')) { result.add('석사'); }
+        else if (item.includes('2~3년') || item.includes('초대졸') || item.includes('전문대') || item.includes('2,3년') || item.includes('2·3년')) { result.add('대졸(2~3년)'); }
+        else if (item.includes('대졸') || item.includes('4년') || item.includes('학사')) { result.add('대졸(4년)'); }
+        else if (item.includes('고졸') || item.includes('고등')) { result.add('고졸'); }
+        else if (item.includes('학력무관') || item.includes('학력 무관') || item.includes('학력제한없음') || item.includes('제한없음') || item.includes('무관')) { result.add('학력무관'); }
+      });
+      // 항목이 하나도 안 잡혔으면 전체 문자열로 다시 시도
+      if (result.size === 0) {
+        const e = edu;
+        if (e.includes('박사')) result.add('박사');
+        if (e.includes('석사')) result.add('석사');
+        if (e.includes('2~3년') || e.includes('초대졸') || e.includes('전문대')) result.add('대졸(2~3년)');
+        if (e.includes('대졸') || e.includes('4년') || e.includes('학사')) result.add('대졸(4년)');
+        if (e.includes('고졸')) result.add('고졸');
+        if (e.includes('학력무관') || e.includes('무관')) result.add('학력무관');
+      }
+      return Array.from(result);
+    }
+
+    // ── 근무지역 정규화 ──
+    const MAJOR_CITIES = ['서울', '인천', '경기', '부산', '대구', '대전', '광주', '울산', '세종', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'];
+
+    function normalizeLocation(loc) {
+      if (!loc) return [];
+      const result = new Set();
+      MAJOR_CITIES.forEach(city => {
+        if (loc.includes(city)) result.add(city);
+      });
+      return Array.from(result);
+    }
+
     // ── 다중 필터 및 검색 로직 ──
     function renderJobFilters() {
       const container = document.getElementById('dynamic-filters');
       if (!container) return;
 
-      // 옵션 추출
-      const cats = new Set(), locs = new Set(), edus = new Set(), 
-            emps = new Set(), cars = new Set(), ncsSet = new Set();
-      
-      allRawJobs.forEach(job => {
-          if (job.category) cats.add(job.category);
-          if (job.location) locs.add(job.location);
-          if (job.education) edus.add(job.education);
-          if (job.employmentType || job.jobType) emps.add(job.employmentType || job.jobType);
-          if (job.careerType) cars.add(job.careerType);
-          if (job.ncsCode) ncsSet.add(job.ncsCode);
-      });
-
-      // 사이드바 타이틀 매핑 참고
+      // 유효한 기관유형 코드만 (한글 카테고리)
+      const VALID_CATEGORIES = ['market-public', 'quasi-market-public', 'fund-quasi', 'entrust-quasi', 'other-public', 'local-public', 'local-investment'];
       const catNames = {
         'market-public': '공기업(시장형)', 'quasi-market-public': '공기업(준시장형)',
         'fund-quasi': '준정부기관(기금관리형)', 'entrust-quasi': '준정부기관(위탁집행형)',
         'other-public': '기타공공기관', 'local-public': '지방공기업',
-        'local-investment': '지방출자·출연기관', 'premium': '프리미엄',
-        'recommended': '추천', 'featured': '주요'
+        'local-investment': '지방출자·출연기관'
       };
 
-      function createFilterGroup(title, key, valuesSet, nameMapper = (v)=>v) {
-          if (valuesSet.size === 0) return '';
-          let html = `<div style="display:flex; flex-wrap:wrap; align-items:center; gap:0.5rem; padding:0.5rem 0;">`;
-          html += `<strong style="width:100px; color:#495057;">${title}</strong>`;
-          html += `<div style="display:flex; flex-wrap:wrap; gap:0.5rem; flex:1;">`;
-          Array.from(valuesSet).sort().forEach(val => {
-              const displayVal = nameMapper(val) || val;
-              const isChecked = currentFilters[key].includes(val) ? 'checked' : '';
-              html += `<label style="display:flex; align-items:center; gap:4px; font-size:0.9rem; cursor:pointer;">
-                         <input type="checkbox" value="${val}" data-filter-key="${key}" onchange="updateFilterState(this)" ${isChecked} />
-                         ${displayVal}
-                       </label>`;
-          });
-          html += `</div></div>`;
-          return html;
+      // 옵션 추출
+      const cats = new Set();
+      const locCities = new Set();
+      const eduSet = new Set();
+      const emps = new Set();
+      const cars = new Set();
+      const ncsSet = new Set();
+
+      allRawJobs.forEach(job => {
+        // 기관유형: 유효한 코드만
+        if (job.category && VALID_CATEGORIES.includes(job.category)) cats.add(job.category);
+        // 근무지역: 주요 도시로 정규화
+        normalizeLocation(job.location).forEach(c => locCities.add(c));
+        // 학력: 6개 대표 카테고리로 정규화
+        normalizeEducation(job.education).forEach(e => eduSet.add(e));
+        // 고용유형, 채용구분, NCS
+        if (job.employmentType || job.jobType) emps.add(job.employmentType || job.jobType);
+        if (job.careerType) cars.add(job.careerType);
+        if (job.ncsCode) ncsSet.add(job.ncsCode);
+      });
+
+      // 필터 칩 생성 함수 (스크롤 패널 방식)
+      function createFilterRow(title, key, valuesArray, nameMapper) {
+        if (!valuesArray || valuesArray.length === 0) return '';
+        let html = `<div class="filter-row">`;
+        html += `<div class="filter-row-label">${title}</div>`;
+        html += `<div class="filter-scroll-area">`;
+        valuesArray.forEach(val => {
+          const displayVal = nameMapper ? (nameMapper(val) || val) : val;
+          const isChecked = currentFilters[key].includes(val);
+          html += `<label class="filter-chip${isChecked ? ' checked' : ''}">
+                     <input type="checkbox" value="${val}" data-filter-key="${key}" onchange="updateFilterState(this)" ${isChecked ? 'checked' : ''} style="display:none;">
+                     <span>${displayVal}</span>
+                   </label>`;
+        });
+        html += `</div></div>`;
+        return html;
       }
 
-      let _h = '';
-      _h += createFilterGroup('기관유형', 'category', cats, v => catNames[v] || v);
-      _h += createFilterGroup('채용구분', 'careerType', cars);
-      _h += createFilterGroup('학력조건', 'education', edus);
-      _h += createFilterGroup('고용유형', 'employmentType', emps);
-      _h += createFilterGroup('근무지역', 'location', locs);
-      _h += createFilterGroup('NCS 코드명', 'ncsCode', ncsSet);
-      
+      // 기관유형: catNames 순서대로 정렬
+      const catOrdered = VALID_CATEGORIES.filter(c => cats.has(c));
+      // 학력: 고정 순서
+      const eduOrdered = EDU_CANONICAL.filter(e => eduSet.has(e));
+      // 근무지역: MAJOR_CITIES 순서대로
+      const locOrdered = MAJOR_CITIES.filter(c => locCities.has(c));
+      // 나머지: 알파벳/가나다 정렬
+      const carsArr = Array.from(cars).sort();
+      const empsArr = Array.from(emps).sort();
+      const ncsArr = Array.from(ncsSet).sort();
+
+      let _h = '<div class="job-filter-panel">';
+      _h += createFilterRow('기관유형', 'category', catOrdered, v => catNames[v] || v);
+      _h += createFilterRow('채용구분', 'careerType', carsArr);
+      _h += createFilterRow('학력조건', 'education', eduOrdered);
+      _h += createFilterRow('고용유형', 'employmentType', empsArr);
+      _h += createFilterRow('근무지역', 'location', locOrdered);
+      _h += createFilterRow('NCS 코드명', 'ncsCode', ncsArr);
+      _h += '</div>';
+
       container.innerHTML = _h;
     }
 
     window.updateFilterState = function(chk) {
       const key = chk.getAttribute('data-filter-key');
       const val = chk.value;
+      const chip = chk.closest('label.filter-chip');
       if (chk.checked) {
-          if (!currentFilters[key].includes(val)) currentFilters[key].push(val);
+        if (!currentFilters[key].includes(val)) currentFilters[key].push(val);
+        if (chip) chip.classList.add('checked');
       } else {
-          currentFilters[key] = currentFilters[key].filter(v => v !== val);
+        currentFilters[key] = currentFilters[key].filter(v => v !== val);
+        if (chip) chip.classList.remove('checked');
       }
       applyJobFilters();
     };
@@ -8200,15 +8363,26 @@
               const c = (job.company || '').toLowerCase();
               if (!t.includes(kw) && !c.includes(kw)) return false;
           }
-          // 다중 필터
+          // 기관유형 (정확히 일치)
           if (currentFilters.category.length > 0 && !currentFilters.category.includes(job.category)) return false;
+          // 채용구분 (정확히 일치)
           if (currentFilters.careerType.length > 0 && !currentFilters.careerType.includes(job.careerType)) return false;
-          if (currentFilters.education.length > 0 && !currentFilters.education.includes(job.education)) return false;
-          if (currentFilters.employmentType.length > 0 && 
+          // 학력조건: 정규화된 6개 카테고리 기반 매칭
+          if (currentFilters.education.length > 0) {
+              const jobEdus = normalizeEducation(job.education);
+              if (!currentFilters.education.some(f => jobEdus.includes(f))) return false;
+          }
+          // 고용유형 (정확히 일치)
+          if (currentFilters.employmentType.length > 0 &&
               !currentFilters.employmentType.includes(job.employmentType || job.jobType)) return false;
-          if (currentFilters.location.length > 0 && !currentFilters.location.includes(job.location)) return false;
+          // 근무지역: 주요 도시 포함 여부 매칭
+          if (currentFilters.location.length > 0) {
+              const jobLocs = normalizeLocation(job.location);
+              if (!currentFilters.location.some(f => jobLocs.includes(f))) return false;
+          }
+          // NCS 코드 (정확히 일치)
           if (currentFilters.ncsCode.length > 0 && !currentFilters.ncsCode.includes(job.ncsCode)) return false;
-          
+
           return true;
       });
 
@@ -8246,25 +8420,25 @@
         keyword: '', ncsCode: [], location: [], education: [],
         employmentType: [], careerType: [], category: []
       };
-      
-      // 만약 사이드바가 선택되어 있다면 유지
+
+      // 만약 사이드바 카테고리가 선택되어 있다면 유지
       if (window.currentJobCategory) {
-          currentFilters.category = [window.currentJobCategory];
+        currentFilters.category = [window.currentJobCategory];
       }
-      
+
       const searchInput = document.getElementById('jobSearchInput');
       if (searchInput) searchInput.value = '';
-      
-      // 체크박스 UI 동기화
-      document.querySelectorAll('#dynamic-filters input[type="checkbox"]').forEach(chk => {
-          const key = chk.getAttribute('data-filter-key');
-          if (key === 'category' && window.currentJobCategory && chk.value === window.currentJobCategory) {
-              chk.checked = true;
-          } else {
-              chk.checked = false;
-          }
+
+      // 칩 UI 동기화
+      document.querySelectorAll('#dynamic-filters label.filter-chip').forEach(chip => {
+        const chk = chip.querySelector('input[type="checkbox"]');
+        if (!chk) return;
+        const key = chk.getAttribute('data-filter-key');
+        const shouldCheck = (key === 'category' && window.currentJobCategory && chk.value === window.currentJobCategory);
+        chk.checked = shouldCheck;
+        chip.classList.toggle('checked', shouldCheck);
       });
-      
+
       applyJobFilters();
     };
 
