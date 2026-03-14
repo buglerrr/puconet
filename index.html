@@ -7884,6 +7884,10 @@
     const itemsPerPage = 12;
     let totalJobs = [];
 
+    // 카테고리별 캐시: { [category]: { jobs: [], ts: timestamp } }
+    const _jobsCache = new Map();
+    const JOBS_CACHE_TTL = 3 * 60 * 1000; // 3분
+
     async function loadJobs() {
       const loading = document.getElementById('loading');
       const emptyState = document.getElementById('emptyState');
@@ -7893,6 +7897,31 @@
       const bottomAddButton = document.querySelector('.bottom-add-button');
 
       if (!loading || !tbody) return;
+
+      const currentCategory = window.currentJobCategory || 'market-public';
+      const now = Date.now();
+      const cached = _jobsCache.get(currentCategory);
+
+      // ── 캐시 HIT: Firestore 없이 즉시 표시 ──
+      if (cached && (now - cached.ts < JOBS_CACHE_TTL)) {
+        totalJobs = cached.jobs;
+        const isAdmin = (window.currentUserRole === 'admin');
+        const mgmtHeader = document.getElementById('job-mgmt-header');
+        const checkboxHeader = document.getElementById('checkbox-header');
+        const bulkDeleteButtons = document.getElementById('bulkDeleteButtons');
+        if (mgmtHeader) mgmtHeader.style.display = isAdmin ? 'table-cell' : 'none';
+        if (checkboxHeader) checkboxHeader.style.display = isAdmin ? 'table-cell' : 'none';
+        if (bulkDeleteButtons) bulkDeleteButtons.style.display = isAdmin ? 'flex' : 'none';
+        loading.style.display = 'none';
+        if (emptyState) emptyState.style.display = totalJobs.length === 0 ? 'block' : 'none';
+        if (jobTable) jobTable.style.display = totalJobs.length === 0 ? 'none' : 'table';
+        if (totalJobs.length > 0) {
+          displayJobsForPage(currentPage, isAdmin);
+          renderPagination();
+        }
+        if (bottomAddButton) bottomAddButton.style.display = isAdmin ? 'block' : 'none';
+        return;
+      }
 
       try {
         loading.style.display = 'block';
@@ -7937,6 +7966,9 @@
             totalJobs.push({ ...d, id: docSnap.id });
           }
         });
+
+        // 캐시에 저장 (3분간 유효)
+        _jobsCache.set(currentCategory, { jobs: [...totalJobs], ts: now });
 
         if (totalJobs.length === 0) {
           loading.style.display = 'none';
