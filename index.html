@@ -6557,9 +6557,34 @@
     const storyItemsPerPage = 12;
     let totalStories = [];
 
+    // ── 취업 이야기 캐시 ──
+    const _storiesCache = new Map();
+    const STORIES_CACHE_TTL = 3 * 60 * 1000; // 3분
+
     window.loadStories = async function () {
       const tbody = document.getElementById('storyTableBody');
       if (!tbody) return;
+
+      const currentCategory = window.currentStoryCategory || 'free';
+      const now = Date.now();
+      const cached = _storiesCache.get(currentCategory);
+
+      // 캐시 유효 시 즉시 표시
+      if (cached && (now - cached.ts < STORIES_CACHE_TTL)) {
+        totalStories = cached.docs;
+        if (totalStories.length === 0) {
+          tbody.innerHTML = '<div class="story-empty-box"><p>아직 이야기가 없습니다.<br>첫 번째 이야기를 들려주세요! ✏️</p></div>';
+          document.getElementById('storyPagination').style.display = 'none';
+          return;
+        }
+
+        const totalPages = Math.ceil(totalStories.length / storyItemsPerPage);
+        if (storyCurrentPage > totalPages) storyCurrentPage = 1;
+
+        displayStoriesForPage(storyCurrentPage);
+        renderStoryPagination();
+        return;
+      }
 
       try {
         const q = query(collection(db, 'stories'), orderBy('createdAt', 'desc'));
@@ -6583,6 +6608,9 @@
             filteredDocs.push({ ...d, id: docSnap.id });
           }
         });
+
+        // 결과 캐시 저장
+        _storiesCache.set(currentCategory, { docs: [...filteredDocs], ts: now });
 
         if (filteredDocs.length === 0) {
           tbody.innerHTML = '<div class="story-empty-box"><p>아직 이야기가 없습니다.<br>첫 번째 이야기를 들려주세요! ✏️</p></div>';
@@ -7225,6 +7253,9 @@
       window.scrollTo(0, 0);
     };
 
+    // ── 공공기관 뉴스 캐시 ──
+    let _newsCache = null;
+
     // loadNews: Firestore에서 뉴스 기사 로드
     window.loadNews = async function () {
       const listBody = document.getElementById('newsListBody');
@@ -7234,6 +7265,31 @@
       const totalCnt = document.getElementById('newsTotalCnt');
 
       if (!listBody) return;
+
+      const now = Date.now();
+      // 캐시 유효 시 즉시 표시
+      if (_newsCache && (now - _newsCache.ts < 3 * 60 * 1000)) { // 3분
+         allNewsData = _newsCache.docs;
+         if (loading) loading.style.display = 'none';
+         if (allNewsData.length === 0) {
+           if (empty) empty.style.display = 'block';
+           if (totalCnt) totalCnt.textContent = '0';
+           renderNewsAside([]);
+           return;
+         }
+         
+         if (empty) empty.style.display = 'none';
+         listBody.innerHTML = '';
+         if (totalCnt) totalCnt.textContent = allNewsData.length;
+         
+         const totalPages = Math.ceil(allNewsData.length / newsItemsPerPage);
+         if (newsCurrentPage > totalPages) newsCurrentPage = 1;
+
+         displayNewsPage(newsCurrentPage);
+         renderNewsPagination();
+         renderNewsAside(allNewsData.slice(0, 5));
+         return;
+      }
 
       // 로딩 상태
       if (loading) loading.style.display = 'block';
@@ -7261,6 +7317,9 @@
         snapshot.forEach(docSnap => {
           allNewsData.push({ id: docSnap.id, ...docSnap.data() });
         });
+
+        // 결과 캐시 저장
+        _newsCache = { docs: [...allNewsData], ts: now };
 
         if (totalCnt) totalCnt.textContent = allNewsData.length;
 
@@ -8822,9 +8881,11 @@
         window.showNewsBoard(true);
       } else if (state.section === 'news-detail') {
         // 뉴스 상세보기로 이동
-        window.showNewsBoard(true).then && window.showNewsBoard(true);
-        // allNewsData에 데이터가 로드된 후 상세보기
-        // (loadNews가 async이므로 showNewsBoard 내부에서 로드됨)
+        window.showNewsBoard(true).then(() => {
+          if (state.newsId && window.allNewsData && window.allNewsData.find(n => n.id === state.newsId)) {
+            window.viewNewsDetail(state.newsId, true);
+          }
+        });
       } else {
         // 기본: 홈으로
         window.goHome(true);
