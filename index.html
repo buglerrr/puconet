@@ -6982,15 +6982,13 @@
     }
 
     window.backToStoryList = function () {
-      const detailSection = document.getElementById('story-detail-section');
-      if (detailSection) detailSection.style.display = 'none';
-
-      const boardSection = document.getElementById('story-board-section');
-      if (boardSection) boardSection.style.display = 'block';
-
-      // 댓글 수 업데이트 등을 위해 목록 다시 로드
-      loadStories();
-      window.scrollTo(0, 0);
+      if (window.history.length > 1) {
+        history.back();
+      } else {
+        const savedCategory = window.currentStoryCategory || 'free';
+        const savedPage = window.lastStoryPage || 1;
+        window.showStoryBoard(false, savedCategory, savedPage);
+      }
     }
 
     window.viewStoryDetail = function (id, skipHistory = false) {
@@ -7471,11 +7469,11 @@
 
     // backToNewsList: 뉴스 목록으로 돌아가기
     window.backToNewsList = function () {
-      document.getElementById('news-detail-section').style.display = 'none';
-      document.getElementById('news-section').style.display = 'block';
-      currentNewsId = null;
-      history.pushState({ section: 'news' }, '', '#news');
-      window.scrollTo(0, 0);
+      if (window.history.length > 1) {
+        history.back();
+      } else {
+        window.showNewsBoard(false);
+      }
     };
 
     // openAddNewsModal: 뉴스 작성 모달 열기
@@ -7659,15 +7657,23 @@
       document.getElementById('general-jobs').style.display = 'block';
       document.getElementById('edu-courses').style.display = 'block';
 
+      // 스크롤 상단으로
       // 상세 섹션 숨기기
       const detailSection = document.getElementById('detail-section');
       if (detailSection) detailSection.style.display = 'none';
 
+      const storyDetailSection = document.getElementById('story-detail-section');
+      if (storyDetailSection) storyDetailSection.style.display = 'none';
+
+      const newsDetailSection = document.getElementById('news-detail-section');
+      if (newsDetailSection) newsDetailSection.style.display = 'none';
+
       // 게시판 섹션 숨기기
       const boardSection = document.getElementById('board-section');
-      if (boardSection) {
-        boardSection.style.display = 'none';
-      }
+      if (boardSection) boardSection.style.display = 'none';
+
+      const storySection = document.getElementById('story-board-section');
+      if (storySection) storySection.style.display = 'none';
 
       const userSection = document.getElementById('user-manage-section');
       if (userSection) userSection.style.display = 'none';
@@ -7912,29 +7918,13 @@
 
     // 채용정보 목록으로 돌아가기 (저장된 페이지로)
     window.goBackToJobList = function () {
-      const savedPage = window.lastJobPage || 1;
-      const savedCategory = window.currentJobCategory || 'market-public';
-
-      // 상세 섹션 숨기기
-      document.getElementById('detail-section').style.display = 'none';
-
-      // 게시판 섹션 보이기
-      document.getElementById('board-section').style.display = 'block';
-
-      // 저장된 페이지로 이동
-      currentPage = savedPage;
-      displayJobsForPage(savedPage, window.currentUserRole === 'admin');
-      renderPagination();
-
-      // 히스토리 추가 - 페이지 번호 포함
-      history.pushState({
-        section: 'board',
-        category: savedCategory,
-        page: savedPage
-      }, '', '#board-' + savedCategory);
-
-      // 스크롤 상단으로
-      window.scrollTo(0, 0);
+      if (window.history.length > 1) {
+        history.back();
+      } else {
+        const savedCategory = window.currentJobCategory || 'market-public';
+        const savedPage = window.lastJobPage || 1;
+        window.showBoard(false, savedCategory, savedPage);
+      }
     }
 
     // 채용정보 목록 불러오기
