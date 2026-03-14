@@ -7045,6 +7045,32 @@
         if (canDelete) { deleteBtn.style.display = 'inline-block'; deleteBtn.onclick = function () { deleteStory(id); }; }
         else { deleteBtn.style.display = 'none'; }
       }
+
+      // ===== 조회수 증가 (세션 내 중복 카운팅 방지) =====
+      const viewedKey = 'viewed_story_' + id;
+      if (!sessionStorage.getItem(viewedKey)) {
+        sessionStorage.setItem(viewedKey, '1');
+        // 비동기로 조회수 업데이트 (화면 전환을 막지 않도록 await 없이 처리)
+        (async () => {
+          try {
+            const storyRef = doc(db, 'stories', id);
+            const snap = await getDoc(storyRef);
+            if (snap.exists()) {
+              const newViews = (snap.data().views || 0) + 1;
+              await updateDoc(storyRef, { views: newViews });
+              // 로컬 데이터 업데이트
+              if (window.storiesData && window.storiesData[id]) {
+                window.storiesData[id].views = newViews;
+              }
+              // 상세 페이지 조회수 표시 업데이트
+              const viewsEl = document.getElementById('story-detail-views');
+              if (viewsEl) viewsEl.textContent = newViews;
+            }
+          } catch (e) {
+            console.warn('조회수 업데이트 실패:', e);
+          }
+        })();
+      }
     }
 
     window.backToStoryList = function () {
@@ -7852,13 +7878,11 @@
       window.scrollTo(0, 0);
     }
 
-    // 채용정보 목록 불러오기
-    // 페이지네이션 변수
-    let currentPage = 1;
-    const itemsPerPage = 12;
-    let totalJobs = [];
+    // 채용정보 캐시 저장소
+    const _jobsCache = {}; // { category: { data: [], timestamp: ms } }
+    const JOBS_CACHE_TTL = 3 * 60 * 1000; // 3분
 
-    async function loadJobs() {
+    async function loadJobs(forceRefresh = false) {
       const loading = document.getElementById('loading');
       const emptyState = document.getElementById('emptyState');
       const jobTable = document.getElementById('jobTable');
@@ -7868,6 +7892,37 @@
 
       if (!loading || !tbody) return;
 
+      const category = window.currentJobCategory || 'market-public';
+      const now = Date.now();
+      const cached = _jobsCache[category];
+
+      // 캐시가 유효하면 즉시 표시 (Firestore 재조회 없음)
+      if (!forceRefresh && cached && (now - cached.timestamp < JOBS_CACHE_TTL)) {
+        totalJobs = cached.data;
+        const isAdmin = (window.currentUserRole === 'admin');
+        const mgmtHeader = document.getElementById('job-mgmt-header');
+        const checkboxHeader = document.getElementById('checkbox-header');
+        const bulkDeleteButtons = document.getElementById('bulkDeleteButtons');
+        if (mgmtHeader) mgmtHeader.style.display = isAdmin ? 'table-cell' : 'none';
+        if (checkboxHeader) checkboxHeader.style.display = isAdmin ? 'table-cell' : 'none';
+        if (bulkDeleteButtons) bulkDeleteButtons.style.display = isAdmin ? 'flex' : 'none';
+
+        if (totalJobs.length === 0) {
+          loading.style.display = 'none';
+          if (emptyState) emptyState.style.display = 'block';
+          if (paginationContainer) paginationContainer.style.display = 'none';
+          if (bottomAddButton) bottomAddButton.style.display = isAdmin ? 'block' : 'none';
+          return;
+        }
+        loading.style.display = 'none';
+        if (jobTable) jobTable.style.display = 'table';
+        displayJobsForPage(currentPage, isAdmin);
+        renderPagination();
+        if (bottomAddButton) bottomAddButton.style.display = isAdmin ? 'block' : 'none';
+        return;
+      }
+
+      // 캐시 없음 → Firestore 조회
       try {
         loading.style.display = 'block';
         if (emptyState) emptyState.style.display = 'none';
@@ -7883,16 +7938,11 @@
         if (querySnapshot.empty) {
           loading.style.display = 'none';
           if (emptyState) emptyState.style.display = 'block';
-
-          // 전체 데이터가 없어도 관리자에게는 등록 버튼 표시
           const isAdmin = (window.currentUserRole === 'admin');
-          if (bottomAddButton) {
-            bottomAddButton.style.display = isAdmin ? 'block' : 'none';
-          }
+          if (bottomAddButton) bottomAddButton.style.display = isAdmin ? 'block' : 'none';
           return;
         }
 
-        // 관리자 여부에 따라 '관리' 헤더 표시 제어
         const isAdmin = (window.currentUserRole === 'admin');
         const mgmtHeader = document.getElementById('job-mgmt-header');
         const checkboxHeader = document.getElementById('checkbox-header');
@@ -7902,45 +7952,39 @@
         if (checkboxHeader) checkboxHeader.style.display = isAdmin ? 'table-cell' : 'none';
         if (bulkDeleteButtons) bulkDeleteButtons.style.display = isAdmin ? 'flex' : 'none';
 
-        // 클라이언트 사이드 필터링
-        totalJobs = [];
+        // 전체 데이터를 카테고리별로 캐시에 저장
+        const allByCategory = {};
         querySnapshot.forEach((docSnap) => {
           const d = docSnap.data();
-          const cat = d.category || 'market-public'; // 카테고리가 없으면 기본값
-          if (cat === window.currentJobCategory) {
-            totalJobs.push({ ...d, id: docSnap.id });
-          }
+          const cat = d.category || 'market-public';
+          if (!allByCategory[cat]) allByCategory[cat] = [];
+          allByCategory[cat].push({ ...d, id: docSnap.id });
         });
+
+        // 모든 카테고리 캐시 갱신
+        Object.keys(allByCategory).forEach(cat => {
+          _jobsCache[cat] = { data: allByCategory[cat], timestamp: now };
+        });
+
+        // 현재 카테고리 데이터 사용
+        totalJobs = allByCategory[category] || [];
 
         if (totalJobs.length === 0) {
           loading.style.display = 'none';
           if (emptyState) emptyState.style.display = 'block';
           if (paginationContainer) paginationContainer.style.display = 'none';
           if (bulkDeleteButtons) bulkDeleteButtons.style.display = 'none';
-
-          // 데이터가 없어도 관리자에게는 등록 버튼 표시
-          if (bottomAddButton) {
-            bottomAddButton.style.display = isAdmin ? 'block' : 'none';
-          }
+          if (bottomAddButton) bottomAddButton.style.display = isAdmin ? 'block' : 'none';
           return;
         }
 
-        console.log('Total jobs loaded:', totalJobs.length);
-        console.log('Category:', window.currentJobCategory);
+        console.log('Total jobs loaded:', totalJobs.length, '| Category:', category);
 
-        // 현재 페이지의 데이터만 표시
         displayJobsForPage(currentPage, isAdmin);
-
         loading.style.display = 'none';
         if (jobTable) jobTable.style.display = 'table';
-
-        // 페이지네이션은 데이터 개수와 관계없이 항상 렌더링 시도
         renderPagination();
-
-        // 관리자에게만 하단 버튼 표시
-        if (bottomAddButton) {
-          bottomAddButton.style.display = isAdmin ? 'block' : 'none';
-        }
+        if (bottomAddButton) bottomAddButton.style.display = isAdmin ? 'block' : 'none';
 
       } catch (error) {
         console.error('데이터 로딩 실패:', error);
