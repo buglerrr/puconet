@@ -6120,22 +6120,11 @@
           // 이름이 없으면 이메일 앞부분 사용
           const displayName = user.displayName || user.email.split('@')[0];
           loginBtn.textContent = displayName + '님';
-          loginBtn.onclick = null;
-          loginBtn.style.cursor = 'default';
+          loginBtn.onclick = function(e) { openMyInfoModal(); return false; };
+          loginBtn.style.cursor = 'pointer';
 
-          // "나의 정보관리" 메뉴 추가
-          if (!document.getElementById('nav-my-info')) {
-            // 로그인 버튼 바로 옆(뒤)에 추가하거나, "로그아웃" 앞에 추가
-            // 여기서는 로그아웃 버튼 앞에 추가
-            const ul = document.querySelector('.global-nav-links');
-            const li = document.createElement('li');
-            li.innerHTML = '<a href="#" onclick="openMyInfoModal(); return false;" id="nav-my-info" style="color: #2ecc71; font-weight:bold;">나의 정보관리</a>';
-            // nav-login (index 0) 바로 뒤에 넣기
-            // 현재 구조: Login(0), Signup(1-hidden), Logout(2), Service(3)...
-            // insertBefore Logout
-            const logoutLi = logoutBtn.parentElement;
-            ul.insertBefore(li, logoutLi);
-          }
+          // "나의 정보관리" 메뉴 - nav-login 클릭으로 열리므로 별도 링크 불필요
+          // (nav-login onclick에서 openMyInfoModal() 호출)
         }
         if (signupBtn) signupBtn.style.display = 'none';
         if (logoutBtn) {
@@ -6151,10 +6140,10 @@
             if (userData.role === 'admin') {
               // 관리자 메뉴 노출 (네비게이션에 추가)
               if (!document.getElementById('nav-admin-users')) {
-                const ul = document.querySelector('.global-nav-links');
+                const ul = document.querySelector('#global_bar .right');
                 const li = document.createElement('li');
                 li.innerHTML = '<a href="#" onclick="showUserManagement(); return false;" id="nav-admin-users" style="color: #e74c3c; font-weight:bold;">회원관리</a>';
-                ul.insertBefore(li, ul.firstChild); // 맨 앞에 추가
+                if (ul) ul.insertBefore(li, ul.firstChild); // 맨 앞에 추가
               }
             }
           }
@@ -8248,6 +8237,15 @@
     }
 
     // ── 다중 필터 및 검색 로직 ──
+    // 필터 항목 유효성 검사: 숫자만 or 영문/숫자만인 경우 제외
+    function isValidFilterItem(val) {
+      if (!val || !val.trim()) return false;
+      const v = val.trim();
+      if (/^\d+$/.test(v)) return false;                         // 숫자만
+      if (/^[a-zA-Z0-9\s.,()_\-/]+$/.test(v)) return false;    // 영문/숫자만 (한글 없음)
+      return true;
+    }
+
     function renderJobFilters() {
       const container = document.getElementById('dynamic-filters');
       if (!container) return;
@@ -8276,10 +8274,15 @@
         normalizeLocation(job.location).forEach(c => locCities.add(c));
         // 학력: 6개 대표 카테고리로 정규화
         normalizeEducation(job.education).forEach(e => eduSet.add(e));
-        // 고용유형, 채용구분, NCS
-        if (job.employmentType || job.jobType) emps.add(job.employmentType || job.jobType);
-        if (job.careerType) cars.add(job.careerType);
-        if (job.ncsCode) ncsSet.add(job.ncsCode);
+        // 고용유형: 쉼표 구분 분리 + 무의미 항목 제외
+        (job.employmentType || job.jobType || '').split(',')
+          .map(s => s.trim()).filter(isValidFilterItem).forEach(s => emps.add(s));
+        // 채용구분: 쉼표 구분 분리 + 무의미 항목 제외
+        (job.careerType || '').split(',')
+          .map(s => s.trim()).filter(isValidFilterItem).forEach(s => cars.add(s));
+        // NCS 코드명: 쉼표 구분 분리 + 무의미 항목 제외
+        (job.ncsCode || '').split(',')
+          .map(s => s.trim()).filter(isValidFilterItem).forEach(s => ncsSet.add(s));
       });
 
       // 컬럼 생성 함수 (이미지 스타일 - 세로 스크롤 목록)
@@ -8361,24 +8364,16 @@
       const isAdmin = (window.currentUserRole === 'admin') ||
                       (window.auth && window.auth.currentUser && window.auth.currentUser.email === 'ilovetruman@gmail.com');
 
-      // 필터 미선택 시 → 안내 메시지 표시, 테이블 숨김
-      if (!hasFilter) {
-        if (jobTable) jobTable.style.display = 'none';
-        if (emptyState) emptyState.style.display = 'none';
-        if (filterGuideMsg) filterGuideMsg.style.display = 'block';
-        if (filterHintRow) filterHintRow.style.display = 'none';
-        if (paginationContainer) paginationContainer.style.display = 'none';
-        if (adminBulkBar) adminBulkBar.style.display = 'none';
-        const cntEl = document.getElementById('jobTotalCnt');
-        if (cntEl) cntEl.textContent = '0';
-        return;
-      }
-
-      // 필터 선택됨 → 안내 숨기고 필터링
+      // 안내 메시지 항상 숨김 (필터 미선택 시에도 전체 공고 표시)
       if (filterGuideMsg) filterGuideMsg.style.display = 'none';
-      if (filterHintRow) filterHintRow.style.display = 'block';
+      if (filterHintRow) filterHintRow.style.display = 'none';
 
-      totalJobs = allRawJobs.filter(job => {
+      // 필터 미선택 시 → 전체 공고 표시
+      if (!hasFilter) {
+        totalJobs = [...allRawJobs];
+      } else {
+        // 필터 선택됨 → 필터링 적용
+        totalJobs = allRawJobs.filter(job => {
           // 키워드
           if (currentFilters.keyword) {
               const kw = currentFilters.keyword;
@@ -8395,19 +8390,25 @@
               const jobEdus = normalizeEducation(job.education);
               if (!currentFilters.education.some(f => jobEdus.includes(f))) return false;
           }
-          // 고용유형 (정확히 일치)
-          if (currentFilters.employmentType.length > 0 &&
-              !currentFilters.employmentType.includes(job.employmentType || job.jobType)) return false;
+          // 고용유형 (쉼표 분리 부분 매칭)
+          if (currentFilters.employmentType.length > 0) {
+            const jobEmpTypes = (job.employmentType || job.jobType || '').split(',').map(s => s.trim());
+            if (!currentFilters.employmentType.some(f => jobEmpTypes.includes(f))) return false;
+          }
           // 근무지역: 주요 도시 포함 여부 매칭
           if (currentFilters.location.length > 0) {
               const jobLocs = normalizeLocation(job.location);
               if (!currentFilters.location.some(f => jobLocs.includes(f))) return false;
           }
-          // NCS 코드 (정확히 일치)
-          if (currentFilters.ncsCode.length > 0 && !currentFilters.ncsCode.includes(job.ncsCode)) return false;
+          // NCS 코드명 (쉼표 분리 부분 매칭)
+          if (currentFilters.ncsCode.length > 0) {
+            const jobNcsCodes = (job.ncsCode || '').split(',').map(s => s.trim());
+            if (!currentFilters.ncsCode.some(f => jobNcsCodes.includes(f))) return false;
+          }
 
           return true;
-      });
+        });
+      } // end else (hasFilter)
 
       // 총 건수
       const cntEl = document.getElementById('jobTotalCnt');
@@ -9208,7 +9209,7 @@
         history.replaceState({ section: 'board', category: category }, '', hash);
       } else if (hash === '#board') {
         window.showBoard(true);
-        history.replaceState({ section: 'board', category: 'market-public' }, '', hash);
+        history.replaceState({ section: 'board', category: null }, '', hash);
       } else if (hash.startsWith('#story-detail-')) {
         // 스토리 상세는 데이터 로드가 필요하므로 스토리 목록으로 이동
         window.showStoryBoard(true);
@@ -9246,7 +9247,7 @@
         window.goHome(true);
       } else if (state.section === 'board') {
         // 채용정보 게시판으로 이동 - 카테고리와 페이지를 직접 전달
-        const targetCategory = state.category || 'market-public';
+        const targetCategory = (state.category !== undefined && state.category !== null) ? state.category : null;
         const targetPage = state.page || 1;
         window.showBoard(true, targetCategory, targetPage);
       } else if (state.section === 'job-detail') {
