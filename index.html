@@ -240,6 +240,43 @@
       border: 1px solid #e9ecef;
     }
 
+    /* === 고용유형 타원형 배지 === */
+    .emp-type-badge {
+      display: inline-block;
+      padding: .22rem .75rem;
+      font-size: .8rem;
+      font-weight: 600;
+      border-radius: 999px;
+      margin: .15rem 0 .1rem;
+      background: #f1f3f5;
+      color: #495057;
+      border: 1.5px solid #dee2e6;
+    }
+    /* 정규직: 파란 테두리 + 연한 하늘색 배경 */
+    .emp-type-badge.emp-regular {
+      background: #e7f5ff;
+      color: #1971c2;
+      border-color: #4dabf7;
+    }
+    /* 비정규직·계약직: 주황색 계열 */
+    .emp-type-badge.emp-nonregular {
+      background: #fff4e6;
+      color: #d9480f;
+      border-color: #ffa94d;
+    }
+    /* 무기계약직: 보라색 계열 */
+    .emp-type-badge.emp-permanent {
+      background: #f3f0ff;
+      color: #6741d9;
+      border-color: #9775fa;
+    }
+    /* 인턴·청년인턴: 초록색 계열 */
+    .emp-type-badge.emp-intern {
+      background: #ebfbee;
+      color: #2f9e44;
+      border-color: #69db7c;
+    }
+
     /* Premium row special spacing (still 4 in one row on desktop) */
     .job-grid--premium {
       margin-top: 1.25rem;
@@ -1499,6 +1536,23 @@
     #jobs .job-card .meta {
       margin-top: auto;
       /* 하단 정렬 */
+    }
+
+    /* === 추천 채용정보 hover 확대 효과 === */
+    #jobs .job-card {
+      transition: transform 0.35s ease, box-shadow 0.35s ease;
+      position: relative;
+    }
+    #jobs .job-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 32px rgba(77, 171, 247, 0.30);
+      z-index: 2;
+    }
+    #jobs .job-card .banner-image {
+      transition: transform 0.35s ease;
+    }
+    #jobs .job-card:hover .banner-image {
+      transform: scale(1.08);
     }
   </style>
   <style>
@@ -9145,7 +9199,7 @@
 
       if (!carouselContainer || cards.length === 0) return;
 
-      const intervalTime = 5000; // 5초
+      const intervalTime = 2000; // 2초
       let isTransitioning = false;
 
       function slideCarousel() {
@@ -9297,6 +9351,36 @@
         window.goHome(true);
       }
     });
+
+    // === 고용유형 타원형 배지 자동 적용 ===
+    function applyEmpTypeBadges() {
+      document.querySelectorAll('.job-card p:not([class])').forEach(function(p) {
+        // 자식 요소가 있는 p는 주소/날짜 등 메타 정보 → 제외
+        if (p.children.length > 0) return;
+        var text = p.textContent.trim();
+        // 고용유형은 짧은 텍스트 (30자 이하)
+        if (text.length > 30) return;
+        // 이미 배지 처리된 경우 중복 방지
+        if (p.classList.contains('emp-type-badge')) return;
+        p.classList.add('emp-type-badge');
+        if (text.includes('비정규직') || (text.includes('계약직') && !text.includes('무기'))) {
+          p.classList.add('emp-nonregular');
+        } else if (text.includes('무기계약') || text.includes('무기예약') || text.includes('무기')) {
+          p.classList.add('emp-permanent');
+        } else if (text.includes('인턴')) {
+          p.classList.add('emp-intern');
+        } else if (text.includes('정규직') || text.includes('정규')) {
+          p.classList.add('emp-regular');
+        }
+        // 기타(파견, 시간제 등): 기본 배지 스타일 적용됨
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+      applyEmpTypeBadges();
+    });
+    // 동적으로 카드가 추가될 때도 재적용할 수 있도록 전역 노출
+    window.applyEmpTypeBadges = applyEmpTypeBadges;
 
   </script>
 </body>
