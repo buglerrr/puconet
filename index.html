@@ -276,6 +276,24 @@
       color: #2f9e44;
       border-color: #69db7c;
     }
+    /* 기간제(계약직과 별도): 핑크 계열 */
+    .emp-type-badge.emp-fixedterm {
+      background: #fff0f6;
+      color: #c2255c;
+      border-color: #faa2c1;
+    }
+    /* 시간제: 청록 계열 */
+    .emp-type-badge.emp-parttime {
+      background: #e6fcf5;
+      color: #0b7285;
+      border-color: #63e6be;
+    }
+    /* 파견/용역: 앰버 계열 */
+    .emp-type-badge.emp-dispatch {
+      background: #fff9db;
+      color: #b26a00;
+      border-color: #ffd43b;
+    }
 
     /* Premium row special spacing (still 4 in one row on desktop) */
     .job-grid--premium {
@@ -9195,9 +9213,7 @@
     // === 프리미엄 채용정보 자동 캐러셀 === 
     window.addEventListener('DOMContentLoaded', function () {
       const carouselContainer = document.querySelector('.premium-carousel-container');
-      const cards = carouselContainer ? Array.from(carouselContainer.querySelectorAll('.job-card')) : [];
-
-      if (!carouselContainer || cards.length === 0) return;
+      if (!carouselContainer || !carouselContainer.querySelector('.job-card')) return;
 
       const intervalTime = 2000; // 2초
       let isTransitioning = false;
@@ -9206,11 +9222,16 @@
         if (isTransitioning) return;
         isTransitioning = true;
 
-        // 각 카드의 실제 너비 + gap 계산
-        const cardWidth = cards[0].offsetWidth;
+        // 각 카드의 실제 너비 + gap 계산 (현재 첫 카드 기준)
+        const firstCardEl = carouselContainer.querySelector('.job-card');
+        const cardWidth = firstCardEl ? firstCardEl.offsetWidth : 0;
         const computedStyle = window.getComputedStyle(carouselContainer);
         const gap = parseFloat(computedStyle.gap) || 16; // gap 값 가져오기 (기본 16px)
         const moveDistance = cardWidth + gap;
+        if (!moveDistance) {
+          isTransitioning = false;
+          return;
+        }
 
         // 왼쪽으로 이동하는 애니메이션 적용
         carouselContainer.style.transition = 'transform 0.6s ease-in-out';
@@ -9235,7 +9256,7 @@
         }, 600); // transition 시간과 동일하게 설정
       }
 
-      // 5초마다 자동 슬라이드
+      // 2초마다 자동 슬라이드
       setInterval(slideCarousel, intervalTime);
     });
 
@@ -9363,7 +9384,13 @@
         // 이미 배지 처리된 경우 중복 방지
         if (p.classList.contains('emp-type-badge')) return;
         p.classList.add('emp-type-badge');
-        if (text.includes('비정규직') || (text.includes('계약직') && !text.includes('무기'))) {
+        if (text.includes('시간제') || text.includes('파트')) {
+          p.classList.add('emp-parttime');
+        } else if (text.includes('파견') || text.includes('용역')) {
+          p.classList.add('emp-dispatch');
+        } else if (text.includes('기간제')) {
+          p.classList.add('emp-fixedterm');
+        } else if (text.includes('비정규직') || (text.includes('계약직') && !text.includes('무기'))) {
           p.classList.add('emp-nonregular');
         } else if (text.includes('무기계약') || text.includes('무기예약') || text.includes('무기')) {
           p.classList.add('emp-permanent');
