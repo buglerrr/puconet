@@ -4976,8 +4976,8 @@
 
                 <!-- 페이지네이션 -->
                 <div id="pagination" class="pagination-container" style="display: none;">
-                  <div class="pagination">
-                    <!-- 페이지 번호들이 여기에 동적으로 추가됩니다 -->
+                  <div class="pagination" style="text-align:center; padding: 20px 0;">
+                    <button id="btnNextPage" onclick="loadNextPage()" style="padding: 10px 30px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 1rem;">다음 페이지 보기 (12개 더보기) ↓</button>
                   </div>
                 </div>
 
@@ -6069,7 +6069,7 @@
   <script type="module">
     // Firebase 9 버전 SDK 가져오기
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, orderBy, query, Timestamp, setDoc, getDoc, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, orderBy, query, Timestamp, setDoc, getDoc, limit, where, startAfter } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
     import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, GoogleAuthProvider, signInWithPopup, OAuthProvider } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
@@ -6101,7 +6101,9 @@
     window.orderBy = orderBy;
     window.query = query;
     window.Timestamp = Timestamp;
-    window.limit = limit; // limit 함수 전역 노출 추가
+    window.limit = limit;
+    window.where = where;
+    window.startAfter = startAfter;
     window.storage = storage;
     window.ref = ref;
     window.Timestamp = Timestamp;
@@ -8175,80 +8177,133 @@
       category: [] // 기관유형
     };
 
-    async function loadJobs() {
+    let lastVisibleDoc = null; // 페이징을 위한 마지막 문서 참조
+    let isLastPage = false;    // 마지막 페이지 여부
+
+    async function loadJobs(isNextPage = false) {
       const loading = document.getElementById('loading');
       const emptyState = document.getElementById('emptyState');
       const jobTable = document.getElementById('jobTable');
       const tbody = document.getElementById('jobTableBody');
       const paginationContainer = document.getElementById('pagination');
-      const bottomAddButton = document.querySelector('.bottom-add-button');
+      const nextBtn = document.getElementById('btnNextPage');
 
       if (!loading || !tbody) return;
 
-      const now = Date.now();
-
       try {
-        loading.style.display = 'block';
-        if (emptyState) emptyState.style.display = 'none';
-        if (jobTable) jobTable.style.display = 'none';
-        if (paginationContainer) paginationContainer.style.display = 'none';
-        if (bottomAddButton) bottomAddButton.style.display = 'none';
-
-        // filterGuideMsg: 로딩 중에는 숨김
-        const filterGuideMsg = document.getElementById('filterGuideMsg');
-        if (filterGuideMsg) filterGuideMsg.style.display = 'none';
-
-        // ── 전체 캐시 활용 ──
-        const allCached = _jobsCache.get('_all_jobs');
-        if (allCached && (now - allCached.ts < JOBS_CACHE_TTL)) {
-          allRawJobs = allCached.jobs;
+        if (!isNextPage) {
+          loading.style.display = 'block';
+          if (emptyState) emptyState.style.display = 'none';
+          if (jobTable) jobTable.style.display = 'none';
+          if (paginationContainer) paginationContainer.style.display = 'none';
+          tbody.innerHTML = '';
+          lastVisibleDoc = null;
+          isLastPage = false;
+          window.jobsData = {};
         } else {
-          const q = query(collection(db, 'jobs'), orderBy('createdAt', 'desc'));
-          const querySnapshot = await getDocs(q);
-          allRawJobs = [];
-          if (!querySnapshot.empty) {
-            querySnapshot.forEach((docSnap) => {
-              const d = docSnap.data();
-              allRawJobs.push({ ...d, id: docSnap.id });
-            });
-          }
-          _jobsCache.set('_all_jobs', { jobs: [...allRawJobs], ts: now });
+          if (nextBtn) nextBtn.textContent = '불러오는 중...';
         }
 
-        loading.style.display = 'none';
-        tbody.innerHTML = '';
+        // 쿼리 구축
+        let qConstraints = [orderBy('createdAt', 'desc'), limit(itemsPerPage)];
 
-        if (allRawJobs.length === 0) {
-          if (emptyState) emptyState.style.display = 'block';
-          const isAdm = (window.currentUserRole === 'admin') ||
-                        (window.auth && window.auth.currentUser && window.auth.currentUser.email === 'ilovetruman@gmail.com');
-          if (bottomAddButton) bottomAddButton.style.display = isAdm ? 'block' : 'none';
+        // 카테고리 필터링 (서버 사이드)
+        if (window.currentJobCategory && window.currentJobCategory !== 'all') {
+          // 'premium', 'recommended' 등 특정 카테고리가 jobs 컬렉션의 'category' 필드에 있다고 가정
+          // 만약 필드명이 다르면 여기서 수정 가능
+          qConstraints.unshift(where('category', '==', window.currentJobCategory));
+        }
+
+        // 페이징 처리
+        if (isNextPage && lastVisibleDoc) {
+          qConstraints.push(startAfter(lastVisibleDoc));
+        }
+
+        const q = query(collection(db, 'jobs'), ...qConstraints);
+        const querySnapshot = await getDocs(q);
+
+        loading.style.display = 'none';
+
+        if (querySnapshot.empty) {
+          if (!isNextPage) {
+            if (emptyState) emptyState.style.display = 'block';
+            if (paginationContainer) paginationContainer.style.display = 'none';
+          } else {
+            if (nextBtn) nextBtn.style.display = 'none';
+          }
           return;
         }
 
-        // 필터 UI 생성
-        renderJobFilters();
+        // 데이터 렌더링
+        querySnapshot.forEach((docSnap) => {
+          const job = { ...docSnap.data(), id: docSnap.id };
+          const createdDate = job.createdAt ? (job.createdAt.toDate ? job.createdAt.toDate().toLocaleDateString('ko-KR') : new Date(job.createdAt).toLocaleDateString('ko-KR')) : '-';
+          window.jobsData[job.id] = { ...job, createdDate: createdDate };
+          
+          const tr = document.createElement('tr');
+          const isAdmin = (window.currentUserRole === 'admin') || (window.auth?.currentUser?.email === 'ilovetruman@gmail.com');
+          const mgmtStyle = isAdmin ? '' : 'display:none;';
+          const checkboxCell = isAdmin ? `<td class="checkbox-cell" style="text-align:center;"><input type="checkbox" class="job-checkbox" data-job-id="${job.id}" onchange="updateSelectedCount()"></td>` : '';
+          
+          const titleText = escapeHtml(job.title || '제목 없음');
+          const companyText = escapeHtml(job.company || '기관명 미상');
+          const displayEmploymentType = job.employmentType || job.jobType || '-';
 
-        // 사이드바 카테고리가 있으면 카테고리 필터에 반영
-        if (window.currentJobCategory) {
-          currentFilters.category = [window.currentJobCategory];
+          tr.innerHTML = `
+                ${checkboxCell}
+                <td class="company-cell" title="${companyText}" style="text-align:center;">${companyText}</td>
+                <td class="title-cell" title="${titleText}">
+                    <a href="#" onclick="viewDetail('${job.id}'); return false;" style="text-decoration:none; color:#2c3e50; font-weight:600;">${titleText}</a>
+                </td>
+                <td class="employment-cell" title="${displayEmploymentType}">${displayEmploymentType}</td>
+                <td class="deadline-cell">${job.deadline || '-'}</td>
+                <td class="mgmt-cell" style="${mgmtStyle}">
+                    <button class="btn-edit" onclick="openEditModal('${job.id}')">수정</button>
+                    <button class="btn-delete" onclick="deleteJob('${job.id}')">삭제</button>
+                </td>
+            `;
+          tbody.appendChild(tr);
+        });
+
+        // 마지막 문서 저장 및 버튼 제어
+        lastVisibleDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+        if (querySnapshot.docs.length < itemsPerPage) {
+          isLastPage = true;
+          if (paginationContainer) paginationContainer.style.display = 'none';
         } else {
-          currentFilters.category = [];
+          if (paginationContainer) paginationContainer.style.display = 'block';
+          if (nextBtn) {
+            nextBtn.style.display = 'inline-block';
+            nextBtn.textContent = '다음 페이지 보기 (12개 더보기) ↓';
+          }
         }
 
-        // applyJobFilters가 테이블 표시/숨김, adminBulkBar, filterGuideMsg 모두 처리
-        applyJobFilters();
+        if (jobTable) jobTable.style.display = 'table';
+        
+        // 관리 컬럼 표시 여부
+        const isAdmin2 = (window.currentUserRole === 'admin') || (window.auth?.currentUser?.email === 'ilovetruman@gmail.com');
+        const mgmtHeader = document.getElementById('job-mgmt-header');
+        const checkboxHeader = document.getElementById('checkbox-header');
+        if (mgmtHeader) mgmtHeader.style.display = isAdmin2 ? 'table-cell' : 'none';
+        if (checkboxHeader) checkboxHeader.style.display = isAdmin2 ? 'table-cell' : 'none';
 
-        // 관리자 등록 버튼
-        const isAdmin2 = (window.currentUserRole === 'admin') ||
-                         (window.auth && window.auth.currentUser && window.auth.currentUser.email === 'ilovetruman@gmail.com');
-        if (bottomAddButton) bottomAddButton.style.display = isAdmin2 ? 'block' : 'none';
+        // 총 개수는 전체 리스트를 모르므로, 현재 리스트의 개수 등을 표시하거나 기획에 맞게 수정
+        const cntEl = document.getElementById('jobTotalCnt');
+        if (cntEl) {
+          const currentCount = tbody.querySelectorAll('tr').length;
+          cntEl.textContent = currentCount + (isLastPage ? '' : '+');
+        }
 
       } catch (error) {
         console.error('데이터 로딩 실패:', error);
         if (loading) loading.style.display = 'none';
       }
     }
+
+    // 다음 페이지 로드 함수
+    window.loadNextPage = function() {
+      loadJobs(true);
+    };
 
     // ── 학력 정규화 ──
     const EDU_CANONICAL = ['고졸', '대졸(2~3년)', '대졸(4년)', '석사', '박사', '학력무관'];
@@ -8381,17 +8436,14 @@
     }
 
     window.updateFilterState = function(chk) {
+      // 서버사이드 필터링으로 전환됨에 따라 이 함수는 필요시 수정하거나 비활성화
+      // 여기서는 카테고리 필터가 바뀔 때 loadJobs를 다시 호출하도록 함
       const key = chk.getAttribute('data-filter-key');
       const val = chk.value;
-      const item = chk.closest('label.filter-item');
-      if (chk.checked) {
-        if (!currentFilters[key].includes(val)) currentFilters[key].push(val);
-        if (item) item.classList.add('selected');
-      } else {
-        currentFilters[key] = currentFilters[key].filter(v => v !== val);
-        if (item) item.classList.remove('selected');
+      if (key === 'category') {
+        window.currentJobCategory = chk.checked ? val : null;
+        loadJobs(false);
       }
-      applyJobFilters();
     };
 
     window.applyJobFilters = function() {
@@ -9294,61 +9346,63 @@
 
     // 뒤로가기/앞으로가기 이벤트 처리
     window.addEventListener('popstate', function (event) {
-      const state = event.state;
+      console.log('[DEBUG] popstate fired. Hash:', window.location.hash, 'State:', event.state);
+      try {
+        const state = event.state;
 
-      if (!state || state.section === 'home') {
-        // 홈으로 이동
-        window.goHome(true);
-      } else if (state.section === 'board') {
-        // 채용정보 게시판으로 이동 - 카테고리와 페이지를 직접 전달
-        const targetCategory = (state.category !== undefined && state.category !== null) ? state.category : null;
-        const targetPage = state.page || 1;
-        window.showBoard(true, targetCategory, targetPage);
-      } else if (state.section === 'job-detail') {
-        // 채용정보 상세로 이동
-        const targetCategory = state.category || 'market-public';
-        const targetPage = state.page || 1;
-
-        if (state.jobId && window.jobsData && window.jobsData[state.jobId]) {
+        if (!state || state.section === 'home') {
+          console.log('[DEBUG] popstate: routing to goHome');
+          window.goHome(true);
+        } else if (state.section === 'board') {
+          const targetCategory = (state.category !== undefined && state.category !== null) ? state.category : null;
+          const targetPage = state.page || 1;
+          console.log('[DEBUG] popstate: routing to showBoard with category:', targetCategory, 'page:', targetPage);
           window.showBoard(true, targetCategory, targetPage);
-          viewDetail(state.jobId, true);
-        } else {
-          // 데이터가 없으면 목록으로 (저장된 페이지로)
-          window.showBoard(true, targetCategory, targetPage);
-        }
-      } else if (state.section === 'story') {
-        // 취업 이야기 게시판으로 이동
-        const targetCategory = state.category || 'free';
-        const targetPage = state.page || 1;
-        window.showStoryBoard(true, targetCategory, targetPage);
-      } else if (state.section === 'story-detail') {
-        // 스토리 상세로 이동
-        const targetCategory = state.category || 'free';
-        const targetPage = state.page || 1;
-
-        if (state.storyId && window.storiesData && window.storiesData[state.storyId]) {
-          window.showStoryBoard(true, targetCategory, targetPage);
-          window.viewStoryDetail(state.storyId, true);
-        } else {
-          // 데이터가 없으면 목록으로
-          window.showStoryBoard(true, targetCategory, targetPage);
-        }
-      } else if (state.section === 'user-manage') {
-        // 회원 관리로 이동
-        window.showUserManagement(true);
-      } else if (state.section === 'news') {
-        // 공공기관 뉴스로 이동
-        window.showNewsBoard(true);
-      } else if (state.section === 'news-detail') {
-        // 뉴스 상세보기로 이동
-        window.showNewsBoard(true).then(() => {
-          if (state.newsId && window.allNewsData && window.allNewsData.find(n => n.id === state.newsId)) {
-            window.viewNewsDetail(state.newsId, true);
+        } else if (state.section === 'job-detail') {
+          const targetCategory = state.category || 'market-public';
+          const targetPage = state.page || 1;
+          console.log('[DEBUG] popstate: routing to job-detail with id:', state.jobId);
+          if (state.jobId && window.jobsData && window.jobsData[state.jobId]) {
+            window.showBoard(true, targetCategory, targetPage);
+            viewDetail(state.jobId, true);
+          } else {
+            console.log('[DEBUG] popstate: jobsData missing, routing to showBoard');
+            window.showBoard(true, targetCategory, targetPage);
           }
-        });
-      } else {
-        // 기본: 홈으로
-        window.goHome(true);
+        } else if (state.section === 'story') {
+          const targetCategory = state.category || 'free';
+          const targetPage = state.page || 1;
+          console.log('[DEBUG] popstate: routing to storyBoard');
+          window.showStoryBoard(true, targetCategory, targetPage);
+        } else if (state.section === 'story-detail') {
+          const targetCategory = state.category || 'free';
+          const targetPage = state.page || 1;
+          console.log('[DEBUG] popstate: routing to story-detail');
+          if (state.storyId && window.storiesData && window.storiesData[state.storyId]) {
+            window.showStoryBoard(true, targetCategory, targetPage);
+            window.viewStoryDetail(state.storyId, true);
+          } else {
+            window.showStoryBoard(true, targetCategory, targetPage);
+          }
+        } else if (state.section === 'user-manage') {
+          console.log('[DEBUG] popstate: routing to user-manage');
+          window.showUserManagement(true);
+        } else if (state.section === 'news') {
+          console.log('[DEBUG] popstate: routing to news');
+          window.showNewsBoard(true);
+        } else if (state.section === 'news-detail') {
+          console.log('[DEBUG] popstate: routing to news-detail');
+          window.showNewsBoard(true).then(() => {
+            if (state.newsId && window.allNewsData && window.allNewsData.find(n => n.id === state.newsId)) {
+              window.viewNewsDetail(state.newsId, true);
+            }
+          });
+        } else {
+          console.log('[DEBUG] popstate: unknown state, routing to goHome');
+          window.goHome(true);
+        }
+      } catch (err) {
+        console.error('[DEBUG] popstate error:', err);
       }
     });
 
