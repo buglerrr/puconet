@@ -597,6 +597,19 @@
       margin-top: -.75rem;
       padding-top: .25rem;
     }
+    /* === v61 Performance Optimization: Pagination Button === */
+    #btnNextPage {
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(52, 152, 219, 0.2);
+    }
+    #btnNextPage:hover {
+      background-color: #2980b9 !important;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(52, 152, 219, 0.3);
+    }
+    #btnNextPage:active {
+      transform: translateY(0);
+    }
 
     /* Make the grids start closer under each title */
     #features .section-title,
@@ -6118,6 +6131,19 @@
     window.getDownloadURL = getDownloadURL;
     window.jobsData = {}; // 전역 데이터 저장소
 
+    // HTML 특수문자 이스케이프 함수
+    function escapeHtml(text) {
+      if (!text) return "";
+      return text
+        .toString()
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+    window.escapeHtml = escapeHtml;
+
     // --- Global Current Category (Default) ---
     window.currentJobCategory = null; // 채용정보 기본: 전체
     window.currentStoryCategory = 'free';  // 취업이야기 기본: 자유게시판
@@ -8177,8 +8203,10 @@
       category: [] // 기관유형
     };
 
+    const itemsPerPage = 12;   // 한 페이지당 출력 개수
     let lastVisibleDoc = null; // 페이징을 위한 마지막 문서 참조
     let isLastPage = false;    // 마지막 페이지 여부
+    let totalJobs = [];        // 필터링된 전체 목록 (필요한 경우)
 
     async function loadJobs(isNextPage = false) {
       const loading = document.getElementById('loading');
