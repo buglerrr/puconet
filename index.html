@@ -7226,14 +7226,9 @@
       loadStories();
     }
 
+    // 취업 이야기 상세 화면에서 이전 화면으로 (목록 또는 직전 상태)
     window.backToStoryList = function () {
-      if (window.history.length > 1) {
-        history.back();
-      } else {
-        const savedCategory = window.currentStoryCategory || 'free';
-        const savedPage = window.lastStoryPage || 1;
-        window.showStoryBoard(false, savedCategory, savedPage);
-      }
+      history.back();
     }
 
     window.viewStoryDetail = function (id, skipHistory = false) {
@@ -7712,13 +7707,9 @@
       }
     };
 
-    // backToNewsList: 뉴스 목록으로 돌아가기
+    // backToNewsList: 뉴스 상세 화면에서 이전 화면으로 (목록 또는 직전 상태)
     window.backToNewsList = function () {
-      if (window.history.length > 1) {
-        history.back();
-      } else {
-        window.showNewsBoard(false);
-      }
+      history.back();
     };
 
     // openAddNewsModal: 뉴스 작성 모달 열기
@@ -8160,15 +8151,9 @@
       window.scrollTo(0, 0);
     }
 
-    // 채용정보 목록으로 돌아가기 (저장된 페이지로)
+    // 채용정보 목록/이전 화면으로 돌아가기 (브라우저 뒤로가기와 동일하게 처리)
     window.goBackToJobList = function () {
-      if (window.history.length > 1) {
-        history.back();
-      } else {
-        const savedCategory = window.currentJobCategory || null;
-        const savedPage = window.lastJobPage || 1;
-        window.showBoard(false, savedCategory, savedPage);
-      }
+      history.back();
     }
 
     // 채용정보 목록 불러오기
