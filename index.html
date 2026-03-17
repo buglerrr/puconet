@@ -2589,70 +2589,71 @@
     }
 
     /* === 취업 이야기 게시판 - 링커리어 스타일 === */
+/* === 취업 이야기 게시판 - 링커리어 스타일 벤치마킹 === */
     .story-sidebar {
-      border: 1px solid #e2e8f0 !important;
-      border-radius: 12px !important;
+      border: 1px solid #ebebeb !important;
+      border-radius: 8px !important;
       overflow: hidden !important;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
-      padding: 0 !important;
+      box-shadow: none !important;
+      padding: 0 0 10px 0 !important;
       align-self: flex-start;
       position: sticky;
       top: 80px;
+      background: #fff;
     }
 
     .story-sidebar-head {
-      background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-      padding: 1.2rem 1.25rem;
-      color: white;
+      background: #fff;
+      padding: 20px 20px 10px 20px;
+      color: #111;
+      border-bottom: 1px solid #ebebeb;
+      margin-bottom: 10px;
     }
 
     .story-sidebar-head h2 {
-      font-size: 1rem;
-      font-weight: 700;
+      font-size: 1.2rem;
+      font-weight: 800;
       margin: 0 0 0.2rem 0;
+      color: #111;
     }
 
     .story-sidebar-head p {
-      font-size: 0.75rem;
+      font-size: 0.85rem;
       margin: 0;
-      opacity: 0.85;
+      color: #888;
     }
 
     .story-sidebar ul {
-      padding: 0.5rem 0 !important;
+      padding: 0 !important;
     }
 
     .story-sidebar li {
       margin: 0 !important;
+      border-bottom: none !important;
     }
 
     .story-sidebar a {
       display: flex !important;
       align-items: center !important;
-      gap: 8px !important;
-      padding: 0.65rem 1.25rem !important;
+      gap: 12px !important;
+      padding: 12px 20px !important;
       border-radius: 0 !important;
-      border-left: 3px solid transparent !important;
-      font-size: 0.9rem !important;
-      color: #4a5568 !important;
+      border-left: none !important;
+      font-size: 0.95rem !important;
+      color: #555 !important;
       font-weight: 500 !important;
-      transform: none !important;
-      box-shadow: none !important;
       background: transparent !important;
+      transition: all 0.2s !important;
     }
 
     .story-sidebar a:hover {
-      background: #eff6ff !important;
-      color: #3b82f6 !important;
-      border-left-color: #3b82f6 !important;
-      transform: none !important;
-      box-shadow: none !important;
+      background: #f8f9fa !important;
+      color: #111 !important;
     }
 
     .story-sidebar a.active {
-      background: #eff6ff !important;
-      color: #3b82f6 !important;
-      border-left-color: #3b82f6 !important;
+      background: #e8f3ff !important;
+      color: #2086fc !important;
       font-weight: 700 !important;
     }
 
@@ -2662,202 +2663,113 @@
 
     /* 게시글 목록 컨테이너 */
     .story-list-wrapper {
-      background: white;
-      border-radius: 12px;
-      border: 1px solid #e2e8f0;
-      overflow: hidden;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+      background: transparent;
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
     }
 
     .story-list-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 1rem 1.25rem;
-      border-bottom: 2px solid #3b82f6;
-      background: white;
+      padding: 0 0 15px 0;
+      border-bottom: 2px solid #111;
+      background: transparent;
     }
 
     .story-list-top h3 {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #1a202c;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #111;
       margin: 0;
     }
 
     .story-list-top .post-count {
-      font-size: 0.82rem;
-      color: #a0aec0;
+      font-size: 0.85rem;
+      color: #888;
     }
 
-    /* 테이블 헤더 행 */
+    /* 테이블 헤더 숨김 */
     .story-table-header {
-      display: flex;
-      align-items: center;
-      padding: 0.6rem 0;
-      background: #f8f9fb;
-      border-bottom: 1px solid #e2e8f0;
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: #8b95a1;
+      display: none !important;
     }
 
-    .story-table-header .col-num {
-      width: 60px;
-      text-align: center;
-    }
-
-    .story-table-header .col-title {
-      flex: 1;
-      padding-left: 1rem;
-    }
-
-    .story-table-header .col-author {
-      width: 90px;
-      text-align: center;
-    }
-
-    .story-table-header .col-date {
-      width: 80px;
-      text-align: center;
-    }
-
-    .story-table-header .col-views {
-      width: 55px;
-      text-align: center;
-    }
-
-    .story-table-header .col-likes {
-      width: 55px;
-      text-align: center;
-    }
-
-    .story-table-header .col-scrap {
-      width: 55px;
-      text-align: center;
-    }
-
-    /* 게시글 행 */
+    /* 게시글 행 (링커리어 카드 스타일) */
     .story-post-row {
       display: flex;
-      align-items: center;
-      padding: 0.7rem 0;
-      border-bottom: 1px solid #f0f2f5;
-      font-size: 0.88rem;
-      color: #333;
-      transition: background 0.12s;
+      flex-direction: column;
+      padding: 16px 10px;
+      border-bottom: 1px solid #ebebeb;
+      transition: background 0.15s;
       cursor: pointer;
     }
 
     .story-post-row:last-child {
-      border-bottom: none;
+      border-bottom: 1px solid #ebebeb;
     }
 
     .story-post-row:hover {
-      background: #f8faff;
+      background: #fafafa;
     }
 
-    .story-post-row .col-num {
-      width: 60px;
-      text-align: center;
-      font-size: 0.8rem;
-      color: #a0aec0;
-    }
-
-    .story-post-row .col-title {
-      flex: 1;
-      padding-left: 1rem;
+    .post-top-row {
       display: flex;
       align-items: center;
-      gap: 6px;
-      min-width: 0;
+      gap: 8px;
+      margin-bottom: 8px;
+      width: 100%;
     }
 
-    .story-post-row .col-title a {
-      text-decoration: none;
-      color: #1a202c;
+    .post-title-text {
+      font-size: 1.1rem;
       font-weight: 600;
+      color: #222;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      flex: 1;
     }
 
-    .story-post-row .col-title a:hover {
-      color: #3b82f6;
+    .post-title-text a {
+      text-decoration: none;
+      color: #222;
+    }
+
+    .post-title-text a:hover {
+      color: #2086fc;
+    }
+
+    .post-comment-count {
+      color: #2086fc;
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-left: 4px;
+    }
+
+    .post-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.85rem;
+      color: #888;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
     .story-cat-tag {
       flex-shrink: 0;
-      font-size: 0.68rem;
-      padding: 1px 7px;
-      border-radius: 8px;
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 4px;
       font-weight: 600;
       white-space: nowrap;
-    }
-
-    .story-cat-tag.cat-free {
-      background: #f3f4f6;
-      color: #6b7280;
-    }
-
-    .story-cat-tag.cat-consulting {
-      background: #eff6ff;
-      color: #3b82f6;
-    }
-
-    .story-cat-tag.cat-study {
-      background: #ecfdf5;
-      color: #059669;
-    }
-
-    .story-cat-tag.cat-ncs-review {
-      background: #fff7ed;
-      color: #ea580c;
-    }
-
-    .story-cat-tag.cat-interview {
-      background: #faf5ff;
-      color: #7c3aed;
-    }
-
-    .story-cat-tag.cat-success {
-      background: #fef2f2;
-      color: #dc2626;
-    }
-
-    .story-cat-tag.cat-expert {
-      background: #f0fdfa;
-      color: #0d9488;
-    }
-
-    .story-post-row .col-author {
-      width: 90px;
-      text-align: center;
-      font-size: 0.82rem;
-      color: #4a5568;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .story-post-row .col-date {
-      width: 80px;
-      text-align: center;
-      font-size: 0.8rem;
-      color: #a0aec0;
-    }
-
-    .story-post-row .col-views,
-    .story-post-row .col-likes,
-    .story-post-row .col-scrap {
-      width: 55px;
-      text-align: center;
-      font-size: 0.8rem;
-      color: #a0aec0;
-    }
-
-    .story-post-row .col-likes {
-      color: #e53e3e;
+      background: #f2f4f7;
+      color: #444;
     }
 
     .story-empty-box {
@@ -2870,7 +2782,6 @@
       font-size: 0.95rem;
       margin-top: 0.5rem;
     }
-
     /* === 게시글 상세 페이지 === */
     .story-detail-card {
       background: white;
@@ -6882,7 +6793,7 @@
       }
     }
 
-    function displayStoriesForPage(page) {
+function displayStoriesForPage(page) {
       const tbody = document.getElementById('storyTableBody');
       tbody.innerHTML = '';
 
@@ -6902,9 +6813,6 @@
       const countEl = document.getElementById('storyPostCount');
       if (countEl) countEl.textContent = `총 ${totalStories.length}개`;
 
-      // 번호 계산 (전체에서의 역순 번호)
-      let displayIndex = totalStories.length - startIndex;
-
       pageStories.forEach((data) => {
         const docId = data.id;
         const date = data.createdAt
@@ -6922,18 +6830,27 @@
         const row = document.createElement('div');
         row.className = 'story-post-row';
         row.onclick = function () { viewStoryDetail(docId); };
+        
         row.innerHTML = `
-          <span class="col-num">${displayIndex--}</span>
-          <span class="col-title">
+          <div class="post-top-row">
             <span class="story-cat-tag cat-${dataCat}">${catLabel}</span>
-            <span class="story-cat-tag cat-${dataCat}">${catLabel}</span>
-            <a href="#" onclick="viewStoryDetail('${docId}'); event.stopPropagation(); return false;" title="${titleText}">${titleText} ${(data.commentCount && data.commentCount > 0) ? `<span class="comment-count-display">(${data.commentCount})</span>` : ''}</a>
-          </span>
-          <span class="col-author">${authorText}</span>
-          <span class="col-date">${date}</span>
-          <span class="col-views">${data.views || 0}</span>
-          <span class="col-likes">${data.likes || 0}</span>
-          <span class="col-scrap">${data.scraps || 0}</span>
+            <div class="post-title-text">
+              <a href="#" onclick="viewStoryDetail('${docId}'); event.stopPropagation(); return false;" title="${titleText}">${titleText}</a>
+              ${(data.commentCount && data.commentCount > 0) ? `<span class="post-comment-count">[${data.commentCount}]</span>` : ''}
+            </div>
+          </div>
+          <div class="post-meta-row">
+            <span class="meta-item author">${authorText}</span>
+            <span class="meta-item date">${date}</span>
+            <span class="meta-item views">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              ${data.views || 0}
+            </span>
+            <span class="meta-item likes" style="color:#e74c3c;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+              ${data.likes || 0}
+            </span>
+          </div>
         `;
         tbody.appendChild(row);
       });
