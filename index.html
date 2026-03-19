@@ -9826,17 +9826,20 @@ function displayStoriesForPage(page) {
     .tc-item {
       display: flex;
       align-items: center;
-      font-size: 13px;
-      color: #333;
+      font-size: 15px; /* 글자 크기 확대 */
+      color: #111; /* 진한 검은색으로 변경 */
       text-decoration: none;
     }
     .tc-item:hover .tc-text {
       text-decoration: underline;
+      color: #1a73e8; /* 마우스 올렸을 때 색상 약간 강조 */
     }
-    .tc-dot {
+    .tc-rank { /* 점 대신 숫자가 들어갈 자리 */
       margin-right: 8px;
-      color: #666;
-      font-weight: bold;
+      color: #1e3a8a; /* 네이비색 포인트 (원하시면 #111로 변경 가능) */
+      font-weight: 800;
+      font-size: 15px;
+      min-width: 22px; /* 숫자가 두 자리일 때 틀어지지 않게 고정 */
     }
     .tc-board {
       color: #666;
@@ -9848,7 +9851,8 @@ function displayStoriesForPage(page) {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      color: #333;
+      color: #111; /* 진한 검은색으로 변경 */
+      font-weight: 500; /* 폰트를 살짝 더 두껍게 */
     }
     .tc-count {
       color: #e74c3c;
@@ -9980,12 +9984,14 @@ function displayStoriesForPage(page) {
             'ncs-review': '자격증', interview: '인턴 고민', success: '합격자소서', expert: '직무질문'
         };
 
-        // 화면 렌더링
+      // 화면 렌더링
         container.innerHTML = '';
-        filteredDocs.forEach((data) => {
+        filteredDocs.forEach((data, index) => { // index 추가
             const docId = data.id;
             const titleText = data.title ? data.title.replace(/</g, "&lt;").replace(/>/g, "&gt;") : '제목 없음';
             const boardName = catLabels[data.category || 'free'] || data.category || '자유게시판';
+            
+            const rankStr = String(index + 1).padStart(2, '0'); // 01, 02, 03 형식으로 순위 생성
             
             let countLabel = data.commentCount || 0;
             if (window.currentBestFilterType === 'likes') countLabel = data.likes || 0;
@@ -9995,7 +10001,7 @@ function displayStoriesForPage(page) {
             item.href = "#";
             item.onclick = function(e) { e.preventDefault(); viewStoryDetail(docId); };
             item.innerHTML = `
-                <span class="tc-dot">·</span>
+                <span class="tc-rank">${rankStr}</span>
                 <span class="tc-board">[${boardName}]</span>
                 <span class="tc-text">${titleText}</span>
                 ${countLabel > 0 ? `<span class="tc-count">[${countLabel}]</span>` : ''}
