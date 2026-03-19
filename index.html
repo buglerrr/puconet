@@ -4988,8 +4988,9 @@
                 <p>공기업 취업 커뮤니티</p>
               </div>
               <ul>
-                <li><a href="#" onclick="switchStoryBoard('free'); return false;" id="story-menu-free"
-                    class="active"><span>🗒️</span> 자유게시판</a></li>
+                <li><a href="#" onclick="switchStoryBoard('all'); return false;" id="story-menu-all"
+                    class="active"><span>📋</span> 전체글</a></li>
+                <li><a href="#" onclick="switchStoryBoard('free'); return false;" id="story-menu-free"><span>🗒️</span> 자유게시판</a></li>
                 <li><a href="#" onclick="switchStoryBoard('consulting'); return false;"
                     id="story-menu-consulting"><span>💬</span> 취업상담실</a></li>
                 <li><a href="#" onclick="switchStoryBoard('study'); return false;" id="story-menu-study"><span>📚</span>
@@ -5054,8 +5055,8 @@
                 <p>공기업 취업 커뮤니티</p>
               </div>
               <ul>
-                <li><a href="#" onclick="switchStoryBoard('free'); return false;" id="detail-menu-free"><span>🗒️</span>
-                    자유게시판</a></li>
+                <li><a href="#" onclick="switchStoryBoard('all'); return false;" id="detail-menu-all"><span>📋</span> 전체글</a></li>
+                <li><a href="#" onclick="switchStoryBoard('free'); return false;" id="detail-menu-free"><span>🗒️</span> 자유게시판</a></li>
                 <li><a href="#" onclick="switchStoryBoard('consulting'); return false;"
                     id="detail-menu-consulting"><span>💬</span> 취업상담실</a></li>
                 <li><a href="#" onclick="switchStoryBoard('study'); return false;"
@@ -5915,7 +5916,7 @@
 
     // --- Global Current Category (Default) ---
     window.currentJobCategory = null; // 채용정보 기본: 전체
-    window.currentStoryCategory = 'free';  // 취업이야기 기본: 자유게시판
+    window.currentStoryCategory = 'all';  // 취업이야기 기본: 전체글
 
 
     // --- Auth Logic Setup ---
@@ -6462,14 +6463,14 @@
       const storySection = document.getElementById('story-board-section');
       if (storySection) {
         storySection.style.display = 'block';
-        // 지정된 카테고리로, 없으면 기본값 free
-        const targetCategory = category || 'free';
+        // 지정된 카테고리로, 없으면 기본값 all
+        const targetCategory = category || 'all';
         switchStoryBoard(targetCategory, true, page);
       }
 
       // 히스토리 추가 (뒤로가기 지원)
       if (!skipHistory) {
-        history.pushState({ section: 'story', category: category || 'free', page: page }, '', '#story');
+        history.pushState({ section: 'story', category: category || 'all', page: page }, '', '#story');
       }
 
       window.scrollTo(0, 0);
@@ -6589,7 +6590,7 @@
       const tbody = document.getElementById('storyTableBody');
       if (!tbody) return;
 
-      const currentCategory = window.currentStoryCategory || 'free';
+      const currentCategory = window.currentStoryCategory || 'all';
       const now = Date.now();
       const cached = _storiesCache.get(currentCategory);
 
@@ -6628,7 +6629,8 @@
           const d = docSnap.data();
           // 카테고리가 없으면 'free'로 간주 (기존 데이터 호환)
           const cat = d.category || 'free';
-          if (cat === window.currentStoryCategory) {
+          // 현재 카테고리가 'all'이거나, 문서의 카테고리와 일치할 때 포함
+          if (window.currentStoryCategory === 'all' || cat === window.currentStoryCategory) {
             filteredDocs.push({ ...d, id: docSnap.id });
           }
         });
@@ -6671,11 +6673,11 @@ function displayStoriesForPage(page) {
 
       // 링커리어 게시판명과 유사하게 라벨 변경
       const catLabels = {
-        free: '자유이야기', consulting: '취업/이직', study: '대외활동',
+        all: '전체글', free: '자유이야기', consulting: '취업/이직', study: '대외활동',
         'ncs-review': '자격증', interview: '인턴 고민', success: '합격자소서', expert: '직무질문'
       };
 
-      const currentCat = window.currentStoryCategory || 'free';
+      const currentCat = window.currentStoryCategory || 'all';
       const titleEl = document.getElementById('storyBoardCategoryTitle');
       if (titleEl) titleEl.textContent = catLabels[currentCat] || currentCat;
       const countEl = document.getElementById('storyPostCount');
@@ -7008,7 +7010,7 @@ function displayStoriesForPage(page) {
 
       // 3-1. 카테고리 타이틀 즉시 업데이트 + 상세 사이드바 동기화
       const _catLabels = {
-        free: '자유게시판', consulting: '취업상담실', study: '스터디 모집',
+        all: '전체글', free: '자유게시판', consulting: '취업상담실', study: '스터디 모집',
         'ncs-review': 'NCS 후기', interview: '면접 후기', success: '최종합격 수기', expert: '현직자/전문가'
       };
       const _titleEl = document.getElementById('storyBoardCategoryTitle');
@@ -7050,7 +7052,7 @@ function displayStoriesForPage(page) {
 
       // 카테고리 뱃지 설정
       const _catLabels = {
-        free: '자유게시판', consulting: '취업상담실', study: '스터디 모집',
+        all: '전체글', free: '자유게시판', consulting: '취업상담실', study: '스터디 모집',
         'ncs-review': 'NCS 후기', interview: '면접 후기', success: '최종합격 수기', expert: '현직자/전문가'
       };
       const dataCat = data.category || 'free';
@@ -7147,7 +7149,7 @@ function displayStoriesForPage(page) {
 
     window.backToStoryList = function () {
       const savedPage = window.lastStoryPage || 1;
-      const savedCategory = window.currentStoryCategory || 'free';
+      const savedCategory = window.currentStoryCategory || 'all';
 
       document.getElementById('story-detail-section').style.display = 'none';
       document.getElementById('story-board-section').style.display = 'block';
