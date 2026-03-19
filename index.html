@@ -2588,6 +2588,119 @@
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
     }
 
+    /* === BEST 인기글 스타일 === */
+    .best-story-wrapper {
+      background: #fff;
+      border: 1px solid #111;
+      border-radius: 0;
+      margin-bottom: 2rem;
+      overflow: hidden;
+      box-shadow: none;
+    }
+    .best-story-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid #111;
+      background: #fafafa;
+    }
+    .best-story-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #e53e3e; /* 핫한 느낌의 빨간색 */
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .best-filters {
+      display: flex;
+      list-style: none;
+      gap: 16px;
+      margin: 0;
+      padding: 0;
+    }
+    .best-filters li {
+      font-size: 0.85rem;
+      color: #718096;
+      cursor: pointer;
+      font-weight: 600;
+      transition: color 0.2s;
+      position: relative;
+    }
+    .best-filters li:hover {
+      color: #2d3748;
+    }
+    .best-filters li.active {
+      color: #111;
+    }
+    .best-filters li.active::after {
+      content: '';
+      position: absolute;
+      bottom: -18px; /* 헤더 패딩에 맞게 조절 */
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: #111;
+    }
+    .best-story-body {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr); /* 2열 배치 */
+      gap: 0;
+    }
+    .best-story-item {
+      padding: 1.25rem;
+      border-bottom: 1px solid #eee;
+      border-right: 1px solid #eee;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .best-story-item:nth-child(even) {
+      border-right: none;
+    }
+    .best-story-item:nth-last-child(-n+2) {
+      border-bottom: none;
+    }
+    .best-story-item:hover {
+      background: #f8f9fa;
+    }
+    .best-item-board {
+      font-size: 0.75rem;
+      color: #3b82f6;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .best-item-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #111;
+      margin-bottom: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .best-item-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.8rem;
+      color: #888;
+      font-weight: 500;
+    }
+    .best-item-meta span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .best-empty {
+      grid-column: span 2;
+      text-align: center;
+      padding: 3rem;
+      color: #a0aec0;
+      font-size: 0.95rem;
+    }
+
     /* === 취업 이야기 게시판 - 링커리어 스타일 === */
 /* === 취업 이야기 게시판 - 링커리어 스타일 (테이블 리스트형) === */
     .story-sidebar {
@@ -5094,6 +5207,21 @@
             <!-- 오른쪽 게시판 컨텐츠 -->
             <div class="board-content">
               <!-- 게시글 목록 -->
+              <div class="best-story-wrapper">
+                <div class="best-story-header">
+                  <h2 class="best-story-title">🔥 BEST 인기글</h2>
+                  <ul class="best-filters" id="best-filters">
+                    <li class="active" onclick="changeBestFilter('weekly', this)">주간</li>
+                    <li onclick="changeBestFilter('monthly', this)">월간</li>
+                    <li onclick="changeBestFilter('likes', this)">추천수</li>
+                    <li onclick="changeBestFilter('views', this)">조회수</li>
+                    <li onclick="changeBestFilter('comments', this)">댓글수</li>
+                  </ul>
+                </div>
+                <div class="best-story-body" id="best-story-body">
+                  </div>
+              </div>
+
               <div id="storyBoardTable" class="story-list-wrapper">
                 <div class="story-list-top">
                   <h3 id="storyBoardCategoryTitle">자유게시판</h3>
@@ -5192,15 +5320,20 @@
                 </div>
 
                 <!-- 액션 버튼 (추천 / 스크랩 / 목록 / 삭제) -->
-                <div class="story-detail-actions-row" id="story-detail-actions">
-                  <button class="detail-action-btn" id="detail-like-btn" onclick="likeDetailStory()">
-                    ❤️ 추천 <span id="detail-like-count">0</span>
-                  </button>
-                  <button class="detail-action-btn" id="detail-scrap-btn" onclick="scrapDetailStory()">
-                    🔖 스크랩 <span id="detail-scrap-count">0</span>
-                  </button>
-                  <button class="detail-list-btn" onclick="backToStoryList()">목록</button>
-                  <button class="detail-delete-btn" id="btn-delete-story" style="display:none;">삭제</button>
+                <div class="story-detail-actions-row" id="story-detail-actions" style="position: relative;">
+                  <div style="display: flex; gap: 0.6rem; justify-content: center; width: 100%;">
+                    <button class="detail-action-btn" id="detail-like-btn" onclick="likeDetailStory()">
+                      ❤️ 추천 <span id="detail-like-count">0</span>
+                    </button>
+                    <button class="detail-action-btn" id="detail-scrap-btn" onclick="scrapDetailStory()">
+                      🔖 스크랩 <span id="detail-scrap-count">0</span>
+                    </button>
+                  </div>
+                  
+                  <div style="position: absolute; right: 1.75rem; top: 50%; transform: translateY(-50%); display: flex; gap: 0.6rem;">
+                    <button class="detail-list-btn" onclick="backToStoryList()">목록</button>
+                    <button class="detail-delete-btn" id="btn-delete-story" style="display:none;">삭제</button>
+                  </div>
                 </div>
               </div>
 
@@ -6693,6 +6826,7 @@
 
         displayStoriesForPage(storyCurrentPage);
         renderStoryPagination();
+        if (typeof renderBestStories === 'function') renderBestStories();
         return;
       }
 
@@ -6741,7 +6875,7 @@
         // 현재 페이지 표시
         displayStoriesForPage(storyCurrentPage);
         renderStoryPagination();
-
+        if (typeof renderBestStories === 'function') renderBestStories();
       } catch (err) {
         console.error(err);
         tbody.innerHTML = '<div class="story-empty-box"><p style="color:#e53e3e;">데이터 로딩 실패. 새로고침을 시도해주세요.</p></div>';
@@ -9428,8 +9562,93 @@ function displayStoriesForPage(page) {
     });
     // 동적으로 카드가 추가될 때도 재적용할 수 있도록 전역 노출
     window.applyEmpTypeBadges = applyEmpTypeBadges;
+// === BEST 인기글 작동 로직 ===
+    window.currentBestFilterType = 'weekly';
 
+    window.changeBestFilter = function(filterType, element) {
+        window.currentBestFilterType = filterType;
+        
+        // 탭 활성화 스타일 변경
+        const filters = document.querySelectorAll('#best-filters li');
+        filters.forEach(li => li.classList.remove('active'));
+        if(element) element.classList.add('active');
+        
+        // 정렬 및 렌더링 재실행
+        renderBestStories();
+    };
+
+    window.renderBestStories = function() {
+        const container = document.getElementById('best-story-body');
+        if(!container) return;
+
+        // 전체 게시글 배열(totalStories) 복사본 생성하여 독립적으로 정렬
+        let bestDocs = [...(totalStories || [])];
+        const now = new Date();
+
+        // 1. 기간 기반 필터링 (주간, 월간은 기간 제한 후 추천수 기준 내림차순 정렬)
+        if (window.currentBestFilterType === 'weekly') {
+            const oneWeekAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+            bestDocs = bestDocs.filter(doc => {
+                if(!doc.createdAt) return false;
+                const d = new Date(doc.createdAt.seconds * 1000);
+                return d >= oneWeekAgo;
+            });
+            bestDocs.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+        } 
+        else if (window.currentBestFilterType === 'monthly') {
+            const oneMonthAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+            bestDocs = bestDocs.filter(doc => {
+                if(!doc.createdAt) return false;
+                const d = new Date(doc.createdAt.seconds * 1000);
+                return d >= oneMonthAgo;
+            });
+            bestDocs.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+        }
+        // 2. 누적 지표 기준 정렬 (기간 무관)
+        else if (window.currentBestFilterType === 'likes') {
+            bestDocs.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+        }
+        else if (window.currentBestFilterType === 'views') {
+            bestDocs.sort((a, b) => (b.views || 0) - (a.views || 0));
+        }
+        else if (window.currentBestFilterType === 'comments') {
+            bestDocs.sort((a, b) => (b.commentCount || 0) - (a.commentCount || 0));
+        }
+
+        // 상위 4개 추출 (2열 2행 구조 유지)
+        bestDocs = bestDocs.slice(0, 4);
+
+        if (bestDocs.length === 0) {
+            container.innerHTML = '<div class="best-empty">해당 조건에 부합하는 인기글이 없습니다.</div>';
+            return;
+        }
+
+        const catLabels = {
+            all: '전체글', free: '자유이야기', consulting: '취업/이직', study: '대외활동',
+            'ncs-review': '자격증', interview: '인턴 고민', success: '합격자소서', expert: '직무질문'
+        };
+
+        container.innerHTML = '';
+        bestDocs.forEach(data => {
+            const docId = data.id;
+            const catLabel = catLabels[data.category || 'free'] || data.category;
+            const titleText = escapeHtml(data.title);
+            
+            const item = document.createElement('div');
+            item.className = 'best-story-item';
+            item.onclick = function() { viewStoryDetail(docId); };
+            item.innerHTML = `
+                <div class="best-item-board">${catLabel}</div>
+                <div class="best-item-title">${titleText}</div>
+                <div class="best-item-meta">
+                    <span title="조회수">👀 ${data.views || 0}</span>
+                    <span title="추천수" style="color:#e53e3e;">❤️ ${data.likes || 0}</span>
+                    <span title="댓글수">💬 ${data.commentCount || 0}</span>
+                </div>
+            `;
+            container.appendChild(item);
+        });
+    };
   </script>
 </body>
-
 </html>
