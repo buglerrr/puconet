@@ -2745,7 +2745,6 @@
       font-size: 0.84rem;
       color: #4a5568;
       cursor: pointer;
-      margin-left: auto;
     }
 
     .detail-list-btn:hover {
@@ -2760,6 +2759,92 @@
       color: white;
       font-size: 0.84rem;
       cursor: pointer;
+    }
+
+    /* === 댓글 좋아요/싫어요 및 3점 메뉴 스타일 === */
+    .comment-item-head {
+      position: relative;
+    }
+    .comment-date {
+      margin-left: 10px;
+    }
+    .comment-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #a0aec0;
+      font-size: 0.85rem;
+    }
+    .comment-action-btn {
+      background: none;
+      border: none;
+      color: #a0aec0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0;
+    }
+    .comment-action-btn:hover {
+      color: #4a5568;
+    }
+    .comment-menu-wrap {
+      position: relative;
+    }
+    .comment-menu-btn {
+      background: none;
+      border: none;
+      color: #a0aec0;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 0 4px;
+      line-height: 1;
+    }
+    .comment-menu-pop {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      border-radius: 4px;
+      z-index: 10;
+      min-width: 80px;
+      overflow: hidden;
+    }
+    .comment-menu-pop button {
+      display: block;
+      width: 100%;
+      padding: 8px 12px;
+      text-align: left;
+      border: none;
+      background: none;
+      font-size: 0.85rem;
+      cursor: pointer;
+      color: #4a5568;
+    }
+    .comment-menu-pop button:hover {
+      background: #f8f9fa;
+    }
+    .comment-edit-form {
+      margin-top: 10px;
+      display: none;
+    }
+    .comment-edit-textarea {
+      width: 100%;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 8px;
+      font-family: inherit;
+      resize: vertical;
+      margin-bottom: 6px;
+    }
+    .comment-edit-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
     }
 
     /* 댓글 카드 */
@@ -6874,9 +6959,22 @@ function displayStoriesForPage(page) {
         listEl.innerHTML = '';
         snap.forEach((docSnap) => {
           const c = docSnap.data();
-          const date = c.createdAt
-            ? new Date(c.createdAt.seconds * 1000).toLocaleDateString('ko-KR', { year: '2-digit', month: '2-digit', day: '2-digit' })
-            : '-';
+          let date = '-';
+          if (c.createdAt) {
+            const d = new Date(c.createdAt.seconds * 1000);
+            const yy = String(d.getFullYear()).slice(-2);
+            const MM = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            const hh = String(d.getHours()).padStart(2, '0');
+            const mm = String(d.getMinutes()).padStart(2, '0');
+            date = `${yy}.${MM}.${dd}. ${hh}:${mm}`;
+          }
+          
+          const commentId = docSnap.id;
+          const currentUser = window.auth && window.auth.currentUser ? window.auth.currentUser.uid : null;
+          // 작성자 본인인지 확인하여 메뉴 표시
+          const isAuthor = currentUser === c.authorUid;
+          
           const initial = (c.authorName || '?')[0].toUpperCase();
           const item = document.createElement('div');
           item.className = 'comment-item';
@@ -6885,8 +6983,27 @@ function displayStoriesForPage(page) {
               <div class="comment-avatar">${initial}</div>
               <span class="comment-author">${escapeHtml(c.authorName || '익명')}</span>
               <span class="comment-date">${date}</span>
+              <div class="comment-actions">
+                <button class="comment-action-btn" onclick="likeComment('${commentId}')">👍 <span id="like-cnt-${commentId}">${c.likes || 0}</span></button>
+                <button class="comment-action-btn" onclick="dislikeComment('${commentId}')">👎 <span id="dislike-cnt-${commentId}">${c.dislikes || 0}</span></button>
+                ${isAuthor ? `
+                <div class="comment-menu-wrap">
+                  <button class="comment-menu-btn" onclick="toggleCommentMenu('${commentId}')">⋮</button>
+                  <div class="comment-menu-pop" id="menu-pop-${commentId}">
+                    <button onclick="openEditComment('${commentId}')">수정</button>
+                    <button onclick="deleteComment('${commentId}')">삭제</button>
+                  </div>
+                </div>` : ''}
+              </div>
             </div>
-            <div class="comment-body">${escapeHtml(c.content)}</div>
+            <div class="comment-body" id="comment-body-${commentId}">${escapeHtml(c.content)}</div>
+            <div class="comment-edit-form" id="edit-form-${commentId}">
+              <textarea id="edit-input-${commentId}" class="comment-edit-textarea"></textarea>
+              <div class="comment-edit-actions">
+                <button class="comment-submit-btn" style="padding: 4px 10px; font-size: 0.8rem;" onclick="submitEditComment('${commentId}')">저장</button>
+                <button class="detail-list-btn" style="padding: 4px 10px; font-size: 0.8rem; margin: 0;" onclick="cancelEditComment('${commentId}')">취소</button>
+              </div>
+            </div>
           `;
           listEl.appendChild(item);
         });
@@ -6944,6 +7061,106 @@ function displayStoriesForPage(page) {
       const c = document.getElementById('comment-char-count');
       if (c) c.textContent = el.value.length;
     }
+
+    // === 댓글 수정, 삭제, 좋아요, 싫어요 기능 ===
+    window.toggleCommentMenu = function(id) {
+        const pop = document.getElementById(`menu-pop-${id}`);
+        if (pop) {
+            pop.style.display = pop.style.display === 'block' ? 'none' : 'block';
+        }
+    };
+
+    window.deleteComment = async function(id) {
+        if(!confirm('댓글을 삭제하시겠습니까?')) return;
+        try {
+            const storyId = window.currentStoryId;
+            await window.deleteDoc(window.doc(window.db, 'stories', storyId, 'comments', id));
+            
+            // 스토리 문서의 전체 댓글 수 감소
+            const storyRef = window.doc(window.db, 'stories', storyId);
+            const storySnap = await window.getDoc(storyRef);
+            if (storySnap.exists()) {
+                const newCount = Math.max(0, (storySnap.data().commentCount || 1) - 1);
+                await window.updateDoc(storyRef, { commentCount: newCount });
+                if (window.storiesData && window.storiesData[storyId]) {
+                    window.storiesData[storyId].commentCount = newCount;
+                }
+            }
+            alert('삭제되었습니다.');
+            await loadComments(storyId);
+        } catch(e) {
+            alert('삭제 실패: ' + e.message);
+        }
+    };
+
+    window.openEditComment = function(id) {
+        document.getElementById(`menu-pop-${id}`).style.display = 'none';
+        const bodyDiv = document.getElementById(`comment-body-${id}`);
+        const formDiv = document.getElementById(`edit-form-${id}`);
+        const inputEl = document.getElementById(`edit-input-${id}`);
+        
+        inputEl.value = bodyDiv.innerText; // 원본 텍스트 가져오기
+        bodyDiv.style.display = 'none';
+        formDiv.style.display = 'block';
+    };
+
+    window.cancelEditComment = function(id) {
+        document.getElementById(`comment-body-${id}`).style.display = 'block';
+        document.getElementById(`edit-form-${id}`).style.display = 'none';
+    };
+
+    window.submitEditComment = async function(id) {
+        const storyId = window.currentStoryId;
+        const inputEl = document.getElementById(`edit-input-${id}`);
+        const newContent = inputEl.value.trim();
+        if(!newContent) { alert('내용을 입력해주세요.'); return; }
+
+        try {
+            await window.updateDoc(window.doc(window.db, 'stories', storyId, 'comments', id), {
+                content: newContent,
+                updatedAt: window.Timestamp.now()
+            });
+            alert('수정되었습니다.');
+            await loadComments(storyId);
+        } catch(e) {
+            alert('수정 실패: ' + e.message);
+        }
+    };
+
+    window.likeComment = async function(id) {
+        const storyId = window.currentStoryId;
+        const currentUser = window.auth.currentUser;
+        if(!currentUser) { alert('로그인이 필요합니다.'); return; }
+        try {
+            const ref = window.doc(window.db, 'stories', storyId, 'comments', id);
+            const snap = await window.getDoc(ref);
+            if(!snap.exists()) return;
+            const newLikes = (snap.data().likes || 0) + 1;
+            await window.updateDoc(ref, { likes: newLikes });
+            document.getElementById(`like-cnt-${id}`).textContent = newLikes;
+        } catch(e) { console.error(e); }
+    };
+
+    window.dislikeComment = async function(id) {
+        const storyId = window.currentStoryId;
+        const currentUser = window.auth.currentUser;
+        if(!currentUser) { alert('로그인이 필요합니다.'); return; }
+        try {
+            const ref = window.doc(window.db, 'stories', storyId, 'comments', id);
+            const snap = await window.getDoc(ref);
+            if(!snap.exists()) return;
+            const newDislikes = (snap.data().dislikes || 0) + 1;
+            await window.updateDoc(ref, { dislikes: newDislikes });
+            document.getElementById(`dislike-cnt-${id}`).textContent = newDislikes;
+        } catch(e) { console.error(e); }
+    };
+
+    // 다른 곳 클릭 시 메뉴 팝업 닫기
+    document.addEventListener('click', function(e) {
+        if(!e.target.closest('.comment-menu-wrap')) {
+            document.querySelectorAll('.comment-menu-pop').forEach(pop => pop.style.display = 'none');
+        }
+    });
 
     window.likeDetailStory = async function () {
       const storyId = window.currentStoryId;
@@ -7062,10 +7279,20 @@ function displayStoriesForPage(page) {
       // 기본 정보 채우기
       document.getElementById('story-detail-title').textContent = data.title;
       document.getElementById('story-detail-author').textContent = data.authorName;
-      document.getElementById('story-detail-date').textContent = data.dateString;
+      
+      let detailDateStr = data.dateString;
+      if (data.createdAt) {
+        const d = new Date(data.createdAt.seconds * 1000);
+        const yy = d.getFullYear();
+        const MM = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        const hh = String(d.getHours()).padStart(2, '0');
+        const mm = String(d.getMinutes()).padStart(2, '0');
+        detailDateStr = `${yy}.${MM}.${dd}. ${hh}:${mm}`;
+      }
+      document.getElementById('story-detail-date').textContent = detailDateStr;
+      
       document.getElementById('story-detail-content').textContent = data.content;
-      document.getElementById('detail-like-count').textContent = data.likes || 0;
-      document.getElementById('detail-scrap-count').textContent = data.scraps || 0;
 
       // 이미지
       const imgArea = document.getElementById('story-detail-image-area');
