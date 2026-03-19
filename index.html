@@ -9748,5 +9748,229 @@ function displayStoriesForPage(page) {
         });
     };  
   </script>
+  <style>
+    /* === BEST 인기글 스타일 (링커리어 완벽 구현) === */
+    .best-story-wrapper {
+      background: #fff !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 12px !important;
+      margin-bottom: 2rem !important;
+      padding: 1.5rem 1.75rem !important;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02) !important;
+    }
+    .best-story-header {
+      display: flex !important;
+      align-items: center !important;
+      margin-bottom: 1.5rem !important;
+      position: relative !important;
+      border-bottom: none !important;
+      background: transparent !important;
+    }
+    .best-story-title {
+      font-size: 1.25rem !important;
+      font-weight: 800 !important;
+      color: #333 !important;
+      margin: 0 !important;
+      margin-right: 1.5rem !important;
+    }
+    .best-filters {
+      display: flex !important;
+      list-style: none !important;
+      gap: 8px !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    .best-filters li {
+      font-size: 0.85rem !important;
+      color: #a0aec0 !important;
+      cursor: pointer !important;
+      font-weight: 600 !important;
+      padding: 6px 14px !important;
+      border-radius: 20px !important;
+      background: #f8f9fa !important;
+      transition: all 0.2s !important;
+    }
+    .best-filters li::after {
+      display: none !important; /* 기존 밋밋한 검은 밑줄 강제 제거 */
+    }
+    .best-filters li:hover {
+      background: #e2e8f0 !important;
+      color: #4a5568 !important;
+    }
+    .best-filters li.active {
+      background: #eff6ff !important;
+      color: #3b82f6 !important;
+    }
+    .best-more {
+      margin-left: auto !important;
+      font-size: 0.85rem !important;
+      color: #718096 !important;
+      text-decoration: none !important;
+      font-weight: 600 !important;
+    }
+    .best-more:hover {
+      color: #111 !important;
+    }
+    .best-story-body {
+      display: grid !important;
+      grid-template-rows: repeat(5, 1fr) !important;
+      grid-auto-flow: column !important;
+      column-gap: 3rem !important;
+      row-gap: 1.2rem !important;
+    }
+    .best-story-item {
+      display: flex !important;
+      align-items: center !important;
+      cursor: pointer !important;
+      text-decoration: none !important;
+      gap: 12px !important;
+      padding: 0 !important;
+      border: none !important;
+    }
+    .best-story-item:hover .best-item-title {
+      text-decoration: underline !important;
+      color: #3b82f6 !important;
+    }
+    .best-item-rank {
+      font-size: 1.05rem !important;
+      font-weight: 800 !important;
+      color: #1e3a8a !important;
+      min-width: 22px !important;
+      text-align: right !important;
+    }
+    .best-item-title {
+      font-size: 0.95rem !important;
+      font-weight: 500 !important;
+      color: #333 !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      flex: 1 !important;
+      margin: 0 !important;
+    }
+    .best-item-count {
+      font-size: 0.9rem !important;
+      color: #e53e3e !important;
+      font-weight: 500 !important;
+      white-space: nowrap !important;
+    }
+    .best-empty {
+      grid-column: span 2 !important;
+      text-align: center !important;
+      padding: 2rem !important;
+      color: #a0aec0 !important;
+      font-size: 0.95rem !important;
+    }
+  </style>
+
+  <script>
+    // === BEST 인기글 파이어베이스 독립 작동 로직 ===
+    window.currentBestFilterType = 'realtime';
+    window._bestStoriesCache = null; // 파이어베이스 데이터 캐싱용
+
+    window.changeBestFilter = function(filterType, element) {
+        window.currentBestFilterType = filterType;
+        const filters = document.querySelectorAll('#best-filters li');
+        filters.forEach(li => li.classList.remove('active'));
+        if(element) element.classList.add('active');
+        renderBestStories();
+    };
+
+    window.renderBestStories = async function() {
+        const container = document.getElementById('best-story-body');
+        if(!container) return;
+
+        let bestDocs = [];
+        
+        // 1. 파이어베이스에서 전체 이야기 데이터 직접 호출 (기존 함수 의존도 제거)
+        try {
+            if (window._bestStoriesCache) {
+                bestDocs = [...window._bestStoriesCache];
+            } else {
+                const q = window.query(window.collection(window.db, 'stories'), window.orderBy('createdAt', 'desc'), window.limit(100));
+                const snap = await window.getDocs(q);
+                snap.forEach(doc => bestDocs.push({ id: doc.id, ...doc.data() }));
+                window._bestStoriesCache = [...bestDocs];
+            }
+        } catch(e) {
+            console.error("BEST 글 로딩 실패:", e);
+            container.innerHTML = '<div class="best-empty">게시글을 불러올 수 없습니다.</div>';
+            return;
+        }
+
+        // 2. 전체 글이 0개일 경우
+        if (bestDocs.length === 0) {
+            container.innerHTML = '<div class="best-empty">게시글이 존재하지 않습니다. 첫 글을 작성해보세요!</div>';
+            return;
+        }
+
+        const now = new Date();
+        let filteredDocs = [...bestDocs];
+
+        // 3. 필터링 로직
+        if (window.currentBestFilterType === 'weekly') {
+            const oneWeekAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+            filteredDocs = filteredDocs.filter(doc => doc.createdAt && new Date(doc.createdAt.seconds * 1000) >= oneWeekAgo);
+            filteredDocs.sort((a, b) => (b.views || 0) - (a.views || 0)); 
+        } 
+        else if (window.currentBestFilterType === 'monthly') {
+            const oneMonthAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+            filteredDocs = filteredDocs.filter(doc => doc.createdAt && new Date(doc.createdAt.seconds * 1000) >= oneMonthAgo);
+            filteredDocs.sort((a, b) => (b.views || 0) - (a.views || 0));
+        }
+        else if (window.currentBestFilterType === 'comments') {
+            filteredDocs.sort((a, b) => (b.commentCount || 0) - (a.commentCount || 0));
+        }
+        else if (window.currentBestFilterType === 'likes') {
+            filteredDocs.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+        }
+        else {
+            // 실시간 (조회수 + 추천수*5)
+            filteredDocs.sort((a, b) => ((b.views || 0) + (b.likes || 0)*5) - ((a.views || 0) + (a.likes || 0)*5));
+        }
+
+        // 4. ⭐ 빈칸 방지 : 조건에 맞는 글이 없으면, 무조건 조회/추천이 가장 높은 글 10개 강제 노출
+        if (filteredDocs.length === 0) {
+            filteredDocs = [...bestDocs].sort((a, b) => ((b.views || 0) + (b.likes || 0)*5) - ((a.views || 0) + (a.likes || 0)*5));
+        }
+
+        // 상위 10개 자르기
+        filteredDocs = filteredDocs.slice(0, 10);
+
+        // 5. 화면 렌더링
+        container.innerHTML = '';
+        filteredDocs.forEach((data, index) => {
+            const docId = data.id;
+            const titleText = data.title ? data.title.replace(/</g, "&lt;").replace(/>/g, "&gt;") : '제목 없음';
+            const rankStr = String(index + 1).padStart(2, '0');
+            
+            let countLabel = data.commentCount || 0;
+            if (window.currentBestFilterType === 'likes') countLabel = data.likes || 0;
+
+            const item = document.createElement('a');
+            item.className = 'best-story-item';
+            item.href = "#";
+            item.onclick = function(e) { e.preventDefault(); viewStoryDetail(docId); };
+            item.innerHTML = `
+                <div class="best-item-rank">${rankStr}</div>
+                <div class="best-item-title">${titleText}</div>
+                <div class="best-item-count">(${countLabel})</div>
+            `;
+            container.appendChild(item);
+        });
+    };
+
+    // 6. 게시판이 열리거나 카테고리가 바뀔 때 알아서 BEST 인기글이 로딩되도록 자동 훅(Hook) 걸기
+    if (typeof window.switchStoryBoard === 'function') {
+        const _originalSwitchStoryBoard = window.switchStoryBoard;
+        window.switchStoryBoard = function(boardType, skipHistory, targetPage) {
+            _originalSwitchStoryBoard(boardType, skipHistory, targetPage);
+            setTimeout(() => window.renderBestStories(), 300); // 0.3초 뒤 베스트글 자동 렌더링
+        };
+    }
+    
+    // 페이지 접속 시 즉시 1번 실행
+    setTimeout(() => window.renderBestStories(), 600);
+  </script>
 </body>
 </html>
