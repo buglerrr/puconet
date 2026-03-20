@@ -2298,7 +2298,7 @@
 
     .job-filter-panel {
       display: flex;
-      border: 1px solid #d0d0d0;
+      border: 2px solid #000; /* 여기를 2px 검은색으로 변경 */
       border-top: none;
       background: #fff;
       overflow: hidden;
@@ -2370,7 +2370,7 @@
       color: #999;
       border-top: 1px solid #e8e8e8;
       background: #fdfdfd;
-      border: 1px solid #d0d0d0;
+      border: 2px solid #000;
       border-top: none;
       border-radius: 0 0 4px 4px;
     }
@@ -4987,7 +4987,7 @@
 
               <!-- 게시판 테이블 -->
               <div id="boardJobTable"
-                style="background:transparent; padding:0; box-shadow:none; border-top:2px solid #000; display: flex; flex-direction: column; height: 100%;">
+                style="background:transparent; padding:0; box-shadow:none; display: flex; flex-direction: column; height: 100%;">
 
                 <!-- 로딩 상태 -->
                 <div id="loading" class="loading">
@@ -4998,8 +4998,7 @@
                 <!-- 다중 필터 영역 -->
                 <div style="margin-bottom:1rem;">
                   <!-- 검색바 + 건수 -->
-                  <div class="filter-top-bar" style="border:1px solid #e2e8f0; border-radius:8px 8px 0 0; border-bottom:none;">
-                    <div style="font-size:1rem; font-weight:700; color:#2c3e50;">
+                <div class="filter-top-bar" style="border:2px solid #000; border-radius:8px 8px 0 0; border-bottom:none;">                    <div style="font-size:1rem; font-weight:700; color:#2c3e50;">
                       총 <span id="jobTotalCnt" style="color:#e74c3c;">0</span>건
                     </div>
                     <div style="display:flex; gap:8px; align-items:center;">
