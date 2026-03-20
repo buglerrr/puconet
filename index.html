@@ -8425,8 +8425,29 @@ function displayStoriesForPage(page) {
 
     // 채용정보 목록/이전 화면으로 돌아가기 (브라우저 뒤로가기와 동일하게 처리)
     window.goBackToJobList = function () {
-      history.back();
-    }
+  const savedPage = window.lastJobPage || 1;
+  const savedCategory = window.currentJobCategory || null;
+
+  document.getElementById('detail-section').style.display = 'none';
+  document.getElementById('board-section').style.display = 'block';
+
+  // 저장된 페이지 상태로 복원
+  currentPage = savedPage;
+  const isAdmin = (window.currentUserRole === 'admin') || 
+                  (window.auth && window.auth.currentUser && window.auth.currentUser.email === 'ilovetruman@gmail.com');
+
+  displayJobsForPage(savedPage, isAdmin);
+  renderPagination();
+
+  // 브라우저 주소창 동기화 (뒤로가기 시 원래 목록 URL로 갱신)
+  history.pushState({
+    section: 'board',
+    category: savedCategory,
+    page: savedPage
+  }, '', savedCategory ? '#board-' + savedCategory : '#board');
+
+  window.scrollTo(0, 0);
+}
 
     // 채용정보 목록 불러오기
     // 페이지네이션 변수
@@ -8512,7 +8533,7 @@ function displayStoriesForPage(page) {
         }
 
         // applyJobFilters가 테이블 표시/숨김, adminBulkBar, filterGuideMsg 모두 처리
-        applyJobFilters();
+        applyJobFilters(false);
 
         // 관리자 등록 버튼
         const isAdmin2 = (window.currentUserRole === 'admin') ||
@@ -8669,7 +8690,7 @@ function displayStoriesForPage(page) {
       applyJobFilters();
     };
 
-    window.applyJobFilters = function() {
+    window.applyJobFilters = function(resetPage) {
       // 검색어 수집
       const searchInput = document.getElementById('jobSearchInput');
       currentFilters.keyword = searchInput ? searchInput.value.trim().toLowerCase() : '';
@@ -8743,7 +8764,9 @@ function displayStoriesForPage(page) {
       const cntEl = document.getElementById('jobTotalCnt');
       if (cntEl) cntEl.textContent = totalJobs.length;
 
-      currentPage = 1;
+      if (resetPage !== false) {
+        currentPage = 1;
+      }
 
       // adminBulkBar 표시 (isAdmin은 위에서 선언됨)
       if (adminBulkBar) adminBulkBar.style.display = isAdmin ? 'flex' : 'none';
