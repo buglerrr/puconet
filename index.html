@@ -4070,7 +4070,14 @@
       color: #3498db;
       text-decoration: underline;
     }
-  </style>
+  /* === 주요 채용정보 로고 크기 맞춤 확대 === */
+    #general-jobs .job-card .banner-image {
+      height: 75px !important; /* 기존 약 45px에서 75px로 대폭 확대 (원하는 만큼 숫자 조절 가능) */
+      width: 100% !important;
+      object-fit: contain !important; /* 로고가 잘리지 않으면서 가로세로 여백 없이 최대한 꽉 차게 맞춰줌 */
+      margin-top: 5px !important;
+      margin-bottom: 12px !important; /* 로고 확대 후 텍스트와 겹치지 않도록 아래쪽 여백 확보 */
+    }</style>
 </head>
 
 <body>
