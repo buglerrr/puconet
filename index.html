@@ -4073,6 +4073,54 @@
       text-decoration: underline;
     }
   </style>
+  <style>
+    /* 추천 및 주요 채용정보 썸네일 꽉 차게 표출하기 오버라이드 */
+    #jobs .job-card,
+    #general-jobs .job-card {
+      padding: 0 !important; /* 카드 내부 기본 여백 제거 */
+      overflow: hidden !important; /* 이미지가 카드 둥근 모서리를 삐져나가지 않게 처리 */
+    }
+
+    #jobs .job-card .banner-image,
+    #general-jobs .job-card .banner-image {
+      width: 100% !important;
+      height: 140px !important; /* 기존 64px에서 140px로 대폭 확대 (원하는 높이로 수정 가능) */
+      max-height: none !important;
+      object-fit: cover !important; /* 비율을 유지하며 빈 공간 없이 영역을 꽉 채움 */
+      margin: 0 !important;
+      padding: 0 !important;
+      border-bottom: 1px solid #eee !important;
+      background-color: #fff !important; /* 투명 로고일 경우를 대비해 흰색 배경 깔기 */
+      border-radius: 0 !important;
+    }
+
+    /* 이미지가 아닌 하단 텍스트 영역에만 좌우 여백을 다시 추가 */
+    #jobs .job-card h3,
+    #jobs .job-card p,
+    #jobs .job-card .job-badges,
+    #jobs .job-card .meta,
+    #general-jobs .job-card h3,
+    #general-jobs .job-card p,
+    #general-jobs .job-card .job-badges,
+    #general-jobs .job-card .meta {
+      padding-left: 16px !important;
+      padding-right: 16px !important;
+    }
+
+    /* 제목과 하단 요소들의 상하 간격 재조정 */
+    #jobs .job-card h3,
+    #general-jobs .job-card h3 {
+      margin-top: 16px !important;
+    }
+    
+    #jobs .job-card .job-badges,
+    #jobs .job-card .meta,
+    #general-jobs .job-card .job-badges,
+    #general-jobs .job-card .meta {
+      margin-bottom: 16px !important;
+    }
+  </style>
+</head>
 </head>
 
 <body>
