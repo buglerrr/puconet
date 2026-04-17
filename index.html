@@ -2837,6 +2837,8 @@
     .story-list-wrapper { background: white; border-radius: 0; border-top: 2px solid #333; overflow: hidden; box-shadow: none; }
     .story-list-top { display: flex; align-items: center; justify-content: space-between; padding: 1rem 0 1rem 1rem; border-bottom: 1px solid #111; background: white; }
     .story-list-top h3 { font-size: 1.2rem; font-weight: 700; color: #111; margin: 0; }
+    .story-list-top-left { display: flex; flex-direction: column; gap: 3px; }
+    .story-board-subtitle { font-size: 0.82rem; color: #aaa; margin: 0; }
     .story-list-top .post-count { font-size: 0.85rem; color: #666; }
 
     /* 링커리어 스타일 테이블 헤더 표시 */
@@ -5335,7 +5337,10 @@
 
               <div id="storyBoardTable" class="story-list-wrapper">
                 <div class="story-list-top">
-                  <h3 id="storyBoardCategoryTitle">자유게시판</h3>
+                  <div class="story-list-top-left">
+                    <h3 id="storyBoardCategoryTitle">자유게시판</h3>
+                    <p id="storyBoardSubtitle" class="story-board-subtitle"></p>
+                  </div>
                   <span class="post-count" id="storyPostCount"></span>
                 </div>
                 <div class="story-table-header">
@@ -7478,6 +7483,19 @@ function displayStoriesForPage(page) {
       const _titleEl = document.getElementById('storyBoardCategoryTitle');
       if (_titleEl) _titleEl.textContent = _catLabels[boardType] || boardType;
 
+      // ★ 게시판별 설명글 업데이트
+      const _subtitleMap = {
+        all:          '취업 이야기의 모든 글을 한눈에 확인하세요.',
+        free:         '자유롭게 취업 이야기를 나눠보세요.',
+        consulting:   '취업 고민, 함께 해결해 드립니다.',
+        study:        '같이 공부할 스터디 멤버를 모집해 보세요.',
+        'ncs-review': '선배들의 실전 NCS 후기를 확인하세요.',
+        interview:    '면접 경험과 팁을 공유해 주세요.',
+        success:      '최종합격의 기쁨과 노하우를 나눠요.',
+        expert:       '현직자와 전문가의 생생한 조언을 들어보세요.'
+      };
+      const _subtitleEl = document.getElementById('storyBoardSubtitle');
+      if (_subtitleEl) _subtitleEl.textContent = _subtitleMap[boardType] || '';
       // ★ 오른쪽 상단 페이지 타이틀도 업데이트
       const _pageTitleEl = document.getElementById('storyPageTitle');
       if (_pageTitleEl) _pageTitleEl.textContent = boardType === 'all' ? '취업 이야기' : (_catLabels[boardType] || boardType);
