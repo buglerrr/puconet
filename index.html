@@ -9534,13 +9534,17 @@ function initCarousel(carouselContainer) {
       return;
     }
 
+    // ★ 첫 카드 복제본을 맨 뒤에 추가 (오른쪽 빈 공간 채우기)
+    const firstCard = carouselContainer.firstElementChild;
+    const clone = firstCard.cloneNode(true);
+    carouselContainer.appendChild(clone);
+
     carouselContainer.style.transition = 'transform 0.6s ease-in-out';
     carouselContainer.style.transform = `translateX(-${moveDistance}px)`;
-
     setTimeout(() => {
       carouselContainer.style.transition = 'none';
-      const firstCard = carouselContainer.firstElementChild;
-      carouselContainer.appendChild(firstCard);
+      carouselContainer.appendChild(firstCard); // 원본 첫 카드를 맨 뒤로
+      carouselContainer.removeChild(clone);     // 복제 카드 제거
       carouselContainer.style.transform = 'translateX(0)';
       setTimeout(() => {
         isTransitioning = false;
