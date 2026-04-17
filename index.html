@@ -7492,6 +7492,10 @@ function displayStoriesForPage(page) {
       if (boardTable) boardTable.style.display = 'block';
       if (boardMessage) boardMessage.style.display = 'none';
 
+      // ★ 전체글일 때만 BEST 인기글 섹션 표시
+      const bestWrapper = document.querySelector('.best-story-wrapper');
+      if (bestWrapper) bestWrapper.style.display = boardType === 'all' ? 'block' : 'none';
+
       // 히스토리 추가 (뒤로가기 지원) - 페이지 번호 포함
       if (!skipHistory) {
         history.pushState({ section: 'story', category: boardType, page: storyCurrentPage }, '', '#story-' + boardType);
