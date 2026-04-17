@@ -4079,7 +4079,46 @@
       object-fit: contain !important; /* 로고가 잘리지 않으면서 가로세로 여백 없이 최대한 꽉 차게 맞춰줌 */
       margin-top: 5px !important;
       margin-bottom: 12px !important; /* 로고 확대 후 텍스트와 겹치지 않도록 아래쪽 여백 확보 */
-    }</style>
+    }
+
+    /* ===== 실시간 채팅방 섹션 ===== */
+.chatroom-section {
+  width: calc(100% + 40px);
+  margin-left: -40px;
+  background: #f8f9fa;
+  padding: 3rem 0;
+}
+.chatroom-section .container { max-width: 1480px; margin: 0 auto; padding: 0 60px; }
+.chatroom-section .section-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.3rem; }
+.chatroom-desc { font-size: 0.9rem; color: #888; margin-bottom: 1.5rem; }
+.chatroom-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.chatroom-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
+.chatroom-card-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.2rem; border-bottom: 1px solid #f0f0f0; }
+.chatroom-card-header h3 { font-size: 1rem; font-weight: 700; margin: 0; }
+.chatroom-join-btn { background: #fff; border: 1.5px solid #2BBDF5; color: #2BBDF5; font-size: 0.82rem; font-weight: 600; padding: 5px 14px; border-radius: 6px; cursor: pointer; transition: background 0.2s, color 0.2s; }
+.chatroom-join-btn:hover { background: #2BBDF5; color: #fff; }
+.chatroom-messages { flex: 1; height: 220px; overflow-y: auto; padding: 0.8rem 1rem; display: flex; flex-direction: column; gap: 0.6rem; background: #fafafa; }
+.chat-msg { display: flex; flex-direction: column; gap: 2px; }
+.chat-msg .msg-author { font-size: 0.78rem; font-weight: 600; color: #555; }
+.chat-msg .msg-bubble { background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; padding: 6px 10px; font-size: 0.88rem; color: #222; max-width: 90%; }
+.chat-msg .msg-time { font-size: 0.72rem; color: #bbb; align-self: flex-end; }
+
+/* 채팅 모달 */
+.chatroom-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 9999; align-items: center; justify-content: center; }
+.chatroom-modal-overlay.active { display: flex; }
+.chatroom-modal { background: #fff; border-radius: 14px; width: 480px; max-height: 80vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.2); }
+.chatroom-modal-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.3rem; border-bottom: 1px solid #eee; }
+.chatroom-modal-header h3 { font-size: 1.1rem; font-weight: 700; margin: 0; }
+.chatroom-modal-close { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #aaa; }
+.chatroom-modal-body { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.7rem; background: #f8f9fa; }
+.chatroom-modal-footer { display: flex; gap: 0.5rem; padding: 0.8rem 1rem; border-top: 1px solid #eee; }
+.chatroom-modal-footer input { flex: 1; border: 1px solid #ddd; border-radius: 8px; padding: 8px 12px; font-size: 0.95rem; outline: none; }
+.chatroom-modal-footer input:focus { border-color: #2BBDF5; }
+.chatroom-modal-footer button { background: #2BBDF5; color: #fff; border: none; border-radius: 8px; padding: 8px 18px; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
+.chatroom-modal-footer button:hover { background: #09A8E0; }
+.my-msg .msg-bubble { background: #e3f6fd; border-color: #b3e5f5; align-self: flex-end; }
+.my-msg { align-items: flex-end; }
+  </style>
 </head>
 
 <body>
@@ -4198,6 +4237,186 @@
           </div>
         </div>
       </section>
+
+      <!-- ===== 실시간 채팅방 섹션 ===== -->
+      <div class="chatroom-section">
+        <div class="container">
+          <h2 class="section-title">실시간 취업 채팅방</h2>
+          <p class="chatroom-desc">공기업 취업 정보를 실시간으로 나눠보세요. 로그인 후 채팅에 참여할 수 있습니다.</p>
+          <div class="chatroom-grid">
+            <!-- 채팅방 카드 3개 -->
+            <div class="chatroom-card">
+              <div class="chatroom-card-header">
+                <div>
+                  <h3>자유 채팅방</h3>
+                  <p style="font-size:0.78rem;color:#aaa;margin:2px 0 0;">취업 관련 자유로운 대화</p>
+                </div>
+                <button class="chatroom-join-btn" onclick="openChatModal('free', '자유 채팅방')">채팅방 참여하기</button>
+              </div>
+              <div class="chatroom-messages" id="preview-free">
+                <p style="font-size:0.82rem;color:#bbb;text-align:center;margin-top:2rem;">메시지를 불러오는 중...</p>
+              </div>
+            </div>
+            <div class="chatroom-card">
+              <div class="chatroom-card-header">
+                <div>
+                  <h3>공기업 준비 채팅방</h3>
+                  <p style="font-size:0.78rem;color:#aaa;margin:2px 0 0;">NCS · 필기 · 전략 공유</p>
+                </div>
+                <button class="chatroom-join-btn" onclick="openChatModal('ncs', '공기업 준비 채팅방')">채팅방 참여하기</button>
+              </div>
+              <div class="chatroom-messages" id="preview-ncs">
+                <p style="font-size:0.82rem;color:#bbb;text-align:center;margin-top:2rem;">메시지를 불러오는 중...</p>
+              </div>
+            </div>
+            <div class="chatroom-card">
+              <div class="chatroom-card-header">
+                <div>
+                  <h3>면접 준비 채팅방</h3>
+                  <p style="font-size:0.78rem;color:#aaa;margin:2px 0 0;">면접 후기 · 질문 · 경험 공유</p>
+                </div>
+                <button class="chatroom-join-btn" onclick="openChatModal('interview', '면접 준비 채팅방')">채팅방 참여하기</button>
+              </div>
+              <div class="chatroom-messages" id="preview-interview">
+                <p style="font-size:0.82rem;color:#bbb;text-align:center;margin-top:2rem;">메시지를 불러오는 중...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 채팅 모달 -->
+      <div class="chatroom-modal-overlay" id="chatroomModalOverlay">
+        <div class="chatroom-modal">
+          <div class="chatroom-modal-header">
+            <h3 id="chatroomModalTitle">채팅방</h3>
+            <button class="chatroom-modal-close" onclick="closeChatModal()">✕</button>
+          </div>
+          <div class="chatroom-modal-body" id="chatroomModalBody"></div>
+          <div class="chatroom-modal-footer">
+            <input type="text" id="chatroomInput" placeholder="메시지를 입력하세요..." onkeydown="if(event.key==='Enter') sendChatMessage()" />
+            <button onclick="sendChatMessage()">전송</button>
+          </div>
+        </div>
+      </div>
+
+      <script>
+      // ===== 실시간 채팅방 스크립트 =====
+      let currentChatRoom = null;
+      let chatUnsubscribe = null;
+
+      // 시간 포맷 (HH:MM)
+      function formatChatTime(ts) {
+        const d = ts?.toDate ? ts.toDate() : new Date(ts);
+        return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+      }
+
+      // 메시지 HTML 생성
+      function buildMsgHTML(data, isMe) {
+        return `<div class="chat-msg ${isMe ? 'my-msg' : ''}">
+          <span class="msg-author">${data.authorName || '익명'}</span>
+          <span class="msg-bubble">${data.text}</span>
+          <span class="msg-time">${formatChatTime(data.createdAt)}</span>
+        </div>`;
+      }
+
+      // 미리보기 로드 (각 채팅방 카드)
+      function loadChatPreviews() {
+        const rooms = ['free', 'ncs', 'interview'];
+        rooms.forEach(roomId => {
+          const el = document.getElementById('preview-' + roomId);
+          if (!el || !window.db) return;
+          const q = window.query(
+            window.collection(window.db, 'chatrooms', roomId, 'messages'),
+            window.orderBy('createdAt', 'desc'),
+            window.limit(5)
+          );
+          window.onSnapshot(q, snapshot => {
+            const msgs = [];
+            snapshot.forEach(d => msgs.unshift(d.data()));
+            if (msgs.length === 0) {
+              el.innerHTML = '<p style="font-size:0.82rem;color:#bbb;text-align:center;margin-top:2rem;">아직 메시지가 없습니다.</p>';
+              return;
+            }
+            el.innerHTML = msgs.map(m => buildMsgHTML(m, false)).join('');
+            el.scrollTop = el.scrollHeight;
+          });
+        });
+      }
+
+      // 채팅 모달 열기
+      window.openChatModal = function(roomId, roomName) {
+        const user = window.auth?.currentUser;
+        if (!user) {
+          alert('채팅방에 참여하려면 로그인이 필요합니다.');
+          if (window.openLoginModal) window.openLoginModal();
+          return;
+        }
+        currentChatRoom = roomId;
+        document.getElementById('chatroomModalTitle').textContent = roomName;
+        document.getElementById('chatroomModalBody').innerHTML = '';
+        document.getElementById('chatroomModalOverlay').classList.add('active');
+
+        // 기존 구독 해제
+        if (chatUnsubscribe) chatUnsubscribe();
+
+        const q = window.query(
+          window.collection(window.db, 'chatrooms', roomId, 'messages'),
+          window.orderBy('createdAt', 'asc'),
+          window.limit(100)
+        );
+        const body = document.getElementById('chatroomModalBody');
+        chatUnsubscribe = window.onSnapshot(q, snapshot => {
+          body.innerHTML = '';
+          snapshot.forEach(d => {
+            const data = d.data();
+            const isMe = data.authorId === user.uid;
+            body.innerHTML += buildMsgHTML(data, isMe);
+          });
+          body.scrollTop = body.scrollHeight;
+        });
+        setTimeout(() => document.getElementById('chatroomInput').focus(), 100);
+      };
+
+      // 채팅 모달 닫기
+      window.closeChatModal = function() {
+        document.getElementById('chatroomModalOverlay').classList.remove('active');
+        if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
+        currentChatRoom = null;
+      };
+
+      // 메시지 전송
+      window.sendChatMessage = async function() {
+        const user = window.auth?.currentUser;
+        if (!user || !currentChatRoom) return;
+        const input = document.getElementById('chatroomInput');
+        const text = input.value.trim();
+        if (!text) return;
+        input.value = '';
+        await window.addDoc(
+          window.collection(window.db, 'chatrooms', currentChatRoom, 'messages'),
+          {
+            text,
+            authorId: user.uid,
+            authorName: user.displayName || user.email?.split('@')[0] || '익명',
+            createdAt: window.Timestamp.now()
+          }
+        );
+      };
+
+      // 페이지 로드 후 미리보기 시작
+      (function waitForDb() {
+        if (window.db && window.onSnapshot) {
+          loadChatPreviews();
+        } else {
+          setTimeout(waitForDb, 200);
+        }
+      })();
+      </script>
+
+      <!-- 최신 채용정보: 카드 디자인을 배너형으로 업데이트 -->
+      <section class="section section--tight-top" id="jobs"
+      
       <!-- 최신 채용정보: 카드 디자인을 배너형으로 업데이트 -->
       <section class="section section--tight-top" id="jobs" style="background: white;">
         <div class="container">
@@ -6201,7 +6420,7 @@
   <script type="module">
     // Firebase 9 버전 SDK 가져오기
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, orderBy, query, Timestamp, setDoc, getDoc, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, orderBy, query, Timestamp, setDoc, getDoc, limit, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
     import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, GoogleAuthProvider, signInWithPopup, OAuthProvider } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
@@ -6233,7 +6452,8 @@
     window.orderBy = orderBy;
     window.query = query;
     window.Timestamp = Timestamp;
-    window.limit = limit; // limit 함수 전역 노출 추가
+    window.limit = limit;
+    window.onSnapshot = onSnapshot; // 실시간 채팅용
     window.storage = storage;
     window.ref = ref;
     window.Timestamp = Timestamp;
