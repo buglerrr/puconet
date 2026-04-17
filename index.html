@@ -5281,10 +5281,6 @@
       <!-- 취업 이야기 게시판 섹션 -->
       <div id="story-board-section" style="display:none; width:100%;">
         <div class="container" style="max-width:1400px; margin:0 auto;">
-          <div class="story-header">
-            <h1>취업 이야기</h1>
-            <button class="btn-write-story" onclick="openWriteStoryModal()">✏️ 이야기 쓰기</button>
-          </div>
 
           <!-- 게시판 레이아웃: 사이드바 + 컨텐츠 -->
           <div class="board-layout">
@@ -5315,6 +5311,11 @@
 
             <!-- 오른쪽 게시판 컨텐츠 -->
             <div class="board-content">
+              <!-- 게시판 제목 + 이야기 쓰기 버튼 -->
+              <div class="story-header">
+                <h1 id="storyPageTitle">취업 이야기</h1>
+                <button class="btn-write-story" onclick="openWriteStoryModal()">✏️ 이야기 쓰기</button>
+              </div>
               <!-- 게시글 목록 -->
               <div class="best-story-wrapper">
                 <div class="best-story-header">
@@ -7476,6 +7477,11 @@ function displayStoriesForPage(page) {
       };
       const _titleEl = document.getElementById('storyBoardCategoryTitle');
       if (_titleEl) _titleEl.textContent = _catLabels[boardType] || boardType;
+
+      // ★ 오른쪽 상단 페이지 타이틀도 업데이트
+      const _pageTitleEl = document.getElementById('storyPageTitle');
+      if (_pageTitleEl) _pageTitleEl.textContent = boardType === 'all' ? '취업 이야기' : (_catLabels[boardType] || boardType);
+      
       const _detailMenu = document.getElementById('detail-menu-' + boardType);
       if (_detailMenu) _detailMenu.classList.add('active');
 
