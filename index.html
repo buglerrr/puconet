@@ -4127,6 +4127,9 @@
 .chatroom-modal-footer button:hover { background: #09A8E0; }
 .my-msg .msg-bubble { background: #e3f6fd; border-color: #b3e5f5; align-self: flex-end; }
 .my-msg { align-items: flex-end; }
+.chat-date-divider { display: flex; align-items: center; gap: 8px; margin: 0.8rem 0; flex-shrink: 0; }
+.chat-date-divider::before, .chat-date-divider::after { content: ''; flex: 1; height: 1px; background: #e0e0e0; }
+.chat-date-divider span { font-size: 0.72rem; color: #aaa; white-space: nowrap; }
   </style>
 </head>
 
@@ -4397,8 +4400,20 @@
         const body = document.getElementById('chatroomModalBody');
         chatUnsubscribe = window.onSnapshot(q, snapshot => {
           body.innerHTML = '';
+          let lastDate = '';
           snapshot.forEach(d => {
             const data = d.data();
+            // 날짜 구분선: 날짜가 바뀔 때마다 표시
+            const msgDate = data.createdAt?.toDate
+              ? data.createdAt.toDate()
+              : new Date(data.createdAt);
+            const dateStr = msgDate.getFullYear() + '.'
+              + String(msgDate.getMonth() + 1).padStart(2, '0') + '.'
+              + String(msgDate.getDate()).padStart(2, '0');
+            if (dateStr !== lastDate) {
+              body.innerHTML += `<div class="chat-date-divider"><span>${dateStr}</span></div>`;
+              lastDate = dateStr;
+            }
             const isMe = data.authorId === user.uid;
             body.innerHTML += buildMsgHTML(data, isMe);
           });
