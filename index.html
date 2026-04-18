@@ -4408,13 +4408,6 @@
       };
 
       // 채팅 모달 닫기
-      window.closeChatModal = function() {
-        document.getElementById('chatroomModalOverlay').classList.remove('active');
-        if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
-        currentChatRoom = null;
-      };
-
-      // 메시지 전송
       window.sendChatMessage = async function() {
         const user = window.auth?.currentUser;
         if (!user || !currentChatRoom) return;
@@ -4422,12 +4415,22 @@
         const text = input.value.trim();
         if (!text) return;
         input.value = '';
+
+        // ★ Firestore에서 닉네임 조회 (취업 이야기 게시판과 동일한 방식)
+        let authorName = user.displayName || user.email?.split('@')[0] || '익명';
+        try {
+          const userDoc = await window.getDoc(window.doc(window.db, 'users', user.uid));
+          if (userDoc.exists() && userDoc.data().nickname) {
+            authorName = userDoc.data().nickname;
+          }
+        } catch (e) { /* 조회 실패시 기본값 사용 */ }
+
         await window.addDoc(
           window.collection(window.db, 'chatrooms', currentChatRoom, 'messages'),
           {
             text,
             authorId: user.uid,
-            authorName: user.displayName || user.email?.split('@')[0] || '익명',
+            authorName,
             createdAt: window.Timestamp.now()
           }
         );
