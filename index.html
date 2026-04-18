@@ -4124,6 +4124,8 @@
 .chatroom-modal-footer input { flex: 1; border: 1px solid #ddd; border-radius: 8px; padding: 8px 12px; font-size: 0.95rem; outline: none; }
 .chatroom-modal-footer input:focus { border-color: #2BBDF5; }
 .chatroom-modal-footer button { background: #2BBDF5; color: #fff; border: none; border-radius: 8px; padding: 8px 18px; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
+.chatroom-exit-btn { background: #f1f3f5 !important; color: #666 !important; border: 1px solid #dee2e6 !important; }
+.chatroom-exit-btn:hover { background: #e9ecef !important; color: #333 !important; }
 .chatroom-modal-footer button:hover { background: #09A8E0; }
 .my-msg .msg-bubble { background: #e3f6fd; border-color: #b3e5f5; align-self: flex-end; }
 .my-msg { align-items: flex-end; }
@@ -4331,7 +4333,8 @@
             <button class="chatroom-modal-close" onclick="window.closeChatModal && window.closeChatModal()">✕</button>
           </div>
           <div class="chatroom-modal-body" id="chatroomModalBody"></div>
-          <div class="chatroom-modal-footer">
+         <div class="chatroom-modal-footer">
+            <button class="chatroom-exit-btn" onclick="window.closeChatModal && window.closeChatModal()">나가기</button>
             <input type="text" id="chatroomInput" placeholder="메시지를 입력하세요..." onkeydown="if(event.key==='Enter') sendChatMessage()" />
             <button onclick="sendChatMessage()">전송</button>
           </div>
@@ -4433,7 +4436,19 @@
         setTimeout(() => document.getElementById('chatroomInput').focus(), 100);
       };
 
-      // 채팅 모달 닫기
+     // 채팅 모달 닫기
+      window.closeChatModal = function() {
+        document.getElementById('chatroomModalOverlay').classList.remove('active');
+        if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
+        currentChatRoom = null;
+      };
+
+      // 오버레이 바깥 클릭 시에도 닫기
+      document.getElementById('chatroomModalOverlay').addEventListener('click', function(e) {
+        if (e.target === this) window.closeChatModal();
+      });
+
+      // 메시지 전송
       window.sendChatMessage = async function() {
         const user = window.auth?.currentUser;
         if (!user || !currentChatRoom) return;
