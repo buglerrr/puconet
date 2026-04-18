@@ -7924,6 +7924,8 @@ function displayStoriesForPage(page) {
       document.getElementById('general-jobs').style.display = 'none';
       document.getElementById('edu-courses').style.display = 'none';
       document.getElementById('detail-section').style.display = 'none';
+      const chatroomSectionSt = document.getElementById('chatroom-section');
+      if (chatroomSectionSt) chatroomSectionSt.style.display = 'none';
 
       const boardSection = document.getElementById('board-section');
       if (boardSection) boardSection.style.display = 'none';
