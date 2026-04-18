@@ -4426,6 +4426,18 @@
       };
 
       // 채팅 모달 닫기
+      window.closeChatModal = function() {
+        document.getElementById('chatroomModalOverlay').classList.remove('active');
+        if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
+        currentChatRoom = null;
+      };
+
+      // 오버레이 바깥 클릭 시에도 닫기
+      document.getElementById('chatroomModalOverlay').addEventListener('click', function(e) {
+        if (e.target === this) window.closeChatModal();
+      });
+
+      // 메시지 전송
       window.sendChatMessage = async function() {
         const user = window.auth?.currentUser;
         if (!user || !currentChatRoom) return;
