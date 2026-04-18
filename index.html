@@ -4124,8 +4124,6 @@
 .chatroom-modal-footer input { flex: 1; border: 1px solid #ddd; border-radius: 8px; padding: 8px 12px; font-size: 0.95rem; outline: none; }
 .chatroom-modal-footer input:focus { border-color: #2BBDF5; }
 .chatroom-modal-footer button { background: #2BBDF5; color: #fff; border: none; border-radius: 8px; padding: 8px 18px; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
-.chatroom-exit-btn { background: #f1f3f5 !important; color: #666 !important; border: 1px solid #dee2e6 !important; }
-.chatroom-exit-btn:hover { background: #e9ecef !important; color: #333 !important; }
 .chatroom-modal-footer button:hover { background: #09A8E0; }
 .my-msg .msg-bubble { background: #e3f6fd; border-color: #b3e5f5; align-self: flex-end; }
 .my-msg { align-items: flex-end; }
@@ -4210,7 +4208,6 @@
 
       <!-- 프리미엄 채용정보: 4개 카드 한 줄 -->
       <section class="section section--compact" id="features">
-      <section class="section section--compact" id="features">
         <div class="container">
           <h2 class="section-title">프리미엄 채용정보 <span class="apply">상품신청&gt;</span></h2>
           <div class="premium-carousel-wrapper">
@@ -4257,7 +4254,7 @@
       <div class="chatroom-section" id="chatroom-section">
         <div class="container">
           <h2 class="section-title">실시간 취업 채팅방</h2>
-          <p class="chatroom-desc">공기업 취업 정보를 실시간으로 나눠보세요. 로그인 후 닉네임으로 채팅에 참여할 수 있습니다.</p>
+          <p class="chatroom-desc">공기업 취업 정보를 실시간으로 나눠보세요. 로그인 후 채팅에 참여할 수 있습니다.</p>
           <div class="chatroom-grid">
             <!-- 채팅방 카드 3개 -->
 <div class="chatroom-card">
@@ -4324,7 +4321,6 @@
           </div>
           <div class="chatroom-modal-body" id="chatroomModalBody"></div>
           <div class="chatroom-modal-footer">
-            <button class="chatroom-exit-btn" onclick="window.closeChatModal && window.closeChatModal()">나가기</button>
             <input type="text" id="chatroomInput" placeholder="메시지를 입력하세요..." onkeydown="if(event.key==='Enter') sendChatMessage()" />
             <button onclick="sendChatMessage()">전송</button>
           </div>
@@ -4427,18 +4423,6 @@
       };
 
       // 채팅 모달 닫기
-      window.closeChatModal = function() {
-        document.getElementById('chatroomModalOverlay').classList.remove('active');
-        if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
-        currentChatRoom = null;
-      };
-
-      // 오버레이 바깥 클릭 시에도 닫기
-      document.getElementById('chatroomModalOverlay').addEventListener('click', function(e) {
-        if (e.target === this) window.closeChatModal();
-      });
-
-      // 메시지 전송
       window.sendChatMessage = async function() {
         const user = window.auth?.currentUser;
         if (!user || !currentChatRoom) return;
