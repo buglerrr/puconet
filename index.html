@@ -4248,7 +4248,7 @@
       </section>
 
       <!-- ===== 실시간 채팅방 섹션 ===== -->
-      <div class="chatroom-section">
+      <div class="chatroom-section" id="chatroom-section">
         <div class="container">
           <h2 class="section-title">실시간 취업 채팅방</h2>
           <p class="chatroom-desc">공기업 취업 정보를 실시간으로 나눠보세요. 로그인 후 채팅에 참여할 수 있습니다.</p>
@@ -8011,7 +8011,7 @@ function displayStoriesForPage(page) {
     // showNewsBoard: 뉴스 섹션 표시 + 데이터 로드
     window.showNewsBoard = async function (skipHistory = false) {
       // 1. 모든 다른 섹션 숨기기
-      ['features', 'jobs', 'general-jobs', 'edu-courses', 'detail-section'].forEach(id => {
+      ['features', 'jobs', 'general-jobs', 'edu-courses', 'detail-section', 'chatroom-section'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.style.display = 'none';
       });
@@ -8493,6 +8493,8 @@ function displayStoriesForPage(page) {
       document.getElementById('jobs').style.display = 'none';
       document.getElementById('general-jobs').style.display = 'none';
       document.getElementById('edu-courses').style.display = 'none';
+      const chatroomSection = document.getElementById('chatroom-section');
+      if (chatroomSection) chatroomSection.style.display = 'none';
 
       const storySection = document.getElementById('story-board-section');
       if (storySection) storySection.style.display = 'none';
