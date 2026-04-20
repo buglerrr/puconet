@@ -7077,8 +7077,7 @@
       if (newsSection) newsSection.style.display = 'none';
 
       // 2. 사이드바 숨기기 (Wrapper에 클래스 추가로 제어)
-      const wrapper = document.querySelector('.content-with-sidebar-wrapper');
-      if (wrapper) wrapper.classList.add('full-width-wrapper');
+      document.querySelectorAll('.content-with-sidebar-wrapper').forEach(el => el.classList.add('full-width-wrapper'));
 
       // 3. 스토리 섹션 보이기
       const storySection = document.getElementById('story-board-section');
@@ -7100,8 +7099,7 @@
     // 원래 화면으로 복귀 시 사이드바 복구
     // 원래 화면으로 복귀 시 사이드바 복구 (전역 노출)
     window.restoreSidebar = function () {
-      const wrapper = document.querySelector('.content-with-sidebar-wrapper');
-      if (wrapper) wrapper.classList.remove('full-width-wrapper');
+      document.querySelectorAll('.content-with-sidebar-wrapper').forEach(el => el.classList.remove('full-width-wrapper'));
 
       const storySection = document.getElementById('story-board-section');
       if (storySection) storySection.style.display = 'none';
@@ -7979,9 +7977,8 @@ function displayStoriesForPage(page) {
       const newsSection = document.getElementById('news-section');
       if (newsSection) newsSection.style.display = 'none';
 
-      // 사이드바 숨기기
-      const wrapper = document.querySelector('.content-with-sidebar-wrapper');
-      if (wrapper) wrapper.classList.add('full-width-wrapper');
+      // 사이드바 숨기기 (취업 이야기와 동일하게)
+      document.querySelectorAll('.content-with-sidebar-wrapper').forEach(el => el.classList.add('full-width-wrapper'));
 
       // 회원 관리 섹션 보이기
       const userSection = document.getElementById('user-manage-section');
@@ -8063,9 +8060,8 @@ function displayStoriesForPage(page) {
           if (el) el.style.display = 'none';
         });
 
-      // 2. 사이드바 복구 (뉴스는 사이드바 있는 레이아웃 사용)
-      const wrapper = document.querySelector('.content-with-sidebar-wrapper');
-      if (wrapper) wrapper.classList.remove('full-width-wrapper');
+      // 2. 사이드바 숨기기 (공공기관 뉴스도 자체 사이드바가 있으므로 전체 우측 사이드바는 숨김)
+      document.querySelectorAll('.content-with-sidebar-wrapper').forEach(el => el.classList.add('full-width-wrapper'));
 
       // 3. 뉴스 섹션 보이기 + 로드
       const newsSection = document.getElementById('news-section');
@@ -8528,9 +8524,8 @@ function displayStoriesForPage(page) {
     // 화면 전환 함수
     // 화면 전환 함수 (채용정보 게시판) - Full Width 적용
     window.showBoard = function (skipHistory = false, category = null, page = 1) {
-      // 사이드바 숨기기 (취업 이야기와 동일하게)
-      const wrapper = document.querySelector('.content-with-sidebar-wrapper');
-      if (wrapper) wrapper.classList.add('full-width-wrapper');
+      // 사이드바 숨기기
+      document.querySelectorAll('.content-with-sidebar-wrapper').forEach(el => el.classList.add('full-width-wrapper'));
 
       // 메인 섹션들 숨기기
       document.getElementById('features').style.display = 'none';
