@@ -4188,7 +4188,7 @@
           <div class="nav-links">
             <a href="#" onclick="checkLoginAndExecute(showBoard, '채용정보를 보려면 로그인이 필요합니다.'); return false;">채용정보</a>
             <a href="#"
-              onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '공공게시판을 보려면 로그인이 필요합니다.'); return false;">공공기관 교육</a>
+              onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '공공게시판을 보려면 로그인이 필요합니다.'); return false;">공공게시판</a>
             <a href="#" onclick="checkLoginAndExecute(showNewsBoard, '공공기관 뉴스를 보려면 로그인이 필요합니다.'); return false;">공공기관
               뉴스</a>
             <a href="#"
@@ -8784,6 +8784,7 @@ function displayStoriesForPage(page) {
 
     // 다중 필터를 위한 전체 공고 및 현재 필터 상태
     let allRawJobs = []; // 모든 채용공고 목록 (필터링 전 원본)
+    let _lastFilterSignature = null; // 필터 UI 재계산 방지용 식별값
     let currentFilters = {
       keyword: '',
       ncsCode: [],
@@ -8793,6 +8794,51 @@ function displayStoriesForPage(page) {
       careerType: [],
       category: [] // 기관유형
     };
+
+    // ── sessionStorage 캐시 키 ──
+    const JOBS_SS_KEY = 'allgong_jobs_cache_v1';
+
+    // 채용공고가 추가/수정/삭제되면 캐시를 비워 다음 loadJobs()가 새로 받아오게 함
+    function invalidateJobsCache() {
+      _jobsCache.delete('_all_jobs');
+      _lastFilterSignature = null;
+      try { sessionStorage.removeItem(JOBS_SS_KEY); } catch (e) {}
+    }
+
+    // 캐시(allRawJobs)가 준비된 뒤, 화면에 그려주는 공통 렌더 함수
+    function renderJobsFromCache() {
+      const loading = document.getElementById('loading');
+      const emptyState = document.getElementById('emptyState');
+      const bottomAddButton = document.querySelector('.bottom-add-button');
+      const tbody = document.getElementById('jobTableBody');
+
+      if (loading) loading.style.display = 'none';
+      if (tbody) tbody.innerHTML = '';
+
+      const isAdm = (window.currentUserRole === 'admin') ||
+                    (window.auth && window.auth.currentUser && window.auth.currentUser.email === 'ilovetruman@gmail.com');
+
+      if (!allRawJobs || allRawJobs.length === 0) {
+        if (emptyState) emptyState.style.display = 'block';
+        if (bottomAddButton) bottomAddButton.style.display = isAdm ? 'block' : 'none';
+        return;
+      }
+
+      // 필터 UI 생성 (내부적으로 동일 데이터면 재계산 생략)
+      renderJobFilters();
+
+      // 사이드바 카테고리가 있으면 카테고리 필터에 반영
+      if (window.currentJobCategory) {
+        currentFilters.category = [window.currentJobCategory];
+      } else {
+        currentFilters.category = [];
+      }
+
+      // applyJobFilters가 테이블 표시/숨김, adminBulkBar, filterGuideMsg 모두 처리
+      applyJobFilters(false);
+
+      if (bottomAddButton) bottomAddButton.style.display = isAdm ? 'block' : 'none';
+    }
 
     async function loadJobs() {
       const loading = document.getElementById('loading');
@@ -8806,66 +8852,63 @@ function displayStoriesForPage(page) {
 
       const now = Date.now();
 
-      try {
+      // ── 1) 캐시 확인: 메모리 → sessionStorage 순 ──
+      let cached = _jobsCache.get('_all_jobs');
+      if (!cached) {
+        try {
+          const raw = sessionStorage.getItem(JOBS_SS_KEY);
+          if (raw) {
+            cached = JSON.parse(raw);
+            if (cached && cached.jobs) _jobsCache.set('_all_jobs', cached);
+          }
+        } catch (e) { /* sessionStorage 사용 불가 시 무시 */ }
+      }
+
+      // ── 2) 캐시가 있으면 네트워크를 기다리지 않고 '즉시' 화면 표시 ──
+      if (cached && cached.jobs && cached.jobs.length >= 0) {
+        allRawJobs = cached.jobs;
+        renderJobsFromCache();
+
+        // 충분히 최신(3분 이내)이면 네트워크 요청 자체를 생략
+        if ((now - cached.ts) < JOBS_CACHE_TTL) {
+          return;
+        }
+        // 오래된 캐시면: 화면은 그대로 둔 채 아래에서 백그라운드 갱신만 진행
+      } else {
+        // 캐시가 전혀 없을 때(최초 진입)만 로딩 표시
         loading.style.display = 'block';
         if (emptyState) emptyState.style.display = 'none';
         if (jobTable) jobTable.style.display = 'none';
         if (paginationContainer) paginationContainer.style.display = 'none';
         if (bottomAddButton) bottomAddButton.style.display = 'none';
-
-        // filterGuideMsg: 로딩 중에는 숨김
         const filterGuideMsg = document.getElementById('filterGuideMsg');
         if (filterGuideMsg) filterGuideMsg.style.display = 'none';
+      }
 
-        // ── 전체 캐시 활용 ──
-        const allCached = _jobsCache.get('_all_jobs');
-        if (allCached && (now - allCached.ts < JOBS_CACHE_TTL)) {
-          allRawJobs = allCached.jobs;
-        } else {
-          const q = query(collection(db, 'jobs'), orderBy('createdAt', 'desc'));
-          const querySnapshot = await getDocs(q);
-          allRawJobs = [];
-          if (!querySnapshot.empty) {
-            querySnapshot.forEach((docSnap) => {
-              const d = docSnap.data();
-              allRawJobs.push({ ...d, id: docSnap.id });
-            });
-          }
-          _jobsCache.set('_all_jobs', { jobs: [...allRawJobs], ts: now });
+      // ── 3) 네트워크에서 최신 데이터 가져오기 (최초 진입 or 캐시 갱신) ──
+      try {
+        const q = query(collection(db, 'jobs'), orderBy('createdAt', 'desc'));
+        const querySnapshot = await getDocs(q);
+        const freshJobs = [];
+        if (!querySnapshot.empty) {
+          querySnapshot.forEach((docSnap) => {
+            const d = docSnap.data();
+            freshJobs.push({ ...d, id: docSnap.id });
+          });
         }
 
-        loading.style.display = 'none';
-        tbody.innerHTML = '';
+        allRawJobs = freshJobs;
+        const payload = { jobs: freshJobs, ts: Date.now() };
+        _jobsCache.set('_all_jobs', payload);
+        try {
+          sessionStorage.setItem(JOBS_SS_KEY, JSON.stringify(payload));
+        } catch (e) { /* 용량 초과 등 저장 실패 시 무시 */ }
 
-        if (allRawJobs.length === 0) {
-          if (emptyState) emptyState.style.display = 'block';
-          const isAdm = (window.currentUserRole === 'admin') ||
-                        (window.auth && window.auth.currentUser && window.auth.currentUser.email === 'ilovetruman@gmail.com');
-          if (bottomAddButton) bottomAddButton.style.display = isAdm ? 'block' : 'none';
-          return;
-        }
-
-        // 필터 UI 생성
-        renderJobFilters();
-
-        // 사이드바 카테고리가 있으면 카테고리 필터에 반영
-        if (window.currentJobCategory) {
-          currentFilters.category = [window.currentJobCategory];
-        } else {
-          currentFilters.category = [];
-        }
-
-        // applyJobFilters가 테이블 표시/숨김, adminBulkBar, filterGuideMsg 모두 처리
-        applyJobFilters(false);
-
-        // 관리자 등록 버튼
-        const isAdmin2 = (window.currentUserRole === 'admin') ||
-                         (window.auth && window.auth.currentUser && window.auth.currentUser.email === 'ilovetruman@gmail.com');
-        if (bottomAddButton) bottomAddButton.style.display = isAdmin2 ? 'block' : 'none';
-
+        renderJobsFromCache();
       } catch (error) {
         console.error('데이터 로딩 실패:', error);
         if (loading) loading.style.display = 'none';
+        // 네트워크 실패 시 캐시로 이미 화면이 떠 있으면 그대로 둠
       }
     }
 
@@ -8922,6 +8965,15 @@ function displayStoriesForPage(page) {
     function renderJobFilters() {
       const container = document.getElementById('dynamic-filters');
       if (!container) return;
+
+      // 같은 데이터(건수 + 첫/마지막 id)면 이미 그려진 필터 UI를 재사용 → 재계산 생략
+      const sig = allRawJobs.length + ':' +
+                  (allRawJobs[0] ? allRawJobs[0].id : '') + ':' +
+                  (allRawJobs[allRawJobs.length - 1] ? allRawJobs[allRawJobs.length - 1].id : '');
+      if (sig === _lastFilterSignature && container.children.length > 0) {
+        return;
+      }
+      _lastFilterSignature = sig;
 
       // 유효한 기관유형 코드만 (한글 카테고리)
       const VALID_CATEGORIES = ['market-public', 'quasi-market-public', 'fund-quasi', 'entrust-quasi', 'other-public', 'local-public', 'local-investment'];
@@ -9436,6 +9488,7 @@ function displayStoriesForPage(page) {
         await window.addDoc(window.collection(window.db, 'jobs'), data);
         alert('✅ 등록되었습니다!');
         closeAddModal();
+        invalidateJobsCache();
         loadJobs();
       } catch (error) {
         console.error('등록 실패:', error);
@@ -9490,6 +9543,7 @@ function displayStoriesForPage(page) {
         await window.updateDoc(window.doc(window.db, 'jobs', id), data);
         alert('✅ 수정되었습니다!');
         closeEditModal();
+        invalidateJobsCache();
         loadJobs();
       } catch (error) {
         console.error('수정 실패:', error);
@@ -9522,6 +9576,7 @@ function displayStoriesForPage(page) {
 
         await window.deleteDoc(window.doc(window.db, 'jobs', id));
         alert('✅ 삭제되었습니다!');
+        invalidateJobsCache();
         loadJobs();
       } catch (error) {
         console.error('삭제 실패:', error);
@@ -9611,6 +9666,7 @@ function displayStoriesForPage(page) {
         const selectAllCheckbox = document.getElementById('selectAllJobs');
         if (selectAllCheckbox) selectAllCheckbox.checked = false;
 
+        invalidateJobsCache();
         loadJobs();
       } catch (error) {
         console.error('일괄 삭제 실패:', error);
@@ -9680,6 +9736,7 @@ function displayStoriesForPage(page) {
         await Promise.all(deletePromises);
 
         alert(`✅ ${totalJobs.length}개의 항목이 모두 삭제되었습니다!`);
+        invalidateJobsCache();
         loadJobs();
       } catch (error) {
         console.error('전체 삭제 실패:', error);
