@@ -4348,12 +4348,19 @@
         return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
       }
 
-      // 메시지 HTML 생성
-      function buildMsgHTML(data, isMe) {
+// 메시지 HTML 생성
+      function buildMsgHTML(data, isMe, msgId) {
+        // 관리자일 때만 삭제 버튼 표시
+        const isAdmin = window.currentUserRole === 'admin';
+        const delBtn = (isAdmin && msgId)
+          ? `<button class="msg-del-btn" onclick="deleteChatMessage('${msgId}')"
+               style="margin-left:6px;border:none;background:none;cursor:pointer;color:#e74c3c;font-size:0.85rem;">🗑</button>`
+          : '';
         return `<div class="chat-msg ${isMe ? 'my-msg' : ''}">
           <span class="msg-author">${data.authorName || '익명'}</span>
           <span class="msg-bubble">${data.text}</span>
           <span class="msg-time">${formatChatTime(data.createdAt)}</span>
+          ${delBtn}
         </div>`;
       }
 
@@ -4425,11 +4432,30 @@
               lastDate = dateStr;
             }
             const isMe = data.authorId === user.uid;
-            body.innerHTML += buildMsgHTML(data, isMe);
+            body.innerHTML += buildMsgHTML(data, isMe, d.id);
           });
           body.scrollTop = body.scrollHeight;
         });
         setTimeout(() => document.getElementById('chatroomInput').focus(), 100);
+      };
+
+      // 채팅 메시지 삭제 (관리자 전용)
+      window.deleteChatMessage = async function(msgId) {
+        if (window.currentUserRole !== 'admin') {
+          alert('삭제 권한이 없습니다.');
+          return;
+        }
+        if (!currentChatRoom || !msgId) return;
+        if (!confirm('이 메시지를 삭제하시겠습니까?')) return;
+        try {
+          await window.deleteDoc(
+            window.doc(window.db, 'chatrooms', currentChatRoom, 'messages', msgId)
+          );
+          // onSnapshot 구독 중이라 화면은 자동으로 갱신됩니다.
+        } catch (e) {
+          console.error('메시지 삭제 실패', e);
+          alert('삭제에 실패했습니다. 권한 또는 네트워크를 확인하세요.');
+        }
       };
 
      // 채팅 모달 닫기
