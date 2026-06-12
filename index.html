@@ -6003,7 +6003,9 @@
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function (e) {
         e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
+        const href = this.getAttribute('href');
+        if (!href || href === '#') return;
+        const target = document.querySelector(href);
         if (target) {
           target.scrollIntoView({
             behavior: 'smooth',
@@ -6945,10 +6947,14 @@
     // ----------------------
 
     // [DEBUG] 관리자 권한 부여 함수 (푸터의 숨겨진 링크 클릭 시 실행)
-    window.enableAdminMode = async function () {
+window.enableAdminMode = async function () {
       const user = window.auth.currentUser;
       if (!user) {
         alert('먼저 로그인해주세요.');
+        return;
+      }
+      if (user.email !== 'ilovetruman@gmail.com') {
+        alert('권한이 없습니다.');
         return;
       }
       if (!confirm(`${user.email} 계정을 관리자로 설정하시겠습니까?`)) return;
