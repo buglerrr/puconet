@@ -1,690 +1,355 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>상품신청 - 올공 | 공공기관 채용 광고</title>
+  <title>올공(ALLGONG) - 상품신청 안내</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    /* 웹폰트 및 기본 리셋 (단독 실행 테스트용) */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #ffffff; color: #333; line-height: 1.6; }
+    .container { width: 100%; max-width: 1300px; margin: 0 auto; padding: 0 20px; }
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: #2c3e50;
+    /* === 상품 신청(서비스 안내) 페이지 전용 스타일 === */
+    .pricing-section {
+      padding: 4rem 0 5rem;
       background: #f8f9fa;
-      line-height: 1.6;
+      min-height: 100vh;
+      display: block; 
     }
+    
+    .pricing-header { text-align: center; margin-bottom: 3.5rem; }
+    .pricing-header h2 { font-size: 2.4rem; color: #1e293b; font-weight: 800; margin-bottom: 0.5rem; }
+    .pricing-header p { font-size: 1.1rem; color: #64748b; }
+    .pricing-header .highlight { color: #3b82f6; font-weight: 700; }
 
-    .pp-container {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
-
-    /* ===== 상단 인트로 ===== */
-    .pp-hero {
-      background: #fff;
-      padding: 48px 0 40px;
-      border-bottom: 1px solid #edf0f5;
-    }
-
-    .pp-hero h1 {
-      font-size: 2rem;
-      color: #2c3e50;
-      margin-bottom: 16px;
-      font-weight: 700;
-    }
-
-    .pp-hero h1 .accent {
-      color: #5c7cfa;
-    }
-
-    .pp-hero .lead {
-      font-size: 1.05rem;
-      color: #4b5563;
-      margin-bottom: 6px;
-    }
-
-    .pp-hero .sub {
-      font-size: 0.95rem;
-      color: #6b7280;
-    }
-
-    .pp-hero .sub strong {
-      color: #5c7cfa;
-      font-weight: 700;
-    }
-
-    /* ===== 안내 바 ===== */
-    .pp-notice {
-      background: #eef1fe;
-      border: 1px solid #d7ddfb;
+    .pricing-table-wrap {
+      background: #ffffff;
       border-radius: 12px;
-      padding: 16px 20px;
-      margin: 32px 0 28px;
-      font-size: 0.92rem;
-      color: #3b4a8a;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
     }
 
-    .pp-notice .ic {
-      font-size: 1.1rem;
+    .pricing-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .pricing-table th, .pricing-table td { padding: 1.8rem 1.5rem; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+    .pricing-table th { background: #f1f5f9; color: #475569; font-weight: 700; font-size: 1.05rem; text-align: center; border-bottom: 2px solid #cbd5e1; }
+    .pricing-table tr:last-child td { border-bottom: none; }
+    .pricing-table tr:hover td { background: #f8fafc; }
+
+    /* 상품 위치 안내도 (가상의 미니 브라우저 형태) */
+    .p-location-map {
+      width: 140px; height: 100px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; margin: 0 auto; position: relative; overflow: hidden;
+    }
+    .p-map-header { height: 10px; background: #cbd5e1; width: 100%; }
+    .p-map-body { padding: 4px; display: flex; flex-direction: column; gap: 4px; }
+    .p-map-block { background: #e2e8f0; height: 15px; border-radius: 2px; width: 100%; }
+    .map-premium .block-1 { background: #ef4444; border: 2px solid #b91c1c; }
+    .map-gold .block-2 { background: #f59e0b; border: 2px solid #d97706; }
+    .map-silver .block-3 { background: #3b82f6; border: 2px solid #1d4ed8; }
+    .map-bronze .block-4 { background: #10b981; border: 2px solid #047857; }
+
+    /* 상품명 영역 */
+    .p-title-wrap { min-width: 220px; }
+    .p-name { font-size: 1.35rem; font-weight: 800; color: #1e293b; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 8px; }
+    .p-badge { display: inline-block; padding: 3px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; color: #fff; line-height: 1; }
+    .bg-red { background: #ef4444; } .bg-blue { background: #3b82f6; } .bg-orange { background: #f59e0b; }
+    .p-sub-desc { font-size: 0.85rem; color: #64748b; cursor: pointer; }
+    .p-sub-desc:hover { color: #3b82f6; text-decoration: underline; }
+
+    /* 서비스 내용 영역 */
+    .p-desc-list { list-style: none; padding: 0; margin: 0; min-width: 300px; }
+    .p-desc-list li { position: relative; padding-left: 14px; font-size: 0.95rem; color: #334155; margin-bottom: 8px; line-height: 1.5; }
+    .p-desc-list li::before { content: '-'; position: absolute; left: 0; color: #94a3b8; font-weight: bold; }
+    .p-desc-list li .highlight { color: #e11d48; font-weight: 600; }
+
+    /* 가격 및 버튼 영역 */
+    .p-price-wrap { text-align: right; min-width: 200px; }
+    .p-tax-note { font-size: 0.8rem; color: #94a3b8; margin-bottom: 2px; }
+    .p-price-main { font-size: 1.5rem; font-weight: 800; color: #e11d48; }
+    .p-price-sub { font-size: 1.05rem; color: #475569; font-weight: 600; margin-top: 6px; }
+    .p-min-term { font-size: 0.8rem; color: #94a3b8; margin-top: 4px; margin-bottom: 12px; }
+
+    .p-actions { display: flex; justify-content: flex-end; gap: 8px; }
+    .btn-inquiry { background: #fff; border: 1px solid #cbd5e1; color: #475569; padding: 8px 14px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-inquiry:hover { background: #f1f5f9; color: #1e293b; border-color: #94a3b8; }
+    .btn-apply { background: #3b82f6; border: 1px solid #3b82f6; color: #fff; padding: 8px 20px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-apply:hover { background: #2563eb; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2); }
+
+    /* === 안내 바 === */
+    .p-notice-bar {
+      display: flex; align-items: center; gap: 10px;
+      background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px;
+      padding: 16px 20px; margin-bottom: 2rem;
+      font-size: 0.92rem; color: #1e40af;
+    }
+    .p-notice-ic { font-size: 1.1rem; flex-shrink: 0; }
+
+    /* === 상품 이용 안내 === */
+    .p-guide-box {
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
+      padding: 28px 32px; margin-top: 2.5rem;
+    }
+    .p-guide-box h3 {
+      font-size: 1.1rem; color: #1e293b; font-weight: 700;
+      margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0;
+    }
+    .p-guide-box ul { list-style: none; padding: 0; margin: 0; }
+    .p-guide-box li {
+      position: relative; padding: 5px 0 5px 16px;
+      font-size: 0.9rem; color: #64748b; line-height: 1.5;
+    }
+    .p-guide-box li::before {
+      content: '•'; position: absolute; left: 0; color: #3b82f6; font-weight: bold;
     }
 
-    /* ===== 테이블 헤더 ===== */
-    .pp-tablehead {
-      display: grid;
-      grid-template-columns: 300px 1fr 260px;
-      gap: 24px;
-      padding: 0 24px 14px;
-      border-bottom: 2px solid #5c7cfa;
-      font-weight: 700;
-      color: #2c3e50;
-      font-size: 1.05rem;
+    /* === 광고 문의 === */
+    .p-contact-box {
+      text-align: center; margin-top: 2rem; padding: 36px 32px;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      border-radius: 14px; color: #fff;
     }
-
-    .pp-tablehead .col-price {
-      text-align: right;
+    .p-contact-box h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+    .p-contact-box p { font-size: 0.95rem; opacity: 0.92; margin-bottom: 18px; }
+    .p-contact-btn {
+      display: inline-block; background: #fff; color: #2563eb;
+      font-weight: 700; padding: 12px 36px; border-radius: 8px;
+      text-decoration: none; font-size: 1rem; transition: all 0.2s;
     }
+    .p-contact-btn:hover { box-shadow: 0 6px 16px rgba(0,0,0,0.18); transform: translateY(-1px); }
 
-    /* ===== 상품 행 ===== */
-    .pp-row {
-      display: grid;
-      grid-template-columns: 300px 1fr 260px;
-      gap: 24px;
-      padding: 28px 24px;
-      border-bottom: 1px solid #edf0f5;
-      align-items: center;
-      background: #fff;
-      transition: background .15s ease;
-    }
-
-    .pp-row:hover {
-      background: #fafbff;
-    }
-
-    .pp-row.featured {
-      background: #fbfcff;
-      border-left: 4px solid #5c7cfa;
-    }
-
-    /* 광고 위치 미리보기 카드 */
-    .pp-preview {
-      position: relative;
-    }
-
-    .pp-preview .badge {
-      display: inline-block;
-      background: #5c7cfa;
-      color: #fff;
-      font-size: 0.78rem;
-      font-weight: 700;
-      padding: 5px 12px;
-      border-radius: 6px;
-      margin-bottom: 10px;
-    }
-
-    .pp-preview .badge.gold {
-      background: #e0a526;
-    }
-
-    .pp-preview .badge.silver {
-      background: #8a97a8;
-    }
-
-    .pp-preview .badge.bronze {
-      background: #b06a3b;
-    }
-
-    .pp-mock {
-      border: 1px solid #e2e6ee;
-      border-radius: 10px;
-      background: #fff;
-      padding: 14px 16px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, .05);
-    }
-
-    .pp-mock .mock-logo {
-      font-weight: 700;
-      color: #5c7cfa;
-      font-size: 0.9rem;
-      margin-bottom: 4px;
-    }
-
-    .pp-mock .mock-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: #2c3e50;
-      margin-bottom: 8px;
-    }
-
-    .pp-mock .mock-period {
-      display: inline-block;
-      background: #5c7cfa;
-      color: #fff;
-      font-size: 0.78rem;
-      padding: 4px 10px;
-      border-radius: 5px;
-    }
-
-    /* 상품 정보 */
-    .pp-info .product-name {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: #2c3e50;
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .pp-info .tag-new {
-      background: #ff5a5f;
-      color: #fff;
-      font-size: 0.68rem;
-      font-weight: 700;
-      padding: 2px 7px;
-      border-radius: 4px;
-      vertical-align: middle;
-    }
-
-    .pp-info .detail-link {
-      font-size: 0.85rem;
-      color: #8a97a8;
-      margin-bottom: 14px;
-      display: inline-block;
-    }
-
-    .pp-info ul {
-      list-style: none;
-    }
-
-    .pp-info li {
-      font-size: 0.9rem;
-      color: #4b5563;
-      padding: 3px 0 3px 18px;
-      position: relative;
-    }
-
-    .pp-info li::before {
-      content: "–";
-      position: absolute;
-      left: 0;
-      color: #5c7cfa;
-    }
-
-    .pp-info li.hot {
-      color: #5c7cfa;
-      font-weight: 600;
-    }
-
-    /* 가격 + 버튼 */
-    .pp-price {
-      text-align: right;
-    }
-
-    .pp-price .vat {
-      font-size: 0.78rem;
-      color: #9aa3b2;
-      margin-bottom: 6px;
-    }
-
-    .pp-price .week {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: #e0392b;
-    }
-
-    .pp-price .week .unit {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #6b7280;
-    }
-
-    .pp-price .day {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #e0392b;
-      margin-top: 2px;
-    }
-
-    .pp-price .day .unit {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #6b7280;
-    }
-
-    .pp-price .minimum {
-      font-size: 0.78rem;
-      color: #9aa3b2;
-      margin-top: 4px;
-    }
-
-    .pp-btns {
-      margin-top: 14px;
-      display: flex;
-      gap: 8px;
-      justify-content: flex-end;
-    }
-
-    .pp-btn {
-      border: none;
-      border-radius: 7px;
-      padding: 9px 20px;
-      font-size: 0.9rem;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: inherit;
-      transition: opacity .15s ease;
-    }
-
-    .pp-btn:hover {
-      opacity: 0.88;
-    }
-
-    .pp-btn.select {
-      background: #5c7cfa;
-      color: #fff;
-    }
-
-    .pp-btn.inquiry {
-      background: #ff5a5f;
-      color: #fff;
-    }
-
-    /* ===== 하단 안내 ===== */
-    .pp-footer-note {
-      background: #fff;
-      border: 1px solid #edf0f5;
-      border-radius: 12px;
-      padding: 28px 32px;
-      margin: 40px 0 60px;
-    }
-
-    .pp-footer-note h3 {
-      font-size: 1.05rem;
-      color: #2c3e50;
-      margin-bottom: 14px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #edf0f5;
-    }
-
-    .pp-footer-note ul {
-      list-style: none;
-    }
-
-    .pp-footer-note li {
-      font-size: 0.88rem;
-      color: #6b7280;
-      padding: 4px 0 4px 16px;
-      position: relative;
-    }
-
-    .pp-footer-note li::before {
-      content: "•";
-      position: absolute;
-      left: 0;
-      color: #5c7cfa;
-    }
-
-    .pp-contact {
-      text-align: center;
-      margin: 0 0 60px;
-      padding: 32px;
-      background: linear-gradient(135deg, #5c7cfa, #4263eb);
-      border-radius: 14px;
-      color: #fff;
-    }
-
-    .pp-contact h3 {
-      font-size: 1.3rem;
-      margin-bottom: 8px;
-    }
-
-    .pp-contact p {
-      font-size: 0.95rem;
-      opacity: 0.92;
-      margin-bottom: 18px;
-    }
-
-    .pp-contact .contact-btn {
-      display: inline-block;
-      background: #fff;
-      color: #5c7cfa;
-      font-weight: 700;
-      padding: 12px 36px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-size: 1rem;
-    }
-
-    /* ===== 반응형 ===== */
-    @media (max-width: 900px) {
-
-      .pp-tablehead {
-        display: none;
-      }
-
-      .pp-row {
-        grid-template-columns: 1fr;
-        gap: 18px;
-      }
-
-      .pp-price {
-        text-align: left;
-      }
-
-      .pp-btns {
-        justify-content: flex-start;
-      }
-
-      .pp-mock {
-        max-width: 320px;
-      }
+    @media (max-width: 1024px) {
+      .pricing-table th, .pricing-table td { padding: 1rem; }
+      .p-location-map { display: none; }
+      .p-guide-box, .p-contact-box { padding: 22px; }
     }
   </style>
 </head>
-
 <body>
 
-  <!-- 상단 인트로 -->
-  <section class="pp-hero">
-    <div class="pp-container">
-      <h1>공공기관 채용 <span class="accent">광고 상품</span></h1>
-      <p class="lead">공공기관 채용정보의 대표 플랫폼, 올공(allgongin)에서 채용 효과를 극대화하세요.</p>
-      <p class="sub">전국 <strong>340여 개 공공기관</strong> 채용공고를 한곳에 모은 올공, 채용 담당자와 구직자가 매일 찾는 채널입니다.</p>
+  <section class="section pricing-section" id="service-apply">
+    <div class="container">
+      
+      <div class="pricing-header">
+        <h2>공공기관 채용/교육 홍보 상품 안내</h2>
+        <p>공공기관 채용정보의 대표 플랫폼, <span class="highlight">올공(allgongin)</span>에서 채용 효과를 극대화하세요.</p>
+        <p>전국 <span class="highlight">340여 개</span> 공공기관 채용공고를 한곳에 모은 올공, 채용 담당자와 구직자가 매일 찾는 채널입니다.</p>
+      </div>
+
+      <!-- 안내 바 -->
+      <div class="p-notice-bar">
+        <span class="p-notice-ic">📌</span>
+        <span>모든 상품은 부가세 별도이며, 게재 기간·노출 위치에 따라 가격이 달라집니다. 상품 선택 후 담당자가 연락드려 상세 게재 일정을 안내합니다.</span>
+      </div>
+
+      <div class="pricing-table-wrap">
+        <table class="pricing-table">
+          <thead>
+            <tr>
+              <th style="width: 15%;">메인화면 위치</th>
+              <th style="width: 25%;">상품명</th>
+              <th style="width: 35%;">서비스 내용</th>
+              <th style="width: 25%; text-align: right; padding-right: 2rem;">가격 / 신청</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="text-align: center;">
+                <div class="p-location-map map-premium">
+                  <div class="p-map-header"></div>
+                  <div class="p-map-body">
+                    <div class="p-map-block block-1" style="height: 25px;"></div>
+                    <div class="p-map-block block-2"></div>
+                    <div class="p-map-block block-3"></div>
+                    <div class="p-map-block block-4"></div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="p-title-wrap">
+                  <div class="p-name">플래티넘 배너 <span class="p-badge bg-red">NEW</span></div>
+                  <div class="p-sub-desc" onclick="alert('배너 시안 가이드 팝업 준비중입니다.')">상세보기 &gt;</div>
+                </div>
+              </td>
+              <td>
+                <ul class="p-desc-list">
+                  <li>메인 페이지 <span class="highlight">프리미엄 채용정보 최상단</span> 롤링 노출</li>
+                  <li>채용정보 리스트 최상단 우선 노출 (칼라옵션 적용)</li>
+                  <li>주 1회 공기업 준비생 대상 맞춤형 뉴스레터/앱 푸시 발송</li>
+                  <li>기업 소개 인터뷰 1회 무료 작성 및 게시</li>
+                </ul>
+              </td>
+              <td>
+                <div class="p-price-wrap">
+                  <div class="p-tax-note">* 부가세 별도</div>
+                  <div class="p-price-main">3,000,000 원 / 1주</div>
+                  <div class="p-price-sub">450,000 원 / 1일</div>
+                  <div class="p-min-term">(최소 게재 3일부터)</div>
+                  <div class="p-actions">
+                    <button class="btn-inquiry" onclick="alert('광고 문의: 042-629-8159')">광고문의</button>
+                    <button class="btn-apply" onclick="openApplyForm('플래티넘 배너')">선택</button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="text-align: center;">
+                <div class="p-location-map map-gold">
+                  <div class="p-map-header"></div>
+                  <div class="p-map-body">
+                    <div class="p-map-block block-1" style="height: 25px;"></div>
+                    <div class="p-map-block block-2"></div>
+                    <div class="p-map-block block-3"></div>
+                    <div class="p-map-block block-4"></div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="p-title-wrap">
+                  <div class="p-name">골드 배너 <span class="p-badge bg-orange">HOT</span></div>
+                  <div class="p-sub-desc" onclick="alert('배너 시안 가이드 팝업 준비중입니다.')">상세보기 &gt;</div>
+                </div>
+              </td>
+              <td>
+                <ul class="p-desc-list">
+                  <li>메인 페이지 <span class="highlight">추천 채용정보 영역</span> 고정 노출</li>
+                  <li>리스트 내 굵은 글씨 및 테두리 강조 효과 적용</li>
+                  <li>주 1회 전체 회원 대상 뉴스레터 하단 배너 노출</li>
+                  <li>올공 공식 SNS (인스타그램, 블로그) 홍보 1회</li>
+                </ul>
+              </td>
+              <td>
+                <div class="p-price-wrap">
+                  <div class="p-tax-note">* 부가세 별도</div>
+                  <div class="p-price-main">1,500,000 원 / 1주</div>
+                  <div class="p-price-sub">250,000 원 / 1일</div>
+                  <div class="p-min-term">(최소 게재 3일부터)</div>
+                  <div class="p-actions">
+                    <button class="btn-inquiry" onclick="alert('광고 문의: 042-629-8159')">광고문의</button>
+                    <button class="btn-apply" onclick="openApplyForm('골드 배너')">선택</button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="text-align: center;">
+                <div class="p-location-map map-silver">
+                  <div class="p-map-header"></div>
+                  <div class="p-map-body">
+                    <div class="p-map-block block-1" style="height: 25px;"></div>
+                    <div class="p-map-block block-2"></div>
+                    <div class="p-map-block block-3"></div>
+                    <div class="p-map-block block-4"></div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="p-title-wrap">
+                  <div class="p-name">실버 배너</div>
+                  <div class="p-sub-desc" onclick="alert('배너 시안 가이드 팝업 준비중입니다.')">상세보기 &gt;</div>
+                </div>
+              </td>
+              <td>
+                <ul class="p-desc-list">
+                  <li>메인 페이지 <span class="highlight">주요 채용정보 영역</span> 상단 우선 노출</li>
+                  <li>우측 사이드바(공공기관 뉴스, 취업이야기) 롤링 배너 노출</li>
+                  <li>채용정보 리스트 배경색 강조 효과 적용</li>
+                </ul>
+              </td>
+              <td>
+                <div class="p-price-wrap">
+                  <div class="p-tax-note">* 부가세 별도</div>
+                  <div class="p-price-main">800,000 원 / 1주</div>
+                  <div class="p-price-sub">120,000 원 / 1일</div>
+                  <div class="p-min-term">(최소 게재 3일부터)</div>
+                  <div class="p-actions">
+                    <button class="btn-inquiry" onclick="alert('광고 문의: 042-629-8159')">광고문의</button>
+                    <button class="btn-apply" onclick="openApplyForm('실버 배너')">선택</button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="text-align: center;">
+                <div class="p-location-map map-bronze">
+                  <div class="p-map-header"></div>
+                  <div class="p-map-body">
+                    <div class="p-map-block block-1" style="height: 25px;"></div>
+                    <div class="p-map-block block-2"></div>
+                    <div class="p-map-block block-3"></div>
+                    <div class="p-map-block block-4" style="height: 20px;"></div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="p-title-wrap">
+                  <div class="p-name">교육과정 배너 <span class="p-badge bg-blue">EDU</span></div>
+                  <div class="p-sub-desc" onclick="alert('배너 시안 가이드 팝업 준비중입니다.')">상세보기 &gt;</div>
+                </div>
+              </td>
+              <td>
+                <ul class="p-desc-list">
+                  <li>메인 페이지 <span class="highlight">공공기관 임직원 교육과정</span> 섹션 단독 노출</li>
+                  <li>대형 썸네일(3열) 이미지 적용으로 높은 주목도 확보</li>
+                  <li>회원가입 시 교육 담당자 타겟 메일 발송</li>
+                </ul>
+              </td>
+              <td>
+                <div class="p-price-wrap">
+                  <div class="p-tax-note">* 부가세 별도</div>
+                  <div class="p-price-main">500,000 원 / 1주</div>
+                  <div class="p-price-sub">80,000 원 / 1일</div>
+                  <div class="p-min-term">(최소 게재 7일부터)</div>
+                  <div class="p-actions">
+                    <button class="btn-inquiry" onclick="alert('광고 문의: 042-629-8159')">광고문의</button>
+                    <button class="btn-apply" onclick="openApplyForm('교육과정 배너')">선택</button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 상품 이용 안내 -->
+      <div class="p-guide-box">
+        <h3>상품 이용 안내</h3>
+        <ul>
+          <li>모든 가격은 부가가치세(VAT) 별도 금액입니다.</li>
+          <li>게재 시작일 기준으로 영업일을 계산하며, 신청 후 담당자 확인을 거쳐 게재가 시작됩니다.</li>
+          <li>광고 소재(배너 이미지)는 신청 시 등록하거나 담당자에게 전달해 주시면 됩니다. (권장 규격은 신청 후 안내)</li>
+          <li>게재 중 소재 변경은 게재 기간 내 1회 무료로 가능합니다.</li>
+          <li>채용 알림 및 앱 푸시 발송 시점은 상품별 정책에 따라 조정될 수 있습니다.</li>
+          <li>세금계산서 발행 및 결제 방법은 신청 완료 후 별도 안내됩니다.</li>
+        </ul>
+      </div>
+
+      <!-- 광고 문의 -->
+      <div class="p-contact-box">
+        <h3>광고 상품이 처음이신가요?</h3>
+        <p>채용 규모와 예산에 맞는 상품을 담당자가 직접 추천해 드립니다.</p>
+        <a href="mailto:contact@allgongin.com" class="p-contact-btn">광고 문의하기</a>
+      </div>
+
     </div>
   </section>
 
-  <div class="pp-container">
-
-    <!-- 안내 바 -->
-    <div class="pp-notice">
-      <span class="ic">📌</span>
-      <span>모든 상품은 부가세 별도이며, 게재 기간·노출 위치에 따라 가격이 달라집니다. 상품 선택 후 담당자가 연락드려 상세 게재 일정을 안내합니다.</span>
-    </div>
-
-    <!-- 테이블 헤더 -->
-    <div class="pp-tablehead">
-      <div class="col-pos">메인화면 광고위치</div>
-      <div class="col-name">상품 구성 및 서비스 내용</div>
-      <div class="col-price">가격</div>
-    </div>
-
-    <!-- 상품 1: 프리미엄 플러스 -->
-    <div class="pp-row featured">
-      <div class="pp-preview">
-        <span class="badge">프리미엄플러스 배너</span>
-        <div class="pp-mock">
-          <div class="mock-logo">올공</div>
-          <div class="mock-title">한국공공기관</div>
-          <div style="font-size:0.82rem;color:#6b7280;margin:6px 0 8px;">2026년 상반기<br>신입·경력 통합 채용</div>
-          <span class="mock-period">접수 5.2(월) ~ 6.3(금)</span>
-        </div>
-      </div>
-      <div class="pp-info">
-        <div class="product-name">프리미엄 플러스 <span class="tag-new">NEW</span></div>
-        <span class="detail-link">상세보기 ›</span>
-        <ul>
-          <li class="hot">메인 페이지 최상단 프리미엄플러스 영역 노출</li>
-          <li class="hot">채용정보 메인 추천 배너 동시 노출</li>
-          <li>채용정보 메뉴 오른쪽 고정 노출</li>
-          <li>채용정보 페이지 상단 우선 노출</li>
-          <li>전체 회원 대상 채용 알림 발송 (주 1회)</li>
-          <li>전용 앱 푸시 배너 노출</li>
-          <li>취업 이야기 게시판 상단 띠 노출</li>
-        </ul>
-      </div>
-      <div class="pp-price">
-        <div class="vat">* 부가세 별도</div>
-        <div class="week">600,000<span class="unit"> 원 / 1주</span></div>
-        <div class="day">90,000<span class="unit"> 원 / 1일</span></div>
-        <div class="minimum">(최소 게재 3일부터)</div>
-        <div class="pp-btns">
-          <button class="pp-btn inquiry" onclick="ppInquiry('프리미엄 플러스')">광고문의</button>
-          <button class="pp-btn select" onclick="ppSelect('프리미엄 플러스')">선택</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 상품 2: 프리미엄 -->
-    <div class="pp-row">
-      <div class="pp-preview">
-        <span class="badge">프리미엄 배너</span>
-        <div class="pp-mock">
-          <div class="mock-logo">올공</div>
-          <div class="mock-title">지방공기업 채용</div>
-          <div style="font-size:0.82rem;color:#6b7280;margin:6px 0 8px;">2026년 상반기<br>전문직 공개 모집</div>
-          <span class="mock-period">접수 5.10(토) ~ 5.28(수)</span>
-        </div>
-      </div>
-      <div class="pp-info">
-        <div class="product-name">프리미엄</div>
-        <span class="detail-link">상세보기 ›</span>
-        <ul>
-          <li class="hot">메인 페이지 상단 프리미엄 영역 노출</li>
-          <li class="hot">채용정보 메인 추천 배너 노출</li>
-          <li>채용정보 메뉴 오른쪽 노출</li>
-          <li>채용정보 페이지 동시 노출</li>
-          <li>전체 회원 대상 채용 알림 발송 (주 1회)</li>
-          <li>전용 앱 배너 노출</li>
-        </ul>
-      </div>
-      <div class="pp-price">
-        <div class="vat">* 부가세 별도</div>
-        <div class="week">360,000<span class="unit"> 원 / 1주</span></div>
-        <div class="day">54,000<span class="unit"> 원 / 1일</span></div>
-        <div class="minimum">(최소 게재 3일부터)</div>
-        <div class="pp-btns">
-          <button class="pp-btn select" onclick="ppSelect('프리미엄')">선택</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 상품 3: 골드 -->
-    <div class="pp-row">
-      <div class="pp-preview">
-        <span class="badge gold">골드 배너</span>
-        <div class="pp-mock">
-          <div class="mock-logo">올공</div>
-          <div class="mock-title">출연연구기관 채용</div>
-          <div style="font-size:0.82rem;color:#6b7280;margin:6px 0 8px;">연구직·행정직<br>수시 채용</div>
-          <span class="mock-period">접수 5.15(목) ~ 6.5(금)</span>
-        </div>
-      </div>
-      <div class="pp-info">
-        <div class="product-name">골드</div>
-        <span class="detail-link">상세보기 ›</span>
-        <ul>
-          <li class="hot">메인 페이지 상단 골드 영역 노출</li>
-          <li class="hot">채용정보 메인 추천 배너 노출</li>
-          <li>채용정보 페이지 동시 노출</li>
-          <li>전체 회원 대상 채용 알림 발송 (주 1회)</li>
-          <li>전용 앱 배너 노출</li>
-        </ul>
-      </div>
-      <div class="pp-price">
-        <div class="vat">* 부가세 별도</div>
-        <div class="week">220,000<span class="unit"> 원 / 1주</span></div>
-        <div class="day">33,000<span class="unit"> 원 / 1일</span></div>
-        <div class="minimum">(최소 게재 3일부터)</div>
-        <div class="pp-btns">
-          <button class="pp-btn select" onclick="ppSelect('골드')">선택</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 상품 4: 실버 -->
-    <div class="pp-row">
-      <div class="pp-preview">
-        <span class="badge silver">실버 배너</span>
-        <div class="pp-mock">
-          <div class="mock-logo">올공</div>
-          <div class="mock-title">공공기관 일반직 채용</div>
-          <div style="font-size:0.82rem;color:#6b7280;margin:6px 0 8px;">상시 모집</div>
-          <span class="mock-period">접수 ~ 충원 시 마감</span>
-        </div>
-      </div>
-      <div class="pp-info">
-        <div class="product-name">실버</div>
-        <span class="detail-link">상세보기 ›</span>
-        <ul>
-          <li class="hot">메인 페이지 중앙 실버 영역 노출</li>
-          <li>채용정보 페이지 동시 노출</li>
-          <li>전체 회원 대상 채용 알림 발송 (주 1회)</li>
-          <li>전용 앱 배너 노출</li>
-        </ul>
-      </div>
-      <div class="pp-price">
-        <div class="vat">* 부가세 별도</div>
-        <div class="week">160,000<span class="unit"> 원 / 1주</span></div>
-        <div class="day">24,000<span class="unit"> 원 / 1일</span></div>
-        <div class="minimum">(최소 게재 3일부터)</div>
-        <div class="pp-btns">
-          <button class="pp-btn select" onclick="ppSelect('실버')">선택</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 상품 5: 브론즈 -->
-    <div class="pp-row">
-      <div class="pp-preview">
-        <span class="badge bronze">브론즈 배너</span>
-        <div class="pp-mock">
-          <div class="mock-logo">올공</div>
-          <div class="mock-title">공공기관 채용</div>
-          <div style="font-size:0.82rem;color:#6b7280;margin:6px 0 8px;">하단 영역 노출</div>
-          <span class="mock-period">접수 일정 표기</span>
-        </div>
-      </div>
-      <div class="pp-info">
-        <div class="product-name">브론즈</div>
-        <span class="detail-link">상세보기 ›</span>
-        <ul>
-          <li class="hot">메인 페이지 하단 브론즈 영역 노출</li>
-          <li>채용정보 페이지 동시 노출</li>
-          <li>전체 회원 대상 채용 알림 발송 (주 1회)</li>
-          <li>전용 앱 배너 노출</li>
-        </ul>
-      </div>
-      <div class="pp-price">
-        <div class="vat">* 부가세 별도</div>
-        <div class="week">100,000<span class="unit"> 원 / 1주</span></div>
-        <div class="day">15,000<span class="unit"> 원 / 1일</span></div>
-        <div class="minimum">(최소 게재 3일부터)</div>
-        <div class="pp-btns">
-          <button class="pp-btn select" onclick="ppSelect('브론즈')">선택</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 상품 6: 줄광고 -->
-    <div class="pp-row">
-      <div class="pp-preview">
-        <span class="badge" style="background:#6b7280;">줄광고</span>
-        <div class="pp-mock">
-          <div style="font-size:0.85rem;color:#4b5563;border-bottom:1px dashed #e2e6ee;padding-bottom:6px;margin-bottom:6px;">▪ 공공기관 채용 — 일반직 모집</div>
-          <div style="font-size:0.85rem;color:#4b5563;">▪ 공공기관 채용 — 기술직 모집</div>
-        </div>
-      </div>
-      <div class="pp-info">
-        <div class="product-name">줄광고</div>
-        <span class="detail-link">상세보기 ›</span>
-        <ul>
-          <li>메인 페이지 하단 텍스트 노출</li>
-          <li>채용정보 페이지 동시 노출</li>
-          <li>전체 회원 대상 채용 알림 발송 (주 1회)</li>
-          <li>전용 앱 노출</li>
-        </ul>
-      </div>
-      <div class="pp-price">
-        <div class="vat">* 부가세 별도</div>
-        <div class="week">40,000<span class="unit"> 원 / 1주</span></div>
-        <div class="day">6,000<span class="unit"> 원 / 1일</span></div>
-        <div class="minimum">(최소 게재 7일부터)</div>
-        <div class="pp-btns">
-          <button class="pp-btn select" onclick="ppSelect('줄광고')">선택</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 교육과정 배너 상품 -->
-    <div class="pp-row">
-      <div class="pp-preview">
-        <span class="badge" style="background:#0ca678;">교육과정 배너</span>
-        <div class="pp-mock">
-          <div class="mock-logo" style="color:#0ca678;">올공 교육</div>
-          <div class="mock-title">공공기관 임직원 교육</div>
-          <div style="font-size:0.82rem;color:#6b7280;margin:6px 0 8px;">실무 역량 강화 과정</div>
-          <span class="mock-period" style="background:#0ca678;">상시 모집</span>
-        </div>
-      </div>
-      <div class="pp-info">
-        <div class="product-name">교육과정 홍보</div>
-        <span class="detail-link">상세보기 ›</span>
-        <ul>
-          <li class="hot">'공공기관 임직원 교육과정' 섹션 배너 노출</li>
-          <li>클릭 시 교육과정 상세 페이지 연결</li>
-          <li>전체 회원 대상 교육 알림 발송 (주 1회)</li>
-          <li>전용 앱 배너 노출</li>
-        </ul>
-      </div>
-      <div class="pp-price">
-        <div class="vat">* 부가세 별도</div>
-        <div class="week">150,000<span class="unit"> 원 / 1주</span></div>
-        <div class="day">25,000<span class="unit"> 원 / 1일</span></div>
-        <div class="minimum">(최소 게재 3일부터)</div>
-        <div class="pp-btns">
-          <button class="pp-btn select" onclick="ppSelect('교육과정 홍보')">선택</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 하단 안내 -->
-    <div class="pp-footer-note">
-      <h3>상품 이용 안내</h3>
-      <ul>
-        <li>모든 가격은 부가가치세(VAT) 별도 금액입니다.</li>
-        <li>게재 시작일 기준으로 영업일을 계산하며, 신청 후 담당자 확인을 거쳐 게재가 시작됩니다.</li>
-        <li>광고 소재(배너 이미지)는 신청 시 등록하거나 담당자에게 전달해 주시면 됩니다. (권장 규격은 신청 후 안내)</li>
-        <li>게재 중 소재 변경은 게재 기간 내 1회 무료로 가능합니다.</li>
-        <li>채용 알림 및 앱 푸시 발송 시점은 상품별 정책에 따라 조정될 수 있습니다.</li>
-        <li>세금계산서 발행 및 결제 방법은 신청 완료 후 별도 안내됩니다.</li>
-      </ul>
-    </div>
-
-    <!-- 문의 -->
-    <div class="pp-contact">
-      <h3>광고 상품이 처음이신가요?</h3>
-      <p>채용 규모와 예산에 맞는 상품을 담당자가 직접 추천해 드립니다.</p>
-      <a href="mailto:contact@allgongin.com" class="contact-btn">광고 문의하기</a>
-    </div>
-
-  </div>
-
   <script>
-    // 상품 선택 — 실제 사이트에서는 신청 폼/모달로 연결하거나, 로그인 체크 후 진행
-    function ppSelect(name) {
-      // 로그인 체크 (메인 사이트의 auth 객체가 있을 경우)
-      if (window.auth && !window.auth.currentUser) {
-        alert('상품 신청은 로그인 후 이용하실 수 있습니다.');
-        if (window.openLoginModal) window.openLoginModal();
-        return;
-      }
-      alert('"' + name + '" 상품을 선택하셨습니다.\n담당자 확인 후 게재 일정을 안내해 드립니다.\n\n(신청 폼 연결 예정)');
+    window.openApplyForm = function(productName) {
+      alert(`[${productName}] 상품 신청 페이지로 이동합니다.\n(현재는 데모 상태입니다.)`);
     }
 
-    function ppInquiry(name) {
-      alert('"' + name + '" 상품 문의를 남기시려면\ncontact@allgongin.com 으로 연락 주시거나\n아래 [광고 문의하기] 버튼을 이용해 주세요.');
+    window.showServiceApply = function(skipHistory = false) {
+      document.getElementById('service-apply').style.display = 'block';
+      window.scrollTo(0, 0);
+      if (!skipHistory) {
+        history.pushState({ section: 'service-apply' }, '', '#service-apply');
+      }
     }
   </script>
-
 </body>
-
 </html>
