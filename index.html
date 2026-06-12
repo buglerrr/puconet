@@ -6049,6 +6049,16 @@
     });
   </script>
   <script>
+    window.openEduBanner = function (url) {
+      const user = window.auth?.currentUser;   // 로그인 여부 확인
+      if (!user) {
+     alert('교육과정 정보를 보려면 로그인이 필요합니다. 회원가입 후 이용해주세요.');
+      if (window.openLoginModal) window.openLoginModal();
+      return;   // 로그인 안 했으면 여기서 멈춤 (창 안 열림)
+    }
+  // 로그인했으면 새 창으로 이미지 열기
+    window.open(url, '_blank', 'noopener,noreferrer');
+    };
     (function () {
       function openPopup(url) {
         // ===== 로그인 체크 임시 비활성화 (테스트용) =====
