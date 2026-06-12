@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>올공(ALLGONG) - 상품신청 안내</title>
+  <!-- EmailJS 라이브러리 -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    // EmailJS 초기화 (Public Key)
+    (function () {
+      emailjs.init({ publicKey: 'rUFBb4XT-CKbLj2iA' });
+    })();
+  </script>
   <style>
     /* 웹폰트 및 기본 리셋 (단독 실행 테스트용) */
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -186,7 +194,7 @@
                   <div class="p-price-sub">450,000 원 / 1일</div>
                   <div class="p-min-term">(최소 게재 3일부터)</div>
                   <div class="p-actions">
-                    <button class="btn-inquiry" onclick="alert('광고 문의: 042-629-8159')">광고문의</button>
+                    <button class="btn-inquiry" onclick="openInquiryForm()">광고문의</button>
                     <button class="btn-apply" onclick="openApplyForm('플래티넘 배너')">선택</button>
                   </div>
                 </div>
@@ -226,7 +234,7 @@
                   <div class="p-price-sub">250,000 원 / 1일</div>
                   <div class="p-min-term">(최소 게재 3일부터)</div>
                   <div class="p-actions">
-                    <button class="btn-inquiry" onclick="alert('광고 문의: 042-629-8159')">광고문의</button>
+                    <button class="btn-inquiry" onclick="openInquiryForm()">광고문의</button>
                     <button class="btn-apply" onclick="openApplyForm('골드 배너')">선택</button>
                   </div>
                 </div>
@@ -265,7 +273,7 @@
                   <div class="p-price-sub">120,000 원 / 1일</div>
                   <div class="p-min-term">(최소 게재 3일부터)</div>
                   <div class="p-actions">
-                    <button class="btn-inquiry" onclick="alert('광고 문의: 042-629-8159')">광고문의</button>
+                    <button class="btn-inquiry" onclick="openInquiryForm()">광고문의</button>
                     <button class="btn-apply" onclick="openApplyForm('실버 배너')">선택</button>
                   </div>
                 </div>
@@ -304,7 +312,7 @@
                   <div class="p-price-sub">80,000 원 / 1일</div>
                   <div class="p-min-term">(최소 게재 7일부터)</div>
                   <div class="p-actions">
-                    <button class="btn-inquiry" onclick="alert('광고 문의: 042-629-8159')">광고문의</button>
+                    <button class="btn-inquiry" onclick="openInquiryForm()">광고문의</button>
                     <button class="btn-apply" onclick="openApplyForm('교육과정 배너')">선택</button>
                   </div>
                 </div>
@@ -332,16 +340,185 @@
       <div class="p-contact-box">
         <h3>광고 상품이 처음이신가요?</h3>
         <p>채용 규모와 예산에 맞는 상품을 담당자가 직접 추천해 드립니다.</p>
-        <a href="mailto:contact@allgongin.com" class="p-contact-btn">광고 문의하기</a>
+        <a href="javascript:void(0)" onclick="openInquiryForm()" class="p-contact-btn">광고 문의하기</a>
       </div>
 
     </div>
   </section>
 
-  <script>
-    window.openApplyForm = function(productName) {
-      alert(`[${productName}] 상품 신청 페이지로 이동합니다.\n(현재는 데모 상태입니다.)`);
+  <!-- ===== 광고 문의 폼 모달 ===== -->
+  <div id="inquiryModal" class="inq-overlay">
+    <div class="inq-box">
+      <div class="inq-head">
+        <h2>1:1 광고 문의</h2>
+        <button type="button" class="inq-close" onclick="closeInquiryForm()">&times;</button>
+      </div>
+      <p class="inq-req">* 표시는 필수 입력사항입니다.</p>
+
+      <div class="inq-row">
+        <label>* 분류</label>
+        <select id="inq-category">
+          <option value="플래티넘 배너">플래티넘 배너</option>
+          <option value="골드 배너">골드 배너</option>
+          <option value="실버 배너">실버 배너</option>
+          <option value="교육과정 배너">교육과정 배너</option>
+          <option value="기타 문의">기타 문의</option>
+        </select>
+      </div>
+
+      <div class="inq-row">
+        <label>* 이름</label>
+        <input type="text" id="inq-name" placeholder="이름을 입력해주세요." />
+      </div>
+
+      <div class="inq-row">
+        <label>* 이메일</label>
+        <input type="email" id="inq-email" placeholder="example@email.com" />
+      </div>
+
+      <div class="inq-row">
+        <label>* 연락처</label>
+        <input type="text" id="inq-phone" placeholder="연락 가능한 휴대폰 번호를 입력해주세요." />
+      </div>
+
+      <div class="inq-row">
+        <label>* 제목</label>
+        <input type="text" id="inq-title" placeholder="제목을 입력해주세요." />
+      </div>
+
+      <div class="inq-row">
+        <label>* 내용</label>
+        <textarea id="inq-content" rows="8" placeholder="1. 광고기간 : &#10;&#10;2. 배너종류 : &#10;&#10;3. 견적서요청(유/무) : "></textarea>
+      </div>
+
+      <div class="inq-actions">
+        <button type="button" class="inq-cancel" onclick="closeInquiryForm()">취소</button>
+        <button type="button" class="inq-submit" onclick="submitInquiry()">문의 보내기</button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .inq-overlay {
+      display: none;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); z-index: 100000;
+      justify-content: center; align-items: flex-start;
+      overflow-y: auto; padding: 30px 16px;
     }
+    .inq-overlay.open { display: flex; }
+    .inq-box {
+      background: #fff; width: 100%; max-width: 560px;
+      border-radius: 12px; padding: 28px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    .inq-head { display: flex; justify-content: space-between; align-items: center; }
+    .inq-head h2 { font-size: 1.5rem; color: #1e293b; font-weight: 800; }
+    .inq-close { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #94a3b8; line-height: 1; }
+    .inq-req { color: #ef4444; font-size: 0.85rem; text-align: right; margin: 4px 0 16px; }
+    .inq-row { margin-bottom: 14px; }
+    .inq-row label { display: block; font-weight: 700; color: #475569; margin-bottom: 6px; font-size: 0.95rem; }
+    .inq-row input, .inq-row select, .inq-row textarea {
+      width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1;
+      border-radius: 8px; font-size: 0.95rem; font-family: inherit; box-sizing: border-box;
+    }
+    .inq-row textarea { resize: vertical; }
+    .inq-row input:focus, .inq-row select:focus, .inq-row textarea:focus {
+      outline: none; border-color: #3b82f6;
+    }
+    .inq-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .inq-actions button { flex: 1; padding: 12px; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; border: none; }
+    .inq-cancel { background: #e2e8f0; color: #475569; }
+    .inq-submit { background: #3b82f6; color: #fff; }
+    .inq-submit:hover { background: #2563eb; }
+  </style>
+
+  <script>
+    // ===== EmailJS 설정값 (여기만 바꾸면 됩니다) =====
+    var EMAILJS_SERVICE_ID  = 'service_2mmkv4k';
+    var EMAILJS_TEMPLATE_ID = 'template_y19pd9h';
+    // ================================================
+
+    // 버튼 클릭 시 폼 열기 (선택한 상품명이 분류에 자동 선택됨)
+    window.openApplyForm = function(productName) {
+      var sel = document.getElementById('inq-category');
+      for (var i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].value === productName) { sel.selectedIndex = i; break; }
+      }
+      document.getElementById('inquiryModal').classList.add('open');
+    }
+
+    // 광고문의 버튼용 (분류 기본값으로 폼 열기)
+    window.openInquiryForm = function() {
+      document.getElementById('inquiryModal').classList.add('open');
+    }
+
+    window.closeInquiryForm = function() {
+      document.getElementById('inquiryModal').classList.remove('open');
+    }
+
+    // 폼 작성 내용을 메일로 전송 (사용자 메일앱이 열림)
+    window.submitInquiry = function() {
+      var category = document.getElementById('inq-category').value;
+      var name     = document.getElementById('inq-name').value.trim();
+      var email    = document.getElementById('inq-email').value.trim();
+      var phone    = document.getElementById('inq-phone').value.trim();
+      var title    = document.getElementById('inq-title').value.trim();
+      var content  = document.getElementById('inq-content').value.trim();
+
+      if (!name || !email || !phone || !title || !content) {
+        alert('필수 입력사항(*)을 모두 작성해주세요.');
+        return;
+      }
+
+      // 메일 본문 구성 (줄바꿈은 <br>로 -> 템플릿의 {{{message}}} 에서 살아남)
+      var message =
+        '[분류] ' + category + '<br>' +
+        '[이름] ' + name + '<br>' +
+        '[이메일] ' + email + '<br>' +
+        '[연락처] ' + phone + '<br>' +
+        '[제목] ' + title + '<br><br>' +
+        '[문의 내용]<br>' + content.replace(/\n/g, '<br>');
+
+      // EmailJS 템플릿으로 넘길 변수들
+      var params = {
+        category:   category,
+        from_name:  name,
+        from_email: email,
+        phone:      phone,
+        title:      title,
+        message:    message
+      };
+
+      // 전송 중 중복 클릭 방지
+      var btn = document.querySelector('.inq-submit');
+      var originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = '전송 중...';
+
+      emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params)
+        .then(function() {
+          alert('문의가 정상적으로 접수되었습니다. 빠른 시일 내에 답변드리겠습니다.');
+          document.getElementById('inq-name').value = '';
+          document.getElementById('inq-email').value = '';
+          document.getElementById('inq-phone').value = '';
+          document.getElementById('inq-title').value = '';
+          document.getElementById('inq-content').value = '';
+          closeInquiryForm();
+        })
+        .catch(function(err) {
+          console.error('EmailJS 오류:', err);
+          alert('전송에 실패했습니다. 잠시 후 다시 시도해주세요.\n문제가 계속되면 042-629-8159로 연락 바랍니다.');
+        })
+        .finally(function() {
+          btn.disabled = false;
+          btn.textContent = originalText;
+        });
+    }
+
+    document.getElementById('inquiryModal').addEventListener('click', function(e) {
+      if (e.target === this) closeInquiryForm();
+    });
 
     window.showServiceApply = function(skipHistory = false) {
       document.getElementById('service-apply').style.display = 'block';
