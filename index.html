@@ -6061,8 +6061,8 @@
     };
     (function () {
       function openPopup(url) {
-        // ===== 로그인 체크 임시 비활성화 (테스트용) =====
-        /*
+
+        // ===== 로그인 체크 활성화 =====
         const user = window.auth?.currentUser;
         if (!user) {
           alert('채용정보를 보려면 로그인이 필요합니다. 회원가입 후 이용해주세요.');
@@ -6071,8 +6071,7 @@
           }
           return;
         }
-        */
-        // ===== 로그인 체크 비활성화 끝 =====
+
 
         if (!url) {
           alert('이 배너에 연결할 채용 웹사이트 주소(URL)를 data-url 속성에 넣어주세요.');
@@ -8388,16 +8387,15 @@ function displayStoriesForPage(page) {
   <script>
     // 로그인 체크 함수 (임시 비활성화 - 테스트용)
     window.checkLoginAndExecute = function (callback, message) {
-      // ===== 로그인 체크 임시 비활성화 =====
-      /*
+
+      // ===== 로그인 체크 활성화 =====
       const user = window.auth?.currentUser;
       if (!user) {
         alert(message || '로그인이 필요한 서비스입니다. 회원가입 후 이용해주세요.');
         window.openLoginModal();
         return false;
       }
-      */
-      // ===== 로그인 체크 비활성화 끝 =====
+
 
       // 로그인 체크 없이 바로 callback 실행
       if (typeof callback === 'function') {
