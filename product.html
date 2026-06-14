@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1300">
+  <title>올공(ALLGONG) - 상품신청 안내</title>
+  <!-- EmailJS 라이브러리 -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    // EmailJS 초기화 (Public Key)
+    (function () {
+      emailjs.init({ publicKey: 'rUFBb4XT-CKbLj2iA' });
+    })();
+  </script>
+  <style>
+    /* 웹폰트 및 기본 리셋 (단독 실행 테스트용) */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #ffffff; color: #333; line-height: 1.6; min-width: 1300px; }
+    .container { width: 1300px; margin: 0 auto; padding: 0 20px; }
+
+    /* === 상품 신청(서비스 안내) 페이지 전용 스타일 === */
+    .pricing-section {
+      padding: 4rem 0 5rem;
+      background: #f8f9fa;
+      min-height: 100vh;
+      display: block; 
+    }
+    
+    .pricing-header { text-align: center; margin-bottom: 3.5rem; }
+    .pricing-header h2 { font-size: 2.4rem; color: #1e293b; font-weight: 800; margin-bottom: 0.5rem; }
+    .pricing-header p { font-size: 1.1rem; color: #64748b; }
+    .pricing-header .highlight { color: #3b82f6; font-weight: 700; }
+
+    .pricing-table-wrap {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+    }
+
+    .pricing-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .pricing-table th, .pricing-table td { padding: 1.8rem 1.5rem; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+    .pricing-table th { background: #f1f5f9; color: #475569; font-weight: 700; font-size: 1.05rem; text-align: center; border-bottom: 2px solid #cbd5e1; }
+    .pricing-table tr:last-child td { border-bottom: none; }
+    .pricing-table tr:hover td { background: #f8fafc; }
+
+    /* 상품 위치 안내도 (가상의 미니 브라우저 형태) */
+    .p-location-map {
+      width: 140px; height: 100px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; margin: 0 auto; position: relative; overflow: hidden;
+    }
+    .p-map-header { height: 10px; background: #cbd5e1; width: 100%; }
+    .p-map-body { padding: 4px; display: flex; flex-direction: column; gap: 4px; }
+    .p-map-block { background: #e2e8f0; height: 15px; border-radius: 2px; width: 100%; }
+    .map-premium .block-1 { background: #ef4444; border: 2px solid #b91c1c; }
+    .map-gold .block-2 { background: #f59e0b; border: 2px solid #d97706; }
+    .map-silver .block-3 { background: #3b82f6; border: 2px solid #1d4ed8; }
+    .map-bronze .block-4 { background: #10b981; border: 2px solid #047857; }
+
+    /* 상품명 영역 */
+    .p-title-wrap { min-width: 220px; }
+    .p-name { font-size: 1.35rem; font-weight: 800; color: #1e293b; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 8px; }
+    .p-badge { display: inline-block; padding: 3px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; color: #fff; line-height: 1; }
+    .bg-red { background: #ef4444; } .bg-blue { background: #3b82f6; } .bg-orange { background: #f59e0b; }
+    .p-sub-desc { font-size: 0.85rem; color: #64748b; cursor: pointer; }
+    .p-sub-desc:hover { color: #3b82f6; text-decoration: underline; }
+
+    /* 서비스 내용 영역 */
+    .p-desc-list { list-style: none; padding: 0; margin: 0; min-width: 300px; }
+    .p-desc-list li { position: relative; padding-left: 14px; font-size: 0.95rem; color: #334155; margin-bottom: 8px; line-height: 1.5; }
+    .p-desc-list li::before { content: '-'; position: absolute; left: 0; color: #94a3b8; font-weight: bold; }
+    .p-desc-list li .highlight { color: #e11d48; font-weight: 600; }
+
+    /* 가격 및 버튼 영역 */
+    .p-price-wrap { text-align: right; min-width: 200px; }
+    .p-tax-note { font-size: 0.8rem; color: #94a3b8; margin-bottom: 2px; }
+    .p-price-main { font-size: 1.5rem; font-weight: 800; color: #e11d48; }
+    .p-price-sub { font-size: 1.05rem; color: #475569; font-weight: 600; margin-top: 6px; }
+    .p-min-term { font-size: 0.8rem; color: #94a3b8; margin-top: 4px; margin-bottom: 12px; }
+
+    .p-actions { display: flex; justify-content: flex-end; gap: 8px; }
+    .btn-inquiry { background: #fff; border: 1px solid #cbd5e1; color: #475569; padding: 8px 14px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-inquiry:hover { background: #f1f5f9; color: #1e293b; border-color: #94a3b8; }
+    .btn-apply { background: #3b82f6; border: 1px solid #3b82f6; color: #fff; padding: 8px 20px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-apply:hover { background: #2563eb; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2); }
+
+    /* === 안내 바 === */
+    .p-notice-bar {
+      display: flex; align-items: center; gap: 10px;
+      background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px;
+      padding: 16px 20px; margin-bottom: 2rem;
+      font-size: 0.92rem; color: #1e40af;
+    }
+    .p-notice-ic { font-size: 1.1rem; flex-shrink: 0; }
+
+    /* === 상품 이용 안내 === */
+    .p-guide-box {
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
+      padding: 28px 32px; margin-top: 2.5rem;
+    }
+    .p-guide-box h3 {
+      font-size: 1.1rem; color: #1e293b; font-weight: 700;
+      margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0;
+    }
+    .p-guide-box ul { list-style: none; padding: 0; margin: 0; }
+    .p-guide-box li {
+      position: relative; padding: 5px 0 5px 16px;
+      font-size: 0.9rem; color: #64748b; line-height: 1.5;
+    }
+    .p-guide-box li::before {
+      content: '•'; position: absolute; left: 0; color: #3b82f6; font-weight: bold;
+    }
+
+    /* === 광고 문의 === */
+    .p-contact-box {
+      text-align: center; margin-top: 2rem; padding: 36px 32px;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      border-radius: 14px; color: #fff;
+    }
+    .p-contact-box h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+    .p-contact-box p { font-size: 0.95rem; opacity: 0.92; margin-bottom: 18px; }
+    .p-contact-btn {
+      display: inline-block; background: #fff; color: #2563eb;
+      font-weight: 700; padding: 12px 36px; border-radius: 8px;
+      text-decoration: none; font-size: 1rem; transition: all 0.2s;
+    }
+    .p-contact-btn:hover { box-shadow: 0 6px 16px rgba(0,0,0,0.18); transform: translateY(-1px); }
+
+    /* 반응형 동작 제거: 화면 크기와 무관하게 항상 동일한 레이아웃 고정 */
+  </style>
+</head>
+<body>
+
+  <section class="section pricing-section" id="service-apply">
+    <div class="container">
+      
+      <div class="pricing-header">
+        <h2>공공기관 채용/교육 홍보 상품 안내</h2>
+        <p>공공기관 채용정보의 대표 플랫폼, <span class="highlight">올공(allgongin)</span>에서 채용 효과를 극대화하세요.</p>
+        <p>전국 <span class="highlight">1000여 개</span> 공공기관 채용공고를 한곳에 모은 올공, 채용 담당자와 구직자가 매일 찾는 채널입니다.</p>
+      </div>
+
+      <!-- 안내 바 -->
+      <div class="p-notice-bar">
+        <span class="p-notice-ic">📌</span>
+        <span>모든 상품은 부가세 별도이며, 게재 기간·노출 위치에 따라 가격이 달라집니다. 상품 선택 후 문의 사항을 등록하시면 담당자가 연락드려 상세 게재 일정을 안내합니다.</span>
+      </div>
+
+      <div class="pricing-table-wrap">
+        <table class="pricing-table">
+          <thead>
+            <tr>
+              <th style="width: 15%;">메인화면 위치</th>
+              <th style="width: 25%;">상품명</th>
+              <th style="width: 35%;">서비스 내용</th>
+              <th style="width: 25%; text-align: right; padding-right: 2rem;">가격 / 신청</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="text-align: center;">
+                <div class="p-location-map map-premium">
+                  <div class="p-map-header"></div>
+                  <div class="p-map-body">
+                    <div class="p-map-block block-1" style="height: 25px;"></div>
+                    <div class="p-map-block block-2"></div>
+                    <div class="p-map-block block-3"></div>
+                    <div class="p-map-block block-4"></div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="p-title-wrap">
+                  <div class="p-name">플래티넘 배너 <span class="p-badge bg-red">NEW</span></div>
+                  <div class="p-sub-desc" onclick="alert('배너 시안 가이드 팝업 준비중입니다.')">상세보기 &gt;</div>
+                </div>
+              </td>
+              <td>
+                <ul class="p-desc-list">
+                  <li>메인 페이지 <span class="highlight">프리미엄 채용정보 최상단</span> 롤링 노출</li>
+                  <li>채용정보 리스트 최상단 우선 노출 (칼라옵션 적용)</li>
+                  <li>주 1회 공기업 준비생 대상 맞춤형 뉴스레터/앱 푸시 발송</li>
+                  <li>기업 소개 인터뷰 1회 무료 작성 및 게시</li>
+                </ul>
+              </td>
+              <td>
+                <div class="p-price-wrap">
+                  <div class="p-tax-note">* 부가세 별도</div>
+                  <div class="p-price-main">3,000,000 원 / 1주</div>
+                  <div class="p-price-sub">450,000 원 / 1일</div>
+                  <div class="p-min-term">(최소 게재 3일부터)</div>
+                  <div class="p-actions">
+                    <button class="btn-inquiry" onclick="openInquiryForm()">광고문의</button>
+                    <button class="btn-apply" onclick="openApplyForm('플래티넘 배너')">선택</button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="text-align: center;">
+                <div class="p-location-map map-gold">
+                  <div class="p-map-header"></div>
+                  <div class="p-map-body">
+                    <div class="p-map-block block-1" style="height: 25px;"></div>
+                    <div class="p-map-block block-2"></div>
+                    <div class="p-map-block block-3"></div>
+                    <div class="p-map-block block-4"></div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="p-title-wrap">
+                  <div class="p-name">골드 배너 <span class="p-badge bg-orange">HOT</span></div>
+                  <div class="p-sub-desc" onclick="alert('배너 시안 가이드 팝업 준비중입니다.')">상세보기 &gt;</div>
+                </div>
+              </td>
+              <td>
+                <ul class="p-desc-list">
+                  <li>메인 페이지 <span class="highlight">추천 채용정보 영역</span> 고정 노출</li>
+                  <li>리스트 내 굵은 글씨 및 테두리 강조 효과 적용</li>
+                  <li>주 1회 전체 회원 대상 뉴스레터 하단 배너 노출</li>
+                  <li>올공 공식 SNS (인스타그램, 블로그) 홍보 1회</li>
+                </ul>
+              </td>
+              <td>
+                <div class="p-price-wrap">
+                  <div class="p-tax-note">* 부가세 별도</div>
+                  <div class="p-price-main">1,500,000 원 / 1주</div>
+                  <div class="p-price-sub">250,000 원 / 1일</div>
+                  <div class="p-min-term">(최소 게재 3일부터)</div>
+                  <div class="p-actions">
+                    <button class="btn-inquiry" onclick="openInquiryForm()">광고문의</button>
+                    <button class="btn-apply" onclick="openApplyForm('골드 배너')">선택</button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="text-align: center;">
+                <div class="p-location-map map-silver">
+                  <div class="p-map-header"></div>
+                  <div class="p-map-body">
+                    <div class="p-map-block block-1" style="height: 25px;"></div>
+                    <div class="p-map-block block-2"></div>
+                    <div class="p-map-block block-3"></div>
+                    <div class="p-map-block block-4"></div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="p-title-wrap">
+                  <div class="p-name">실버 배너</div>
+                  <div class="p-sub-desc" onclick="alert('배너 시안 가이드 팝업 준비중입니다.')">상세보기 &gt;</div>
+                </div>
+              </td>
+              <td>
+                <ul class="p-desc-list">
+                  <li>메인 페이지 <span class="highlight">주요 채용정보 영역</span> 상단 우선 노출</li>
+                  <li>우측 사이드바(공공기관 뉴스, 취업이야기) 롤링 배너 노출</li>
+                  <li>채용정보 리스트 배경색 강조 효과 적용</li>
+                </ul>
+              </td>
+              <td>
+                <div class="p-price-wrap">
+                  <div class="p-tax-note">* 부가세 별도</div>
+                  <div class="p-price-main">800,000 원 / 1주</div>
+                  <div class="p-price-sub">120,000 원 / 1일</div>
+                  <div class="p-min-term">(최소 게재 3일부터)</div>
+                  <div class="p-actions">
+                    <button class="btn-inquiry" onclick="openInquiryForm()">광고문의</button>
+                    <button class="btn-apply" onclick="openApplyForm('실버 배너')">선택</button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="text-align: center;">
+                <div class="p-location-map map-bronze">
+                  <div class="p-map-header"></div>
+                  <div class="p-map-body">
+                    <div class="p-map-block block-1" style="height: 25px;"></div>
+                    <div class="p-map-block block-2"></div>
+                    <div class="p-map-block block-3"></div>
+                    <div class="p-map-block block-4" style="height: 20px;"></div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="p-title-wrap">
+                  <div class="p-name">교육과정 배너 <span class="p-badge bg-blue">EDU</span></div>
+                  <div class="p-sub-desc" onclick="alert('배너 시안 가이드 팝업 준비중입니다.')">상세보기 &gt;</div>
+                </div>
+              </td>
+              <td>
+                <ul class="p-desc-list">
+                  <li>메인 페이지 <span class="highlight">공공기관 임직원 교육과정</span> 섹션 단독 노출</li>
+                  <li>대형 썸네일(3열) 이미지 적용으로 높은 주목도 확보</li>
+                  <li>회원가입 시 교육 담당자 타겟 메일 발송</li>
+                </ul>
+              </td>
+              <td>
+                <div class="p-price-wrap">
+                  <div class="p-tax-note">* 부가세 별도</div>
+                  <div class="p-price-main">500,000 원 / 1주</div>
+                  <div class="p-price-sub">80,000 원 / 1일</div>
+                  <div class="p-min-term">(최소 게재 7일부터)</div>
+                  <div class="p-actions">
+                    <button class="btn-inquiry" onclick="openInquiryForm()">광고문의</button>
+                    <button class="btn-apply" onclick="openApplyForm('교육과정 배너')">선택</button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 상품 이용 안내 -->
+      <div class="p-guide-box">
+        <h3>상품 이용 안내</h3>
+        <ul>
+          <li>모든 가격은 부가가치세(VAT) 별도 금액입니다.</li>
+          <li>게재 시작일 기준으로 영업일을 계산하며, 신청 후 담당자 확인을 거쳐 게재가 시작됩니다.</li>
+          <li>광고 소재(배너 이미지)는 신청 시 등록하거나 담당자에게 전달해 주시면 됩니다. (권장 규격은 신청 후 안내)</li>
+          <li>게재 중 소재 변경은 게재 기간 내 1회 무료로 가능합니다.</li>
+          <li>채용 알림 및 앱 푸시 발송 시점은 상품별 정책에 따라 조정될 수 있습니다.</li>
+          <li>세금계산서 발행 및 결제 방법은 신청 완료 후 별도 안내됩니다.</li>
+        </ul>
+      </div>
+
+      <!-- 광고 문의 -->
+      <div class="p-contact-box">
+        <h3>광고 상품이 처음이신가요?</h3>
+        <p>채용 규모와 예산에 맞는 상품을 담당자가 직접 추천해 드립니다.</p>
+        <a href="javascript:void(0)" onclick="openInquiryForm()" class="p-contact-btn">광고 문의하기</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===== 광고 문의 폼 모달 ===== -->
+  <div id="inquiryModal" class="inq-overlay">
+    <div class="inq-box">
+      <div class="inq-head">
+        <h2>1:1 광고 문의</h2>
+        <button type="button" class="inq-close" onclick="closeInquiryForm()">&times;</button>
+      </div>
+      <p class="inq-req">* 표시는 필수 입력사항입니다.</p>
+
+      <div class="inq-row">
+        <label>* 분류</label>
+        <select id="inq-category">
+          <option value="플래티넘 배너">플래티넘 배너</option>
+          <option value="골드 배너">골드 배너</option>
+          <option value="실버 배너">실버 배너</option>
+          <option value="교육과정 배너">교육과정 배너</option>
+          <option value="기타 문의">기타 문의</option>
+        </select>
+      </div>
+
+      <div class="inq-row">
+        <label>* 이름</label>
+        <input type="text" id="inq-name" placeholder="이름을 입력해주세요." />
+      </div>
+
+      <div class="inq-row">
+        <label>* 이메일</label>
+        <input type="email" id="inq-email" placeholder="example@email.com" />
+      </div>
+
+      <div class="inq-row">
+        <label>* 연락처</label>
+        <input type="text" id="inq-phone" placeholder="연락 가능한 휴대폰 번호를 입력해주세요." />
+      </div>
+
+      <div class="inq-row">
+        <label>* 제목</label>
+        <input type="text" id="inq-title" placeholder="제목을 입력해주세요." />
+      </div>
+
+      <div class="inq-row">
+        <label>* 내용</label>
+        <textarea id="inq-content" rows="8" placeholder="1. 광고기간 : &#10;&#10;2. 배너종류 : &#10;&#10;3. 견적서요청(유/무) : "></textarea>
+      </div>
+
+      <div class="inq-actions">
+        <button type="button" class="inq-cancel" onclick="closeInquiryForm()">취소</button>
+        <button type="button" class="inq-submit" onclick="submitInquiry()">문의 보내기</button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .inq-overlay {
+      display: none;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); z-index: 100000;
+      justify-content: center; align-items: flex-start;
+      overflow-y: auto; padding: 30px 16px;
+    }
+    .inq-overlay.open { display: flex; }
+    .inq-box {
+      background: #fff; width: 560px;
+      border-radius: 12px; padding: 28px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    .inq-head { display: flex; justify-content: space-between; align-items: center; }
+    .inq-head h2 { font-size: 1.5rem; color: #1e293b; font-weight: 800; }
+    .inq-close { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #94a3b8; line-height: 1; }
+    .inq-req { color: #ef4444; font-size: 0.85rem; text-align: right; margin: 4px 0 16px; }
+    .inq-row { margin-bottom: 14px; }
+    .inq-row label { display: block; font-weight: 700; color: #475569; margin-bottom: 6px; font-size: 0.95rem; }
+    .inq-row input, .inq-row select, .inq-row textarea {
+      width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1;
+      border-radius: 8px; font-size: 0.95rem; font-family: inherit; box-sizing: border-box;
+    }
+    .inq-row textarea { resize: vertical; }
+    .inq-row input:focus, .inq-row select:focus, .inq-row textarea:focus {
+      outline: none; border-color: #3b82f6;
+    }
+    .inq-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .inq-actions button { flex: 1; padding: 12px; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; border: none; }
+    .inq-cancel { background: #e2e8f0; color: #475569; }
+    .inq-submit { background: #3b82f6; color: #fff; }
+    .inq-submit:hover { background: #2563eb; }
+  </style>
+
+  <script>
+    // ===== EmailJS 설정값 (여기만 바꾸면 됩니다) =====
+    var EMAILJS_SERVICE_ID  = 'service_2mmkv4k';
+    var EMAILJS_TEMPLATE_ID = 'template_y19pd9h';
+    // ================================================
+
+    // 버튼 클릭 시 폼 열기 (선택한 상품명이 분류에 자동 선택됨)
+    window.openApplyForm = function(productName) {
+      var sel = document.getElementById('inq-category');
+      for (var i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].value === productName) { sel.selectedIndex = i; break; }
+      }
+      document.getElementById('inquiryModal').classList.add('open');
+    }
+
+    // 광고문의 버튼용 (분류 기본값으로 폼 열기)
+    window.openInquiryForm = function() {
+      document.getElementById('inquiryModal').classList.add('open');
+    }
+
+    window.closeInquiryForm = function() {
+      document.getElementById('inquiryModal').classList.remove('open');
+    }
+
+    // 폼 작성 내용을 메일로 전송 (사용자 메일앱이 열림)
+    window.submitInquiry = function() {
+      var category = document.getElementById('inq-category').value;
+      var name     = document.getElementById('inq-name').value.trim();
+      var email    = document.getElementById('inq-email').value.trim();
+      var phone    = document.getElementById('inq-phone').value.trim();
+      var title    = document.getElementById('inq-title').value.trim();
+      var content  = document.getElementById('inq-content').value.trim();
+
+      if (!name || !email || !phone || !title || !content) {
+        alert('필수 입력사항(*)을 모두 작성해주세요.');
+        return;
+      }
+
+      // 메일 본문 구성 (줄바꿈은 <br>로 -> 템플릿의 {{{message}}} 에서 살아남)
+      var message =
+        '[분류] ' + category + '<br>' +
+        '[이름] ' + name + '<br>' +
+        '[이메일] ' + email + '<br>' +
+        '[연락처] ' + phone + '<br>' +
+        '[제목] ' + title + '<br><br>' +
+        '[문의 내용]<br>' + content.replace(/\n/g, '<br>');
+
+      // EmailJS 템플릿으로 넘길 변수들
+      var params = {
+        category:   category,
+        from_name:  name,
+        from_email: email,
+        phone:      phone,
+        title:      title,
+        message:    message
+      };
+
+      // 전송 중 중복 클릭 방지
+      var btn = document.querySelector('.inq-submit');
+      var originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = '전송 중...';
+
+      emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params)
+        .then(function() {
+          alert('문의가 정상적으로 접수되었습니다. 빠른 시일 내에 답변드리겠습니다.');
+          document.getElementById('inq-name').value = '';
+          document.getElementById('inq-email').value = '';
+          document.getElementById('inq-phone').value = '';
+          document.getElementById('inq-title').value = '';
+          document.getElementById('inq-content').value = '';
+          closeInquiryForm();
+        })
+        .catch(function(err) {
+          console.error('EmailJS 오류:', err);
+          alert('전송에 실패했습니다. 잠시 후 다시 시도해주세요.\n문제가 계속되면 042-629-8159로 연락 바랍니다.');
+        })
+        .finally(function() {
+          btn.disabled = false;
+          btn.textContent = originalText;
+        });
+    }
+
+    document.getElementById('inquiryModal').addEventListener('click', function(e) {
+      if (e.target === this) closeInquiryForm();
+    });
+
+    window.showServiceApply = function(skipHistory = false) {
+      document.getElementById('service-apply').style.display = 'block';
+      window.scrollTo(0, 0);
+      if (!skipHistory) {
+        history.pushState({ section: 'service-apply' }, '', '#service-apply');
+      }
+    }
+  </script>
+</body>
+</html>
