@@ -1460,8 +1460,8 @@
     #edu-courses .edu-banner {
       width: 100%;
       /* 칼럼 폭 100% (폭 어긋남 방지) */
+      /* 모든 배너 박스 높이를 동일하게 고정 (첫 배너 비율 기준) */
       height: 360px;
-      /* 기존 대비 약 2배 (필요시 320~400px 조정) */
       display: flex;
       flex-direction: column;
       border-radius: 16px;
@@ -1476,15 +1476,20 @@
     }
 
     #edu-courses .edu-banner .thumb {
-      flex: 1 0 auto;
+      /* 박스 전체를 채우도록 고정 → 모든 배너 동일 크기 */
+      width: 100%;
       height: 100%;
+      flex: 1 1 auto;
+      min-height: 0;
       background: #f1f3f5;
     }
 
     #edu-courses .edu-banner .thumb img {
       width: 100%;
       height: 100%;
+      /* contain: 이미지 전체를 박스 안에 넣어 글자가 절대 잘리지 않게 함 */
       object-fit: contain;
+      display: block;
     }
 
     #edu-courses .edu-banner .meta {
@@ -1650,7 +1655,7 @@
 
     #jobs .job-card .banner-image {
       width: 100%;
-      height: 85px;
+      height: 64px;
       /* 로고 박스 고정 */
       object-fit: contain;
       object-position: center;
@@ -4096,11 +4101,68 @@
     }
   /* === 주요 채용정보 로고 크기 맞춤 확대 === */
     #general-jobs .job-card .banner-image {
-      height: 85px !important; /* 기존 약 45px에서 75px로 대폭 확대 (원하는 만큼 숫자 조절 가능) */
+      height: 75px !important; /* 기존 약 45px에서 75px로 대폭 확대 (원하는 만큼 숫자 조절 가능) */
       width: 100% !important;
       object-fit: contain !important; /* 로고가 잘리지 않으면서 가로세로 여백 없이 최대한 꽉 차게 맞춰줌 */
       margin-top: 5px !important;
       margin-bottom: 12px !important; /* 로고 확대 후 텍스트와 겹치지 않도록 아래쪽 여백 확보 */
+    }
+
+/* ===== 줄글 목록형 채용공고 ===== */
+    /* 아래 '공공기관 임직원 교육과정' 섹션과의 빈 공간을 위 섹션 간격 수준으로 좁힘 */
+    #hibrain-jobs {
+      padding-bottom: 1.25rem;
+    }
+    /* 3열 그리드 - '주요 채용정보' 컨테이너와 동일한 폭(1480px) 안에서 정렬 */
+    #hibrain-jobs .hibrain-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);  /* 3열 (사진과 동일) */
+      column-gap: 48px;   /* 열 사이 간격 */
+      row-gap: 14px;      /* 행 사이 간격 */
+      margin-top: 8px;
+    }
+    /* 각 줄글 항목: 앞에 파란 점(•) + 한 줄 표시 */
+    #hibrain-jobs .hibrain-item {
+      position: relative;
+      display: block;
+      padding-left: 18px;   /* 불릿 자리 확보 */
+      font-size: 0.98rem;
+      line-height: 1.5;
+      text-decoration: none;
+      color: #333;
+      white-space: nowrap;        /* 한 줄 고정 */
+      overflow: hidden;
+      text-overflow: ellipsis;    /* 길면 … 처리 */
+      transition: color 0.15s ease;
+    }
+    #hibrain-jobs .hibrain-item::before {
+      content: "•";
+      position: absolute;
+      left: 2px;
+      top: 0;
+      color: #5c7cfa;        /* 파란 불릿 */
+      font-weight: 700;
+    }
+    /* 기관명: 굵게 검정 */
+    #hibrain-jobs .hibrain-org {
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-right: 6px;
+    }
+    /* 설명: 회색 */
+    #hibrain-jobs .hibrain-desc {
+      color: #555;
+    }
+    #hibrain-jobs .hibrain-item:hover .hibrain-org,
+    #hibrain-jobs .hibrain-item:hover .hibrain-desc {
+      color: #5c7cfa;        /* 마우스 올리면 파랑 강조 */
+    }
+    /* 모바일: 1열로 전환 */
+    @media (max-width: 768px) {
+      #hibrain-jobs .hibrain-grid {
+        grid-template-columns: 1fr;
+        column-gap: 0;
+      }
     }
 
 /* ===== 실시간 채팅방 섹션 ===== */
@@ -5027,7 +5089,108 @@
             </a>
           </div>
         </div>
-      </section>     
+      </section>
+
+
+      <!-- ===== 하이브레인넷 채용공고 (줄글 목록형) ===== -->
+      <section class="section section--tight-top" id="hibrain-jobs" style="background: white;">
+        <div class="container">
+          <h2 class="section-title" style="color:#5c7cfa;">
+            대학·연구기관 채용
+            <span class="apply" style="font-size:0.85rem; color:#888; font-weight:500;">출처: 하이브레인넷</span>
+          </h2>
+          <div class="hibrain-grid">
+            <!-- 1열 -->
+            <a class="hibrain-item" href="javascript:void(0)" role="button"
+               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+              <span class="hibrain-org">홍콩중문대학교</span><span class="hibrain-desc">대학원 2027/2028학년도 입학설명회 (…</span>
+            </a>
+            <a class="hibrain-item" href="javascript:void(0)" role="button"
+               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+              <span class="hibrain-org">한국전기연구원</span><span class="hibrain-desc">2026년도 제1차 연수직 공개경쟁 채용</span>
+            </a>
+            <a class="hibrain-item" href="javascript:void(0)" role="button"
+               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+              <span class="hibrain-org">대림대학교</span><span class="hibrain-desc">2026년도 2학기 겸임교원 신규채용</span>
+            </a>
+            <a class="hibrain-item" href="javascript:void(0)" role="button"
+               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+              <span class="hibrain-org">서울과학기술대학교</span><span class="hibrain-desc">의과학대학원 Brain Rhythm Lab …</span>
+            </a>
+            <a class="hibrain-item" href="javascript:void(0)" role="button"
+               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+              <span class="hibrain-org">경북대학교</span><span class="hibrain-desc">의료정보학교실 AIM Lab 대학원생 모집</span>
+            </a>
+            <a class="hibrain-item" href="javascript:void(0)" role="button"
+               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+              <span class="hibrain-org">가천대학교</span><span class="hibrain-desc">메디컬캠퍼스 약학대학 약학과 분자독성…</span>
+            </a>
+            <a class="hibrain-item" href="javascript:void(0)" role="button"
+               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+              <span class="hibrain-org">단국대학교</span><span class="hibrain-desc">천안캠퍼스 조직재생공학연구원 COMET L…</span>
+            </a>
+            <!-- 2열 -->
+            <a class="hibrain-item" href="javascript:void(0)" role="button"
+               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+              <span class="hibrain-org">충남대학교</span><span class="hibrain-desc">에너지과학기술대학원 반응분리나노소재…</span>
+            </a>
+            <a class="hibrain-item" href="javascript:void(0)" role="button"
+               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+              <span class="hibrain-org">한국전기연구원</span><span class="hibrain-desc">2026년도 제3차 별정직 공개경쟁 채용</span>
+            </a>
+            <a class="hibrain-item" href="javascript:void(0)" role="button"
+               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+              <span class="hibrain-org">서울연구원</span><span class="hibrain-desc">2026년 제6회 정원외직원 및 대체인력(석…</span>
+            </a>
+            <a class="hibrain-item" href="javascript:void(0)" role="button"
+               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+              <span class="hibrain-org">대구과학대학교</span><span class="hibrain-desc">간호학과 2026학년도 2학기 전임교원 …</span>
+            </a>
+            <a class="hibrain-item" href="javascript:void(0)" role="button"
+               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+              <span class="hibrain-org">동의과학대학교</span><span class="hibrain-desc">2026학년도 2학기 교원 초빙 (2차)</span>
+            </a>
+            <a class="hibrain-item" href="javascript:void(0)" role="button"
+               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+              <span class="hibrain-org">캡스톤브릿지</span><span class="hibrain-desc">바이오·헬스케어·의료·융합 경영컨설턴트…</span>
+            </a>
+            <a class="hibrain-item" href="javascript:void(0)" role="button"
+               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+              <span class="hibrain-org">국립보건연구원</span><span class="hibrain-desc">2026년 하반기 Post-Doc. 상시 채용</span>
+            </a>
+            <!-- 3열 -->
+            <a class="hibrain-item" href="javascript:void(0)" role="button"
+               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+              <span class="hibrain-org">수원여자대학교</span><span class="hibrain-desc">2026학년도 2학기 제1차 교수 초빙 (…</span>
+            </a>
+            <a class="hibrain-item" href="javascript:void(0)" role="button"
+               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+              <span class="hibrain-org">한국HRD원격평생교육원</span><span class="hibrain-desc">소방학/재난관리 수업 진행 …</span>
+            </a>
+            <a class="hibrain-item" href="javascript:void(0)" role="button"
+               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+              <span class="hibrain-org">UNIST</span><span class="hibrain-desc">하이퍼-컴포저블 데이터센터 연구센터 박사급 …</span>
+            </a>
+            <a class="hibrain-item" href="javascript:void(0)" role="button"
+               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+              <span class="hibrain-org">(GB)글로벌이노에듀</span><span class="hibrain-desc">사회복지현장실습 교·강사 모집</span>
+            </a>
+            <a class="hibrain-item" href="javascript:void(0)" role="button"
+               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+              <span class="hibrain-org">충남대학교</span><span class="hibrain-desc">약학대학 약물역학연구실 대학원생 모집</span>
+            </a>
+            <a class="hibrain-item" href="javascript:void(0)" role="button"
+               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+              <span class="hibrain-org">GIST</span><span class="hibrain-desc">인문사회과학부 비전임직교원(대우교수) 채용</span>
+            </a>
+            <a class="hibrain-item" href="javascript:void(0)" role="button"
+               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+              <span class="hibrain-org">대한의사협회</span><span class="hibrain-desc">의료정책연구원 직원 채용 (연구직, 사무…</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
 
       <!-- 공공기관 임직원 교육과정 (폭 일치 + 3열 + 높이 2배) -->
       <section class="section section--tight-top" id="edu-courses">
@@ -6995,6 +7158,8 @@ window.enableAdminMode = async function () {
       document.getElementById('features').style.display = 'none';
       document.getElementById('jobs').style.display = 'none';
       document.getElementById('general-jobs').style.display = 'none';
+      var __hibrain = document.getElementById('hibrain-jobs');
+      if (__hibrain) __hibrain.style.display = 'none';
       document.getElementById('edu-courses').style.display = 'none';
       document.getElementById('detail-section').style.display = 'none';
       const boardSection = document.getElementById('board-section');
@@ -7889,6 +8054,8 @@ function displayStoriesForPage(page) {
       document.getElementById('features').style.display = 'none';
       document.getElementById('jobs').style.display = 'none';
       document.getElementById('general-jobs').style.display = 'none';
+      var __hibrain = document.getElementById('hibrain-jobs');
+      if (__hibrain) __hibrain.style.display = 'none';
       document.getElementById('edu-courses').style.display = 'none';
       document.getElementById('detail-section').style.display = 'none';
       const chatroomSectionSt = document.getElementById('chatroom-section');
@@ -8411,6 +8578,8 @@ function displayStoriesForPage(page) {
       document.getElementById('features').style.display = 'block';
       document.getElementById('jobs').style.display = 'block';
       document.getElementById('general-jobs').style.display = 'block';
+      var __hibrainHome = document.getElementById('hibrain-jobs');
+      if (__hibrainHome) __hibrainHome.style.display = 'block';
       document.getElementById('edu-courses').style.display = 'block';
       const chatroomSectionHome = document.getElementById('chatroom-section');
       if (chatroomSectionHome) chatroomSectionHome.style.display = 'block';
@@ -8459,6 +8628,8 @@ function displayStoriesForPage(page) {
       document.getElementById('features').style.display = 'none';
       document.getElementById('jobs').style.display = 'none';
       document.getElementById('general-jobs').style.display = 'none';
+      var __hibrain = document.getElementById('hibrain-jobs');
+      if (__hibrain) __hibrain.style.display = 'none';
       document.getElementById('edu-courses').style.display = 'none';
       const chatroomSection = document.getElementById('chatroom-section');
       if (chatroomSection) chatroomSection.style.display = 'none';
