@@ -337,6 +337,8 @@
     #global_bar {
       background: #f4f4f4;
       width: calc(100% + 40px);
+      /* 창을 줄여도 상단 바가 압축/이동되지 않도록 최소 너비 고정 */
+      min-width: calc(1540px + 40px);
       align-self: flex-start;
       margin-left: -40px;
       display: flex;
@@ -351,6 +353,7 @@
       justify-content: space-between;
       align-items: center;
       width: 1480px;
+      flex-shrink: 0;
       margin: 0 160px 0 80px;
       padding: 0 20px 0 106px;
       box-sizing: border-box;
