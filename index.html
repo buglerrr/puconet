@@ -1856,6 +1856,33 @@
       overflow-y: auto;
     }
 
+    /* 로그인 창 닫기(X) 버튼 - 네모 안 X, 우측 상단 고정 */
+    .login-modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid #d0d0d0;
+      border-radius: 6px;
+      background: #fff;
+      color: #555;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      z-index: 2;
+    }
+    .login-modal-close:hover {
+      background: #f1f3f5;
+      border-color: #adb5bd;
+      color: #000;
+    }
+
     @keyframes slideDown {
       from {
         transform: translateY(-50px);
@@ -4228,15 +4255,15 @@
         <li><a href="#" onclick="openLoginModal(); return false;" id="nav-login"><span>로그인</span></a></li>
         <li><a href="#" onclick="openSignupModal(); return false;" id="nav-signup"><span>회원가입</span></a></li>
         <li><a href="#" onclick="handleLogout()" id="nav-logout" style="display:none;"><span>로그아웃</span></a></li>
-        <li><a href="#service-intro"><span>서비스 소개</span></a></li>
-        <li><a href="#support"><span>고객센터</span></a></li>
+        <li><a href="product_inform.html"><span>서비스 소개</span></a></li>
+        <li><a href="#" onclick="openCustomerCenter(); return false;"><span>고객센터</span></a></li>
         <li class="prod">
-          <a href="javascript:;" class="glo_item_more">상품안내<span class="my_menu"></span></a>
+          <a href="product_inform.html">상품안내<span class="my_menu"></span></a>
           <ul class="my_menu_pop" style="display:none">
-            <li><a href="#service-apply" class="bold">서비스 신청</a></li>
-            <li><a href="#"> - 채용공고 노출 상품</a></li>
-            <li><a href="#"> - 배너광고 상품</a></li>
-            <li><a href="#"> - 프리미엄 등록 상품</a></li>
+            <li><a href="product_inform.html" class="bold">서비스 신청</a></li>
+            <li><a href="product_inform.html"> - 채용공고 노출 상품</a></li>
+            <li><a href="product_inform.html"> - 배너광고 상품</a></li>
+            <li><a href="product_inform.html"> - 프리미엄 등록 상품</a></li>
           </ul>
         </li>
       </ul>
@@ -4244,6 +4271,40 @@
   </div>
   <!-- ED 상단 글로벌 메뉴바 ED -->
   <script>
+    // 고객센터 - 새 탭에 ALLGONG CI + 연락처 표출
+    window.openCustomerCenter = function () {
+      var win = window.open('', '_blank');
+      if (!win) {
+        alert('팝업이 차단되었습니다. 브라우저의 팝업 차단을 해제해주세요.');
+        return;
+      }
+      var ci = 'https://github.com/buglerrr/puconet/blob/main/ALLGONG%20CI.png?raw=true';
+      var doc = win.document;
+      doc.open();
+      doc.write(
+        '<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">' +
+        '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+        '<title>고객센터 - 올공(ALLGONG)</title>' +
+        '<style>' +
+        'body{margin:0;font-family:"Malgun Gothic","맑은 고딕",Apple SD Gothic Neo,sans-serif;' +
+        'background:#f8f9fa;color:#2c3e50;min-height:100vh;display:flex;flex-direction:column;' +
+        'align-items:center;justify-content:flex-start;padding-top:80px;box-sizing:border-box;}' +
+        '.ci{height:90px;width:auto;object-fit:contain;margin-bottom:36px;}' +
+        '.info{text-align:center;line-height:2.2;font-size:1.25rem;}' +
+        '.info .label{font-weight:700;color:#1a1a1a;}' +
+        '.info a{color:#5c7cfa;text-decoration:none;}' +
+        '.info a:hover{text-decoration:underline;}' +
+        '</style></head><body>' +
+        '<img class="ci" src="' + ci + '" alt="올공(ALLGONG) CI">' +
+        '<div class="info">' +
+        '<div><span class="label">고객센터(직통):</span> 042-629-8159</div>' +
+        '<div><span class="label">문의:</span> <a href="mailto:trumanlee@hnu.kr">trumanlee@hnu.kr</a></div>' +
+        '</div>' +
+        '</body></html>'
+      );
+      doc.close();
+    };
+
     // 상품안내 드롭다운 토글
     document.addEventListener('click', function (e) {
       var toggler = e.target.closest('.glo_item_more');
@@ -4310,24 +4371,24 @@
                 <img alt="한국도로공사" class="banner-image" src="./한국도로공사.png" />
                 <h3>한국도로공사</h3>
                 <p>신입·경력 / 사무·전기</p>
-                <div class="deadline"><strong>마감:</strong> 2026.07.20 <span
-                    style="color:#e74c3c;font-weight:600;">D-3</span></div>
+                <div class="deadline"><strong>마감:</strong> <span class="deadline-date" data-deadline="2026-07-01">2026.07.01</span> <span
+                    style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-07-01"></span></span></div>
               </a>
               <a aria-label="프리미엄 - 국가철도공단 채용공고 이동" class="job-card" data-url="https://www.kr.or.kr/boardCnts/list.do?boardID=72"
                 href="javascript:void(0)" role="button">
                 <img alt="국가철도공단" class="banner-image" src="./images/ci/국가철도공단.png" /> 
                 <h3>국가철도공단</h3>
                 <p>사무·기술</p>
-                <div class="deadline"><strong>마감:</strong> 2026.07.20 <span
-                    style="color:#e74c3c;font-weight:600;">D-5</span></div>
+                <div class="deadline"><strong>마감:</strong> <span class="deadline-date" data-deadline="2026-08-08">2026.08.08</span> <span
+                    style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-08-08"></span></span></div>
               </a>
               <a aria-label="프리미엄 - 광주광역시도시공사 채용공고 이동" class="job-card" data-url="https://gmcc.ai-recruit.kr/"
                 href="javascript:void(0)" role="button">
                 <img alt="광주광역시도시공사" class="banner-image" src="./images/ci/광주광역시도시공사.png" />
                 <h3>광주광역시도시공사</h3>
                 <p>토목·전기·통신</p>
-                <div class="deadline"><strong>마감:</strong> 2025.10.17 <span
-                    style="color:#e74c3c;font-weight:600;">D-0</span></div>
+                <div class="deadline"><strong>마감:</strong> <span class="deadline-date" data-deadline="2026-07-05">2026.07.05</span> <span
+                    style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-07-05"></span></span></div>
               </a>
               <a aria-label="프리미엄 - 국립공원공단 채용공고 이동" class="job-card"
                 data-url="https://knps.fairy.im/"
@@ -4335,8 +4396,8 @@
                 <img alt="국립공원공단" class="banner-image" src="./images/ci/국립공원공단.png" />
                 <h3>국립공원공단</h3>
                 <p>청년인턴</p>
-                <div class="deadline"><strong>마감:</strong> 2025.10.16 <span
-                    style="color:#e74c3c;font-weight:600;">D-1</span></div>
+                <div class="deadline"><strong>마감:</strong> <span class="deadline-date" data-deadline="2026-07-22">2026.07.22</span> <span
+                    style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-07-22"></span></span></div>
               </a>
             </div>
           </div>
@@ -4604,7 +4665,7 @@
               <img alt="기술보증기금" class="banner-image" src="./images/ci/기술보증기금.png" />
               <h3 title="기술보증기금 전문인력 채용공고">기술보증기금 전문인력 채용공고</h3>
               <p>정규직</p>
-              <p class="meta">근무지: 경기 외 · 마감: 2025-10-01 D-12</p>
+              <p class="meta">근무지: 경기 외 · 마감: <span class="deadline-date" data-deadline="2026-08-18">2026.08.18</span> <span class="dday" data-deadline="2026-08-18" style="color:#e74c3c;font-weight:600;"></span></p>
               <div class="job-badges"></div>
             </a>
 
@@ -4613,7 +4674,7 @@
               <img alt="대전관광공사" class="banner-image" src="./images/ci/대전관광공사.png" />
               <h3 title="대전관광공사 정규직 수시채용 공고">대전관광공사 정규직 수시채용 공고</h3>
               <p>정규직</p>
-              <p class="meta">근무지: 전남 · 마감: 2025-10-02 D-13</p>
+              <p class="meta">근무지: 전남 · 마감: <span class="deadline-date" data-deadline="2026-07-13">2026.07.13</span> <span class="dday" data-deadline="2026-07-13" style="color:#e74c3c;font-weight:600;"></span></p>
               <div class="job-badges"></div>
             </a>
 
@@ -4622,7 +4683,7 @@
               <img alt="대전광역시시설관리공단" class="banner-image" src="./images/ci/대전광역시시설관리공단.png" />
               <h3 title="대전광역시시설관리공단 일반직 신입사원 채용">대전광역시시설관리공단 일반직 신입사원 채용</h3>
               <p>정규직</p>
-              <p class="meta">근무지: 서울 · 마감: 2025-10-01 D-12</p>
+              <p class="meta">근무지: 서울 · 마감: <span class="deadline-date" data-deadline="2026-07-18">2026.07.18</span> <span class="dday" data-deadline="2026-07-18" style="color:#e74c3c;font-weight:600;"></span></p>
               <div class="job-badges"></div>
             </a>
 
@@ -4631,7 +4692,7 @@
               <img alt="대전교통공사" class="banner-image" src="./images/ci/대전교통공사.png" />
               <h3 title="대전교통공사 하반기 보훈 채용공고">대전교통공사 하반기 보훈 채용공고</h3>
               <p>정규직</p>
-              <p class="meta">근무지: 서울 외 · 마감: 2025-10-01 D-12</p>
+              <p class="meta">근무지: 서울 외 · 마감: <span class="deadline-date" data-deadline="2026-08-27">2026.08.27</span> <span class="dday" data-deadline="2026-08-27" style="color:#e74c3c;font-weight:600;"></span></p>
               <div class="job-badges"></div>
             </a>
 
@@ -4640,7 +4701,7 @@
               <img alt="대전도시공사" class="banner-image" src="./images/ci/대전도시공사.png" />
               <h3 title="대전도시공사 하반기 정규직(고졸) 채용 공고">대전도시공사 정규직(고졸) 채용 공고</h3>
               <p>정규직</p>
-              <p class="meta">근무지: 서울 외 · 마감: 2025-10-02 D-13</p>
+              <p class="meta">근무지: 서울 외 · 마감: <span class="deadline-date" data-deadline="2026-08-19">2026.08.19</span> <span class="dday" data-deadline="2026-08-19" style="color:#e74c3c;font-weight:600;"></span></p>
               <div class="job-badges"></div>
             </a>
 
@@ -4649,7 +4710,7 @@
               <img alt="소상공인시장진흥공단" class="banner-image" src="./images/ci/소상공인시장진흥공단.png" />
               <h3 title="소상공인시장진흥공단 하반기 정규직(장애, 보훈) 채용 공고">소상공인시장진흥공단 하반기 정규직(장애, 보훈) 채용 공고</h3>
               <p>정규직</p>
-              <p class="meta">근무지: 서울 외 · 마감: 2025-10-02 D-13</p>
+              <p class="meta">근무지: 서울 외 · 마감: <span class="deadline-date" data-deadline="2026-07-23">2026.07.23</span> <span class="dday" data-deadline="2026-07-23" style="color:#e74c3c;font-weight:600;"></span></p>
               <div class="job-badges"></div>
             </a>
 
@@ -4658,7 +4719,7 @@
               <img alt="신용보증재단중앙회" class="banner-image" src="./images/ci/신용보증재단중앙회.png" />
               <h3 title="신용보증재단중앙회 제2차 직원 채용 공고(연구직)">신용보증재단중앙회 제2차 직원 채용 공고(연구직)</h3>
               <p>정규직</p>
-              <p class="meta">근무지: 서울 외 · 마감: 2025-10-01 D-12</p>
+              <p class="meta">근무지: 서울 외 · 마감: <span class="deadline-date" data-deadline="2026-07-02">2026.07.02</span> <span class="dday" data-deadline="2026-07-02" style="color:#e74c3c;font-weight:600;"></span></p>
               <div class="job-badges"></div>
             </a>
 
@@ -4667,7 +4728,7 @@
               <img alt="중소기업기술정보진흥원" class="banner-image" src="./images/ci/중소기업기술정보진흥원.png" />
               <h3 title="중소기업기술정보진흥원 신입직원 채용 공고">중소기업기술정보진흥원 신입직원 채용 공고</h3>
               <p>정규직</p>
-              <p class="meta">근무지: 전남 · 마감: 2025-10-01 D-12</p>
+              <p class="meta">근무지: 전남 · 마감: <span class="deadline-date" data-deadline="2026-07-25">2026.07.25</span> <span class="dday" data-deadline="2026-07-25" style="color:#e74c3c;font-weight:600;"></span></p>
               <div class="job-badges"></div>
             </a>
 
@@ -4676,7 +4737,7 @@
               <img alt="충북개발공사" class="banner-image" src="./images/ci/충북개발공사.png" />
               <h3 title="충북개발공사 하반기 별정직 신입사원 모집공고">충북개발공사 하반기 별정직 신입사원 모집공고</h3>
               <p>정규직</p>
-              <p class="meta">근무지: 인천 외 · 마감: 2025-09-30 D-11</p>
+              <p class="meta">근무지: 인천 외 · 마감: <span class="deadline-date" data-deadline="2026-08-03">2026.08.03</span> <span class="dday" data-deadline="2026-08-03" style="color:#e74c3c;font-weight:600;"></span></p>
               <div class="job-badges"></div>
             </a>
 
@@ -4685,7 +4746,7 @@
               <img alt="충청남도개발공사" class="banner-image" src="./images/ci/충청남도개발공사.png" />
               <h3 title="충청남도개발공사 하반기 정규직 신입직원 채용 공고">충청남도개발공사 하반기 정규직 신입직원 채용 공고</h3>
               <p>정규직</p>
-              <p class="meta">근무지: 서울 · 마감: 2025-10-01 D-12</p>
+              <p class="meta">근무지: 서울 · 마감: <span class="deadline-date" data-deadline="2026-07-28">2026.07.28</span> <span class="dday" data-deadline="2026-07-28" style="color:#e74c3c;font-weight:600;"></span></p>
               <div class="job-badges"></div>
             </a>
 
@@ -4694,7 +4755,7 @@
               <img alt="한국남동발전(주)" class="banner-image" src="./images/ci/한국남동발전.png" />
               <h3 title="한국남동발전(주) 제4차 신입사원(대졸수준 해외사업 개발·관리 전형) 선발">한국남동발전(주) 제4차 신입사원(대졸수준 해외사업 개발·관리 전형) 선발</h3>
               <p>정규직</p>
-              <p class="meta">근무지: 부산 외 · 마감: 2025-10-01 D-12</p>
+              <p class="meta">근무지: 부산 외 · 마감: <span class="deadline-date" data-deadline="2026-07-13">2026.07.13</span> <span class="dday" data-deadline="2026-07-13" style="color:#e74c3c;font-weight:600;"></span></p>
               <div class="job-badges"></div>
             </a>
 
@@ -4703,7 +4764,7 @@
               <img alt="한국도로공사" class="banner-image" src="./images/ci/한국도로공사.png" />
               <h3 title="한국도로공사 정규직 공개채용 공고">한국도로공사 정규직 공개채용 공고</h3>
               <p>정규직</p>
-              <p class="meta">근무지: 서울 · 마감: 2025-09-30 D-11</p>
+              <p class="meta">근무지: 서울 · 마감: <span class="deadline-date" data-deadline="2026-08-15">2026.08.15</span> <span class="dday" data-deadline="2026-08-15" style="color:#e74c3c;font-weight:600;"></span></p>
               <div class="job-badges"></div>
             </a>
 
@@ -4712,7 +4773,7 @@
               <img alt="한국동서발전(주)" class="banner-image" src="./images/ci/한국동서발전.png" />
               <h3 title="2026년 한국동서발전(주) 정규직 채용">2026년 한국동서발전(주) 정규직 채용</h3>
               <p>정규직</p>
-              <p class="meta">근무지: 경기 외 · 마감: 2025-09-29 D-10</p>
+              <p class="meta">근무지: 경기 외 · 마감: <span class="deadline-date" data-deadline="2026-08-06">2026.08.06</span> <span class="dday" data-deadline="2026-08-06" style="color:#e74c3c;font-weight:600;"></span></p>
               <div class="job-badges"></div>
             </a>
 
@@ -4721,7 +4782,7 @@
               <img alt="한국무역보험공사" class="banner-image" src="./images/ci/한국무역보험공사.png" />
               <h3 title="2026년 제2차 한국무역보험공사 채용 공고">2026년 제2차 한국무역보험공사 채용 공고</h3>
               <p>정규직</p>
-              <p class="meta">근무지: 충북 · 마감: 2025-09-26 D-7</p>
+              <p class="meta">근무지: 충북 · 마감: <span class="deadline-date" data-deadline="2026-08-12">2026.08.12</span> <span class="dday" data-deadline="2026-08-12" style="color:#e74c3c;font-weight:600;"></span></p>
               <div class="job-badges"></div>
             </a>
 
@@ -4730,7 +4791,7 @@
               <img alt="한국보훈복지의료공단" class="banner-image" src="./images/ci/한국보훈복지의료공단.png" />
               <h3 title="한국보훈복지의료공단 하반기 대졸수준 채용공고">한국보훈복지의료공단 하반기 대졸수준 채용공고</h3>
               <p>정규직</p>
-              <p class="meta">근무지: 서울 외 · 마감: 2025-10-01 D-12</p>
+              <p class="meta">근무지: 서울 외 · 마감: <span class="deadline-date" data-deadline="2026-07-22">2026.07.22</span> <span class="dday" data-deadline="2026-07-22" style="color:#e74c3c;font-weight:600;"></span></p>
               <div class="job-badges"></div>
             </a>
 
@@ -4739,7 +4800,7 @@
               <img alt="한국산림복지진흥원" class="banner-image" src="./images/ci/한국산림복지진흥원.png" />
               <h3 title="한국산림복지진흥원 하반기 정규직 채용 공고">한국산림복지진흥원 하반기 정규직 채용 공고</h3>
               <p>정규직</p>
-              <p class="meta">근무지: 서울 외 · 마감: 2025-09-23 D-4</p>
+              <p class="meta">근무지: 서울 외 · 마감: <span class="deadline-date" data-deadline="2026-08-23">2026.08.23</span> <span class="dday" data-deadline="2026-08-23" style="color:#e74c3c;font-weight:600;"></span></p>
               <div class="job-badges"></div>
             </a>
 
@@ -4748,7 +4809,7 @@
               <img alt="한국수목원정원관리원" class="banner-image" src="./images/ci/한국수목원정원관리원.png" />
               <h3 title="한국수목원정원관리원 제4차 전문직원 채용">한국수목원정원관리원 제4차 전문직원 채용</h3>
               <p>정규직</p>
-              <p class="meta">근무지: 전남 · 마감: 2025-10-01 D-12</p>
+              <p class="meta">근무지: 전남 · 마감: <span class="deadline-date" data-deadline="2026-07-20">2026.07.20</span> <span class="dday" data-deadline="2026-07-20" style="color:#e74c3c;font-weight:600;"></span></p>
               <div class="job-badges"></div>
             </a>
 
@@ -4757,7 +4818,7 @@
               <img alt="한국수자원공사" class="banner-image" src="./images/ci/한국수자원공사.png" />
               <h3 title="한국수자원공사 8차 연구직/전문연구직(정규직) 채용">한국수자원공사 8차 연구직/전문연구직(정규직) 채용</h3>
               <p>정규직</p>
-              <p class="meta">근무지: 세종 · 마감: 2025-09-24 D-5</p>
+              <p class="meta">근무지: 세종 · 마감: <span class="deadline-date" data-deadline="2026-07-18">2026.07.18</span> <span class="dday" data-deadline="2026-07-18" style="color:#e74c3c;font-weight:600;"></span></p>
               <div class="job-badges"></div>
             </a>
 
@@ -4766,7 +4827,7 @@
               <img alt="한국자산관리공사" class="banner-image" src="./images/ci/한국자산관리공사.png" />
               <h3 title="2026 한국자산관리공사 제2차 채용(정규직) 공고">2026 한국자산관리공사 제2차 채용(정규직) 공고</h3>
               <p>정규직</p>
-              <p class="meta">근무지: 서울 · 마감: 2025-09-23 D-4</p>
+              <p class="meta">근무지: 서울 · 마감: <span class="deadline-date" data-deadline="2026-07-06">2026.07.06</span> <span class="dday" data-deadline="2026-07-06" style="color:#e74c3c;font-weight:600;"></span></p>
               <div class="job-badges"></div>
             </a>
 
@@ -4775,7 +4836,7 @@
               <img alt="한국토지주택공사" class="banner-image" src="./images/ci/한국토지주택공사.png" />
               <h3 title="한국토지주택공사 2026년 하반기 직원 채용 공고(연구직 3명, 행정직 2명)">한국토지주택공사 2026년 하반기 직원 채용 공고(연구직 3명, 행정직 2명)</h3>
               <p>정규직</p>
-              <p class="meta">근무지: 서울 · 마감: 2025-09-22 D-3</p>
+              <p class="meta">근무지: 서울 · 마감: <span class="deadline-date" data-deadline="2026-08-13">2026.08.13</span> <span class="dday" data-deadline="2026-08-13" style="color:#e74c3c;font-weight:600;"></span></p>
               <div class="job-badges"></div>
             </a>
 
@@ -4832,8 +4893,8 @@
                 src="./images/ci/한국도로공사.png" />
               <h3>한국도로공사</h3>
               <p>비정규직</p>
-              <p><strong>근무지:</strong> 세종 · <strong>마감:</strong> 2025.10.11 <span
-                  style="color:#e74c3c;font-weight:600;">D-4</span></p>
+              <p><strong>근무지:</strong> 세종 · <strong>마감:</strong> <span class="deadline-date" data-deadline="2026-07-19">2026.07.19</span> <span
+                  style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-07-19"></span></span></p>
               <div class="job-badges">
                 <span class="badge">일반</span>
                 <span class="badge">온라인접수</span>
@@ -4845,8 +4906,8 @@
                 src="./images/ci/한국수자원공사.png" />
               <h3>한국수자원공사</h3>
               <p>비정규직</p>
-              <p><strong>근무지:</strong> 경기 · <strong>마감:</strong> 2025.10.12 <span
-                  style="color:#e74c3c;font-weight:600;">D-5</span></p>
+              <p><strong>근무지:</strong> 경기 · <strong>마감:</strong> <span class="deadline-date" data-deadline="2026-08-02">2026.08.02</span> <span
+                  style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-08-02"></span></span></p>
               <div class="job-badges">
                 <span class="badge">일반</span>
                 <span class="badge">온라인접수</span>
@@ -4858,8 +4919,8 @@
                 src="./images/ci/한국철도공사.png" />
               <h3>한국철도공사</h3>
               <p>비정규직</p>
-              <p><strong>근무지:</strong> 서울 · <strong>마감:</strong> 2025.10.13 <span
-                  style="color:#e74c3c;font-weight:600;">D-6</span></p>
+              <p><strong>근무지:</strong> 서울 · <strong>마감:</strong> <span class="deadline-date" data-deadline="2026-07-03">2026.07.03</span> <span
+                  style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-07-03"></span></span></p>
               <div class="job-badges">
                 <span class="badge">일반</span>
                 <span class="badge">온라인접수</span>
@@ -4871,8 +4932,8 @@
                 src="./images/ci/한국토지주택공사.png" />
               <h3>한국토지주택공사</h3>
               <p>정규직</p>
-              <p><strong>근무지:</strong> 대전 · <strong>마감:</strong> 2025.10.14 <span
-                  style="color:#e74c3c;font-weight:600;">D-7</span></p>
+              <p><strong>근무지:</strong> 대전 · <strong>마감:</strong> <span class="deadline-date" data-deadline="2026-07-08">2026.07.08</span> <span
+                  style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-07-08"></span></span></p>
               <div class="job-badges">
                 <span class="badge">일반</span>
                 <span class="badge">온라인접수</span>
@@ -4884,8 +4945,8 @@
                 src="./images/ci/한국동서발전.png" />
               <h3>한국동서발전</h3>
               <p>정규직</p>
-              <p><strong>근무지:</strong> 경기 · <strong>마감:</strong> 2025.10.15 <span
-                  style="color:#e74c3c;font-weight:600;">D-8</span></p>
+              <p><strong>근무지:</strong> 경기 · <strong>마감:</strong> <span class="deadline-date" data-deadline="2026-07-18">2026.07.18</span> <span
+                  style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-07-18"></span></span></p>
               <div class="job-badges">
                 <span class="badge">일반</span>
                 <span class="badge">온라인접수</span>
@@ -4897,8 +4958,8 @@
                 src="./images/ci/한국남동발전.png" />
               <h3>한국남동발전</h3>
               <p>비정규직</p>
-              <p><strong>근무지:</strong> 경남 · <strong>마감:</strong> 2025.10.16 <span
-                  style="color:#e74c3c;font-weight:600;">D-9</span></p>
+              <p><strong>근무지:</strong> 경남 · <strong>마감:</strong> <span class="deadline-date" data-deadline="2026-07-23">2026.07.23</span> <span
+                  style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-07-23"></span></span></p>
               <div class="job-badges">
                 <span class="badge">일반</span>
                 <span class="badge">온라인접수</span>
@@ -4910,8 +4971,8 @@
                 src="./images/ci/한국무역보험공사.png" />
               <h3>한국무역보험공사</h3>
               <p>비정규직</p>
-              <p><strong>근무지:</strong> 세종 · <strong>마감:</strong> 2025.10.17 <span
-                  style="color:#e74c3c;font-weight:600;">D-10</span></p>
+              <p><strong>근무지:</strong> 세종 · <strong>마감:</strong> <span class="deadline-date" data-deadline="2026-08-08">2026.08.08</span> <span
+                  style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-08-08"></span></span></p>
               <div class="job-badges">
                 <span class="badge">일반</span>
                 <span class="badge">온라인접수</span>
@@ -4923,8 +4984,8 @@
                 src="./images/ci/기술보증기금.png" />
               <h3>기술보증기금</h3>
               <p>비정규직</p>
-              <p><strong>근무지:</strong> 충남 · <strong>마감:</strong> 2025.10.18 <span
-                  style="color:#e74c3c;font-weight:600;">D-11</span></p>
+              <p><strong>근무지:</strong> 충남 · <strong>마감:</strong> <span class="deadline-date" data-deadline="2026-08-19">2026.08.19</span> <span
+                  style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-08-19"></span></span></p>
               <div class="job-badges">
                 <span class="badge">일반</span>
                 <span class="badge">온라인접수</span>
@@ -4936,8 +4997,8 @@
                 src="./images/ci/한국자산관리공사.png" />
               <h3>한국자산관리공사</h3>
               <p>비정규직</p>
-              <p><strong>근무지:</strong> 서울 · <strong>마감:</strong> 2025.10.19 <span
-                  style="color:#e74c3c;font-weight:600;">D-12</span></p>
+              <p><strong>근무지:</strong> 서울 · <strong>마감:</strong> <span class="deadline-date" data-deadline="2026-08-26">2026.08.26</span> <span
+                  style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-08-26"></span></span></p>
               <div class="job-badges">
                 <span class="badge">일반</span>
                 <span class="badge">온라인접수</span>
@@ -4949,8 +5010,8 @@
                 src="./images/ci/한국산림복지진흥원.png" />
               <h3>한국산림복지진흥원</h3>
               <p>비정규직</p>
-              <p><strong>근무지:</strong> 서울 외 4 · <strong>마감:</strong> 2025.10.20 <span
-                  style="color:#e74c3c;font-weight:600;">D-13</span></p>
+              <p><strong>근무지:</strong> 서울 외 4 · <strong>마감:</strong> <span class="deadline-date" data-deadline="2026-07-25">2026.07.25</span> <span
+                  style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-07-25"></span></span></p>
               <div class="job-badges">
                 <span class="badge">일반</span>
                 <span class="badge">온라인접수</span>
@@ -4962,8 +5023,8 @@
                 src="./images/ci/한국수목원정원관리원.png" />
               <h3>한국수목원정원관리원</h3>
               <p>비정규직</p>
-              <p><strong>근무지:</strong> 울산 · <strong>마감:</strong> 2025.10.21 <span
-                  style="color:#e74c3c;font-weight:600;">D-14</span></p>
+              <p><strong>근무지:</strong> 울산 · <strong>마감:</strong> <span class="deadline-date" data-deadline="2026-07-23">2026.07.23</span> <span
+                  style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-07-23"></span></span></p>
               <div class="job-badges">
                 <span class="badge">일반</span>
                 <span class="badge">온라인접수</span>
@@ -4975,8 +5036,8 @@
                 src="./images/ci/국립공원공단.png" />
               <h3>국립공원공단</h3>
               <p>비정규직</p>
-              <p><strong>근무지:</strong> 경기 외 1 · <strong>마감:</strong> 2025.10.22 <span
-                  style="color:#e74c3c;font-weight:600;">D-15</span></p>
+              <p><strong>근무지:</strong> 경기 외 1 · <strong>마감:</strong> <span class="deadline-date" data-deadline="2026-08-11">2026.08.11</span> <span
+                  style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-08-11"></span></span></p>
               <div class="job-badges">
                 <span class="badge">일반</span>
                 <span class="badge">온라인접수</span>
@@ -4988,8 +5049,8 @@
                 src="./images/ci/한국보훈복지의료공단.png" />
               <h3>한국보훈복지의료공단</h3>
               <p>정규직</p>
-              <p><strong>근무지:</strong> 충북 · <strong>마감:</strong> 2025.10.23 <span
-                  style="color:#e74c3c;font-weight:600;">D-16</span></p>
+              <p><strong>근무지:</strong> 충북 · <strong>마감:</strong> <span class="deadline-date" data-deadline="2026-08-05">2026.08.05</span> <span
+                  style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-08-05"></span></span></p>
               <div class="job-badges">
                 <span class="badge">일반</span>
                 <span class="badge">온라인접수</span>
@@ -5002,8 +5063,8 @@
                 src="./images/ci/국민체육진흥공단.jpg" />
               <h3>국민체육진흥공단</h3>
               <p>비정규직</p>
-              <p><strong>근무지:</strong> 서울 외 16 · <strong>마감:</strong> 2025.10.24 <span
-                  style="color:#e74c3c;font-weight:600;">D-17</span></p>
+              <p><strong>근무지:</strong> 서울 외 16 · <strong>마감:</strong> <span class="deadline-date" data-deadline="2026-07-25">2026.07.25</span> <span
+                  style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-07-25"></span></span></p>
               <div class="job-badges">
                 <span class="badge">일반</span>
                 <span class="badge">온라인접수</span>
@@ -5015,8 +5076,8 @@
                 src="./images/ci/소상공인시장진흥공단.png" />
               <h3>소상공인시장진흥공단</h3>
               <p>비정규직</p>
-              <p><strong>근무지:</strong> 세종 · <strong>마감:</strong> 2025.10.25 <span
-                  style="color:#e74c3c;font-weight:600;">D-18</span></p>
+              <p><strong>근무지:</strong> 세종 · <strong>마감:</strong> <span class="deadline-date" data-deadline="2026-08-04">2026.08.04</span> <span
+                  style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-08-04"></span></span></p>
               <div class="job-badges">
                 <span class="badge">일반</span>
                 <span class="badge">온라인접수</span>
@@ -5028,8 +5089,8 @@
                 src="./images/ci/국가철도공단.png" />
               <h3>국가철도공단</h3>
               <p>비정규직</p>
-              <p><strong>근무지:</strong> 충남 · <strong>마감:</strong> 2025.10.26 <span
-                  style="color:#e74c3c;font-weight:600;">D-19</span></p>
+              <p><strong>근무지:</strong> 충남 · <strong>마감:</strong> <span class="deadline-date" data-deadline="2026-07-13">2026.07.13</span> <span
+                  style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-07-13"></span></span></p>
               <div class="job-badges">
                 <span class="badge">일반</span>
                 <span class="badge">온라인접수</span>
@@ -5041,8 +5102,8 @@
                 src="./images/ci/광주광역시도시공사.png" />
               <h3>광주광역시도시공사</h3>
               <p>정규직</p>
-              <p><strong>근무지:</strong> 인천 외 6 · <strong>마감:</strong> 2025.10.27 <span
-                  style="color:#e74c3c;font-weight:600;">D-3</span></p>
+              <p><strong>근무지:</strong> 인천 외 6 · <strong>마감:</strong> <span class="deadline-date" data-deadline="2026-07-12">2026.07.12</span> <span
+                  style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-07-12"></span></span></p>
               <div class="job-badges">
                 <span class="badge">일반</span>
                 <span class="badge">온라인접수</span>
@@ -5054,8 +5115,8 @@
                 src="./images/ci/대전광역시시설관리공단.png" />
               <h3>대전광역시시설관리공단</h3>
               <p>비정규직</p>
-              <p><strong>근무지:</strong> 서울 외 1 · <strong>마감:</strong> 2025.10.28 <span
-                  style="color:#e74c3c;font-weight:600;">D-4</span></p>
+              <p><strong>근무지:</strong> 서울 외 1 · <strong>마감:</strong> <span class="deadline-date" data-deadline="2026-08-20">2026.08.20</span> <span
+                  style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-08-20"></span></span></p>
               <div class="job-badges">
                 <span class="badge">일반</span>
                 <span class="badge">온라인접수</span>
@@ -5067,8 +5128,8 @@
                 src="./images/ci/대전관광공사.png" />
               <h3>대전관광공사</h3>
               <p>비정규직</p>
-              <p><strong>근무지:</strong> 인천 · <strong>마감:</strong> 2025.10.29 <span
-                  style="color:#e74c3c;font-weight:600;">D-5</span></p>
+              <p><strong>근무지:</strong> 인천 · <strong>마감:</strong> <span class="deadline-date" data-deadline="2026-08-26">2026.08.26</span> <span
+                  style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-08-26"></span></span></p>
               <div class="job-badges">
                 <span class="badge">일반</span>
                 <span class="badge">온라인접수</span>
@@ -5080,8 +5141,8 @@
                 src="./images/ci/대전교통공사.png" />
               <h3>대전교통공사</h3>
               <p>비정규직</p>
-              <p><strong>근무지:</strong> 전북 · <strong>마감:</strong> 2025.10.10 <span
-                  style="color:#e74c3c;font-weight:600;">D-6</span></p>
+              <p><strong>근무지:</strong> 전북 · <strong>마감:</strong> <span class="deadline-date" data-deadline="2026-07-24">2026.07.24</span> <span
+                  style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-07-24"></span></span></p>
               <div class="job-badges">
                 <span class="badge">일반</span>
                 <span class="badge">온라인접수</span>
@@ -6141,8 +6202,8 @@
   <!-- 로그인 모달 -->
   <!-- 로그인 모달 (소셜 로그인 중심) -->
   <div id="loginModal" class="modal">
-    <div class="modal-content" style="max-width: 400px; text-align: center;">
-      <span class="close" onclick="closeLoginModal()">&times;</span>
+    <div class="modal-content" style="max-width: 400px; text-align: center; position: relative;">
+      <button type="button" class="login-modal-close" onclick="closeLoginModal()" aria-label="닫기">✕</button>
 
       <!-- CI 로고 -->
       <div style="margin-bottom: 2rem;">
@@ -10571,6 +10632,43 @@ window.addEventListener('DOMContentLoaded', startPremiumCarousel);
       );
     });
   });
+</script>
+
+<!-- ===== 마감일 기준 D-Day 자동 계산 (매일 오늘 날짜 기준으로 자동 갱신) ===== -->
+<script>
+  (function () {
+    function updateDdays() {
+      var today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      document.querySelectorAll('.dday').forEach(function (el) {
+        var iso = el.getAttribute('data-deadline');
+        if (!iso) return;
+        var parts = iso.split('-');
+        if (parts.length !== 3) return;
+        var deadline = new Date(
+          parseInt(parts[0], 10),
+          parseInt(parts[1], 10) - 1,
+          parseInt(parts[2], 10)
+        );
+        deadline.setHours(0, 0, 0, 0);
+
+        var diffDays = Math.round((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        var text;
+        if (diffDays > 0) text = 'D-' + diffDays;
+        else if (diffDays === 0) text = 'D-DAY';
+        else text = '마감';
+        el.textContent = text;
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', updateDdays);
+    } else {
+      updateDdays();
+    }
+    setInterval(updateDdays, 60 * 60 * 1000);
+  })();
 </script>
 </body>
 </html>
