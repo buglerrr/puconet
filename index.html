@@ -4108,7 +4108,7 @@
       margin-bottom: 12px !important; /* 로고 확대 후 텍스트와 겹치지 않도록 아래쪽 여백 확보 */
     }
 
-/* ===== 줄글 목록형 채용공고 ===== */
+/* ===== 하이브레인넷 채용공고 (줄글 목록형) ===== */
     /* 아래 '공공기관 임직원 교육과정' 섹션과의 빈 공간을 위 섹션 간격 수준으로 좁힘 */
     #hibrain-jobs {
       padding-bottom: 1.25rem;
@@ -6436,29 +6436,14 @@
               </div>
             </div>
 
-            <!-- 휴대폰 -->
+            <!-- 휴대폰 (선택 입력 - 인증 절차 없음) -->
             <div class="row mbr_phone">
               <div class="col_1">
                 <label for="signup_phone">휴대폰번호</label>
               </div>
               <div class="col_2">
-                <input type="tel" id="signup_phone" placeholder="010-0000-0000" maxlength="13" />
-                <button type="button" class="buttonSendCertification" onclick="alert('인증번호가 전송되었습니다 (모의).')">인증번호
-                  전송</button>
+                <input type="tel" id="signup_phone" placeholder="010-0000-0000 (선택)" maxlength="13" />
                 <div class="notice_msg" id="notice_msg_phone"></div>
-              </div>
-            </div>
-
-            <!-- 인증번호 -->
-            <div class="row authentication_check">
-              <div class="col_1">
-                <label for="signup_cert">인증번호 입력</label>
-              </div>
-              <div class="col_2">
-                <input type="text" id="signup_cert" placeholder="인증번호 6자리" maxlength="6" />
-                <button type="button" class="btnConfirm" onclick="alert('인증되었습니다 (모의).')">확인</button>
-                <button type="button" class="btnSend" onclick="alert('재전송되었습니다 (모의).')">재전송</button>
-                <div class="notice_msg" id="notice_msg_certify"></div>
               </div>
             </div>
           </div>
@@ -7080,9 +7065,22 @@
     window.handleSignup = async function (e) {
       e.preventDefault();
 
-      const email = document.getElementById('signup_email').value;
+      const email = document.getElementById('signup_email').value.trim();
       const pw = document.getElementById('signup_password').value;
-      const name = document.getElementById('signup_name').value;
+      const name = document.getElementById('signup_name').value.trim();
+      // 휴대폰번호는 받되, 인증 절차 없이 선택 입력으로만 사용
+      const phoneEl = document.getElementById('signup_phone');
+      const phone = phoneEl ? phoneEl.value.trim() : '';
+
+      // 필수 입력값 확인
+      if (!email) {
+        alert('이메일을 입력해주세요.');
+        return;
+      }
+      if (!name) {
+        alert('이름(실명)을 입력해주세요.');
+        return;
+      }
 
       // 약관 동의 체크
       const chkAge = document.getElementById('chk_age');
@@ -7106,12 +7104,37 @@
         const userCredential = await createUserWithEmailAndPassword(auth, email, pw);
         // 프로필 이름 설정
         await updateProfile(userCredential.user, { displayName: name });
+
+        // 휴대폰번호 등 추가 정보를 Firestore에 저장 (입력했을 경우)
+        try {
+          if (window.db && window.doc && window.setDoc) {
+            await window.setDoc(window.doc(window.db, 'users', userCredential.user.uid), {
+              name: name,
+              email: email,
+              phone: phone || '',
+              createdAt: new Date().toISOString()
+            }, { merge: true });
+          }
+        } catch (saveErr) {
+          console.warn('사용자 추가정보 저장 실패(가입은 정상 완료):', saveErr);
+        }
+
         alert('✅ 가입을 환영합니다! (' + name + '님)\n자동으로 로그인되었습니다.');
         closeSignupModal();
       } catch (err) {
         let msg = '가입 실패: ' + err.message;
-        if (err.code === 'auth/email-already-in-use') msg = '이미 사용 중인 이메일입니다.';
+        if (err.code === 'auth/email-already-in-use') {
+          msg = '이미 사용 중인 이메일입니다.';
+        } else if (err.code === 'auth/invalid-email') {
+          msg = '이메일 형식이 올바르지 않습니다.';
+        } else if (err.code === 'auth/weak-password') {
+          msg = '비밀번호가 너무 약합니다. (6자리 이상)';
+        } else if (err.code === 'auth/operation-not-allowed') {
+          // 이메일/비밀번호 로그인 제공업체가 비활성화된 경우
+          msg = '이메일 가입 기능이 현재 비활성화되어 있습니다.\nFirebase Console > Authentication > Sign-in method 에서\n"이메일/비밀번호" 제공업체를 사용 설정해주세요.';
+        }
         alert(msg);
+        console.error('회원가입 오류:', err);
       }
     }
 
