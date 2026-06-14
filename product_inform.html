@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>서비스 소개 · 상품안내 — 올공(ALLGONG)</title>
+  <link rel="icon" type="image/png" href="https://github.com/buglerrr/puconet/blob/main/ALLGONG%20CI.png?raw=true">
+  <style>
+    :root {
+      --accent: #5c7cfa;
+      --accent-dark: #3b5bdb;
+      --ink: #1a2233;
+      --muted: #5b6478;
+      --line: #e6e8ef;
+      --bg: #f7f8fb;
+      --card: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Pretendard", "Malgun Gothic", "맑은 고딕", "Apple SD Gothic Neo", sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+    /* 헤더 */
+    .topbar {
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .topbar .wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand img { height: 46px; width: auto; object-fit: contain; }
+    .back-link {
+      font-size: 0.92rem;
+      color: var(--accent);
+      font-weight: 600;
+      border: 1.5px solid var(--accent);
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: all 0.15s ease;
+    }
+    .back-link:hover { background: var(--accent); color: #fff; }
+
+    /* 히어로 */
+    .hero {
+      background: linear-gradient(135deg, #eef2ff 0%, #f7f8fb 60%);
+      padding: 72px 0 64px;
+      border-bottom: 1px solid var(--line);
+    }
+    .hero .eyebrow {
+      display: inline-block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--accent-dark);
+      background: #e0e7ff;
+      padding: 6px 14px;
+      border-radius: 999px;
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: 2.6rem;
+      line-height: 1.25;
+      margin: 0 0 18px;
+      letter-spacing: -0.02em;
+    }
+    .hero h1 .pt { color: var(--accent); }
+    .hero p {
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 640px;
+      margin: 0;
+    }
+
+    /* 섹션 공통 */
+    section { padding: 64px 0; }
+    .section-eyebrow {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin: 0 0 10px;
+    }
+    .section-title {
+      font-size: 1.9rem;
+      margin: 0 0 12px;
+      letter-spacing: -0.01em;
+    }
+    .section-lead {
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 660px;
+      margin: 0 0 40px;
+    }
+
+    /* 서비스 소개 - 특징 3개 */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+    .feature {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 28px 24px;
+    }
+    .feature .num {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .feature h3 { margin: 0 0 8px; font-size: 1.15rem; }
+    .feature p { margin: 0; color: var(--muted); font-size: 0.96rem; }
+
+    /* 상품안내 - 카드 */
+    .products { padding-top: 0; }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+    .product {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 30px 26px;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .product:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(92, 124, 250, 0.16);
+    }
+    .product.featured {
+      border-color: var(--accent);
+      box-shadow: 0 8px 24px rgba(92, 124, 250, 0.12);
+    }
+    .product .tag {
+      align-self: flex-start;
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: #fff;
+      background: var(--accent);
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+    }
+    .product h3 { margin: 0 0 6px; font-size: 1.25rem; }
+    .product .desc { color: var(--muted); font-size: 0.96rem; margin: 0 0 20px; flex: 1; }
+    .product ul { list-style: none; padding: 0; margin: 0 0 24px; }
+    .product li {
+      position: relative;
+      padding-left: 22px;
+      margin-bottom: 9px;
+      font-size: 0.94rem;
+      color: var(--ink);
+    }
+    .product li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: 800;
+    }
+    .product .cta {
+      display: block;
+      text-align: center;
+      padding: 12px;
+      border-radius: 9px;
+      font-weight: 700;
+      border: 1.5px solid var(--accent);
+      color: var(--accent);
+      transition: all 0.15s ease;
+    }
+    .product .cta:hover { background: var(--accent); color: #fff; }
+    .product.featured .cta { background: var(--accent); color: #fff; }
+    .product.featured .cta:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
+
+    /* 문의 영역 */
+    .contact {
+      background: var(--ink);
+      color: #fff;
+      text-align: center;
+    }
+    .contact h2 { font-size: 1.7rem; margin: 0 0 10px; }
+    .contact p { color: #aab2c5; margin: 0 0 28px; }
+    .contact .lines { font-size: 1.1rem; line-height: 2.1; }
+    .contact .lines .label { font-weight: 700; }
+    .contact .lines a { color: #9db2ff; }
+    .contact .lines a:hover { text-decoration: underline; }
+
+    footer {
+      background: #fff;
+      border-top: 1px solid var(--line);
+      padding: 28px 0;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    @media (max-width: 880px) {
+      .features, .product-grid { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 헤더 -->
+  <div class="topbar">
+    <div class="wrap">
+      <a class="brand" href="_v76___allgongin_v75_고정형.html">
+        <img src="https://github.com/buglerrr/puconet/blob/main/ALLGONG%20CI.png?raw=true" alt="올공(ALLGONG) CI">
+      </a>
+      <a class="back-link" href="_v76___allgongin_v75_고정형.html">← 메인으로</a>
+    </div>
+  </div>
+
+  <!-- 히어로 -->
+  <div class="hero">
+    <div class="wrap">
+      <span class="eyebrow">SERVICE INTRODUCTION</span>
+      <h1>국내 최초 <span class="pt">공공기관 전문</span> 채용포털,<br>올공(ALLGONG)</h1>
+      <p>공공기관 경영평가위원 현직 교수가 직접 운영합니다. 흩어진 공공기관 채용공고를 한곳에 모아, 지원자에게는 정확한 정보를, 채용기관에는 꼭 맞는 인재를 연결합니다.</p>
+    </div>
+  </div>
+
+  <!-- 서비스 소개 -->
+  <section>
+    <div class="wrap">
+      <p class="section-eyebrow">왜 올공인가</p>
+      <h2 class="section-title">공공기관 채용에 특화된 단 하나의 포털</h2>
+      <p class="section-lead">공기업, 준정부기관, 기타공공기관, 지방공기업까지 — 기관 유형별로 정리된 채용정보를 실시간으로 제공합니다.</p>
+      <div class="features">
+        <div class="feature">
+          <div class="num">01</div>
+          <h3>실시간 채용 집계</h3>
+          <p>전국 공공기관의 채용공고를 매일 수집·갱신하여, 마감일 기준 D-Day를 자동으로 계산해 보여드립니다.</p>
+        </div>
+        <div class="feature">
+          <div class="num">02</div>
+          <h3>기관 유형별 분류</h3>
+          <p>7개 공공기관 유형 체계로 분류해, 원하는 기관 형태의 공고만 빠르게 찾아볼 수 있습니다.</p>
+        </div>
+        <div class="feature">
+          <div class="num">03</div>
+          <h3>전문가 운영</h3>
+          <p>공공기관 경영평가위원 현직 교수가 운영하여, 채용 트렌드와 평가 관점을 반영한 정보를 제공합니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 상품안내 -->
+  <section class="products" id="products">
+    <div class="wrap">
+      <p class="section-eyebrow">상품안내</p>
+      <h2 class="section-title">채용기관을 위한 노출 상품</h2>
+      <p class="section-lead">기관의 채용공고를 더 많은 지원자에게 노출하고 싶다면, 목적에 맞는 상품을 선택하세요.</p>
+      <div class="product-grid">
+
+        <div class="product">
+          <span class="tag">노출</span>
+          <h3>채용공고 노출 상품</h3>
+          <p class="desc">채용정보 게시판 상단에 공고를 우선 노출하여 지원자의 첫 시선을 확보합니다.</p>
+          <ul>
+            <li>게시판 상단 우선 정렬</li>
+            <li>기관 로고 강조 표시</li>
+            <li>노출 기간 선택 가능</li>
+          </ul>
+          <a class="cta" href="#contact">문의하기</a>
+        </div>
+
+        <div class="product featured">
+          <span class="tag">인기</span>
+          <h3>프리미엄 등록 상품</h3>
+          <p class="desc">메인 화면 '프리미엄 채용정보' 캐러셀에 노출되는 최상위 상품입니다.</p>
+          <ul>
+            <li>메인 프리미엄 영역 노출</li>
+            <li>자동 슬라이드 배너 포함</li>
+            <li>'추천·주요 채용정보' 동시 노출</li>
+            <li>마감 D-Day 강조 표시</li>
+          </ul>
+          <a class="cta" href="#contact">문의하기</a>
+        </div>
+
+        <div class="product">
+          <span class="tag">광고</span>
+          <h3>배너광고 상품</h3>
+          <p class="desc">메인 및 게시판 영역의 배너 자리를 통해 기관·교육과정을 브랜딩합니다.</p>
+          <ul>
+            <li>메인 배너 영역 게재</li>
+            <li>교육과정 배너 연동</li>
+            <li>클릭 시 지정 페이지 이동</li>
+          </ul>
+          <a class="cta" href="#contact">문의하기</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 문의 -->
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <h2>상품 도입 문의</h2>
+      <p>상품 신청 및 제휴 문의는 아래로 연락 주세요.</p>
+      <div class="lines">
+        <div><span class="label">고객센터(직통):</span> 042-629-8159</div>
+        <div><span class="label">문의:</span> <a href="mailto:trumanlee@hnu.kr">trumanlee@hnu.kr</a></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    © 2026 - 현재 allgongin.com 올공(ALLGONG). All rights reserved.
+  </footer>
+
+</body>
+</html>
