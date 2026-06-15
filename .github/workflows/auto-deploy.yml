@@ -27,5 +27,5 @@ jobs:
       - name: main 브랜치에 자동 머지 & 배포
         run: |
           git checkout main
-          git merge origin/${{ github.ref_name }} --no-ff -m "Auto deploy from ${{ github.ref_name }}"
+          git merge origin/${{ github.ref_name }} --no-ff --allow-unrelated-histories -X theirs -m "Auto deploy from ${{ github.ref_name }}"
           git push origin main
