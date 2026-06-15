@@ -5163,14 +5163,9 @@
       const storySection = document.getElementById('story-board-section');
       if (storySection) {
         storySection.style.display = 'block';
-        // 지정된 카테고리로, 없으면 기본값 free
         const targetCategory = category || 'free';
-        switchStoryBoard(targetCategory, true, page);
-      }
-
-      // 히스토리 추가 (뒤로가기 지원)
-      if (!skipHistory) {
-        history.pushState({ section: 'story', category: category || 'free', page: page }, '', '#story');
+        // history 관리는 switchStoryBoard에 일임 (중복 pushState 방지)
+        switchStoryBoard(targetCategory, skipHistory, page);
       }
 
       window.scrollTo(0, 0);
@@ -5798,8 +5793,8 @@
       displayStoriesForPage(savedPage);
       renderStoryPagination();
 
-      // 히스토리 추가 (뒤로가기 지원) - 페이지 번호 포함
-      history.pushState({
+      // replaceState: story-detail 항목을 story 항목으로 교체 (pushState 금지 — 뒤로가기 중복 방지)
+      history.replaceState({
         section: 'story',
         category: savedCategory,
         page: savedPage
@@ -5971,18 +5966,13 @@
       const boardSection = document.getElementById('board-section');
       if (boardSection) {
         boardSection.style.display = 'block';
-        // 지정된 카테고리로, 없으면 기본값 market-public
         const targetCategory = category || 'market-public';
-        switchBoard(targetCategory, true, page);
+        // history 관리는 switchBoard에 일임 (중복 pushState 방지)
+        switchBoard(targetCategory, skipHistory, page);
       }
 
       const userSection = document.getElementById('user-manage-section');
       if (userSection) userSection.style.display = 'none';
-
-      // 히스토리 추가 (뒤로가기 지원)
-      if (!skipHistory) {
-        history.pushState({ section: 'board', category: category || 'market-public', page: page }, '', '#board');
-      }
 
       // 스크롤 상단으로
       window.scrollTo(0, 0);
@@ -6178,8 +6168,8 @@
       displayJobsForPage(savedPage, window.currentUserRole === 'admin');
       renderPagination();
 
-      // 히스토리 추가 - 페이지 번호 포함
-      history.pushState({
+      // replaceState: job-detail 항목을 board 항목으로 교체 (pushState 금지 — 뒤로가기 중복 방지)
+      history.replaceState({
         section: 'board',
         category: savedCategory,
         page: savedPage
@@ -6194,6 +6184,32 @@
     let currentPage = 1;
     const itemsPerPage = 12;
     let totalJobs = [];
+
+    // 채용형태별 필터: employmentType / careerType 기반 매핑
+    function matchesJobCategory(job, category) {
+      const empType = (job.employmentType || '').toLowerCase();
+      const careerType = (job.careerType || '').toLowerCase();
+      switch (category) {
+        case 'intern':
+          // 고용유형에 '청년인턴' 포함 (채용형 / 체험형 모두)
+          return empType.includes('청년인턴');
+        case 'entry-level':
+          // 채용구분에 '신입' 포함 (단, '신입+경력'·'신입·경력'은 경력 항목으로 분류)
+          return careerType.includes('신입') && !careerType.includes('경력');
+        case 'experienced':
+          // 채용구분에 '신입+경력' 또는 '신입·경력' 포함
+          return careerType.includes('신입+경력') || careerType.includes('신입·경력') || (careerType.includes('신입') && careerType.includes('경력'));
+        case 'regular':
+          // 고용유형에 '정규직' 포함
+          return empType.includes('정규직');
+        case 'contract':
+          // 고용유형에 '무기계약직' 또는 '비정규직' 포함
+          return empType.includes('무기계약직') || empType.includes('비정규직');
+        default:
+          // 나머지는 category 필드로 분류
+          return (job.category || 'market-public') === category;
+      }
+    }
 
     async function loadJobs() {
       const loading = document.getElementById('loading');
@@ -6243,8 +6259,7 @@
         totalJobs = [];
         querySnapshot.forEach((docSnap) => {
           const d = docSnap.data();
-          const cat = d.category || 'market-public'; // 카테고리가 없으면 기본값
-          if (cat === window.currentJobCategory) {
+          if (matchesJobCategory(d, window.currentJobCategory)) {
             totalJobs.push({ ...d, id: docSnap.id });
           }
         });
