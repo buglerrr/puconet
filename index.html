@@ -199,10 +199,14 @@
       width: 100%;
       height: 56px;
       object-fit: contain;
+      object-position: center;
       display: block;
       margin-bottom: .65rem;
       image-rendering: auto;
       filter: saturate(1.05);
+      box-sizing: border-box;
+      padding: 4px;
+      background: #fff;
     }
 
     .job-card h3 {
@@ -945,25 +949,20 @@
     /* 2) Lock the logo box to a fixed area and keep the logo itself from resizing unpredictably */
     #features .job-card .banner-image {
       background: #ffffff !important;
-      /* white (무색) logo area */
-      width: auto !important;
-      /* keep intrinsic logo width within bounds */
+      width: 100% !important;
       max-width: 100% !important;
       height: 80px !important;
-      /* fixed logo visual height */
       max-height: 80px !important;
       object-fit: contain !important;
-      /* never crop; keep aspect ratio */
+      object-position: center !important;
       display: block !important;
       margin: 0 auto .6rem auto !important;
-      /* center horizontally, keep spacing below */
-      padding: 8px !important;
-      /* breathing room around logos */
+      padding: 4px !important;
       border: 1px solid #eef2f7 !important;
-      /* subtle boundary so white-on-white logos are visible */
       border-radius: 8px !important;
       box-shadow: none !important;
       image-rendering: auto !important;
+      box-sizing: border-box !important;
     }
 
     /* 3) Prevent text sections from pushing card height; clamp lines where helpful */
@@ -1058,7 +1057,9 @@
 
       #features .job-card .banner-image {
         height: 64px !important;
-        padding: 6px !important;
+        padding: 4px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       .container {
@@ -1384,10 +1385,12 @@
     #jobs .job-card .banner-image {
       width: 100%;
       height: 64px;
-      /* 로고 박스 고정 */
       object-fit: contain;
       object-position: center;
       display: block;
+      box-sizing: border-box;
+      padding: 4px;
+      background: #fff;
     }
 
     #jobs .job-card h3 {
