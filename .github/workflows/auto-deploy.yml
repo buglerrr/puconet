@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 jobs:
-  auto-merge-to-main:
+  deploy-to-main:
     runs-on: ubuntu-latest
     steps:
       - name: 코드 가져오기
@@ -24,8 +24,12 @@ jobs:
           git config user.name "Claude Code Bot"
           git config user.email "claude-bot@github.com"
 
-      - name: main 브랜치에 자동 머지 & 배포
+      - name: main 브랜치를 claude 브랜치 파일 내용으로 덮어쓰기 & 배포
         run: |
+          git fetch origin ${{ github.ref_name }}
           git checkout main
-          git merge origin/${{ github.ref_name }} --no-ff --allow-unrelated-histories -X theirs -m "Auto deploy from ${{ github.ref_name }}"
+          # 콘텐츠 머지(라인 단위) 대신 파일 단위로 claude 브랜치 내용을 그대로 가져와 덮어쓴다.
+          # (히스토리가 무관한 두 브랜치에서 merge 시 HTML이 섞여 깨지는 문제 방지)
+          git checkout origin/${{ github.ref_name }} -- .
+          git commit -m "Auto deploy from ${{ github.ref_name }}" || echo "변경 사항 없음 - 커밋 생략"
           git push origin main
