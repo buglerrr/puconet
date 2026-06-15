@@ -1846,6 +1846,30 @@
       transform: translateY(-50%);
     }
 
+    /* 새 글 N 뱃지 */
+    .new-post-badge {
+      display: inline-block;
+      background: #e53e3e;
+      color: #fff;
+      font-size: 0.6rem;
+      font-weight: 800;
+      padding: 1px 4px;
+      border-radius: 2px;
+      margin-left: 5px;
+      vertical-align: middle;
+      line-height: 1.5;
+      letter-spacing: 0;
+      pointer-events: none;
+    }
+
+    /* 댓글 수 표시 */
+    .story-comment-count {
+      color: #e53e3e;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-left: 3px;
+    }
+
     /* 오른쪽 게시판 컨텐츠 */
     .board-content {
       flex: 1;
@@ -4751,7 +4775,7 @@
   <script type="module">
     // Firebase 9 버전 SDK 가져오기
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, orderBy, query, Timestamp, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, orderBy, query, Timestamp, setDoc, getDoc, increment } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
     import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
@@ -5268,16 +5292,21 @@
           return;
         }
 
-        // 클라이언트 사이드 필터링
+        // 클라이언트 사이드 필터링 + N 뱃지 업데이트용 전체 수집
         const filteredDocs = [];
+        const allDocs = [];
         querySnapshot.forEach((docSnap) => {
           const d = docSnap.data();
           // 카테고리가 없으면 'free'로 간주 (기존 데이터 호환)
           const cat = d.category || 'free';
+          allDocs.push({ ...d, id: docSnap.id });
           if (cat === window.currentStoryCategory) {
             filteredDocs.push({ ...d, id: docSnap.id });
           }
         });
+
+        // 카테고리별 N 뱃지 업데이트 (3일 이내 새 글 여부)
+        updateNewPostBadges(allDocs);
 
         if (filteredDocs.length === 0) {
           tbody.innerHTML = '<div class="story-empty-box"><p>아직 이야기가 없습니다.<br>첫 번째 이야기를 들려주세요! ✏️</p></div>';
@@ -5341,6 +5370,9 @@
         const dataCat = data.category || 'free';
         const catLabel = catLabels[dataCat] || dataCat;
 
+        const commentCount = data.commentCount || 0;
+        const commentBadge = commentCount > 0 ? `<span class="story-comment-count">[${commentCount}]</span>` : '';
+
         const row = document.createElement('div');
         row.className = 'story-post-row';
         row.onclick = function() { viewStoryDetail(docId); };
@@ -5348,7 +5380,7 @@
           <span class="col-num">${displayIndex--}</span>
           <span class="col-title">
             <span class="story-cat-tag cat-${dataCat}">${catLabel}</span>
-            <a href="#" onclick="viewStoryDetail('${docId}'); event.stopPropagation(); return false;" title="${titleText}">${titleText}</a>
+            <a href="#" onclick="viewStoryDetail('${docId}'); event.stopPropagation(); return false;" title="${titleText}">${titleText}</a>${commentBadge}
           </span>
           <span class="col-author">${authorText}</span>
           <span class="col-date">${date}</span>
@@ -5357,6 +5389,34 @@
           <span class="col-scrap">${data.scraps || 0}</span>
         `;
         tbody.appendChild(row);
+      });
+    }
+
+    // 카테고리별 신규 글 N 뱃지 업데이트 (3일 이내 글 있는 카테고리에 표시)
+    function updateNewPostBadges(allDocs) {
+      const threeDaysAgo = Date.now() - 3 * 24 * 60 * 60 * 1000;
+      const catWithNew = new Set();
+      allDocs.forEach(d => {
+        if (d.createdAt && d.createdAt.seconds * 1000 > threeDaysAgo) {
+          catWithNew.add(d.category || 'free');
+        }
+      });
+
+      const cats = ['free', 'consulting', 'study', 'ncs-review', 'interview', 'success', 'expert'];
+      cats.forEach(cat => {
+        const prefixes = ['story-menu-', 'detail-menu-'];
+        prefixes.forEach(prefix => {
+          const el = document.getElementById(prefix + cat);
+          if (!el) return;
+          const existing = el.querySelector('.new-post-badge');
+          if (existing) existing.remove();
+          if (catWithNew.has(cat)) {
+            const badge = document.createElement('span');
+            badge.className = 'new-post-badge';
+            badge.textContent = 'N';
+            el.appendChild(badge);
+          }
+        });
       });
     }
 
@@ -5531,6 +5591,13 @@
           authorName, authorUid: currentUser.uid, content,
           createdAt: Timestamp.now(), likes: 0
         });
+        // 게시글의 commentCount 필드 원자적 증가
+        try {
+          await updateDoc(doc(db, 'stories', storyId), { commentCount: increment(1) });
+          if (window.storiesData && window.storiesData[storyId]) {
+            window.storiesData[storyId].commentCount = (window.storiesData[storyId].commentCount || 0) + 1;
+          }
+        } catch (e) {}
         contentEl.value = '';
         const charCount = document.getElementById('comment-char-count');
         if (charCount) charCount.textContent = '0';
