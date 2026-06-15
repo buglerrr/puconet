@@ -208,10 +208,14 @@
       width: 100%;
       height: 56px;
       object-fit: contain;
+      object-position: center;
       display: block;
       margin-bottom: .65rem;
       image-rendering: auto;
       filter: saturate(1.05);
+      box-sizing: border-box;
+      padding: 4px;
+      background: #fff;
     }
 
     .job-card h3 {
@@ -1091,25 +1095,20 @@
     /* 2) Lock the logo box to a fixed area and keep the logo itself from resizing unpredictably */
     #features .job-card .banner-image {
       background: #ffffff !important;
-      /* white (무색) logo area */
-      width: auto !important;
-      /* keep intrinsic logo width within bounds */
+      width: 100% !important;
       max-width: 100% !important;
       height: 80px !important;
-      /* fixed logo visual height */
       max-height: 80px !important;
       object-fit: contain !important;
-      /* never crop; keep aspect ratio */
+      object-position: center !important;
       display: block !important;
       margin: 0 auto .6rem auto !important;
-      /* center horizontally, keep spacing below */
-      padding: 8px !important;
-      /* breathing room around logos */
+      padding: 4px !important;
       border: 1px solid #eef2f7 !important;
-      /* subtle boundary so white-on-white logos are visible */
       border-radius: 8px !important;
       box-shadow: none !important;
       image-rendering: auto !important;
+      box-sizing: border-box !important;
     }
 
     /* 3) Prevent text sections from pushing card height; clamp lines where helpful */
@@ -1204,7 +1203,9 @@
 
       #features .job-card .banner-image {
         height: 64px !important;
-        padding: 6px !important;
+        padding: 4px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       .container {
@@ -1641,10 +1642,12 @@
     #jobs .job-card .banner-image {
       width: 100%;
       height: 64px;
-      /* 로고 박스 고정 */
       object-fit: contain;
       object-position: center;
       display: block;
+      box-sizing: border-box;
+      padding: 4px;
+      background: #fff;
     }
 
     #jobs .job-card h3 {
@@ -2147,301 +2150,29 @@
       transform: translateY(-50%);
     }
 
-    /* New 'N' Mark Style */
-    .new-mark {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background-color: #e74c3c;
-      color: white;
-      font-size: 10px;
-      font-weight: bold;
-      width: 16px;
-      height: 16px;
-      border-radius: 4px;
-      margin-left: 6px;
-      line-height: 1;
-      vertical-align: middle;
-      position: relative;
-      top: -1px;
-    }
-
-    /* Comment Count Style in List */
-    .comment-count-display {
-      color: #e74c3c;
-      font-weight: bold;
-      font-size: 0.9em;
-      margin-left: 4px;
-    }
-
-
-    /* Social Login Buttons */
-    .btn-social {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 10px;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      font-size: 1rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: opacity 0.2s;
-    }
-
-    .btn-social:hover {
-      opacity: 0.9;
-    }
-
-    .btn-kakao {
-      background-color: #FEE500;
-      color: #000000;
-    }
-
-    .btn-naver {
-      background-color: #03C75A;
-      color: #FFFFFF;
-    }
-
-    .btn-apple {
-      background-color: #000000;
-      color: #FFFFFF;
-    }
-
-    .btn-google {
-      background-color: #FFFFFF;
-      color: #444444;
-      border: 1px solid #dddddd;
-    }
-
-    /* ===== 채용정보 게시판 사이드바 ===== */
-    .board-sidebar {
-      width: 200px;
-      min-width: 200px;
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-      align-self: flex-start;
-    }
-
-    /* 사이드바 상단 타이틀 배너 */
-    .board-sidebar .page-title-banner {
-      background: linear-gradient(135deg, #1e3a5f 0%, #2a5298 100%);
-      padding: 1.1rem;
-      text-align: center;
-      margin-bottom: 0;
-      border-radius: 0;
-    }
-
-    .board-sidebar .page-title-banner h1 {
-      font-size: 1.1rem;
-      font-weight: 700;
+    /* 새 글 N 뱃지 */
+    .new-post-badge {
+      display: inline-block;
+      background: #e53e3e;
       color: #fff;
-      letter-spacing: 1px;
-      margin: 0;
-    }
-
-    /* 그룹 헤더 */
-    .board-sidebar .sidebar-group-header {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: #94a3b8;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 0.9rem 1rem 0.3rem;
-      margin: 0;
-    }
-
-    .board-sidebar .sidebar-group-header:not(:first-of-type) {
-      border-top: 1px solid #f1f5f9;
-      margin-top: 0.3rem;
-    }
-
-    /* 항목 ul/li */
-    .board-sidebar ul {
-      list-style: none;
-      margin: 0;
-      padding: 0 0 0.4rem 0;
-    }
-
-    .board-sidebar li {
-      margin: 0;
-    }
-
-    /* 항목 링크 */
-    .board-sidebar a {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 0.5rem 1rem;
-      font-size: 0.88rem;
-      font-weight: 500;
-      color: #374151;
-      border-left: 3px solid transparent;
-      text-decoration: none;
-      transition: all 0.15s ease;
-      background: transparent;
-    }
-
-    .board-sidebar a:hover {
-      background: #eff6ff;
-      color: #2563eb;
-      border-left-color: #2563eb;
-    }
-
-    .board-sidebar a.active {
-      background: #eff6ff;
-      color: #1d4ed8;
-      border-left-color: #1d4ed8;
-      font-weight: 700;
-    }
-
-    /* NEW 배지 */
-    .board-sidebar .new-mark {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: #ef4444;
-      color: #fff;
-      font-size: 9px;
+      font-size: 0.6rem;
       font-weight: 800;
-      padding: 1px 5px;
-      border-radius: 4px;
-      margin-left: 2px;
-      letter-spacing: 0;
-      line-height: 1.6;
-    }
-
-    /* ===== 채용정보 게시판 사이드바 끝 ===== */
-
-    /* ===== 채용정보 필터 패널 (컬럼형) ===== */
-    .filter-top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.75rem 1rem;
-      background: #fff;
-      border: 1px solid #d0d0d0;
-      border-bottom: 1px solid #e5e5e5;
-      border-radius: 4px 4px 0 0;
-    }
-
-    .job-filter-panel {
-      display: flex;
-      border: 2px solid #000; /* 여기를 2px 검은색으로 변경 */
-      border-top: none;
-      background: #fff;
-      overflow: hidden;
-      margin-bottom: 0;
-    }
-
-    .filter-col {
-      flex: 1;
-      min-width: 0;
-      border-right: 1px solid #e0e0e0;
-    }
-
-    .filter-col:last-child {
-      border-right: none;
-    }
-
-    .filter-col-header {
-      padding: 8px 10px;
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: #222;
-      background: #f5f5f5;
-      border-bottom: 1px solid #e0e0e0;
-      letter-spacing: -0.2px;
-    }
-
-    .filter-col-items {
-      max-height: 170px;
-      overflow-y: auto;
-      padding: 2px 0;
-    }
-
-    .filter-col-items::-webkit-scrollbar {
-      width: 4px;
-    }
-    .filter-col-items::-webkit-scrollbar-track { background: #f8f8f8; }
-    .filter-col-items::-webkit-scrollbar-thumb { background: #c8c8c8; border-radius: 3px; }
-    .filter-col-items::-webkit-scrollbar-thumb:hover { background: #a0a0a0; }
-
-    .filter-item {
-      display: block;
-      padding: 5px 10px;
-      font-size: 0.82rem;
-      color: #444;
-      cursor: pointer;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      transition: background 0.1s, color 0.1s;
-      user-select: none;
+      padding: 1px 4px;
+      border-radius: 2px;
+      margin-left: 5px;
+      vertical-align: middle;
       line-height: 1.5;
+      letter-spacing: 0;
+      pointer-events: none;
     }
 
-    .filter-item:hover {
-      background: #eef4ff;
-      color: #1553b5;
-    }
-
-    .filter-item.selected {
-      color: #1553b5;
-      font-weight: 700;
-      background: #f0f5ff;
-    }
-
-    /* 검색 조건 안내 메시지 */
-    .filter-hint-row {
-      padding: 7px 12px;
-      font-size: 0.82rem;
-      color: #999;
-      border-top: 1px solid #e8e8e8;
-      background: #fdfdfd;
-      border: 2px solid #000;
-      border-top: none;
-      border-radius: 0 0 4px 4px;
-    }
-
-    /* ===== 필터 클릭 전 안내 ===== */
-    .filter-guide-msg {
-      text-align: center;
-      padding: 3rem 2rem;
-      color: #94a3b8;
-      border: 2px dashed #e2e8f0;
-      border-radius: 8px;
-      margin-top: 1rem;
-    }
-    .filter-guide-msg .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
-    .filter-guide-msg p { font-size: 0.95rem; }
-
-    /* 관리자 일괄 삭제 바 */
-    #adminBulkBar {
-      display: none;
-      align-items: center;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-      padding: 0.6rem 1rem;
-      background: #fff3cd;
-      border: 1px solid #ffc107;
-      border-radius: 8px;
-      margin-bottom: 0.75rem;
-    }
-    #adminBulkBar .admin-label {
+    /* 댓글 수 표시 */
+    .story-comment-count {
+      color: #e53e3e;
       font-size: 0.85rem;
-      font-weight: 700;
-      color: #856404;
+      font-weight: 600;
+      margin-left: 3px;
     }
-    /* ===== 채용정보 필터 패널 끝 ===== */
 
     /* 오른쪽 게시판 컨텐츠 */
     .board-content {
@@ -6596,7 +6327,7 @@
   <script type="module">
     // Firebase 9 버전 SDK 가져오기
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, orderBy, query, Timestamp, setDoc, getDoc, limit, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, orderBy, query, Timestamp, setDoc, getDoc, increment } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
     import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, GoogleAuthProvider, signInWithPopup, OAuthProvider } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
@@ -7245,14 +6976,9 @@ window.enableAdminMode = async function () {
       const storySection = document.getElementById('story-board-section');
       if (storySection) {
         storySection.style.display = 'block';
-        // 지정된 카테고리로, 없으면 기본값 all
-        const targetCategory = category || 'all';
-        switchStoryBoard(targetCategory, true, page);
-      }
-
-      // 히스토리 추가 (뒤로가기 지원)
-      if (!skipHistory) {
-        history.pushState({ section: 'story', category: category || 'all', page: page }, '', '#story');
+        const targetCategory = category || 'free';
+        // history 관리는 switchStoryBoard에 일임 (중복 pushState 방지)
+        switchStoryBoard(targetCategory, skipHistory, page);
       }
 
       window.scrollTo(0, 0);
@@ -7406,20 +7132,21 @@ window.enableAdminMode = async function () {
           return;
         }
 
-        // 클라이언트 사이드 필터링
+        // 클라이언트 사이드 필터링 + N 뱃지 업데이트용 전체 수집
         const filteredDocs = [];
+        const allDocs = [];
         querySnapshot.forEach((docSnap) => {
           const d = docSnap.data();
           // 카테고리가 없으면 'free'로 간주 (기존 데이터 호환)
           const cat = d.category || 'free';
-          // 현재 카테고리가 'all'이거나, 문서의 카테고리와 일치할 때 포함
-          if (window.currentStoryCategory === 'all' || cat === window.currentStoryCategory) {
+          allDocs.push({ ...d, id: docSnap.id });
+          if (cat === window.currentStoryCategory) {
             filteredDocs.push({ ...d, id: docSnap.id });
           }
         });
 
-        // 결과 캐시 저장
-        _storiesCache.set(currentCategory, { docs: [...filteredDocs], ts: now });
+        // 카테고리별 N 뱃지 업데이트 (3일 이내 새 글 여부)
+        updateNewPostBadges(allDocs);
 
         if (filteredDocs.length === 0) {
           tbody.innerHTML = '<div class="story-empty-box"><p>아직 이야기가 없습니다.<br>첫 번째 이야기를 들려주세요! ✏️</p></div>';
@@ -7509,6 +7236,9 @@ function displayStoriesForPage(page) {
         // 댓글 수 (빨간색 괄호)
         const commentHtml = (data.commentCount && data.commentCount > 0) ? `<span class="post-comment-count">(${data.commentCount})</span>` : '';
 
+        const commentCount = data.commentCount || 0;
+        const commentBadge = commentCount > 0 ? `<span class="story-comment-count">[${commentCount}]</span>` : '';
+
         const row = document.createElement('div');
         row.className = 'story-post-row';
         row.onclick = function () { viewStoryDetail(docId); };
@@ -7517,8 +7247,8 @@ function displayStoriesForPage(page) {
           <span class="col-num">${displayIndex--}</span>
           <span class="col-board">${catLabel}</span>
           <span class="col-title">
-            <a href="#" onclick="viewStoryDetail('${docId}'); event.stopPropagation(); return false;" title="${titleText}">${titleText}</a>
-            ${commentHtml}
+            <span class="story-cat-tag cat-${dataCat}">${catLabel}</span>
+            <a href="#" onclick="viewStoryDetail('${docId}'); event.stopPropagation(); return false;" title="${titleText}">${titleText}</a>${commentBadge}
           </span>
           <span class="col-author">${authorText}</span>
           <span class="col-date">${dateStr}</span>
@@ -7527,6 +7257,34 @@ function displayStoriesForPage(page) {
           <span class="col-scrap">${data.scraps || 0}</span>
         `;
         tbody.appendChild(row);
+      });
+    }
+
+    // 카테고리별 신규 글 N 뱃지 업데이트 (3일 이내 글 있는 카테고리에 표시)
+    function updateNewPostBadges(allDocs) {
+      const threeDaysAgo = Date.now() - 3 * 24 * 60 * 60 * 1000;
+      const catWithNew = new Set();
+      allDocs.forEach(d => {
+        if (d.createdAt && d.createdAt.seconds * 1000 > threeDaysAgo) {
+          catWithNew.add(d.category || 'free');
+        }
+      });
+
+      const cats = ['free', 'consulting', 'study', 'ncs-review', 'interview', 'success', 'expert'];
+      cats.forEach(cat => {
+        const prefixes = ['story-menu-', 'detail-menu-'];
+        prefixes.forEach(prefix => {
+          const el = document.getElementById(prefix + cat);
+          if (!el) return;
+          const existing = el.querySelector('.new-post-badge');
+          if (existing) existing.remove();
+          if (catWithNew.has(cat)) {
+            const badge = document.createElement('span');
+            badge.className = 'new-post-badge';
+            badge.textContent = 'N';
+            el.appendChild(badge);
+          }
+        });
       });
     }
 
@@ -7733,6 +7491,13 @@ function displayStoriesForPage(page) {
           authorName, authorUid: currentUser.uid, content,
           createdAt: Timestamp.now(), likes: 0
         });
+        // 게시글의 commentCount 필드 원자적 증가
+        try {
+          await updateDoc(doc(db, 'stories', storyId), { commentCount: increment(1) });
+          if (window.storiesData && window.storiesData[storyId]) {
+            window.storiesData[storyId].commentCount = (window.storiesData[storyId].commentCount || 0) + 1;
+          }
+        } catch (e) {}
         contentEl.value = '';
         const charCount = document.getElementById('comment-char-count');
         if (charCount) charCount.textContent = '0';
@@ -8106,8 +7871,8 @@ function displayStoriesForPage(page) {
       displayStoriesForPage(savedPage);
       renderStoryPagination();
 
-      // 히스토리 추가 (뒤로가기 지원) - 페이지 번호 포함
-      history.pushState({
+      // replaceState: story-detail 항목을 story 항목으로 교체 (pushState 금지 — 뒤로가기 중복 방지)
+      history.replaceState({
         section: 'story',
         category: savedCategory,
         page: savedPage
@@ -8721,17 +8486,13 @@ function displayStoriesForPage(page) {
       const boardSection = document.getElementById('board-section');
       if (boardSection) {
         boardSection.style.display = 'block';
-        // 지정된 카테고리로, 없으면 전체 표시
-        switchBoard(category || null, true, page);
+        const targetCategory = category || 'market-public';
+        // history 관리는 switchBoard에 일임 (중복 pushState 방지)
+        switchBoard(targetCategory, skipHistory, page);
       }
 
       const userSection = document.getElementById('user-manage-section');
       if (userSection) userSection.style.display = 'none';
-
-      // 히스토리 추가 (뒤로가기 지원)
-      if (!skipHistory) {
-        history.pushState({ section: 'board', category: category || null, page: page }, '', '#board');
-      }
 
       // 스크롤 상단으로
       window.scrollTo(0, 0);
@@ -8930,12 +8691,12 @@ function displayStoriesForPage(page) {
   displayJobsForPage(savedPage, isAdmin);
   renderPagination();
 
-  // 브라우저 주소창 동기화 (뒤로가기 시 원래 목록 URL로 갱신)
-  history.pushState({
-    section: 'board',
-    category: savedCategory,
-    page: savedPage
-  }, '', savedCategory ? '#board-' + savedCategory : '#board');
+      // replaceState: job-detail 항목을 board 항목으로 교체 (pushState 금지 — 뒤로가기 중복 방지)
+      history.replaceState({
+        section: 'board',
+        category: savedCategory,
+        page: savedPage
+      }, '', '#board-' + savedCategory);
 
   window.scrollTo(0, 0);
 }
@@ -8946,66 +8707,30 @@ function displayStoriesForPage(page) {
     const itemsPerPage = 12;
     let totalJobs = [];
 
-    // 카테고리별 캐시: { [category]: { jobs: [], ts: timestamp } }
-    const _jobsCache = new Map();
-    const JOBS_CACHE_TTL = 3 * 60 * 1000; // 3분
-
-    // 다중 필터를 위한 전체 공고 및 현재 필터 상태
-    let allRawJobs = []; // 모든 채용공고 목록 (필터링 전 원본)
-    let _lastFilterSignature = null; // 필터 UI 재계산 방지용 식별값
-    let currentFilters = {
-      keyword: '',
-      ncsCode: [],
-      location: [],
-      education: [],
-      employmentType: [],
-      careerType: [],
-      category: [] // 기관유형
-    };
-
-    // ── sessionStorage 캐시 키 ──
-    const JOBS_SS_KEY = 'allgong_jobs_cache_v1';
-
-    // 채용공고가 추가/수정/삭제되면 캐시를 비워 다음 loadJobs()가 새로 받아오게 함
-    function invalidateJobsCache() {
-      _jobsCache.delete('_all_jobs');
-      _lastFilterSignature = null;
-      try { sessionStorage.removeItem(JOBS_SS_KEY); } catch (e) {}
-    }
-
-    // 캐시(allRawJobs)가 준비된 뒤, 화면에 그려주는 공통 렌더 함수
-    function renderJobsFromCache() {
-      const loading = document.getElementById('loading');
-      const emptyState = document.getElementById('emptyState');
-      const bottomAddButton = document.querySelector('.bottom-add-button');
-      const tbody = document.getElementById('jobTableBody');
-
-      if (loading) loading.style.display = 'none';
-      if (tbody) tbody.innerHTML = '';
-
-      const isAdm = (window.currentUserRole === 'admin') ||
-                    (window.auth && window.auth.currentUser && window.auth.currentUser.email === 'ilovetruman@gmail.com');
-
-      if (!allRawJobs || allRawJobs.length === 0) {
-        if (emptyState) emptyState.style.display = 'block';
-        if (bottomAddButton) bottomAddButton.style.display = isAdm ? 'block' : 'none';
-        return;
+    // 채용형태별 필터: employmentType / careerType 기반 매핑
+    function matchesJobCategory(job, category) {
+      const empType = (job.employmentType || '').toLowerCase();
+      const careerType = (job.careerType || '').toLowerCase();
+      switch (category) {
+        case 'intern':
+          // 고용유형에 '청년인턴' 포함 (채용형 / 체험형 모두)
+          return empType.includes('청년인턴');
+        case 'entry-level':
+          // 채용구분에 '신입' 포함 (단, '신입+경력'·'신입·경력'은 경력 항목으로 분류)
+          return careerType.includes('신입') && !careerType.includes('경력');
+        case 'experienced':
+          // 채용구분에 '신입+경력' 또는 '신입·경력' 포함
+          return careerType.includes('신입+경력') || careerType.includes('신입·경력') || (careerType.includes('신입') && careerType.includes('경력'));
+        case 'regular':
+          // 고용유형에 '정규직' 포함
+          return empType.includes('정규직');
+        case 'contract':
+          // 고용유형에 '무기계약직' 또는 '비정규직' 포함
+          return empType.includes('무기계약직') || empType.includes('비정규직');
+        default:
+          // 나머지는 category 필드로 분류
+          return (job.category || 'market-public') === category;
       }
-
-      // 필터 UI 생성 (내부적으로 동일 데이터면 재계산 생략)
-      renderJobFilters();
-
-      // 사이드바 카테고리가 있으면 카테고리 필터에 반영
-      if (window.currentJobCategory) {
-        currentFilters.category = [window.currentJobCategory];
-      } else {
-        currentFilters.category = [];
-      }
-
-      // applyJobFilters가 테이블 표시/숨김, adminBulkBar, filterGuideMsg 모두 처리
-      applyJobFilters(false);
-
-      if (bottomAddButton) bottomAddButton.style.display = isAdm ? 'block' : 'none';
     }
 
     async function loadJobs() {
@@ -9065,12 +8790,54 @@ function displayStoriesForPage(page) {
           });
         }
 
-        allRawJobs = freshJobs;
-        const payload = { jobs: freshJobs, ts: Date.now() };
-        _jobsCache.set('_all_jobs', payload);
-        try {
-          sessionStorage.setItem(JOBS_SS_KEY, JSON.stringify(payload));
-        } catch (e) { /* 용량 초과 등 저장 실패 시 무시 */ }
+        // 관리자 여부에 따라 '관리' 헤더 표시 제어
+        const isAdmin = (window.currentUserRole === 'admin');
+        const mgmtHeader = document.getElementById('job-mgmt-header');
+        const checkboxHeader = document.getElementById('checkbox-header');
+        const bulkDeleteButtons = document.getElementById('bulkDeleteButtons');
+
+        if (mgmtHeader) mgmtHeader.style.display = isAdmin ? 'table-cell' : 'none';
+        if (checkboxHeader) checkboxHeader.style.display = isAdmin ? 'table-cell' : 'none';
+        if (bulkDeleteButtons) bulkDeleteButtons.style.display = isAdmin ? 'flex' : 'none';
+
+        // 클라이언트 사이드 필터링
+        totalJobs = [];
+        querySnapshot.forEach((docSnap) => {
+          const d = docSnap.data();
+          if (matchesJobCategory(d, window.currentJobCategory)) {
+            totalJobs.push({ ...d, id: docSnap.id });
+          }
+        });
+
+        if (totalJobs.length === 0) {
+          loading.style.display = 'none';
+          if (emptyState) emptyState.style.display = 'block';
+          if (paginationContainer) paginationContainer.style.display = 'none';
+          if (bulkDeleteButtons) bulkDeleteButtons.style.display = 'none';
+
+          // 데이터가 없어도 관리자에게는 등록 버튼 표시
+          if (bottomAddButton) {
+            bottomAddButton.style.display = isAdmin ? 'block' : 'none';
+          }
+          return;
+        }
+
+        console.log('Total jobs loaded:', totalJobs.length);
+        console.log('Category:', window.currentJobCategory);
+
+        // 현재 페이지의 데이터만 표시
+        displayJobsForPage(currentPage, isAdmin);
+
+        loading.style.display = 'none';
+        if (jobTable) jobTable.style.display = 'table';
+
+        // 페이지네이션은 데이터 개수와 관계없이 항상 렌더링 시도
+        renderPagination();
+
+        // 관리자에게만 하단 버튼 표시
+        if (bottomAddButton) {
+          bottomAddButton.style.display = isAdmin ? 'block' : 'none';
+        }
 
         renderJobsFromCache();
       } catch (error) {
