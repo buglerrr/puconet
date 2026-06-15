@@ -4360,7 +4360,7 @@
               style="color: #666; font-weight:bold;">취업 이야기</a>
             <a href="product.html" target="_blank"
               style="color: #e0392b; font-weight: bold;">상품신청</a>
-            <div class="visitor-counter" title="방문자 수">
+            <div class="visitor-counter" id="visitorCounterBox" title="방문자 수" style="display:none;">
               <div class="vc-row"><span class="vc-label">Today</span><span class="vc-num" id="visitorToday">-</span></div>
               <div class="vc-row"><span class="vc-label">Total</span><span class="vc-num" id="visitorTotal">-</span></div>
             </div>
@@ -6619,9 +6619,13 @@
             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'));
       }
 
-      // visitorStats 컬렉션: 방문자 수 카운터 (비로그인 포함 누구나 읽기/카운트 가능)
+      // visitorStats 컬렉션: 방문자 수 카운터
+      // - 읽기(수치 조회): 관리자(role=='admin')만 가능 → 일반 방문자에겐 안 보임
+      // - 쓰기(카운트 증가): 비로그인 포함 누구나 가능 (방문 집계용)
       match /visitorStats/{docId} {
-        allow read: if true;
+        allow read: if request.auth != null &&
+          exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
         allow write: if true;
       }
     }
@@ -6684,28 +6688,22 @@
     window.increment = increment;
 
     // ===== 방문자 수 카운터 (Today / Total) =====
-    (async function countVisitor() {
+    // 관리자에게만 박스를 노출하는 표시 함수 (onAuthStateChanged에서 호출)
+    window.refreshVisitorStats = async function () {
       try {
-        // 오늘 날짜 키 (KST 기준)
+        const box = document.getElementById('visitorCounterBox');
+        if (!box) return;
+        // 관리자가 아니면 숨기고 종료
+        if (window.currentUserRole !== 'admin') {
+          box.style.display = 'none';
+          return;
+        }
         const now = new Date();
         const kst = new Date(now.getTime() + (9 * 60 * 60 * 1000));
-        const todayKey = kst.toISOString().slice(0, 10); // YYYY-MM-DD
-
+        const todayKey = kst.toISOString().slice(0, 10);
         const totalRef = doc(db, 'visitorStats', 'total');
         const todayRef = doc(db, 'visitorStats', 'today_' + todayKey);
 
-        // 세션당 1회만 카운트 (새로고침 시 중복 증가 방지)
-        const alreadyCounted = sessionStorage.getItem('visitorCounted');
-
-        if (!alreadyCounted) {
-          // total 증가 (문서 없으면 생성)
-          await setDoc(totalRef, { count: increment(1) }, { merge: true });
-          // today 증가 (문서 없으면 생성)
-          await setDoc(todayRef, { count: increment(1), date: todayKey }, { merge: true });
-          sessionStorage.setItem('visitorCounted', '1');
-        }
-
-        // 현재 수치 읽어서 화면에 표시
         const [totalSnap, todaySnap] = await Promise.all([
           getDoc(totalRef),
           getDoc(todayRef)
@@ -6717,6 +6715,30 @@
         const totalEl = document.getElementById('visitorTotal');
         if (todayEl) todayEl.textContent = todayCount.toLocaleString();
         if (totalEl) totalEl.textContent = totalCount.toLocaleString();
+        box.style.display = 'inline-flex'; // 관리자에게만 노출
+      } catch (e) {
+        console.warn('방문자 통계 표시 실패:', e);
+      }
+    };
+
+    // 카운트 누적: 모든 방문자에 대해 수행 (표시 여부와 무관)
+    (async function countVisitor() {
+      try {
+        const now = new Date();
+        const kst = new Date(now.getTime() + (9 * 60 * 60 * 1000));
+        const todayKey = kst.toISOString().slice(0, 10); // YYYY-MM-DD
+
+        const totalRef = doc(db, 'visitorStats', 'total');
+        const todayRef = doc(db, 'visitorStats', 'today_' + todayKey);
+
+        // 세션당 1회만 카운트 (새로고침 시 중복 증가 방지)
+        const alreadyCounted = sessionStorage.getItem('visitorCounted');
+
+        if (!alreadyCounted) {
+          await setDoc(totalRef, { count: increment(1) }, { merge: true });
+          await setDoc(todayRef, { count: increment(1), date: todayKey }, { merge: true });
+          sessionStorage.setItem('visitorCounted', '1');
+        }
       } catch (e) {
         console.warn('방문자 카운트 실패:', e);
       }
@@ -6829,6 +6851,9 @@
           }
         } catch (e) { }
 
+        // 방문자 통계 박스: 관리자에게만 노출
+        if (typeof window.refreshVisitorStats === 'function') window.refreshVisitorStats();
+
         // 권한에 따른 UI 업데이트
         if (typeof loadJobs === 'function') loadJobs();
 
@@ -6853,6 +6878,11 @@
 
         const myInfoBtn = document.getElementById('nav-my-info');
         if (myInfoBtn) myInfoBtn.parentElement.remove();
+
+        // 로그아웃 시 권한 초기화 및 방문자 통계 박스 숨김
+        window.currentUserRole = null;
+        const vcBox = document.getElementById('visitorCounterBox');
+        if (vcBox) vcBox.style.display = 'none';
       }
     });
 
