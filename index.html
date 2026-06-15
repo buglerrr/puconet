@@ -926,6 +926,38 @@
       color: #444 !important;
     }
 
+    /* === 방문자 수 카운터 박스 === */
+    .visitor-counter {
+      display: inline-flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 2px;
+      padding: 5px 12px;
+      border: 1px solid #d0d5dd;
+      border-radius: 8px;
+      background: #f8fafc;
+      line-height: 1.2;
+      vertical-align: middle;
+    }
+    .visitor-counter .vc-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      white-space: nowrap;
+    }
+    .visitor-counter .vc-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #64748b;
+    }
+    .visitor-counter .vc-num {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: #1e293b;
+      font-variant-numeric: tabular-nums;
+    }
+
     /* === v15 spacing tweaks === */
     #general-jobs {
       padding-bottom: 0 !important;
@@ -4328,6 +4360,10 @@
               style="color: #666; font-weight:bold;">취업 이야기</a>
             <a href="product.html" target="_blank"
               style="color: #e0392b; font-weight: bold;">상품신청</a>
+            <div class="visitor-counter" title="방문자 수">
+              <div class="vc-row"><span class="vc-label">Today</span><span class="vc-num" id="visitorToday">-</span></div>
+              <div class="vc-row"><span class="vc-label">Total</span><span class="vc-num" id="visitorTotal">-</span></div>
+            </div>
           </div>
         </nav>
       </div>
@@ -6582,6 +6618,12 @@
            (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'));
       }
+
+      // visitorStats 컬렉션: 방문자 수 카운터 (비로그인 포함 누구나 읽기/카운트 가능)
+      match /visitorStats/{docId} {
+        allow read: if true;
+        allow write: if true;
+      }
     }
   }
 
@@ -6596,7 +6638,7 @@
   <script type="module">
     // Firebase 9 버전 SDK 가져오기
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, orderBy, query, Timestamp, setDoc, getDoc, limit, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, orderBy, query, Timestamp, setDoc, getDoc, limit, onSnapshot, increment } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
     import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, GoogleAuthProvider, signInWithPopup, OAuthProvider } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
@@ -6639,6 +6681,46 @@
     window.getDownloadURL = getDownloadURL;
     window.setDoc = setDoc;
     window.getDoc = getDoc;
+    window.increment = increment;
+
+    // ===== 방문자 수 카운터 (Today / Total) =====
+    (async function countVisitor() {
+      try {
+        // 오늘 날짜 키 (KST 기준)
+        const now = new Date();
+        const kst = new Date(now.getTime() + (9 * 60 * 60 * 1000));
+        const todayKey = kst.toISOString().slice(0, 10); // YYYY-MM-DD
+
+        const totalRef = doc(db, 'visitorStats', 'total');
+        const todayRef = doc(db, 'visitorStats', 'today_' + todayKey);
+
+        // 세션당 1회만 카운트 (새로고침 시 중복 증가 방지)
+        const alreadyCounted = sessionStorage.getItem('visitorCounted');
+
+        if (!alreadyCounted) {
+          // total 증가 (문서 없으면 생성)
+          await setDoc(totalRef, { count: increment(1) }, { merge: true });
+          // today 증가 (문서 없으면 생성)
+          await setDoc(todayRef, { count: increment(1), date: todayKey }, { merge: true });
+          sessionStorage.setItem('visitorCounted', '1');
+        }
+
+        // 현재 수치 읽어서 화면에 표시
+        const [totalSnap, todaySnap] = await Promise.all([
+          getDoc(totalRef),
+          getDoc(todayRef)
+        ]);
+        const totalCount = totalSnap.exists() ? (totalSnap.data().count || 0) : 0;
+        const todayCount = todaySnap.exists() ? (todaySnap.data().count || 0) : 0;
+
+        const todayEl = document.getElementById('visitorToday');
+        const totalEl = document.getElementById('visitorTotal');
+        if (todayEl) todayEl.textContent = todayCount.toLocaleString();
+        if (totalEl) totalEl.textContent = totalCount.toLocaleString();
+      } catch (e) {
+        console.warn('방문자 카운트 실패:', e);
+      }
+    })();
     window.googleProvider = new GoogleAuthProvider();
     window.getDownloadURL = getDownloadURL;
     window.getDownloadURL = getDownloadURL;
