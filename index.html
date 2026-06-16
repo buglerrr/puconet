@@ -4356,7 +4356,7 @@
             <a href="#" onclick="checkLoginAndExecute(showNewsBoard, '공공기관 뉴스를 보려면 로그인이 필요합니다.'); return false;">공공기관
               뉴스</a>
             <a href="#"
-              onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '공모전 소식을 보려면 로그인이 필요합니다.'); return false;">공모전
+              onclick="checkLoginAndExecute(showContestBoard, '공모전 소식을 보려면 로그인이 필요합니다.'); return false;">공모전
               소식</a>
             <a href="#" onclick="checkLoginAndExecute(showStoryBoard, '취업 이야기를 보려면 로그인이 필요합니다.'); return false;"
               style="color: #666; font-weight:bold;">취업 이야기</a>
@@ -6165,6 +6165,169 @@
       </div>
       <!-- ========== /뉴스 모달 끝 ========== -->
 
+      <!-- ========== 공모전 소식 섹션 (링커리어 스타일) ========== -->
+      <style>
+        #contest-section { width:100%; }
+        .contest-head { margin-bottom: 0.5rem; }
+        .contest-head-top { display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap; }
+        .contest-title-wrap h1 { font-size:1.9rem; font-weight:800; color:#222; margin:0; }
+        .contest-title-wrap p { font-size:0.92rem; color:#888; margin-top:4px; }
+        .contest-search { position:relative; flex:1; max-width:360px; min-width:240px; }
+        .contest-search input { width:100%; border:1px solid #e0e0e0; border-radius:24px; padding:10px 42px 10px 18px; font-size:0.92rem; outline:none; }
+        .contest-search input:focus { border-color:#2BBDF5; }
+        .contest-search button { position:absolute; right:6px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:1.1rem; cursor:pointer; color:#888; padding:6px; }
+        .contest-cats { display:flex; flex-wrap:wrap; gap:8px; margin:1.2rem 0; padding-bottom:0.9rem; border-bottom:1px solid #eee; }
+        .contest-cat { border:1px solid #e0e0e0; background:#fff; border-radius:20px; padding:7px 16px; font-size:0.85rem; color:#555; cursor:pointer; transition:all .15s; white-space:nowrap; }
+        .contest-cat:hover { border-color:#2BBDF5; color:#2BBDF5; }
+        .contest-cat.active { background:#2BBDF5; border-color:#2BBDF5; color:#fff; font-weight:600; }
+        .contest-banner-link { display:block; margin:0 0 1.4rem; }
+        .contest-result-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem; }
+        .contest-count { font-size:0.9rem; color:#555; }
+        .contest-count b { color:#2BBDF5; }
+        .contest-sort { border:1px solid #e0e0e0; border-radius:8px; padding:7px 12px; font-size:0.85rem; color:#444; cursor:pointer; background:#fff; }
+        .btn-write-contest { background:#2BBDF5; color:#fff; border:none; border-radius:8px; padding:9px 16px; font-size:0.9rem; font-weight:600; cursor:pointer; }
+        .btn-write-contest:hover { background:#09A8E0; }
+        .contest-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:1.6rem 1.3rem; }
+        .contest-card { background:#fff; border:1px solid #eee; border-radius:10px; overflow:hidden; cursor:pointer; transition:transform .15s, box-shadow .15s; display:flex; flex-direction:column; }
+        .contest-card:hover { transform:translateY(-4px); box-shadow:0 8px 20px rgba(0,0,0,0.1); }
+        .contest-card-thumb { position:relative; width:100%; aspect-ratio:3/4; background:#f0f2f5; overflow:hidden; }
+        .contest-card-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+        .contest-card-thumb .no-img { width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#cbd5e1; font-size:2.6rem; }
+        .contest-dday { position:absolute; top:8px; right:8px; background:rgba(43,189,245,0.95); color:#fff; font-size:0.74rem; font-weight:700; padding:4px 9px; border-radius:6px; }
+        .contest-dday.closed { background:rgba(120,120,120,0.92); }
+        .contest-dday.urgent { background:rgba(231,76,60,0.95); }
+        .contest-card-body { padding:0.8rem 0.85rem 1rem; display:flex; flex-direction:column; gap:5px; flex:1; }
+        .contest-card-org { font-size:0.76rem; color:#999; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .contest-card-title { font-size:0.92rem; font-weight:700; color:#222; line-height:1.35; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; min-height:2.5em; }
+        .contest-card-meta { margin-top:auto; display:flex; gap:12px; font-size:0.74rem; color:#aaa; padding-top:6px; }
+        .contest-loading, .contest-empty { text-align:center; padding:4rem 0; color:#999; font-size:1rem; grid-column:1/-1; }
+        .contest-pagination { display:flex; justify-content:center; gap:6px; margin-top:2.5rem; }
+        .contest-pagination button { min-width:36px; height:36px; border:1px solid #e0e0e0; background:#fff; border-radius:8px; cursor:pointer; font-size:0.9rem; color:#555; }
+        .contest-pagination button.active { background:#2BBDF5; border-color:#2BBDF5; color:#fff; font-weight:700; }
+        .contest-pagination button:disabled { opacity:0.4; cursor:default; }
+        #contest-detail-section { width:100%; max-width:920px; margin:0 auto; }
+        .contest-detail-top { display:flex; gap:2rem; flex-wrap:wrap; margin-bottom:2rem; }
+        .contest-detail-poster { width:320px; flex-shrink:0; border-radius:10px; overflow:hidden; border:1px solid #eee; background:#f0f2f5; }
+        .contest-detail-poster img { width:100%; display:block; }
+        .contest-detail-info { flex:1; min-width:280px; }
+        .contest-detail-info .c-org { font-size:0.9rem; color:#888; margin-bottom:6px; }
+        .contest-detail-info h1 { font-size:1.5rem; font-weight:800; color:#222; line-height:1.4; margin-bottom:1.2rem; }
+        .contest-detail-info .c-row { display:flex; gap:8px; font-size:0.92rem; margin-bottom:9px; }
+        .contest-detail-info .c-row .lbl { color:#999; width:80px; flex-shrink:0; }
+        .contest-detail-info .c-row .val { color:#333; font-weight:500; }
+        .contest-detail-link { display:inline-block; margin-top:1rem; background:#2BBDF5; color:#fff; text-decoration:none; padding:11px 24px; border-radius:8px; font-weight:600; font-size:0.95rem; }
+        .contest-detail-link:hover { background:#09A8E0; }
+        .contest-detail-content { border-top:1px solid #eee; padding-top:1.5rem; font-size:0.95rem; line-height:1.8; color:#333; white-space:pre-wrap; word-break:break-word; }
+        .contest-detail-actions { margin-top:2rem; display:flex; gap:8px; }
+        .contest-detail-actions button { padding:9px 16px; border-radius:8px; border:1px solid #ddd; background:#fff; cursor:pointer; font-size:0.9rem; }
+        .btn-contest-edit { color:#2BBDF5; border-color:#2BBDF5 !important; }
+        .btn-contest-delete { color:#e74c3c; border-color:#e74c3c !important; }
+      </style>
+
+      <!-- 공모전 목록 -->
+      <div id="contest-section" style="display:none;">
+        <div class="contest-head">
+          <div class="contest-head-top">
+            <div class="contest-title-wrap">
+              <h1>공모전</h1>
+              <p>대외활동·공모전 소식을 한눈에 모아보세요.</p>
+            </div>
+            <div class="contest-search">
+              <input type="text" id="contestSearchInput" placeholder="공모전명, 주최, 키워드 검색"
+                onkeydown="if(event.key==='Enter') applyContestSearch()">
+              <button onclick="applyContestSearch()">🔍</button>
+            </div>
+          </div>
+          <div class="contest-cats" id="contestCats"></div>
+          <a href="product.html" target="_blank" class="contest-banner-link">
+            <img src="./공공기관채용박람회_최종.png" alt="공모전 배너"
+              style="width:100%; height:auto; border-radius:10px; display:block;">
+          </a>
+          <div class="contest-result-row">
+            <div class="contest-count">검색결과 <b id="contestCount">0</b>건</div>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <button class="btn-write-contest" id="btnWriteContest" onclick="openAddContestModal()" style="display:none;">✏️ 공모전 등록</button>
+              <select class="contest-sort" id="contestSort" onchange="applyContestSort()">
+                <option value="latest">최신순</option>
+                <option value="deadline">마감임박순</option>
+                <option value="views">조회순</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div id="contestLoading" class="contest-loading">⏳ 공모전을 불러오는 중...</div>
+        <div id="contestEmpty" class="contest-empty" style="display:none;">📭 등록된 공모전이 없습니다.</div>
+        <div class="contest-grid" id="contestGrid"></div>
+        <div class="contest-pagination" id="contestPagination" style="display:none;"></div>
+      </div>
+
+      <!-- 공모전 상세 -->
+      <div id="contest-detail-section" style="display:none;">
+        <button onclick="backToContestList()" style="background:none;border:none;color:#555;cursor:pointer;font-size:0.95rem;margin-bottom:1.2rem;">← 공모전 목록</button>
+        <div class="contest-detail-top">
+          <div class="contest-detail-poster" id="contestDetailPoster"></div>
+          <div class="contest-detail-info">
+            <div class="c-org" id="contestDetailOrg"></div>
+            <h1 id="contestDetailTitle"></h1>
+            <div class="c-row"><span class="lbl">접수기간</span><span class="val" id="contestDetailPeriod"></span></div>
+            <div class="c-row"><span class="lbl">마감</span><span class="val" id="contestDetailDday"></span></div>
+            <div class="c-row"><span class="lbl">카테고리</span><span class="val" id="contestDetailCat"></span></div>
+            <div class="c-row"><span class="lbl">조회수</span><span class="val" id="contestDetailViews"></span></div>
+            <a href="#" target="_blank" rel="noopener" class="contest-detail-link" id="contestDetailLink" style="display:none;">공모전 사이트 바로가기 →</a>
+          </div>
+        </div>
+        <div class="contest-detail-content" id="contestDetailContent"></div>
+        <div class="contest-detail-actions">
+          <button onclick="backToContestList()">← 목록으로</button>
+          <button class="btn-contest-edit" id="btnContestEdit" onclick="openEditContestModal()" style="display:none;">✏️ 수정</button>
+          <button class="btn-contest-delete" id="btnContestDelete" onclick="deleteCurrentContest()" style="display:none;">🗑️ 삭제</button>
+        </div>
+      </div>
+
+      <!-- 공모전 등록/수정 모달 -->
+      <div id="contestModal" class="modal">
+        <div class="modal-content" style="max-width:600px;">
+          <h2 id="contestModalTitle">✏️ 공모전 등록</h2>
+          <form onsubmit="handleSubmitContest(event)">
+            <input type="hidden" id="contest_edit_id">
+            <div class="form-group">
+              <label>제목 *</label>
+              <input type="text" id="contest_title" required placeholder="공모전 제목">
+            </div>
+            <div class="form-group">
+              <label>주최 / 기업명</label>
+              <input type="text" id="contest_org" placeholder="예: 한국전력공사">
+            </div>
+            <div class="form-group">
+              <label>카테고리</label>
+              <select id="contest_category"></select>
+            </div>
+            <div class="form-group">
+              <label>포스터 이미지 업로드</label>
+              <input type="file" id="contest_image" accept="image/*">
+              <div id="contest_current_img" style="margin-top:6px; font-size:13px; color:#666;"></div>
+            </div>
+            <div class="form-group" style="display:flex; gap:10px;">
+              <div style="flex:1;"><label>접수 시작일</label><input type="date" id="contest_start"></div>
+              <div style="flex:1;"><label>접수 마감일</label><input type="date" id="contest_end"></div>
+            </div>
+            <div class="form-group">
+              <label>홈페이지 / 접수 링크</label>
+              <input type="url" id="contest_link" placeholder="https://">
+            </div>
+            <div class="form-group">
+              <label>상세 내용</label>
+              <textarea id="contest_content" rows="8" placeholder="공모전 상세 설명" style="resize:vertical;"></textarea>
+            </div>
+            <div style="text-align:right; margin-top:20px;">
+              <button type="submit" class="btn-submit">저장</button>
+              <button type="button" class="btn-cancel" onclick="closeContestModal()">취소</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <!-- ========== /공모전 소식 섹션 끝 ========== -->
+
 
 
 
@@ -7500,6 +7663,9 @@ window.enableAdminMode = async function () {
       if (userSection) userSection.style.display = 'none';
       const newsSection = document.getElementById('news-section');
       if (newsSection) newsSection.style.display = 'none';
+      ['contest-section', 'contest-detail-section'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.style.display = 'none';
+      });
 
       // 2. 사이드바 숨기기 (Wrapper에 클래스 추가로 제어)
       document.querySelectorAll('.content-with-sidebar-wrapper').forEach(el => el.classList.add('full-width-wrapper'));
@@ -7534,6 +7700,10 @@ window.enableAdminMode = async function () {
 
       const newsSection = document.getElementById('news-section');
       if (newsSection) newsSection.style.display = 'none';
+
+      ['contest-section', 'contest-detail-section'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.style.display = 'none';
+      });
     }
 
     window.openWriteStoryModal = function () {
@@ -8484,7 +8654,7 @@ function displayStoriesForPage(page) {
         if (el) el.style.display = 'none';
       });
       ['board-section', 'user-manage-section', 'story-board-section',
-        'story-detail-section', 'news-detail-section'].forEach(id => {
+        'story-detail-section', 'news-detail-section', 'contest-section', 'contest-detail-section'].forEach(id => {
           const el = document.getElementById(id);
           if (el) el.style.display = 'none';
         });
@@ -8882,6 +9052,339 @@ function displayStoriesForPage(page) {
     // ==================== /공공기관 뉴스 게시판 끝 ====================
   </script>
 
+  <script>
+    // ==================== 공모전 소식 (링커리어 스타일) ====================
+    let contestCurrentPage = 1;
+    const contestItemsPerPage = 12;
+    let allContestData = [];        // Firestore 원본 전체
+    let filteredContestData = [];   // 필터/검색/정렬 적용 결과
+    let currentContestId = null;
+    let contestActiveCat = 'all';
+    let contestSortMode = 'latest';
+    let contestSearchKeyword = '';
+    let _contestCache = null;
+
+    const CONTEST_CATEGORIES = [
+      { value: 'all', label: '전체' },
+      { value: 'planning', label: '기획/아이디어' },
+      { value: 'marketing', label: '광고/마케팅' },
+      { value: 'media', label: '사진/영상/UCC' },
+      { value: 'design', label: '디자인/캐릭터/웹툰' },
+      { value: 'naming', label: '네이밍/슬로건' },
+      { value: 'it', label: 'IT/소프트웨어' },
+      { value: 'science', label: '과학/공학' },
+      { value: 'art', label: '예체능/미술/음악' },
+      { value: 'literature', label: '문학/수기/논문' },
+      { value: 'startup', label: '창업/비즈니스' },
+      { value: 'etc', label: '기타' }
+    ];
+    function contestCatLabel(v) {
+      const c = CONTEST_CATEGORIES.find(x => x.value === v);
+      return c ? c.label : (v || '기타');
+    }
+
+    // D-day 계산 (마감일 기준)
+    function contestDday(endDateStr) {
+      if (!endDateStr) return { text: '상시', cls: '' };
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const end = new Date(endDateStr); end.setHours(0, 0, 0, 0);
+      if (isNaN(end.getTime())) return { text: '상시', cls: '' };
+      const diff = Math.round((end - today) / (1000 * 60 * 60 * 24));
+      if (diff < 0) return { text: '마감', cls: 'closed' };
+      if (diff === 0) return { text: 'D-DAY', cls: 'urgent' };
+      return { text: 'D-' + diff, cls: diff <= 7 ? 'urgent' : '' };
+    }
+
+    // 공모전 섹션 표시 + 데이터 로드
+    window.showContestBoard = async function (skipHistory = false) {
+      ['features', 'jobs', 'general-jobs', 'hibrain-jobs', 'edu-courses', 'detail-section', 'chatroom-section',
+        'board-section', 'user-manage-section', 'story-board-section', 'story-detail-section',
+        'news-section', 'news-detail-section', 'contest-detail-section'].forEach(id => {
+          const el = document.getElementById(id); if (el) el.style.display = 'none';
+        });
+      document.querySelectorAll('.content-with-sidebar-wrapper').forEach(el => el.classList.add('full-width-wrapper'));
+
+      renderContestCats();
+      const sec = document.getElementById('contest-section');
+      if (sec) { sec.style.display = 'block'; await loadContests(); }
+
+      const btnWrite = document.getElementById('btnWriteContest');
+      if (btnWrite) btnWrite.style.display = (window.currentUserRole === 'admin') ? 'inline-flex' : 'none';
+
+      if (!skipHistory) history.pushState({ section: 'contest' }, '', '#contest');
+      window.scrollTo(0, 0);
+    };
+
+    function renderContestCats() {
+      const wrap = document.getElementById('contestCats');
+      if (!wrap) return;
+      wrap.innerHTML = CONTEST_CATEGORIES.map(c =>
+        `<button class="contest-cat ${c.value === contestActiveCat ? 'active' : ''}" onclick="filterContestByCat('${c.value}')">${c.label}</button>`
+      ).join('');
+    }
+    window.filterContestByCat = function (v) { contestActiveCat = v; contestCurrentPage = 1; renderContestCats(); applyContestFilters(); };
+    window.applyContestSearch = function () { const i = document.getElementById('contestSearchInput'); contestSearchKeyword = (i ? i.value.trim() : '').toLowerCase(); contestCurrentPage = 1; applyContestFilters(); };
+    window.applyContestSort = function () { const s = document.getElementById('contestSort'); contestSortMode = s ? s.value : 'latest'; contestCurrentPage = 1; applyContestFilters(); };
+
+    // Firestore에서 공모전 로드 (3분 캐시)
+    window.loadContests = async function () {
+      const loading = document.getElementById('contestLoading');
+      const now = Date.now();
+      if (_contestCache && (now - _contestCache.ts < 3 * 60 * 1000)) {
+        allContestData = _contestCache.docs;
+        if (loading) loading.style.display = 'none';
+        applyContestFilters();
+        return;
+      }
+      if (loading) loading.style.display = 'block';
+      try {
+        const q = window.query(window.collection(window.db, 'contests'), window.orderBy('createdAt', 'desc'));
+        const snap = await window.getDocs(q);
+        allContestData = [];
+        snap.forEach(d => allContestData.push({ id: d.id, ...d.data() }));
+        _contestCache = { docs: [...allContestData], ts: now };
+        if (loading) loading.style.display = 'none';
+        applyContestFilters();
+      } catch (err) {
+        console.error('공모전 로딩 오류:', err);
+        if (loading) loading.style.display = 'none';
+        const grid = document.getElementById('contestGrid');
+        if (grid) grid.innerHTML = '<div class="contest-empty" style="display:block;">⚠️ 데이터 로딩 실패. 새로고침 해주세요.</div>';
+      }
+    };
+
+    // 카테고리 필터 + 검색 + 정렬 적용
+    function applyContestFilters() {
+      let arr = [...allContestData];
+      if (contestActiveCat !== 'all') arr = arr.filter(c => (c.category || 'etc') === contestActiveCat);
+      if (contestSearchKeyword) {
+        arr = arr.filter(c => (`${c.title || ''} ${c.org || ''} ${c.content || ''}`).toLowerCase().includes(contestSearchKeyword));
+      }
+      if (contestSortMode === 'views') {
+        arr.sort((a, b) => (b.views || 0) - (a.views || 0));
+      } else if (contestSortMode === 'deadline') {
+        const t = Date.now();
+        arr.sort((a, b) => {
+          let ea = a.endDate ? new Date(a.endDate).getTime() : Infinity;
+          let eb = b.endDate ? new Date(b.endDate).getTime() : Infinity;
+          if (ea < t) ea = Infinity; // 마감 지난 건 뒤로
+          if (eb < t) eb = Infinity;
+          return ea - eb; // 마감 가까운 순
+        });
+      } // latest: createdAt desc (이미 정렬됨)
+      filteredContestData = arr;
+
+      const cnt = document.getElementById('contestCount');
+      if (cnt) cnt.textContent = filteredContestData.length;
+
+      const empty = document.getElementById('contestEmpty');
+      const grid = document.getElementById('contestGrid');
+      if (filteredContestData.length === 0) {
+        if (empty) empty.style.display = 'block';
+        if (grid) grid.innerHTML = '';
+        renderContestPagination();
+        return;
+      }
+      if (empty) empty.style.display = 'none';
+      const totalPages = Math.ceil(filteredContestData.length / contestItemsPerPage);
+      if (contestCurrentPage > totalPages) contestCurrentPage = 1;
+      displayContestPage(contestCurrentPage);
+      renderContestPagination();
+    }
+
+    function displayContestPage(page) {
+      const grid = document.getElementById('contestGrid');
+      if (!grid) return;
+      const start = (page - 1) * contestItemsPerPage;
+      const pageData = filteredContestData.slice(start, start + contestItemsPerPage);
+      grid.innerHTML = pageData.map(c => {
+        const dd = contestDday(c.endDate);
+        const thumb = c.imageUrl
+          ? `<img src="${escapeHtml(c.imageUrl)}" alt="${escapeHtml(c.title || '')}">`
+          : `<div class="no-img">🏆</div>`;
+        return `<div class="contest-card" onclick="viewContestDetail('${c.id}')">
+          <div class="contest-card-thumb">
+            ${thumb}
+            <span class="contest-dday ${dd.cls}">${dd.text}</span>
+          </div>
+          <div class="contest-card-body">
+            <span class="contest-card-org">${escapeHtml(c.org || '주최 미정')}</span>
+            <span class="contest-card-title">${escapeHtml(c.title || '')}</span>
+            <span class="contest-card-meta"><span>👁 ${c.views || 0}</span><span>${escapeHtml(contestCatLabel(c.category))}</span></span>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function renderContestPagination() {
+      const container = document.getElementById('contestPagination');
+      if (!container) return;
+      const totalPages = Math.ceil(filteredContestData.length / contestItemsPerPage);
+      if (totalPages <= 1) { container.style.display = 'none'; return; }
+      container.style.display = 'flex';
+      container.innerHTML = '';
+      const prev = document.createElement('button');
+      prev.textContent = '‹'; prev.disabled = contestCurrentPage === 1;
+      prev.onclick = () => goToContestPage(contestCurrentPage - 1);
+      container.appendChild(prev);
+      for (let i = 1; i <= totalPages; i++) {
+        const b = document.createElement('button');
+        b.textContent = i;
+        if (i === contestCurrentPage) b.className = 'active';
+        b.onclick = () => goToContestPage(i);
+        container.appendChild(b);
+      }
+      const next = document.createElement('button');
+      next.textContent = '›'; next.disabled = contestCurrentPage === totalPages;
+      next.onclick = () => goToContestPage(contestCurrentPage + 1);
+      container.appendChild(next);
+    }
+    function goToContestPage(page) {
+      const totalPages = Math.ceil(filteredContestData.length / contestItemsPerPage);
+      if (page < 1 || page > totalPages) return;
+      contestCurrentPage = page; displayContestPage(page); renderContestPagination(); window.scrollTo(0, 0);
+    }
+
+    // 상세 보기
+    window.viewContestDetail = async function (id, skipHistory = false) {
+      const data = allContestData.find(c => c.id === id);
+      if (!data) return;
+      currentContestId = id;
+      document.getElementById('contest-section').style.display = 'none';
+      document.getElementById('contest-detail-section').style.display = 'block';
+      window.scrollTo(0, 0);
+
+      const poster = document.getElementById('contestDetailPoster');
+      poster.innerHTML = data.imageUrl
+        ? `<img src="${escapeHtml(data.imageUrl)}" alt="">`
+        : '<div style="padding:3rem;text-align:center;color:#cbd5e1;font-size:3rem;">🏆</div>';
+      document.getElementById('contestDetailOrg').textContent = data.org || '주최 미정';
+      document.getElementById('contestDetailTitle').textContent = data.title || '';
+      document.getElementById('contestDetailPeriod').textContent = (data.startDate || '?') + ' ~ ' + (data.endDate || '상시');
+      document.getElementById('contestDetailDday').textContent = contestDday(data.endDate).text;
+      document.getElementById('contestDetailCat').textContent = contestCatLabel(data.category);
+      document.getElementById('contestDetailViews').textContent = (data.views || 0) + '회';
+      const link = document.getElementById('contestDetailLink');
+      if (data.link) { link.href = data.link; link.style.display = 'inline-block'; } else { link.style.display = 'none'; }
+      document.getElementById('contestDetailContent').textContent = data.content || '';
+
+      const isAdmin = window.currentUserRole === 'admin';
+      document.getElementById('btnContestEdit').style.display = isAdmin ? 'inline-block' : 'none';
+      document.getElementById('btnContestDelete').style.display = isAdmin ? 'inline-block' : 'none';
+
+      // 조회수 증가
+      try {
+        await window.updateDoc(window.doc(window.db, 'contests', id), { views: window.increment(1) });
+        data.views = (data.views || 0) + 1;
+      } catch (e) { /* 조회수 증가 실패는 무시 */ }
+
+      if (!skipHistory) history.pushState({ section: 'contest-detail', contestId: id }, '', '#contest-detail-' + id);
+    };
+    window.backToContestList = function () { history.back(); };
+
+    // 관리자: 등록/수정 모달
+    function fillContestCatOptions() {
+      const sel = document.getElementById('contest_category');
+      if (!sel) return;
+      sel.innerHTML = CONTEST_CATEGORIES.filter(c => c.value !== 'all')
+        .map(c => `<option value="${c.value}">${c.label}</option>`).join('');
+    }
+    window.openAddContestModal = function () {
+      const m = document.getElementById('contestModal'); if (!m) return;
+      fillContestCatOptions();
+      document.getElementById('contestModalTitle').textContent = '✏️ 공모전 등록';
+      document.getElementById('contest_edit_id').value = '';
+      document.getElementById('contest_title').value = '';
+      document.getElementById('contest_org').value = '';
+      document.getElementById('contest_category').value = 'planning';
+      document.getElementById('contest_image').value = '';
+      document.getElementById('contest_current_img').textContent = '';
+      document.getElementById('contest_start').value = '';
+      document.getElementById('contest_end').value = '';
+      document.getElementById('contest_link').value = '';
+      document.getElementById('contest_content').value = '';
+      m.style.display = 'block';
+    };
+    window.openEditContestModal = function () {
+      if (!currentContestId) return;
+      const data = allContestData.find(c => c.id === currentContestId);
+      if (!data) return;
+      const m = document.getElementById('contestModal'); if (!m) return;
+      fillContestCatOptions();
+      document.getElementById('contestModalTitle').textContent = '✏️ 공모전 수정';
+      document.getElementById('contest_edit_id').value = currentContestId;
+      document.getElementById('contest_title').value = data.title || '';
+      document.getElementById('contest_org').value = data.org || '';
+      document.getElementById('contest_category').value = data.category || 'planning';
+      document.getElementById('contest_image').value = '';
+      document.getElementById('contest_current_img').textContent = data.imageUrl ? '※ 기존 이미지 있음 (새 파일 업로드 시 교체)' : '';
+      document.getElementById('contest_start').value = data.startDate || '';
+      document.getElementById('contest_end').value = data.endDate || '';
+      document.getElementById('contest_link').value = data.link || '';
+      document.getElementById('contest_content').value = data.content || '';
+      m.style.display = 'block';
+    };
+    window.closeContestModal = function () { const m = document.getElementById('contestModal'); if (m) m.style.display = 'none'; };
+
+    window.handleSubmitContest = async function (e) {
+      e.preventDefault();
+      const user = window.auth.currentUser;
+      if (!user || window.currentUserRole !== 'admin') { alert('관리자 권한이 필요합니다.'); return; }
+      const editId = document.getElementById('contest_edit_id').value;
+      const title = document.getElementById('contest_title').value.trim();
+      if (!title) { alert('제목을 입력해주세요.'); return; }
+      const org = document.getElementById('contest_org').value.trim();
+      const category = document.getElementById('contest_category').value;
+      const startDate = document.getElementById('contest_start').value;
+      const endDate = document.getElementById('contest_end').value;
+      const link = document.getElementById('contest_link').value.trim();
+      const content = document.getElementById('contest_content').value.trim();
+      const imageFile = document.getElementById('contest_image').files[0];
+      try {
+        let imageUrl = '';
+        if (editId) { const ex = allContestData.find(c => c.id === editId); if (ex) imageUrl = ex.imageUrl || ''; }
+        if (imageFile) imageUrl = await window.uploadFile(imageFile, 'contest_images');
+        const docData = { title, org, category, startDate, endDate, link, content, imageUrl, updatedAt: window.Timestamp.now() };
+        if (editId) {
+          await window.updateDoc(window.doc(window.db, 'contests', editId), docData);
+          alert('✅ 공모전이 수정되었습니다.');
+        } else {
+          docData.createdAt = window.Timestamp.now();
+          docData.views = 0;
+          await window.addDoc(window.collection(window.db, 'contests'), docData);
+          alert('✅ 공모전이 등록되었습니다.');
+        }
+        _contestCache = null;
+        closeContestModal();
+        if (editId && document.getElementById('contest-detail-section').style.display !== 'none') {
+          await loadContests();
+          viewContestDetail(editId, true);
+        } else {
+          contestCurrentPage = 1;
+          await loadContests();
+          document.getElementById('contest-detail-section').style.display = 'none';
+          document.getElementById('contest-section').style.display = 'block';
+        }
+      } catch (err) { console.error(err); alert('저장 실패: ' + err.message); }
+    };
+
+    window.deleteCurrentContest = async function () {
+      if (!currentContestId) return;
+      if (window.currentUserRole !== 'admin') { alert('관리자 권한이 필요합니다.'); return; }
+      if (!confirm('정말 삭제하시겠습니까?')) return;
+      try {
+        await window.deleteDoc(window.doc(window.db, 'contests', currentContestId));
+        _contestCache = null;
+        alert('✅ 삭제되었습니다.');
+        backToContestList();
+        contestCurrentPage = 1;
+        await loadContests();
+        document.getElementById('contest-section').style.display = 'block';
+      } catch (err) { alert('삭제 실패: ' + err.message); }
+    };
+    // ==================== /공모전 소식 끝 ====================
+  </script>
+
 
   <script>
     // 로그인 체크 함수 (임시 비활성화 - 테스트용)
@@ -8980,6 +9483,11 @@ function displayStoriesForPage(page) {
       // 뉴스 섹션 숨기기
       const newsSection = document.getElementById('news-section');
       if (newsSection) newsSection.style.display = 'none';
+
+      // 공모전 섹션 숨기기
+      ['contest-section', 'contest-detail-section'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.style.display = 'none';
+      });
 
       // 게시판 섹션 보이기
       const boardSection = document.getElementById('board-section');
@@ -10409,6 +10917,13 @@ window.addEventListener('DOMContentLoaded', startPremiumCarousel);
       } else if (hash === '#news') {
         window.showNewsBoard(true);
         history.replaceState({ section: 'news' }, '', hash);
+      } else if (hash.startsWith('#contest-detail-')) {
+        // 공모전 상세는 데이터 로드가 필요하므로 목록으로 이동
+        window.showContestBoard(true);
+        history.replaceState({ section: 'contest' }, '', '#contest');
+      } else if (hash === '#contest') {
+        window.showContestBoard(true);
+        history.replaceState({ section: 'contest' }, '', hash);
       } else {
         // 기본: 홈으로
         history.replaceState({ section: 'home' }, '', '#home');
@@ -10468,6 +10983,14 @@ window.addEventListener('DOMContentLoaded', startPremiumCarousel);
           if (state.newsId && window.allNewsData && window.allNewsData.find(n => n.id === state.newsId)) {
             window.viewNewsDetail(state.newsId, true);
           }
+        });
+      } else if (state.section === 'contest') {
+        // 공모전 목록으로 이동
+        window.showContestBoard(true);
+      } else if (state.section === 'contest-detail') {
+        // 공모전 상세 → 목록 표시 후 해당 공모전 열기
+        window.showContestBoard(true).then(() => {
+          if (state.contestId) window.viewContestDetail(state.contestId, true);
         });
       } else {
         // 기본: 홈으로
