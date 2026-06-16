@@ -5783,6 +5783,8 @@
                 <li><a href="#" onclick="switchStoryBoard('all'); return false;" id="story-menu-all"
                     class="active"><span>📋</span> 전체글</a></li>
                 <li><a href="#" onclick="switchStoryBoard('free'); return false;" id="story-menu-free"><span>🗒️</span> 자유게시판</a></li>
+                <li><a href="#" onclick="switchStoryBoard('counsel'); return false;"
+                    id="story-menu-counsel"><span>🤔</span> 고민상담(자유주제)</a></li>
                 <li><a href="#" onclick="switchStoryBoard('consulting'); return false;"
                     id="story-menu-consulting"><span>💬</span> 취업상담실</a></li>
                 <li><a href="#" onclick="switchStoryBoard('study'); return false;" id="story-menu-study"><span>📚</span>
@@ -5873,6 +5875,8 @@
               <ul>
                 <li><a href="#" onclick="switchStoryBoard('all'); return false;" id="detail-menu-all"><span>📋</span> 전체글</a></li>
                 <li><a href="#" onclick="switchStoryBoard('free'); return false;" id="detail-menu-free"><span>🗒️</span> 자유게시판</a></li>
+                <li><a href="#" onclick="switchStoryBoard('counsel'); return false;"
+                    id="detail-menu-counsel"><span>🤔</span> 고민상담(자유주제)</a></li>
                 <li><a href="#" onclick="switchStoryBoard('consulting'); return false;"
                     id="detail-menu-consulting"><span>💬</span> 취업상담실</a></li>
                 <li><a href="#" onclick="switchStoryBoard('study'); return false;"
@@ -7683,7 +7687,7 @@ function displayStoriesForPage(page) {
 
       // 링커리어 게시판명과 유사하게 라벨 변경
       const catLabels = {
-        all: '전체글', free: '자유이야기', consulting: '취업/이직', study: '대외활동',
+        all: '전체글', free: '자유이야기', counsel: '고민상담(자유주제)', consulting: '취업/이직', study: '대외활동',
         'ncs-review': '자격증', interview: '인턴 고민', success: '합격자소서', expert: '직무질문'
       };
 
@@ -8152,7 +8156,7 @@ function displayStoriesForPage(page) {
 
       // 3-1. 카테고리 타이틀 즉시 업데이트 + 상세 사이드바 동기화
       const _catLabels = {
-        all: '전체글', free: '자유게시판', consulting: '취업상담실', study: '스터디 모집',
+        all: '전체글', free: '자유게시판', counsel: '고민상담(자유주제)', consulting: '취업상담실', study: '스터디 모집',
         'ncs-review': 'NCS 후기', interview: '면접 후기', success: '최종합격 수기', expert: '현직자/전문가'
       };
       const _titleEl = document.getElementById('storyBoardCategoryTitle');
@@ -8162,6 +8166,7 @@ function displayStoriesForPage(page) {
       const _subtitleMap = {
         all:          '취업 이야기의 모든 글을 한눈에 확인하세요.',
         free:         '자유롭게 취업 이야기를 나눠보세요.',
+        counsel:      '주제에 상관없이 고민을 자유롭게 나눠보세요.',
         consulting:   '취업 고민, 함께 해결해 드립니다.',
         study:        '같이 공부할 스터디 멤버를 모집해 보세요.',
         'ncs-review': '선배들의 실전 NCS 후기를 확인하세요.',
@@ -8216,7 +8221,7 @@ function displayStoriesForPage(page) {
 
       // 카테고리 뱃지 설정
       const _catLabels = {
-        all: '전체글', free: '자유게시판', consulting: '취업상담실', study: '스터디 모집',
+        all: '전체글', free: '자유게시판', counsel: '고민상담(자유주제)', consulting: '취업상담실', study: '스터디 모집',
         'ncs-review': 'NCS 후기', interview: '면접 후기', success: '최종합격 수기', expert: '현직자/전문가'
       };
       const dataCat = data.category || 'free';
@@ -10785,7 +10790,7 @@ window.addEventListener('DOMContentLoaded', startPremiumCarousel);
         filteredDocs = filteredDocs.slice(0, 10);
 
         const catLabels = {
-            all: '전체글', free: '자유이야기', consulting: '취업/이직', study: '대외활동',
+            all: '전체글', free: '자유이야기', counsel: '고민상담(자유주제)', consulting: '취업/이직', study: '대외활동',
             'ncs-review': '자격증', interview: '인턴 고민', success: '합격자소서', expert: '직무질문'
         };
 
