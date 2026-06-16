@@ -4236,6 +4236,8 @@
 /* 메시지 영역: flex:1 + min-height:0 이 스크롤 고정의 핵심 */
 .chatroom-messages { flex: 1; min-height: 0; overflow-y: auto; padding: 0.8rem 1rem; display: flex; flex-direction: column; gap: 0.6rem; background: #fafafa; }
 .chat-msg { display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; }
+.chat-msg .msg-author-row { display: flex; align-items: center; gap: 6px; }
+.chat-msg .msg-avatar { width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem; line-height: 1; flex-shrink: 0; }
 .chat-msg .msg-author { font-size: 0.78rem; font-weight: 600; color: #555; }
 .chat-msg .msg-bubble { background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; padding: 6px 10px; font-size: 0.88rem; color: #222; max-width: 90%; }
 .chat-msg .msg-time { font-size: 0.72rem; color: #bbb; align-self: flex-end; }
@@ -4518,21 +4520,33 @@
         return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
       }
 
-      // 채팅 닉네임 자동 생성: 사용자 고유 ID(uid)로부터 결정적으로 생성하므로
-      // 같은 사람은 항상 같은 닉네임이 나오고, 한 번 정해지면 계속 고정됩니다.
-      window.generateChatNickname = function (uid) {
-        if (!uid) return '';
+      // 채팅 아이덴티티 자동 생성: 사용자 고유 ID(uid)로부터 결정적으로 생성하므로
+      // 같은 사람은 항상 같은 닉네임/아바타가 나오고, 한 번 정해지면 계속 고정됩니다.
+      window.getChatIdentity = function (uid) {
         const adjectives = ['행복한', '용감한', '엉뚱한', '부지런한', '따뜻한', '똑똑한', '느긋한', '활기찬', '차분한', '신나는', '당당한', '깜찍한', '씩씩한', '상냥한', '재빠른', '든든한', '멋진', '귀여운', '지혜로운', '다정한', '유쾌한', '진지한', '반짝이는', '포근한', '정직한', '수줍은', '대담한', '명랑한', '우아한', '믿음직한'];
         const nouns = ['사과', '고양이', '다람쥐', '호랑이', '펭귄', '너구리', '부엉이', '수달', '토끼', '여우', '고래', '판다', '곰돌이', '병아리', '거북이', '참새', '두더지', '강아지', '햄스터', '코알라', '사슴', '오리', '문어', '달팽이', '고슴도치', '앵무새', '북극곰', '청설모', '두루미', '귀리'];
+        // 동물 이모지를 nouns 배열과 1:1로 대응시켜 닉네임의 동물과 아바타가 일치
+        const emojis = ['🍎', '🐱', '🐿️', '🐯', '🐧', '🦝', '🦉', '🦦', '🐰', '🦊', '🐳', '🐼', '🐻', '🐤', '🐢', '🐦', '🐭', '🐶', '🐹', '🐨', '🦌', '🦆', '🐙', '🐌', '🦔', '🦜', '🐻‍❄️', '🐿️', '🦩', '🌾'];
+        const colors = ['#FFE0E0', '#FFEFD5', '#E0F7FA', '#E8F5E9', '#F3E5F5', '#FFF3E0', '#E3F2FD', '#FCE4EC', '#F1F8E9', '#EDE7F6'];
+        if (!uid) return { nickname: '', emoji: '🙂', color: '#e9ecef' };
         // 문자열 해시 (djb2 변형) → uid가 같으면 항상 같은 값
         let h = 5381;
         for (let i = 0; i < uid.length; i++) {
           h = ((h << 5) + h + uid.charCodeAt(i)) >>> 0;
         }
-        const adj = adjectives[h % adjectives.length];
-        const noun = nouns[Math.floor(h / adjectives.length) % nouns.length];
+        const nounIdx = Math.floor(h / adjectives.length) % nouns.length;
         const num = (Math.floor(h / (adjectives.length * nouns.length)) % 99) + 1;
-        return `${adj} ${noun} ${num}`;
+        const colorIdx = Math.floor(h / (adjectives.length * nouns.length * 99)) % colors.length;
+        return {
+          nickname: `${adjectives[h % adjectives.length]} ${nouns[nounIdx]} ${num}`,
+          emoji: emojis[nounIdx],
+          color: colors[colorIdx]
+        };
+      };
+
+      // 닉네임만 필요할 때 (메시지 저장 등)
+      window.generateChatNickname = function (uid) {
+        return uid ? window.getChatIdentity(uid).nickname : '';
       };
 
 // 메시지 HTML 생성
@@ -4543,10 +4557,14 @@
           ? `<button class="msg-del-btn" onclick="deleteChatMessage('${msgId}')"
                style="margin-left:6px;border:none;background:none;cursor:pointer;color:#e74c3c;font-size:0.85rem;">🗑</button>`
           : '';
-        // 실명 대신 uid 기반 자동 닉네임 표시 (기존에 실명으로 저장된 메시지도 닉네임으로 가려짐)
-        const displayName = window.generateChatNickname(data.authorId) || data.authorName || '익명';
+        // 실명 대신 uid 기반 자동 닉네임/아바타 표시 (기존에 실명으로 저장된 메시지도 가려짐)
+        const ident = window.getChatIdentity(data.authorId);
+        const displayName = ident.nickname || data.authorName || '익명';
         return `<div class="chat-msg ${isMe ? 'my-msg' : ''}">
-          <span class="msg-author">${displayName}</span>
+          <span class="msg-author-row">
+            <span class="msg-avatar" style="background:${ident.color};">${ident.emoji}</span>
+            <span class="msg-author">${displayName}</span>
+          </span>
           <span class="msg-bubble">${data.text}</span>
           <span class="msg-time">${formatChatTime(data.createdAt)}</span>
           ${delBtn}
