@@ -4364,6 +4364,10 @@
               <div class="vc-row"><span class="vc-label">Today</span><span class="vc-num" id="visitorToday">-</span></div>
               <div class="vc-row"><span class="vc-label">Total</span><span class="vc-num" id="visitorTotal">-</span></div>
             </div>
+            <div class="visitor-counter" id="memberCounterBox" title="회원 수" style="display:none;">
+              <div class="vc-row"><span class="vc-label">총 회원수</span><span class="vc-num" id="memberTotal">-</span></div>
+              <div class="vc-row"><span class="vc-label">신규 가입자</span><span class="vc-num" id="memberNew">-</span></div>
+            </div>
           </div>
         </nav>
       </div>
@@ -6620,13 +6624,18 @@
       }
 
       // visitorStats 컬렉션: 방문자 수 카운터
-      // - 읽기(수치 조회): 관리자(role=='admin')만 가능 → 일반 방문자에겐 안 보임
-      // - 쓰기(카운트 증가): 비로그인 포함 누구나 가능 (방문 집계용)
+      // - 집계 수치(total, today_*): 읽기는 관리자만, 쓰기는 카운트용으로 누구나
+      // - IP 방문기록(daily_*/ips/*): 중복 체크를 위해 누구나 읽기/쓰기 (IP만 저장, 민감정보 아님)
       match /visitorStats/{docId} {
         allow read: if request.auth != null &&
           exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
         allow write: if true;
+
+        // IP 방문기록 서브컬렉션: 비로그인 방문자도 읽기/쓰기 가능해야 함
+        match /ips/{ipId} {
+          allow read, write: if true;
+        }
       }
     }
   }
@@ -6687,62 +6696,161 @@
     window.getDoc = getDoc;
     window.increment = increment;
 
-    // ===== 방문자 수 카운터 (Today / Total) =====
-    // 관리자에게만 박스를 노출하는 표시 함수 (onAuthStateChanged에서 호출)
+    // 관리자 이메일 (이 계정 방문은 집계에서 제외)
+    window.ADMIN_EMAIL = 'ilovetruman@gmail.com';
+
+    // KST 기준 오늘 날짜 키 (YYYY-MM-DD)
+    function getKstTodayKey() {
+      const now = new Date();
+      const kst = new Date(now.getTime() + (9 * 60 * 60 * 1000));
+      return kst.toISOString().slice(0, 10);
+    }
+
+    // 방문자 IP 조회 (실패 시 null, 결과 캐싱)
+    let _cachedIp;
+    async function fetchVisitorIp() {
+      if (_cachedIp !== undefined) return _cachedIp;
+      try {
+        const res = await fetch('https://api.ipify.org?format=json', { cache: 'no-store' });
+        if (!res.ok) { _cachedIp = null; return null; }
+        const data = await res.json();
+        _cachedIp = data.ip || null;
+        return _cachedIp;
+      } catch (e) {
+        _cachedIp = null;
+        return null;
+      }
+    }
+
+    // IP를 Firestore 문서 ID로 안전하게 변환 (. : 등 치환)
+    function safeIpKey(ip) {
+      return ip.replace(/[.:]/g, '_');
+    }
+
+    // ===== 방문자/회원 통계 표시 (관리자 전용) =====
     window.refreshVisitorStats = async function () {
       try {
         const box = document.getElementById('visitorCounterBox');
-        if (!box) return;
+        const memberBox = document.getElementById('memberCounterBox');
         // 관리자가 아니면 숨기고 종료
         if (window.currentUserRole !== 'admin') {
-          box.style.display = 'none';
+          if (box) box.style.display = 'none';
+          if (memberBox) memberBox.style.display = 'none';
           return;
         }
-        const now = new Date();
-        const kst = new Date(now.getTime() + (9 * 60 * 60 * 1000));
-        const todayKey = kst.toISOString().slice(0, 10);
+
+        const todayKey = getKstTodayKey();
+
+        // --- 방문자 통계 ---
         const totalRef = doc(db, 'visitorStats', 'total');
         const todayRef = doc(db, 'visitorStats', 'today_' + todayKey);
-
         const [totalSnap, todaySnap] = await Promise.all([
           getDoc(totalRef),
           getDoc(todayRef)
         ]);
         const totalCount = totalSnap.exists() ? (totalSnap.data().count || 0) : 0;
         const todayCount = todaySnap.exists() ? (todaySnap.data().count || 0) : 0;
-
         const todayEl = document.getElementById('visitorToday');
         const totalEl = document.getElementById('visitorTotal');
         if (todayEl) todayEl.textContent = todayCount.toLocaleString();
         if (totalEl) totalEl.textContent = totalCount.toLocaleString();
-        box.style.display = 'inline-flex'; // 관리자에게만 노출
+        if (box) box.style.display = 'inline-flex';
+
+        // --- 회원 통계 ---
+        await window.refreshMemberStats();
       } catch (e) {
         console.warn('방문자 통계 표시 실패:', e);
       }
     };
 
-    // 카운트 누적: 모든 방문자에 대해 수행 (표시 여부와 무관)
+    // 회원 통계: 총 회원수 + 오늘(24시간) 신규 가입자수
+    window.refreshMemberStats = async function () {
+      try {
+        const memberBox = document.getElementById('memberCounterBox');
+        if (!memberBox) return;
+        if (window.currentUserRole !== 'admin') { memberBox.style.display = 'none'; return; }
+
+        const snap = await getDocs(collection(db, 'users'));
+        let total = 0;
+        let newToday = 0;
+        const cutoff = Date.now() - (24 * 60 * 60 * 1000); // 최근 24시간
+
+        snap.forEach((d) => {
+          total++;
+          const data = d.data();
+          const created = data.createdAt;
+          let createdMs = null;
+          if (created && typeof created.toMillis === 'function') {
+            createdMs = created.toMillis(); // Firestore Timestamp
+          } else if (created && created.seconds) {
+            createdMs = created.seconds * 1000;
+          }
+          if (createdMs !== null && createdMs >= cutoff) newToday++;
+        });
+
+        const totalEl = document.getElementById('memberTotal');
+        const newEl = document.getElementById('memberNew');
+        if (totalEl) totalEl.textContent = total.toLocaleString();
+        if (newEl) newEl.textContent = newToday.toLocaleString();
+        memberBox.style.display = 'inline-flex';
+      } catch (e) {
+        console.warn('회원 통계 표시 실패:', e);
+      }
+    };
+
+    // ===== 방문자 카운트 누적: IP 기준 하루 1회 =====
     (async function countVisitor() {
       try {
-        const now = new Date();
-        const kst = new Date(now.getTime() + (9 * 60 * 60 * 1000));
-        const todayKey = kst.toISOString().slice(0, 10); // YYYY-MM-DD
+        const todayKey = getKstTodayKey();
+        const ip = await fetchVisitorIp();
 
-        const totalRef = doc(db, 'visitorStats', 'total');
-        const todayRef = doc(db, 'visitorStats', 'today_' + todayKey);
-
-        // 세션당 1회만 카운트 (새로고침 시 중복 증가 방지)
-        const alreadyCounted = sessionStorage.getItem('visitorCounted');
-
-        if (!alreadyCounted) {
-          await setDoc(totalRef, { count: increment(1) }, { merge: true });
-          await setDoc(todayRef, { count: increment(1), date: todayKey }, { merge: true });
-          sessionStorage.setItem('visitorCounted', '1');
+        // IP 조회 실패 시: 브라우저 단위 fallback(localStorage)로 하루 1회 처리
+        if (!ip) {
+          const lsKey = 'visitorCountedDate';
+          if (localStorage.getItem(lsKey) === todayKey) return;
+          await setDoc(doc(db, 'visitorStats', 'total'), { count: increment(1) }, { merge: true });
+          await setDoc(doc(db, 'visitorStats', 'today_' + todayKey), { count: increment(1), date: todayKey }, { merge: true });
+          localStorage.setItem(lsKey, todayKey);
+          return;
         }
+
+        // 같은 IP가 오늘 이미 방문했는지 기록 문서로 확인
+        const logRef = doc(db, 'visitorStats', 'daily_' + todayKey, 'ips', safeIpKey(ip));
+        const logSnap = await getDoc(logRef);
+        if (logSnap.exists()) return; // 오늘 이미 카운트된 IP → 중복 제외
+
+        // 신규 IP → 카운트 +1 후 기록 생성
+        await setDoc(doc(db, 'visitorStats', 'total'), { count: increment(1) }, { merge: true });
+        await setDoc(doc(db, 'visitorStats', 'today_' + todayKey), { count: increment(1), date: todayKey }, { merge: true });
+        await setDoc(logRef, { ts: Timestamp.now() });
       } catch (e) {
         console.warn('방문자 카운트 실패:', e);
       }
     })();
+
+    // 관리자(ilovetruman) 방문 제외 보정: 오늘 이 IP가 카운트돼 있으면 -1 하고 기록 표시
+    window.excludeAdminVisit = async function () {
+      try {
+        const todayKey = getKstTodayKey();
+        const ip = await fetchVisitorIp();
+        if (!ip) return;
+        const logRef = doc(db, 'visitorStats', 'daily_' + todayKey, 'ips', safeIpKey(ip));
+        let logSnap = await getDoc(logRef);
+        // countVisitor가 아직 기록을 만들기 전일 수 있으니 한 번 더 대기 후 확인
+        if (!logSnap.exists()) {
+          await new Promise(r => setTimeout(r, 1200));
+          logSnap = await getDoc(logRef);
+        }
+        // 오늘 이 IP가 카운트된 적이 있고, 아직 관리자 제외 처리가 안 됐을 때만 되돌림
+        if (logSnap.exists() && !logSnap.data().adminExcluded) {
+          await setDoc(doc(db, 'visitorStats', 'total'), { count: increment(-1) }, { merge: true });
+          await setDoc(doc(db, 'visitorStats', 'today_' + todayKey), { count: increment(-1), date: todayKey }, { merge: true });
+          await setDoc(logRef, { adminExcluded: true }, { merge: true });
+        }
+      } catch (e) {
+        console.warn('관리자 방문 제외 실패:', e);
+      }
+    };
     window.googleProvider = new GoogleAuthProvider();
     window.getDownloadURL = getDownloadURL;
     window.getDownloadURL = getDownloadURL;
@@ -6851,6 +6959,11 @@
           }
         } catch (e) { }
 
+        // 관리자(ilovetruman) 방문은 집계 제외: 오늘 이 IP가 이미 카운트됐다면 되돌림
+        if (user.email === window.ADMIN_EMAIL && typeof window.excludeAdminVisit === 'function') {
+          await window.excludeAdminVisit();
+        }
+
         // 방문자 통계 박스: 관리자에게만 노출
         if (typeof window.refreshVisitorStats === 'function') window.refreshVisitorStats();
 
@@ -6883,6 +6996,8 @@
         window.currentUserRole = null;
         const vcBox = document.getElementById('visitorCounterBox');
         if (vcBox) vcBox.style.display = 'none';
+        const mcBox = document.getElementById('memberCounterBox');
+        if (mcBox) mcBox.style.display = 'none';
       }
     });
 
