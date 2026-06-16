@@ -4518,6 +4518,23 @@
         return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
       }
 
+      // 채팅 닉네임 자동 생성: 사용자 고유 ID(uid)로부터 결정적으로 생성하므로
+      // 같은 사람은 항상 같은 닉네임이 나오고, 한 번 정해지면 계속 고정됩니다.
+      window.generateChatNickname = function (uid) {
+        if (!uid) return '';
+        const adjectives = ['행복한', '용감한', '엉뚱한', '부지런한', '따뜻한', '똑똑한', '느긋한', '활기찬', '차분한', '신나는', '당당한', '깜찍한', '씩씩한', '상냥한', '재빠른', '든든한', '멋진', '귀여운', '지혜로운', '다정한', '유쾌한', '진지한', '반짝이는', '포근한', '정직한', '수줍은', '대담한', '명랑한', '우아한', '믿음직한'];
+        const nouns = ['사과', '고양이', '다람쥐', '호랑이', '펭귄', '너구리', '부엉이', '수달', '토끼', '여우', '고래', '판다', '곰돌이', '병아리', '거북이', '참새', '두더지', '강아지', '햄스터', '코알라', '사슴', '오리', '문어', '달팽이', '고슴도치', '앵무새', '북극곰', '청설모', '두루미', '귀리'];
+        // 문자열 해시 (djb2 변형) → uid가 같으면 항상 같은 값
+        let h = 5381;
+        for (let i = 0; i < uid.length; i++) {
+          h = ((h << 5) + h + uid.charCodeAt(i)) >>> 0;
+        }
+        const adj = adjectives[h % adjectives.length];
+        const noun = nouns[Math.floor(h / adjectives.length) % nouns.length];
+        const num = (Math.floor(h / (adjectives.length * nouns.length)) % 99) + 1;
+        return `${adj} ${noun} ${num}`;
+      };
+
 // 메시지 HTML 생성
       function buildMsgHTML(data, isMe, msgId) {
         // 관리자일 때만 삭제 버튼 표시
@@ -4526,8 +4543,10 @@
           ? `<button class="msg-del-btn" onclick="deleteChatMessage('${msgId}')"
                style="margin-left:6px;border:none;background:none;cursor:pointer;color:#e74c3c;font-size:0.85rem;">🗑</button>`
           : '';
+        // 실명 대신 uid 기반 자동 닉네임 표시 (기존에 실명으로 저장된 메시지도 닉네임으로 가려짐)
+        const displayName = window.generateChatNickname(data.authorId) || data.authorName || '익명';
         return `<div class="chat-msg ${isMe ? 'my-msg' : ''}">
-          <span class="msg-author">${data.authorName || '익명'}</span>
+          <span class="msg-author">${displayName}</span>
           <span class="msg-bubble">${data.text}</span>
           <span class="msg-time">${formatChatTime(data.createdAt)}</span>
           ${delBtn}
@@ -4649,14 +4668,9 @@
         if (!text) return;
         input.value = '';
 
-        // ★ Firestore에서 닉네임 조회 (취업 이야기 게시판과 동일한 방식)
-        let authorName = user.displayName || user.email?.split('@')[0] || '익명';
-        try {
-          const userDoc = await window.getDoc(window.doc(window.db, 'users', user.uid));
-          if (userDoc.exists() && userDoc.data().nickname) {
-            authorName = userDoc.data().nickname;
-          }
-        } catch (e) { /* 조회 실패시 기본값 사용 */ }
+        // ★ 실명이 아닌 uid 기반 자동 닉네임으로 저장 (링커리어 방식)
+        //   같은 사람은 항상 같은 닉네임이 생성되어 고정됩니다.
+        const authorName = window.generateChatNickname(user.uid);
 
         await window.addDoc(
           window.collection(window.db, 'chatrooms', currentChatRoom, 'messages'),
