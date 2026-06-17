@@ -10880,7 +10880,11 @@ window.addEventListener('DOMContentLoaded', startPremiumCarousel);
         // 홈 상태로 초기화 (replaceState로 현재 상태 교체)
         history.replaceState({ section: 'home' }, '', '#home');
       } else {
-        // URL 해시에 따라 해당 섹션으로 이동
+        // 새로고침/직접 접속(예: #contest)으로 들어와도 뒤로가기를 누르면
+        // 사이트 밖으로 나가지 않고 '홈'으로 돌아오도록 홈 기준점을 먼저 깔아둔다.
+        history.replaceState({ section: 'home' }, '', '#home'); // 0번 기록 = 홈(base)
+        history.pushState({ section: 'home' }, '', '#home');    // 1번 기록(현재) = 홈
+        // 아래 함수가 1번 기록을 해당 섹션으로 교체 → 히스토리: [홈, 현재섹션]
         handleHashNavigation(hash);
       }
     });
