@@ -1,0 +1,4 @@
+functions-framework==3.*
+firebase-admin==6.*
+requests==2.*
+pandas==2.*
