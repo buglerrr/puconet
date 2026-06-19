@@ -1,0 +1,395 @@
+"""
+ALLGONG 채용공고 자동 수집·게시 (Cloud Function, 2nd gen / HTTP trigger)
+────────────────────────────────────────────────────────────────────
+교수님의 두 주피터 노트북을 하나로 합쳐 서버리스로 동작하도록 포팅한 버전.
+
+  ① 알리오 공공기관 API에서 채용공고 + 기관 마스터 수집
+  ② 복합필터(보건·의료 제외 + 신입·학력 + 마감 ≤ N일) 적용 + 기관유형 병합
+  ③ (엑셀 단계 생략) Firestore 'jobs' 컬렉션에 '고정 ID'로 upsert
+     - 같은 공고는 새로 만들지 않고 갱신 (중복 누적 방지)
+     - 이번 수집에 없는 자동등록 공고(source='alio-auto')는 삭제 (마감 공고 정리)
+     - 관리자가 수동으로 올린 공고(source 없음)는 건드리지 않음
+  ④ Storage 'logos/' 의 기관 로고를 매칭해 imageUrl 로 사용
+
+환경변수
+  ALIO_SERVICE_KEY  (필수)  : data.go.kr 서비스키  ← Secret Manager 로 주입
+  STORAGE_BUCKET    (선택)  : 기본 'recruit-board.firebasestorage.app'
+  COLLECTION_NAME   (선택)  : 기본 'jobs'
+  MAX_DAYS          (선택)  : 복합필터 마감일 기준, 기본 20
+  FILTER_MODE       (선택)  : 'composite'(기본,복합필터) | 'no_medical'(보건의료만 제외) | 'all'(전체)
+
+인증
+  Cloud Functions 런타임 서비스계정의 기본 자격증명(ADC)을 사용하므로
+  serviceAccountKey.json 파일이 필요 없습니다. (같은 프로젝트 recruit-board)
+"""
+
+import hashlib
+import math
+import os
+import re
+from datetime import datetime, timedelta
+
+import pandas as pd
+import requests
+
+import firebase_admin
+from firebase_admin import firestore, storage
+
+# ─────────────────────────── 설정 ───────────────────────────
+SERVICE_KEY = os.environ.get("ALIO_SERVICE_KEY", "")
+STORAGE_BUCKET = os.environ.get("STORAGE_BUCKET", "recruit-board.firebasestorage.app")
+COLLECTION_NAME = os.environ.get("COLLECTION_NAME", "jobs")
+MAX_DAYS = int(os.environ.get("MAX_DAYS", "20"))
+FILTER_MODE = os.environ.get("FILTER_MODE", "composite")
+
+PUBLIC_URL = "https://apis.data.go.kr/1051000/public_inst/list"
+RECRUIT_URL = "http://apis.data.go.kr/1051000/recruitment/list"
+
+# 기관유형(한글) → 사이트 카테고리 코드 (업로더 노트북과 동일)
+CATEGORY_MAPPING = {
+    "공기업(준시장형)": "market-public",
+    "공기업(시장형)": "market-public",
+    "준정부기관(기금관리형)": "fund-quasi",
+    "준정부기관(위탁집행형)": "entrust-quasi",
+    "기타공공기관": "other-public",
+    "지방공기업": "local-public",
+    "지방출자·출연기관": "local-investment",
+}
+
+# 한글 컬럼 매핑 (크롤러 노트북과 동일)
+COL_MAP = {
+    "instNm": "기관명",
+    "ncsCdNmLst": "NCS코드명",
+    "hireTypeNmLst": "고용유형",
+    "workRgnNmLst": "근무지역",
+    "recrutSeNm": "채용구분",
+    "prefCondCn": "우대조건",
+    "recrutNope": "채용인원",
+    "pbancBgngYmd": "공고시작일",
+    "pbancEndYmd": "공고종료일",
+    "recrutPbancTtl": "채용공고제목",
+    "srcUrl": "원본공고URL",
+    "replmprYn": "대체인력여부",
+    "aplyQlfcCn": "지원자격요건",
+    "disqlfcRsn": "결격사유",
+    "scrnprcdrMthdExpln": "전형절차",
+    "prefCn": "우대사항",
+    "acbgCondNmLst": "학력조건",
+    "nonatchRsn": "미채용사유",
+    "ongoingYn": "진행여부",
+    "decimalDay": "마감일까지남은일",
+    "pbadmsStdInstCd": "표준기관코드",
+}
+
+
+# ─────────────────────── 공통 수집 함수 ───────────────────────
+def _collect_all_pages(url: str, params: dict, page_size: int = 500) -> list:
+    """주어진 URL의 모든 페이지를 수집하여 items 리스트로 반환."""
+    params = {**params, "pageNo": 1, "numOfRows": page_size}
+    r = requests.get(url, params=params, timeout=30)
+    r.raise_for_status()
+    j = r.json()
+    if j.get("resultCode") != 200:
+        raise RuntimeError(f"API 오류: {j}")
+
+    total = int(j.get("totalCount", 0))
+    items = j.get("result", [])
+    pages = max(1, math.ceil(total / page_size))
+    print(f"  → 총 {total}건, {pages} 페이지 수집 중...")
+
+    for p in range(2, pages + 1):
+        params["pageNo"] = p
+        rr = requests.get(url, params=params, timeout=30)
+        rr.raise_for_status()
+        jj = rr.json()
+        if jj.get("resultCode") != 200:
+            break
+        items.extend(jj.get("result", []))
+    return items
+
+
+def fetch_institutions() -> pd.DataFrame:
+    """공공기관 마스터 → 기관유형 등 핵심 컬럼만 반환."""
+    print("[1/2] 공공기관 마스터 수집")
+    items = _collect_all_pages(PUBLIC_URL, {"serviceKey": SERVICE_KEY, "resultType": "json"})
+    df = pd.DataFrame(items)
+    keep = ["pbadmsStdInstCd", "instTypeNm", "instClsfNm", "sprvsnInstNm", "ctpvNm", "sggNm"]
+    df_core = df[[c for c in keep if c in df.columns]].copy()
+    if "pbadmsStdInstCd" in df_core.columns:
+        df_core.drop_duplicates(subset=["pbadmsStdInstCd"], inplace=True)
+    print(f"  → 마스터 {len(df_core)}개 기관 로드")
+    return df_core
+
+
+def fetch_recruitments() -> pd.DataFrame:
+    """현재 진행중(ongoingYn=Y) 채용공고 → 한글 컬럼 변환."""
+    print("[2/2] 현재진행중 채용공고 수집")
+    items = _collect_all_pages(
+        RECRUIT_URL, {"serviceKey": SERVICE_KEY, "resultType": "json", "ongoingYn": "Y"}
+    )
+    df = pd.json_normalize(items)
+    df_core = df.loc[:, [c for c in COL_MAP if c in df.columns]].copy()
+    df_core.rename(columns=COL_MAP, inplace=True)
+    for c in ("공고시작일", "공고종료일"):
+        if c in df_core.columns:
+            df_core[c] = pd.to_datetime(df_core[c], format="%Y%m%d", errors="coerce")
+    print(f"  → 채용공고 {len(df_core)}건 로드")
+    return df_core
+
+
+def merge_inst_type(df: pd.DataFrame, df_inst: pd.DataFrame) -> pd.DataFrame:
+    """표준기관코드 기준으로 기관유형 등 마스터 정보를 병합."""
+    if "표준기관코드" not in df.columns or "pbadmsStdInstCd" not in df_inst.columns:
+        print("  ⚠️ 표준기관코드 컬럼이 없어 기관유형 병합 생략")
+        return df
+    merged = df.merge(
+        df_inst, left_on="표준기관코드", right_on="pbadmsStdInstCd", how="left"
+    ).drop(columns=["pbadmsStdInstCd"], errors="ignore")
+    merged.rename(
+        columns={
+            "instTypeNm": "기관유형",
+            "instClsfNm": "기관구분",
+            "sprvsnInstNm": "소관부처",
+            "ctpvNm": "시도",
+            "sggNm": "시군구",
+        },
+        inplace=True,
+    )
+    return merged
+
+
+# ──────────────────── 필터 함수들 ─────────────────────────
+def filter_no_medical(df: pd.DataFrame) -> pd.DataFrame:
+    if "NCS코드명" not in df.columns:
+        return df
+    return df[~df["NCS코드명"].str.contains("보건.의료", na=False, regex=False)].copy()
+
+
+def filter_entry_education(df: pd.DataFrame) -> pd.DataFrame:
+    out = df.copy()
+    if "채용구분" in out.columns:
+        out = out[out["채용구분"].isin(["신입", "신입+경력"])]
+    if "학력조건" in out.columns:
+        out = out[
+            out["학력조건"].str.contains(r"학력무관|대졸\(2~3년\)|대졸\(4년\)", na=False)
+        ]
+    return out
+
+
+def filter_deadline(df: pd.DataFrame, max_days: int) -> pd.DataFrame:
+    if "마감일까지남은일" not in df.columns:
+        return df
+    dd = pd.to_numeric(df["마감일까지남은일"], errors="coerce")
+    return df[dd.notna() & (dd <= max_days)].copy()
+
+
+def build_dataset() -> pd.DataFrame:
+    """FILTER_MODE 에 맞춰 최종 업로드용 DataFrame 생성."""
+    df_inst = fetch_institutions()
+    df_raw = fetch_recruitments()
+
+    if FILTER_MODE == "all":
+        df = df_raw
+    elif FILTER_MODE == "no_medical":
+        df = filter_no_medical(df_raw)
+    else:  # composite (기본)
+        df = filter_no_medical(df_raw)
+        df = filter_entry_education(df)
+        df = filter_deadline(df, MAX_DAYS)
+
+    df = merge_inst_type(df, df_inst)
+    if "기관명" in df.columns:
+        df = df.sort_values(by="기관명", ascending=True)
+    print(f"  → 최종 업로드 대상: {len(df)}건 (FILTER_MODE={FILTER_MODE})")
+    return df
+
+
+# ──────────────────── 가공 함수 (업로더 노트북과 동일) ───────────
+def clean_preference(text):
+    if not text:
+        return ""
+    s = str(text)
+    for phrase in [
+        "※ 자세한 사항은 첨부파일의 공고문 참조",
+        "※ 상세 내용은 첨부파일의 채용공고문 참조",
+        "※ 보다 자세한 사항은 첨부파일의 채용공고문을 참조",
+        "※ 상세 내용은\n첨부파일의 채용공고문 참조",
+        "※ 보다 자세한 사항은\n첨부파일의 채용공고문을 참조",
+    ]:
+        s = s.replace(phrase, "")
+    return s.strip()
+
+
+def format_deadline(date_value):
+    if date_value is None or date_value == "":
+        return ""
+    if isinstance(date_value, pd.Timestamp) or isinstance(date_value, datetime):
+        if pd.isna(date_value):
+            return ""
+        return date_value.strftime("%Y-%m-%d")
+    s = str(date_value).strip()
+    if " " in s:
+        s = s.split(" ")[0]
+    return re.sub(r"[./]", "-", s)
+
+
+def clean_url(url):
+    if not url:
+        return "#"
+    s = str(url).strip().replace("'", "").replace('"', "").strip()
+    if not s or not s.startswith(("http://", "https://")):
+        return "#"
+    return s
+
+
+def clean_content(text):
+    if not text or text == "":
+        return ""
+    return str(text).replace("_x000D_", "").replace("\r", "").strip()
+
+
+def get_logo_url(company_name, logo_files):
+    if company_name in logo_files:
+        return logo_files[company_name]
+    clean_name = str(company_name).replace(" ", "")
+    for key, url in logo_files.items():
+        if key.replace(" ", "") == clean_name:
+            return url
+    for key, url in logo_files.items():
+        if company_name and (company_name in key or key in company_name):
+            return url
+    return "./logo.png"
+
+
+def stable_doc_id(row) -> str:
+    """공고를 고유하게 식별하는 결정적 문서 ID (중복 방지/갱신용)."""
+    src = clean_url(row.get("원본공고URL", ""))
+    if src != "#":
+        basis = src
+    else:
+        basis = f"{row.get('기관명','')}|{row.get('채용공고제목','')}|{format_deadline(row.get('공고종료일',''))}"
+    return "alio_" + hashlib.md5(basis.encode("utf-8")).hexdigest()
+
+
+# ──────────────────── Firestore 동기화 ───────────────────────
+def load_logo_files(bucket):
+    print("📂 Storage logos/ 에서 로고 목록 로드 중...")
+    logo_files = {}
+    try:
+        for blob in bucket.list_blobs(prefix="logos/"):
+            filename = blob.name.replace("logos/", "")
+            if not filename:
+                continue
+            company = filename.rsplit(".", 1)[0]
+            try:
+                blob.make_public()
+            except Exception:
+                pass  # 균일 버킷 접근(uniform access)이면 ACL 불가 → public_url 그대로 사용
+            logo_files[company] = blob.public_url
+        print(f"  ✅ 로고 {len(logo_files)}개")
+    except Exception as e:
+        print(f"  ⚠️ 로고 목록 로드 실패: {e}")
+    return logo_files
+
+
+def sync_to_firestore(df: pd.DataFrame) -> dict:
+    db = firestore.client()
+    bucket = storage.bucket()
+    logo_files = load_logo_files(bucket)
+
+    base_time = datetime.now()
+    current_ids = set()
+    ops = 0
+    batch = db.batch()
+    col = db.collection(COLLECTION_NAME)
+
+    def commit():
+        nonlocal batch, ops
+        if ops:
+            batch.commit()
+        batch = db.batch()
+        ops = 0
+
+    i = 0
+    for _, row in df.iterrows():
+        doc_id = stable_doc_id(row)
+        if doc_id in current_ids:
+            continue  # 같은 공고 중복 행 스킵
+        current_ids.add(doc_id)
+
+        company = row.get("기관명", "")
+        category = CATEGORY_MAPPING.get(str(row.get("기관유형", "")).strip(), "public")
+        deadline = format_deadline(row.get("공고종료일", ""))
+        timestamp = base_time + timedelta(seconds=i)
+        i += 1
+
+        doc_data = {
+            "title": row.get("채용공고제목", "제목없음"),
+            "company": company,
+            "category": category,
+            "employmentType": row.get("고용유형", ""),
+            "jobType": row.get("고용유형", ""),
+            "location": row.get("근무지역", ""),
+            "deadline": deadline,
+            "closingDate": deadline,
+            "ncsCode": row.get("NCS코드명", ""),
+            "careerType": row.get("채용구분", ""),
+            "recruitmentCount": str(row.get("채용인원", "0")),
+            "education": row.get("학력조건", ""),
+            "preference": clean_preference(row.get("우대조건", "")),
+            "detailUrl": clean_url(row.get("원본공고URL", "")),
+            "imageUrl": get_logo_url(company, logo_files),
+            "content": clean_content(row.get("전형절차", "")),
+            "createdAt": timestamp,
+            "created_at": timestamp,
+            "source": "alio-auto",  # 자동 등록 표시 (정리 대상 식별용)
+        }
+        batch.set(col.document(doc_id), doc_data, merge=True)
+        ops += 1
+        if ops >= 450:
+            commit()
+    commit()
+    print(f"  ✅ upsert 완료: {len(current_ids)}건")
+
+    # ── 마감/사라진 자동등록 공고 정리 (수동 등록 공고는 보존) ──
+    deleted = 0
+    auto_docs = col.where("source", "==", "alio-auto").stream()
+    for d in auto_docs:
+        if d.id not in current_ids:
+            batch.delete(col.document(d.id))
+            ops += 1
+            deleted += 1
+            if ops >= 450:
+                commit()
+    commit()
+    print(f"  🗑️ 정리(삭제)된 만료 공고: {deleted}건")
+
+    return {"upserted": len(current_ids), "deleted": deleted}
+
+
+def run() -> dict:
+    if not SERVICE_KEY:
+        raise RuntimeError("ALIO_SERVICE_KEY 환경변수가 설정되지 않았습니다.")
+    if not firebase_admin._apps:
+        firebase_admin.initialize_app(options={"storageBucket": STORAGE_BUCKET})
+    df = build_dataset()
+    result = sync_to_firestore(df)
+    print(f"🎉 완료: {result}")
+    return result
+
+
+# ──────────────────── 진입점 ───────────────────────
+# Cloud Functions(2nd gen) HTTP 트리거
+try:
+    import functions_framework
+
+    @functions_framework.http
+    def job_sync(request):  # noqa: ARG001
+        result = run()
+        return (f"OK {result}", 200)
+except ImportError:
+    pass
+
+# 로컬 실행용
+if __name__ == "__main__":
+    run()
