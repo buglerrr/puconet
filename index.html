@@ -10868,7 +10868,9 @@ function initCarousel(carouselContainer) {
   setInterval(slideCarousel, intervalTime);
 }
 
-window.addEventListener('DOMContentLoaded', startPremiumCarousel);
+// [v84 복원] 첫 화면 배너 캐러셀 슬라이드 비활성화 (요청에 따라 이전 고정 배너로 되돌림)
+// 다시 켜려면 아래 줄의 주석을 해제하세요.
+// window.addEventListener('DOMContentLoaded', startPremiumCarousel);
 
     // === 브라우저 뒤로가기/앞으로가기 지원 ===
     // 초기 상태 설정
@@ -11032,9 +11034,11 @@ window.addEventListener('DOMContentLoaded', startPremiumCarousel);
       });
     }
 
-    window.addEventListener('DOMContentLoaded', function() {
-      applyEmpTypeBadges();
-    });
+    // [v84 복원] 고용형태 타원형 배지 비활성화 (요청에 따라 이전 밋밋한 글자 모양으로 되돌림)
+    // 다시 켜려면 아래 addEventListener 주석을 해제하세요.
+    // window.addEventListener('DOMContentLoaded', function() {
+    //   applyEmpTypeBadges();
+    // });
     // 동적으로 카드가 추가될 때도 재적용할 수 있도록 전역 노출
     window.applyEmpTypeBadges = applyEmpTypeBadges;
 
