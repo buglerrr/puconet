@@ -9550,8 +9550,32 @@ function displayStoriesForPage(page) {
       'regular':     { dim: 'employmentType', values: ['정규직'] },
       'contract':    { dim: 'employmentType', values: ['비정규직'] }
     };
+    // 마감일까지 남은 일수 (없으면 null)
+    function _boardDaysLeft(deadline) {
+      if (!deadline) return null;
+      const e = new Date(deadline); if (isNaN(e.getTime())) return null;
+      e.setHours(0, 0, 0, 0); const t = new Date(); t.setHours(0, 0, 0, 0);
+      return Math.round((e - t) / 86400000);
+    }
+    // '추천' 게시판 = 첫 화면 '추천 채용정보' 배너와 동일 (자동수집 + 정규직/청년인턴 + 미마감)
+    function isRecommendedJob(job) {
+      if (job.source !== 'alio-auto') return false;
+      const TARGET = ['정규직', '청년인턴(채용형)', '청년인턴(체험형)'];
+      const emps = String(job.employmentType || job.jobType || '').split(/[,+/]/).map(function (s) { return s.trim(); });
+      if (!TARGET.some(function (t) { return emps.indexOf(t) !== -1; })) return false;
+      const dl = _boardDaysLeft(job.deadline || job.closingDate);
+      if (dl !== null && dl < 0) return false; // 마감 지난 것 제외
+      return true;
+    }
+    // '마감임박' 게시판 = 오늘부터 마감까지 3일 이내(0~3일)
+    function isDeadlineSoonJob(job) {
+      const dl = _boardDaysLeft(job.deadline || job.closingDate);
+      return dl !== null && dl >= 0 && dl <= 3;
+    }
     function computeBoardTypeFilter(boardType) {
       if (!boardType) return null;
+      if (boardType === 'recommended') return { predicate: isRecommendedJob };
+      if (boardType === 'deadline-soon') return { predicate: isDeadlineSoonJob };
       if (BOARD_FILTER_MAP[boardType]) return BOARD_FILTER_MAP[boardType];
       if (boardType.indexOf('region-') === 0) return { dim: 'location', values: [boardType.slice(7)] };
       return null;
@@ -10126,14 +10150,18 @@ function displayStoriesForPage(page) {
       } // end else (hasFilter)
 
       // ===== [추가] 사이드바 채용형태별/지역별 필터 (포함 매칭) =====
-      if (window.boardTypeFilter && window.boardTypeFilter.values && window.boardTypeFilter.values.length) {
+      if (window.boardTypeFilter) {
         const _bf = window.boardTypeFilter;
-        totalJobs = totalJobs.filter(function (job) {
-          const raw = (_bf.dim === 'employmentType') ? (job.employmentType || job.jobType || '') : (job[_bf.dim] || '');
-          // 콤마/플러스/슬래시로 분리 후 정확히 일치하는 항목이 있는지 (예: '비정규직'이 '정규직'에 오매칭되지 않도록)
-          const parts = String(raw).split(/[,+/]/).map(function (s) { return s.trim(); });
-          return _bf.values.some(function (x) { return parts.indexOf(x) !== -1; });
-        });
+        if (typeof _bf.predicate === 'function') {
+          totalJobs = totalJobs.filter(_bf.predicate);
+        } else if (_bf.values && _bf.values.length) {
+          totalJobs = totalJobs.filter(function (job) {
+            const raw = (_bf.dim === 'employmentType') ? (job.employmentType || job.jobType || '') : (job[_bf.dim] || '');
+            // 콤마/플러스/슬래시로 분리 후 정확히 일치하는 항목이 있는지 (예: '비정규직'이 '정규직'에 오매칭되지 않도록)
+            const parts = String(raw).split(/[,+/]/).map(function (s) { return s.trim(); });
+            return _bf.values.some(function (x) { return parts.indexOf(x) !== -1; });
+          });
+        }
       }
 
       // 총 건수
