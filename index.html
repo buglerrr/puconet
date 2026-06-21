@@ -5501,6 +5501,34 @@
                 <li><a href="#" onclick="switchBoard('local-investment'); return false;"
                     id="board-menu-local-investment">지방출자·출연기관</a></li>
               </ul>
+
+              <!-- ④ 지역별 (한 줄에 3개, 클릭 시 해당 지역 포함 공고 표시) -->
+              <p class="sidebar-group-header">지역별</p>
+              <div class="region-grid">
+                <a href="#" onclick="switchBoard('region-서울'); return false;" id="board-menu-region-서울">서울</a>
+                <a href="#" onclick="switchBoard('region-부산'); return false;" id="board-menu-region-부산">부산</a>
+                <a href="#" onclick="switchBoard('region-대구'); return false;" id="board-menu-region-대구">대구</a>
+                <a href="#" onclick="switchBoard('region-인천'); return false;" id="board-menu-region-인천">인천</a>
+                <a href="#" onclick="switchBoard('region-광주'); return false;" id="board-menu-region-광주">광주</a>
+                <a href="#" onclick="switchBoard('region-대전'); return false;" id="board-menu-region-대전">대전</a>
+                <a href="#" onclick="switchBoard('region-울산'); return false;" id="board-menu-region-울산">울산</a>
+                <a href="#" onclick="switchBoard('region-세종'); return false;" id="board-menu-region-세종">세종</a>
+                <a href="#" onclick="switchBoard('region-경기'); return false;" id="board-menu-region-경기">경기</a>
+                <a href="#" onclick="switchBoard('region-강원'); return false;" id="board-menu-region-강원">강원</a>
+                <a href="#" onclick="switchBoard('region-충북'); return false;" id="board-menu-region-충북">충북</a>
+                <a href="#" onclick="switchBoard('region-충남'); return false;" id="board-menu-region-충남">충남</a>
+                <a href="#" onclick="switchBoard('region-전북'); return false;" id="board-menu-region-전북">전북</a>
+                <a href="#" onclick="switchBoard('region-전남'); return false;" id="board-menu-region-전남">전남</a>
+                <a href="#" onclick="switchBoard('region-경북'); return false;" id="board-menu-region-경북">경북</a>
+                <a href="#" onclick="switchBoard('region-경남'); return false;" id="board-menu-region-경남">경남</a>
+                <a href="#" onclick="switchBoard('region-제주'); return false;" id="board-menu-region-제주">제주</a>
+              </div>
+              <style>
+                .board-sidebar .region-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 4px 0 8px; }
+                .board-sidebar .region-grid a { display: block; text-align: center; padding: 7px 2px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 0.85rem; color: #555; text-decoration: none; transition: all .15s; }
+                .board-sidebar .region-grid a:hover { border-color: #3498db; color: #3498db; }
+                .board-sidebar .region-grid a.active { background: #3498db; color: #fff; border-color: #3498db; font-weight: 600; }
+              </style>
             </aside>
 
 
@@ -9513,6 +9541,29 @@ function displayStoriesForPage(page) {
 
 
     // 채용정보 게시판 전환 함수
+    // ===== [추가] 사이드바 채용형태별/지역별 필터 매핑 =====
+    window.boardTypeFilter = null; // {dim, values} | null  (포함 매칭으로 적용)
+    const BOARD_FILTER_MAP = {
+      'intern':      { dim: 'employmentType', values: ['청년인턴(채용형)', '청년인턴(체험형)'] },
+      'entry-level': { dim: 'careerType',     values: ['신입'] },
+      'experienced': { dim: 'careerType',     values: ['경력'] },
+      'regular':     { dim: 'employmentType', values: ['정규직'] },
+      'contract':    { dim: 'employmentType', values: ['비정규직'] }
+    };
+    function computeBoardTypeFilter(boardType) {
+      if (!boardType) return null;
+      if (BOARD_FILTER_MAP[boardType]) return BOARD_FILTER_MAP[boardType];
+      if (boardType.indexOf('region-') === 0) return { dim: 'location', values: [boardType.slice(7)] };
+      return null;
+    }
+    // 사이드바 선택을 필터에 반영: 채용형태/지역 보드는 boardTypeFilter, 그 외(기관유형 등)는 category
+    function applyBoardSelection() {
+      const c = window.currentJobCategory;
+      const bf = computeBoardTypeFilter(c);
+      window.boardTypeFilter = bf;
+      currentFilters.category = (!bf && c) ? [c] : [];
+    }
+
     window.switchBoard = function (boardType, skipHistory = false, targetPage = 1) {
       // 1. 현재 카테고리 업데이트
       window.currentJobCategory = boardType;
@@ -9540,7 +9591,10 @@ function displayStoriesForPage(page) {
 
       const titleElement = document.getElementById('currentBoardTitle');
       if (titleElement) {
-        titleElement.textContent = boardType ? (boardTitles[boardType] || '채용정보') : '채용정보 전체';
+        let _title;
+        if (boardType && boardType.indexOf('region-') === 0) _title = boardType.slice(7) + ' 지역 채용';
+        else _title = boardType ? (boardTitles[boardType] || '채용정보') : '채용정보 전체';
+        titleElement.textContent = _title;
       }
 
       // 3. 사이드바 메뉴 활성화 상태 변경
@@ -9767,12 +9821,8 @@ function displayStoriesForPage(page) {
       // 필터 UI 생성 (내부적으로 동일 데이터면 재계산 생략)
       renderJobFilters();
 
-      // 사이드바 카테고리가 있으면 카테고리 필터에 반영
-      if (window.currentJobCategory) {
-        currentFilters.category = [window.currentJobCategory];
-      } else {
-        currentFilters.category = [];
-      }
+      // 사이드바 선택(기관유형 / 채용형태 / 지역)을 필터에 반영
+      applyBoardSelection();
 
       // applyJobFilters가 테이블 표시/숨김, adminBulkBar, filterGuideMsg 모두 처리
       applyJobFilters(false);
@@ -10075,6 +10125,17 @@ function displayStoriesForPage(page) {
         });
       } // end else (hasFilter)
 
+      // ===== [추가] 사이드바 채용형태별/지역별 필터 (포함 매칭) =====
+      if (window.boardTypeFilter && window.boardTypeFilter.values && window.boardTypeFilter.values.length) {
+        const _bf = window.boardTypeFilter;
+        totalJobs = totalJobs.filter(function (job) {
+          const raw = (_bf.dim === 'employmentType') ? (job.employmentType || job.jobType || '') : (job[_bf.dim] || '');
+          // 콤마/플러스/슬래시로 분리 후 정확히 일치하는 항목이 있는지 (예: '비정규직'이 '정규직'에 오매칭되지 않도록)
+          const parts = String(raw).split(/[,+/]/).map(function (s) { return s.trim(); });
+          return _bf.values.some(function (x) { return parts.indexOf(x) !== -1; });
+        });
+      }
+
       // 총 건수
       const cntEl = document.getElementById('jobTotalCnt');
       if (cntEl) cntEl.textContent = totalJobs.length;
@@ -10113,10 +10174,8 @@ function displayStoriesForPage(page) {
         employmentType: [], careerType: [], category: []
       };
 
-      // 만약 사이드바 카테고리가 선택되어 있다면 유지
-      if (window.currentJobCategory) {
-        currentFilters.category = [window.currentJobCategory];
-      }
+      // 사이드바 선택(기관유형 / 채용형태 / 지역)을 유지
+      applyBoardSelection();
 
       const searchInput = document.getElementById('jobSearchInput');
       if (searchInput) searchInput.value = '';
