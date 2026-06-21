@@ -11450,5 +11450,122 @@ function initCarousel(carouselContainer) {
     setInterval(updateDdays, 60 * 60 * 1000);
   })();
 </script>
+<!-- ===== [추가] 추천 채용정보 자동 배너 (자동수집 공고 중 정규직/청년인턴 → 맨 윗줄 삽입) ===== -->
+<style>
+  #jobs .auto-rec-card {
+    display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch;
+    border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; box-sizing: border-box;
+    width: 100%; max-width: 100%; height: 200px; overflow: hidden; background: #ffffff;
+    text-decoration: none; cursor: pointer; position: relative;
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+  }
+  #jobs .auto-rec-card:hover { transform: scale(1.05); box-shadow: 0 12px 32px rgba(77,171,247,0.30); z-index: 2; }
+  #jobs .auto-rec-card .banner-image { width: 100%; height: 64px; object-fit: contain; object-position: center; display: block; transition: transform 0.35s ease; }
+  #jobs .auto-rec-card:hover .banner-image { transform: scale(1.08); }
+  #jobs .auto-rec-card h3 { font-size: 16px; line-height: 1.3; margin: 8px 0 4px; color: #222; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  #jobs .auto-rec-card p { margin: 0 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .95rem; color: #333; }
+  #jobs .auto-rec-card .meta { margin-top: auto; font-size: .85rem; color: #555; }
+  #jobs .auto-rec-card .dday { color: #e74c3c; font-weight: 600; }
+  #jobs .auto-rec-card .rec-tag { position: absolute; top: 8px; right: 8px; background: #2BBDF5; color: #fff; font-size: .68rem; font-weight: 700; padding: 2px 7px; border-radius: 5px; }
+</style>
+<script>
+  (function () {
+    var TARGET_EMP = ['정규직', '청년인턴(채용형)', '청년인턴(체험형)'];
+    var done = false;
+
+    function esc(s) { var d = document.createElement('div'); d.textContent = (s == null ? '' : String(s)); return d.innerHTML; }
+    function escA(s) { return esc(s).replace(/"/g, '&quot;'); }
+
+    function fmtLoc(loc) {
+      if (!loc) return '-';
+      var parts = String(loc).split(/[,，]/).map(function (x) { return x.trim(); }).filter(Boolean);
+      if (parts.length <= 1) return parts[0] || '-';
+      return parts[0] + ' 외';
+    }
+    function daysLeft(deadline) {
+      if (!deadline) return null;
+      var end = new Date(deadline); if (isNaN(end.getTime())) return null;
+      end.setHours(0, 0, 0, 0); var t = new Date(); t.setHours(0, 0, 0, 0);
+      return Math.round((end - t) / 86400000);
+    }
+    function ddayText(deadline) {
+      var dl = daysLeft(deadline);
+      if (dl === null) return '';
+      if (dl < 0) return '마감'; if (dl === 0) return 'D-DAY'; return 'D-' + dl;
+    }
+    function matchedEmp(emp) {
+      var parts = String(emp || '').split(/[,，]/).map(function (x) { return x.trim(); });
+      return TARGET_EMP.filter(function (t) { return parts.indexOf(t) !== -1; });
+    }
+
+    // 배너 클릭 → 해당 공고의 '채용정보' 게시판 상세글 표출
+    window.openRecommendedJob = function (id) {
+      try { if (typeof window.showBoard === 'function') window.showBoard(true); } catch (e) {}
+      if (typeof viewDetail === 'function') { viewDetail(id); }
+      else if (typeof window.viewDetail === 'function') { window.viewDetail(id); }
+    };
+
+    async function renderRecommendedBanners() {
+      if (done) return;
+      var grid = document.querySelector('#jobs .job-grid');
+      if (!grid) return;
+      try {
+        var q = window.query(window.collection(window.db, 'jobs'), window.orderBy('createdAt', 'desc'), window.limit(300));
+        var snap = await window.getDocs(q);
+        var items = [];
+        snap.forEach(function (docSnap) {
+          var d = docSnap.data();
+          if (d.source !== 'alio-auto') return;                 // 자동수집 공고만
+          var emps = matchedEmp(d.employmentType || d.jobType); // 정규직/청년인턴(채용·체험형)만
+          if (emps.length === 0) return;
+          var dl = d.deadline || d.closingDate || '';
+          var left = daysLeft(dl);
+          if (left !== null && left < 0) return;                // 마감 지난 공고 제외
+          items.push({ id: docSnap.id, d: d, emps: emps });
+        });
+        if (items.length === 0) return;
+
+        window.jobsData = window.jobsData || {};
+        var frag = document.createDocumentFragment();
+        items.forEach(function (it) {
+          var d = it.d;
+          var created = (d.createdAt && d.createdAt.seconds)
+            ? new Date(d.createdAt.seconds * 1000).toLocaleDateString('ko-KR') : '';
+          // 클릭 상세보기를 위해 jobsData 채워둠
+          window.jobsData[it.id] = Object.assign({}, d, { id: it.id, createdDate: created });
+
+          var dl = d.deadline || d.closingDate || '';
+          var img = (d.imageUrl && d.imageUrl !== './logo.png') ? d.imageUrl : './올공 CI.png';
+          var a = document.createElement('a');
+          a.className = 'auto-rec-card';
+          a.setAttribute('href', 'javascript:void(0)');
+          a.setAttribute('role', 'button');
+          a.setAttribute('data-job-id', it.id);
+          a.addEventListener('click', function () { window.openRecommendedJob(it.id); });
+          a.innerHTML =
+            '<span class="rec-tag">추천</span>' +
+            '<img class="banner-image" alt="' + escA(d.company || '') + '" src="' + escA(img) + '" onerror="this.onerror=null;this.src=\'./올공 CI.png\'" />' +
+            '<h3 title="' + escA(d.title || '') + '">' + esc(d.title || '') + '</h3>' +
+            '<p>' + esc(it.emps.join('/')) + '</p>' +
+            '<p class="meta">근무지: ' + esc(fmtLoc(d.location)) + ' · 마감: ' + esc(dl || '-') +
+            ' <span class="dday">' + esc(ddayText(dl)) + '</span></p>';
+          frag.appendChild(a);
+        });
+        // 기존 배너는 아래로, 신규 추천 배너를 맨 앞에 삽입
+        grid.insertBefore(frag, grid.firstChild);
+        done = true;
+      } catch (e) { console.error('추천 배너 로드 실패:', e); }
+    }
+
+    (function wait() {
+      if (window.db && window.getDocs && window.query && window.orderBy && window.limit
+          && document.querySelector('#jobs .job-grid')) {
+        renderRecommendedBanners();
+      } else {
+        setTimeout(wait, 250);
+      }
+    })();
+  })();
+</script>
 </body>
 </html>

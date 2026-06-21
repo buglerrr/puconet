@@ -42,6 +42,13 @@ COLLECTION_NAME = os.environ.get("COLLECTION_NAME", "jobs")
 MAX_DAYS = int(os.environ.get("MAX_DAYS", "20"))
 FILTER_MODE = os.environ.get("FILTER_MODE", "composite")
 
+# 제목에 이 키워드들이 포함된 공고는 업로드에서 제외 (콤마로 구분, 환경변수로 변경 가능)
+_DEFAULT_EXCLUDE = (
+    "청원경찰,의사,간호,환경미화,운전,경비,"
+    "단기노무원,프로젝트계약근로자,작업원,보강공사,단순정비,일용근로자"
+)
+EXCLUDE_KEYWORDS = [k.strip() for k in os.environ.get("EXCLUDE_KEYWORDS", _DEFAULT_EXCLUDE).split(",") if k.strip()]
+
 PUBLIC_URL = "https://apis.data.go.kr/1051000/public_inst/list"
 RECRUIT_URL = "http://apis.data.go.kr/1051000/recruitment/list"
 
@@ -183,6 +190,29 @@ def filter_deadline(df: pd.DataFrame, max_days: int) -> pd.DataFrame:
     return df[dd.notna() & (dd <= max_days)].copy()
 
 
+def filter_exclude_keywords(df: pd.DataFrame) -> pd.DataFrame:
+    """채용공고제목에 제외 키워드가 포함된 공고를 제거."""
+    if "채용공고제목" not in df.columns or not EXCLUDE_KEYWORDS:
+        return df
+    before = len(df)
+    pattern = "|".join(re.escape(k) for k in EXCLUDE_KEYWORDS)
+    out = df[~df["채용공고제목"].astype(str).str.contains(pattern, na=False, regex=True)].copy()
+    print(f"  → 제외 키워드 필터: {before - len(out)}건 제거 → {len(out)}건")
+    return out
+
+
+def filter_not_expired(df: pd.DataFrame) -> pd.DataFrame:
+    """마감일(공고종료일)이 오늘보다 이전인 공고 제거 (만료 공고는 게시 안 함)."""
+    if "공고종료일" not in df.columns:
+        return df
+    before = len(df)
+    today = pd.Timestamp(datetime.now().date())
+    end = pd.to_datetime(df["공고종료일"], errors="coerce")
+    out = df[end.isna() | (end >= today)].copy()
+    print(f"  → 마감 지난 공고 제외: {before - len(out)}건 제거 → {len(out)}건")
+    return out
+
+
 def build_dataset() -> pd.DataFrame:
     """FILTER_MODE 에 맞춰 최종 업로드용 DataFrame 생성."""
     df_inst = fetch_institutions()
@@ -196,6 +226,10 @@ def build_dataset() -> pd.DataFrame:
         df = filter_no_medical(df_raw)
         df = filter_entry_education(df)
         df = filter_deadline(df, MAX_DAYS)
+
+    # 제목 키워드 제외 + 마감 지난 공고 제외 (항상 적용)
+    df = filter_exclude_keywords(df)
+    df = filter_not_expired(df)
 
     df = merge_inst_type(df, df_inst)
     if "기관명" in df.columns:

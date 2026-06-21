@@ -116,6 +116,7 @@ gcloud scheduler jobs run job-sync-daily --location=asia-northeast3
 | `FILTER_MODE` | `composite` | `composite`(신입·학력·마감·보건제외) / `no_medical`(보건의료만 제외) / `all`(전체) |
 | `COLLECTION_NAME` | `jobs` | 업로드 대상 Firestore 컬렉션 |
 | `STORAGE_BUCKET` | `recruit-board.firebasestorage.app` | 로고 버킷 |
+| `EXCLUDE_KEYWORDS` | `청원경찰,의사,간호,환경미화,운전,경비,단기노무원,프로젝트계약근로자,작업원,보강공사,단순정비,일용근로자` | 제목에 포함되면 업로드 제외할 키워드(콤마 구분). 바꾸려면 `--set-env-vars=EXCLUDE_KEYWORDS="키워드1,키워드2"` |
 
 예: 전체 공고를 올리고 싶다면
 `--set-env-vars=FILTER_MODE=all` 추가.
