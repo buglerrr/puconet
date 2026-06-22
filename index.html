@@ -11593,9 +11593,9 @@ function initCarousel(carouselContainer) {
     };
 
     async function renderRecommendedBanners() {
-      if (done) return;
+      if (done) return true;
       var grid = document.querySelector('#jobs .job-grid');
-      if (!grid) return;
+      if (!grid) return false;
       try {
         var q = window.query(window.collection(window.db, 'jobs'), window.orderBy('createdAt', 'desc'), window.limit(300));
         var snap = await window.getDocs(q);
@@ -11610,7 +11610,10 @@ function initCarousel(carouselContainer) {
           if (left !== null && left < 0) return;                // 마감 지난 공고 제외
           items.push({ id: docSnap.id, d: d, emps: emps });
         });
-        if (items.length === 0) return;
+        if (items.length === 0) return false;  // 아직 데이터 없음 → 재시도 대상
+
+        // 혹시 모를 중복 방지: 기존 자동 배너 제거 후 다시 삽입
+        Array.prototype.forEach.call(grid.querySelectorAll('.auto-rec-card'), function (el) { el.remove(); });
 
         window.jobsData = window.jobsData || {};
         var frag = document.createDocumentFragment();
@@ -11641,13 +11644,27 @@ function initCarousel(carouselContainer) {
         // 기존 배너는 아래로, 신규 추천 배너를 맨 앞에 삽입
         grid.insertBefore(frag, grid.firstChild);
         done = true;
-      } catch (e) { console.error('추천 배너 로드 실패:', e); }
+        return true;
+      } catch (e) { console.error('추천 배너 로드 실패:', e); return false; }
+    }
+
+    // 성공할 때까지(데이터가 보일 때까지) 재시도 — 첫 콜드 로드/캐시 지연 시에도 새로고침 없이 표출
+    var _recTries = 0;
+    function tryRenderRecommended() {
+      renderRecommendedBanners().then(function (ok) {
+        if (!ok && _recTries < 15) {
+          _recTries++;
+          setTimeout(tryRenderRecommended, 1000);
+        }
+      }).catch(function () {
+        if (_recTries < 15) { _recTries++; setTimeout(tryRenderRecommended, 1000); }
+      });
     }
 
     (function wait() {
       if (window.db && window.getDocs && window.query && window.orderBy && window.limit
           && document.querySelector('#jobs .job-grid')) {
-        renderRecommendedBanners();
+        tryRenderRecommended();
       } else {
         setTimeout(wait, 250);
       }
