@@ -49,6 +49,9 @@ _DEFAULT_EXCLUDE = (
 )
 EXCLUDE_KEYWORDS = [k.strip() for k in os.environ.get("EXCLUDE_KEYWORDS", _DEFAULT_EXCLUDE).split(",") if k.strip()]
 
+# 첫 화면 '추천 채용정보' 배너 대상 고용유형
+RECOMMENDED_EMP = {"정규직", "청년인턴(채용형)", "청년인턴(체험형)"}
+
 PUBLIC_URL = "https://apis.data.go.kr/1051000/public_inst/list"
 RECRUIT_URL = "http://apis.data.go.kr/1051000/recruitment/list"
 
@@ -357,6 +360,10 @@ def sync_to_firestore(df: pd.DataFrame) -> dict:
         timestamp = base_time + timedelta(seconds=i)
         i += 1
 
+        # 첫 화면 '추천 채용정보' 배너 대상 표시 (정규직/청년인턴(채용·체험형))
+        _emp_parts = {p.strip() for p in re.split(r"[,+/]", str(row.get("고용유형", "")))}
+        is_recommended = bool(_emp_parts & RECOMMENDED_EMP)
+
         doc_data = {
             "title": row.get("채용공고제목", "제목없음"),
             "company": company,
@@ -377,6 +384,7 @@ def sync_to_firestore(df: pd.DataFrame) -> dict:
             "createdAt": timestamp,
             "created_at": timestamp,
             "source": "alio-auto",  # 자동 등록 표시 (정리 대상 식별용)
+            "recommended": is_recommended,  # 추천 배너 대상 여부 (홈 빠른 조회용)
         }
         batch.set(col.document(doc_id), doc_data, merge=True)
         ops += 1

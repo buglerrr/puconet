@@ -5,6 +5,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=1480" />
+  <!-- [성능] Firebase SDK/Firestore 미리 연결 + 모듈 선다운로드 → 첫 로딩 단축 -->
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://firebasestorage.googleapis.com" crossorigin>
+  <link rel="dns-prefetch" href="https://www.gstatic.com">
+  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js">
+  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js">
+  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js">
+  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js">
   <link rel="icon" type="image/png" href="https://github.com/buglerrr/puconet/blob/main/ALLGONG%20CI.png?raw=true">
   <title>올공(ALLGONG) - 국내 최초 공공기업 전문 채용 포탈</title>
   <!-- Claude Code 연동 테스트 -->
@@ -6878,7 +6887,7 @@
   <script type="module">
     // Firebase 9 버전 SDK 가져오기
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, orderBy, query, Timestamp, setDoc, getDoc, limit, onSnapshot, increment } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, orderBy, query, Timestamp, setDoc, getDoc, limit, onSnapshot, increment, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
     import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, GoogleAuthProvider, signInWithPopup, OAuthProvider } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
@@ -6909,6 +6918,7 @@
     window.deleteDoc = deleteDoc;
     window.orderBy = orderBy;
     window.query = query;
+    window.where = where;
     window.Timestamp = Timestamp;
     window.limit = limit;
     window.onSnapshot = onSnapshot; // 실시간 채팅용
@@ -11592,79 +11602,121 @@ function initCarousel(carouselContainer) {
       else if (typeof window.viewDetail === 'function') { window.viewDetail(id); }
     };
 
-    async function renderRecommendedBanners() {
-      if (done) return true;
+    var CACHE_KEY = 'allgong_rec_banners_v2';
+
+    // 공고 문서 → 배너/상세보기에 필요한 slim 아이템 (JSON 캐시 가능)
+    function normalizeJob(id, d) {
+      var createdMs = (d.createdAt && d.createdAt.seconds) ? d.createdAt.seconds * 1000 : 0;
+      return {
+        id: id, emps: matchedEmp(d.employmentType || d.jobType),
+        title: d.title || '', company: d.company || '',
+        employmentType: d.employmentType || '', jobType: d.jobType || d.employmentType || '',
+        location: d.location || '', deadline: d.deadline || d.closingDate || '', closingDate: d.closingDate || d.deadline || '',
+        ncsCode: d.ncsCode || '', careerType: d.careerType || '', recruitmentCount: d.recruitmentCount || '',
+        education: d.education || '', preference: d.preference || '', detailUrl: d.detailUrl || '#',
+        imageUrl: d.imageUrl || '', content: d.content || '', category: d.category || '',
+        createdMs: createdMs, createdDate: createdMs ? new Date(createdMs).toLocaleDateString('ko-KR') : ''
+      };
+    }
+    function notExpired(it) {
+      var left = daysLeft(it.deadline || it.closingDate);
+      return left === null || left >= 0;
+    }
+
+    // 아이템 배열 → 배너 카드 생성 (맨 앞 삽입). jobsData도 채워 클릭 상세보기 가능
+    function renderItems(items) {
+      var grid = document.querySelector('#jobs .job-grid');
+      if (!grid || !items || !items.length) return false;
+      items = items.slice().sort(function (a, b) { return (b.createdMs || 0) - (a.createdMs || 0); }); // 최신순
+      Array.prototype.forEach.call(grid.querySelectorAll('.auto-rec-card'), function (el) { el.remove(); });
+      window.jobsData = window.jobsData || {};
+      var frag = document.createDocumentFragment();
+      items.forEach(function (it) {
+        window.jobsData[it.id] = Object.assign({}, it, { createdDate: it.createdDate }); // 상세보기용
+        var dl = it.deadline || it.closingDate || '';
+        var img = (it.imageUrl && it.imageUrl !== './logo.png') ? it.imageUrl : './올공 CI.png';
+        var a = document.createElement('a');
+        a.className = 'auto-rec-card';
+        a.setAttribute('href', 'javascript:void(0)');
+        a.setAttribute('role', 'button');
+        a.setAttribute('data-job-id', it.id);
+        a.addEventListener('click', function () { window.openRecommendedJob(it.id); });
+        a.innerHTML =
+          '<span class="rec-tag">추천</span>' +
+          '<img class="banner-image" alt="' + escA(it.company) + '" src="' + escA(img) + '" onerror="this.onerror=null;this.src=\'./올공 CI.png\'" />' +
+          '<h3 title="' + escA(it.title) + '">' + esc(it.title) + '</h3>' +
+          '<p>' + esc((it.emps || []).join('/')) + '</p>' +
+          '<p class="meta">근무지: ' + esc(fmtLoc(it.location)) + ' · 마감: ' + esc(dl || '-') +
+          ' <span class="dday">' + esc(ddayText(dl)) + '</span></p>';
+        frag.appendChild(a);
+      });
+      grid.insertBefore(frag, grid.firstChild);
+      return true;
+    }
+
+    // ② localStorage 캐시 → 재방문 시 DB 로딩 전에 즉시 표시
+    function renderFromCache() {
+      try {
+        var cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+        if (!cached || !cached.items) return false;
+        return renderItems(cached.items.filter(notExpired));
+      } catch (e) { return false; }
+    }
+    function saveCache(items) {
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), items: items })); } catch (e) {}
+    }
+
+    // ① 효율 조회: recommended==true 인 수십 건만 읽음 (실패/0건 시 기존 방식 폴백)
+    async function fetchRecommended() {
+      try {
+        if (window.where) {
+          var q1 = window.query(window.collection(window.db, 'jobs'), window.where('recommended', '==', true));
+          var s1 = await window.getDocs(q1);
+          var a1 = [];
+          s1.forEach(function (ds) { a1.push(normalizeJob(ds.id, ds.data())); });
+          a1 = a1.filter(notExpired);
+          if (a1.length) return a1;
+        }
+      } catch (e) { /* 폴백 */ }
+      // 폴백: 플래그 미적용 기간 대비 — 최근 300건 읽어 클라이언트 필터
+      var q2 = window.query(window.collection(window.db, 'jobs'), window.orderBy('createdAt', 'desc'), window.limit(300));
+      var s2 = await window.getDocs(q2);
+      var a2 = [];
+      s2.forEach(function (ds) {
+        var d = ds.data();
+        if (d.source !== 'alio-auto') return;
+        var it = normalizeJob(ds.id, d);
+        if (it.emps.length && notExpired(it)) a2.push(it);
+      });
+      return a2;
+    }
+
+    async function refreshBanners() {
       var grid = document.querySelector('#jobs .job-grid');
       if (!grid) return false;
       try {
-        var q = window.query(window.collection(window.db, 'jobs'), window.orderBy('createdAt', 'desc'), window.limit(300));
-        var snap = await window.getDocs(q);
-        var items = [];
-        snap.forEach(function (docSnap) {
-          var d = docSnap.data();
-          if (d.source !== 'alio-auto') return;                 // 자동수집 공고만
-          var emps = matchedEmp(d.employmentType || d.jobType); // 정규직/청년인턴(채용·체험형)만
-          if (emps.length === 0) return;
-          var dl = d.deadline || d.closingDate || '';
-          var left = daysLeft(dl);
-          if (left !== null && left < 0) return;                // 마감 지난 공고 제외
-          items.push({ id: docSnap.id, d: d, emps: emps });
-        });
-        if (items.length === 0) return false;  // 아직 데이터 없음 → 재시도 대상
-
-        // 혹시 모를 중복 방지: 기존 자동 배너 제거 후 다시 삽입
-        Array.prototype.forEach.call(grid.querySelectorAll('.auto-rec-card'), function (el) { el.remove(); });
-
-        window.jobsData = window.jobsData || {};
-        var frag = document.createDocumentFragment();
-        items.forEach(function (it) {
-          var d = it.d;
-          var created = (d.createdAt && d.createdAt.seconds)
-            ? new Date(d.createdAt.seconds * 1000).toLocaleDateString('ko-KR') : '';
-          // 클릭 상세보기를 위해 jobsData 채워둠
-          window.jobsData[it.id] = Object.assign({}, d, { id: it.id, createdDate: created });
-
-          var dl = d.deadline || d.closingDate || '';
-          var img = (d.imageUrl && d.imageUrl !== './logo.png') ? d.imageUrl : './올공 CI.png';
-          var a = document.createElement('a');
-          a.className = 'auto-rec-card';
-          a.setAttribute('href', 'javascript:void(0)');
-          a.setAttribute('role', 'button');
-          a.setAttribute('data-job-id', it.id);
-          a.addEventListener('click', function () { window.openRecommendedJob(it.id); });
-          a.innerHTML =
-            '<span class="rec-tag">추천</span>' +
-            '<img class="banner-image" alt="' + escA(d.company || '') + '" src="' + escA(img) + '" onerror="this.onerror=null;this.src=\'./올공 CI.png\'" />' +
-            '<h3 title="' + escA(d.title || '') + '">' + esc(d.title || '') + '</h3>' +
-            '<p>' + esc(it.emps.join('/')) + '</p>' +
-            '<p class="meta">근무지: ' + esc(fmtLoc(d.location)) + ' · 마감: ' + esc(dl || '-') +
-            ' <span class="dday">' + esc(ddayText(dl)) + '</span></p>';
-          frag.appendChild(a);
-        });
-        // 기존 배너는 아래로, 신규 추천 배너를 맨 앞에 삽입
-        grid.insertBefore(frag, grid.firstChild);
-        done = true;
+        var items = await fetchRecommended();
+        if (!items.length) return false; // 재시도 대상
+        renderItems(items);
+        saveCache(items);
         return true;
       } catch (e) { console.error('추천 배너 로드 실패:', e); return false; }
     }
 
-    // 성공할 때까지(데이터가 보일 때까지) 재시도 — 첫 콜드 로드/캐시 지연 시에도 새로고침 없이 표출
     var _recTries = 0;
-    function tryRenderRecommended() {
-      renderRecommendedBanners().then(function (ok) {
-        if (!ok && _recTries < 15) {
-          _recTries++;
-          setTimeout(tryRenderRecommended, 1000);
-        }
+    function tryRefresh() {
+      refreshBanners().then(function (ok) {
+        if (!ok && _recTries < 15) { _recTries++; setTimeout(tryRefresh, 1000); }
       }).catch(function () {
-        if (_recTries < 15) { _recTries++; setTimeout(tryRenderRecommended, 1000); }
+        if (_recTries < 15) { _recTries++; setTimeout(tryRefresh, 1000); }
       });
     }
 
-    (function wait() {
-      if (window.db && window.getDocs && window.query && window.orderBy && window.limit
+    renderFromCache();  // 즉시: 캐시로 먼저 표시 (DB 준비 전)
+    (function wait() {   // 그 다음 DB 준비되면 최신으로 갱신
+      if (window.db && window.getDocs && window.query && window.collection
           && document.querySelector('#jobs .job-grid')) {
-        tryRenderRecommended();
+        tryRefresh();
       } else {
         setTimeout(wait, 250);
       }
