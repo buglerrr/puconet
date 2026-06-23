@@ -5851,6 +5851,7 @@
               <ul>
                 <li><a href="#" onclick="switchStoryBoard('all'); return false;" id="story-menu-all"
                     class="active"><span>📋</span> 전체글</a></li>
+                <li><a href="#" onclick="switchStoryBoard('greeting'); return false;" id="story-menu-greeting"><span>👋</span> 가입인사</a></li>
                 <li><a href="#" onclick="switchStoryBoard('free'); return false;" id="story-menu-free"><span>🗒️</span> 자유게시판</a></li>
                 <li><a href="#" onclick="switchStoryBoard('counsel'); return false;"
                     id="story-menu-counsel"><span>🤔</span> 고민상담(자유주제)</a></li>
@@ -5894,6 +5895,10 @@
               </div>
 
               <div id="storyBoardTable" class="story-list-wrapper">
+                <!-- 가입인사 게시판 전용 안내 문구 -->
+                <div id="greetingNotice" style="display:none; margin-bottom:14px; padding:14px 18px; background:#eef9fe; border:1px solid #bfe8fa; border-left:4px solid #2BBDF5; border-radius:8px; color:#0b6e93; font-weight:700; font-size:.97rem; line-height:1.5;">
+                  🎁 가입인사시 향후 공공기관 설명회시 무료 및 최우선 참가 특전 부여
+                </div>
                 <div class="story-list-top">
                   <div class="story-list-top-left">
                     <h3 id="storyBoardCategoryTitle">자유게시판</h3>
@@ -5943,6 +5948,7 @@
               </div>
               <ul>
                 <li><a href="#" onclick="switchStoryBoard('all'); return false;" id="detail-menu-all"><span>📋</span> 전체글</a></li>
+                <li><a href="#" onclick="switchStoryBoard('greeting'); return false;" id="detail-menu-greeting"><span>👋</span> 가입인사</a></li>
                 <li><a href="#" onclick="switchStoryBoard('free'); return false;" id="detail-menu-free"><span>🗒️</span> 자유게시판</a></li>
                 <li><a href="#" onclick="switchStoryBoard('counsel'); return false;"
                     id="detail-menu-counsel"><span>🤔</span> 고민상담(자유주제)</a></li>
@@ -7927,7 +7933,7 @@ function displayStoriesForPage(page) {
 
       // 링커리어 게시판명과 유사하게 라벨 변경
       const catLabels = {
-        all: '전체글', free: '자유이야기', counsel: '고민상담(자유주제)', consulting: '취업/이직', study: '대외활동',
+        all: '전체글', greeting: '가입인사', free: '자유이야기', counsel: '고민상담(자유주제)', consulting: '취업/이직', study: '대외활동',
         'ncs-review': '자격증', interview: '인턴 고민', success: '합격자소서', expert: '직무질문'
       };
 
@@ -8396,7 +8402,7 @@ function displayStoriesForPage(page) {
 
       // 3-1. 카테고리 타이틀 즉시 업데이트 + 상세 사이드바 동기화
       const _catLabels = {
-        all: '전체글', free: '자유게시판', counsel: '고민상담(자유주제)', consulting: '취업상담실', study: '스터디 모집',
+        all: '전체글', greeting: '가입인사', free: '자유게시판', counsel: '고민상담(자유주제)', consulting: '취업상담실', study: '스터디 모집',
         'ncs-review': 'NCS 후기', interview: '면접 후기', success: '최종합격 수기', expert: '현직자/전문가'
       };
       const _titleEl = document.getElementById('storyBoardCategoryTitle');
@@ -8405,6 +8411,7 @@ function displayStoriesForPage(page) {
       // ★ 게시판별 설명글 업데이트
       const _subtitleMap = {
         all:          '취업 이야기의 모든 글을 한눈에 확인하세요.',
+        greeting:     '올공에 오신 것을 환영합니다! 가입인사를 남겨보세요.',
         free:         '자유롭게 취업 이야기를 나눠보세요.',
         counsel:      '주제에 상관없이 고민을 자유롭게 나눠보세요.',
         consulting:   '취업 고민, 함께 해결해 드립니다.',
@@ -8429,6 +8436,10 @@ function displayStoriesForPage(page) {
 
       if (boardTable) boardTable.style.display = 'block';
       if (boardMessage) boardMessage.style.display = 'none';
+
+      // ★ 가입인사 게시판일 때만 안내 문구 표시
+      const _greetingNotice = document.getElementById('greetingNotice');
+      if (_greetingNotice) _greetingNotice.style.display = (boardType === 'greeting') ? 'block' : 'none';
 
       // ★ 전체글일 때만 BEST 인기글 섹션 표시
       const bestWrapper = document.querySelector('.best-story-wrapper');
@@ -8461,7 +8472,7 @@ function displayStoriesForPage(page) {
 
       // 카테고리 뱃지 설정
       const _catLabels = {
-        all: '전체글', free: '자유게시판', counsel: '고민상담(자유주제)', consulting: '취업상담실', study: '스터디 모집',
+        all: '전체글', greeting: '가입인사', free: '자유게시판', counsel: '고민상담(자유주제)', consulting: '취업상담실', study: '스터디 모집',
         'ncs-review': 'NCS 후기', interview: '면접 후기', success: '최종합격 수기', expert: '현직자/전문가'
       };
       const dataCat = data.category || 'free';
@@ -11450,7 +11461,7 @@ function initCarousel(carouselContainer) {
         filteredDocs = filteredDocs.slice(0, 10);
 
         const catLabels = {
-            all: '전체글', free: '자유이야기', counsel: '고민상담(자유주제)', consulting: '취업/이직', study: '대외활동',
+            all: '전체글', greeting: '가입인사', free: '자유이야기', counsel: '고민상담(자유주제)', consulting: '취업/이직', study: '대외활동',
             'ncs-review': '자격증', interview: '인턴 고민', success: '합격자소서', expert: '직무질문'
         };
 
@@ -11563,7 +11574,14 @@ function initCarousel(carouselContainer) {
   #jobs .auto-rec-card p { margin: 0 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .95rem; color: #333; }
   #jobs .auto-rec-card .meta { margin-top: auto; font-size: .85rem; color: #555; }
   #jobs .auto-rec-card .dday { color: #e74c3c; font-weight: 600; }
-  #jobs .auto-rec-card .rec-tag { position: absolute; top: 8px; right: 8px; background: #2BBDF5; color: #fff; font-size: .68rem; font-weight: 700; padding: 2px 7px; border-radius: 5px; }
+  #jobs .auto-rec-card .rec-tag { position: absolute; top: 8px; right: 8px; background: #2BBDF5; color: #fff; font-size: .68rem; font-weight: 700; padding: 2px 7px; border-radius: 5px; transform-origin: center center; animation: recTagWobble 0.9s ease-in-out infinite; }
+  @keyframes recTagWobble {
+    0%, 100% { transform: translateX(-3px) rotate(-8deg); }
+    50%      { transform: translateX(3px) rotate(8deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #jobs .auto-rec-card .rec-tag { animation: none; }
+  }
 </style>
 <script>
   (function () {
@@ -11721,6 +11739,46 @@ function initCarousel(carouselContainer) {
         setTimeout(wait, 250);
       }
     })();
+  })();
+</script>
+
+<!-- [추가] 로그인 안내 팝업 (첫 화면 / 비로그인 사용자) -->
+<style>
+  #loginTipPopup { position: fixed; top: 96px; right: 24px; z-index: 990; width: 300px; background:#fff; border:1px solid #e3e8ef; border-radius:12px; box-shadow:0 12px 32px rgba(0,0,0,.18); padding:18px 18px 16px; display:none; }
+  #loginTipPopup.show { display:block; animation: loginTipIn .35s ease; }
+  @keyframes loginTipIn { from{opacity:0; transform:translateY(-12px);} to{opacity:1; transform:translateY(0);} }
+  #loginTipPopup .tip-close { position:absolute; top:8px; right:10px; border:none; background:none; font-size:22px; line-height:1; color:#98a2b3; cursor:pointer; padding:2px 6px; }
+  #loginTipPopup .tip-close:hover { color:#475467; }
+  #loginTipPopup .tip-icon { font-size:22px; }
+  #loginTipPopup .tip-msg { margin:8px 0 14px; font-size:1rem; font-weight:700; color:#1d2939; line-height:1.45; }
+  #loginTipPopup .tip-msg em { font-style:normal; color:#2BBDF5; }
+  #loginTipPopup .tip-login-btn { width:100%; border:none; background:#2BBDF5; color:#fff; font-weight:700; font-size:.95rem; padding:10px 0; border-radius:8px; cursor:pointer; }
+  #loginTipPopup .tip-login-btn:hover { background:#16a6dc; }
+  @media (max-width:768px){ #loginTipPopup{ right:12px; left:12px; width:auto; top:80px; } }
+</style>
+<div id="loginTipPopup" role="dialog" aria-label="로그인 안내">
+  <button class="tip-close" aria-label="닫기" onclick="window.closeLoginTip && window.closeLoginTip()">&times;</button>
+  <div class="tip-icon">🔎</div>
+  <p class="tip-msg"><em>로그인</em>하면 더 많은 정보 검색 가능</p>
+  <button class="tip-login-btn" onclick="window.loginTipLogin && window.loginTipLogin()">로그인하기</button>
+</div>
+<script>
+  (function () {
+    var KEY = 'allgong_login_tip_closed';
+    function el() { return document.getElementById('loginTipPopup'); }
+    function loggedIn() { try { return !!(window.auth && window.auth.currentUser); } catch (e) { return false; } }
+    window.closeLoginTip = function () { var p = el(); if (p) p.classList.remove('show'); try { sessionStorage.setItem(KEY, '1'); } catch (e) {} };
+    window.loginTipLogin = function () { window.closeLoginTip(); if (typeof window.openLoginModal === 'function') window.openLoginModal(); };
+    function maybeShow() {
+      var p = el(); if (!p) return;
+      var closed = false; try { closed = sessionStorage.getItem(KEY) === '1'; } catch (e) {}
+      if (closed || loggedIn()) { p.classList.remove('show'); return; }
+      p.classList.add('show');
+    }
+    function start() { setTimeout(maybeShow, 1200); } // 로그인 세션 복원 시간을 준 뒤 표시
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+    // 다른 경로(헤더 등)로 로그인하면 자동으로 닫기
+    var ticks = 0, iv = setInterval(function () { ticks++; if (loggedIn()) { var p = el(); if (p) p.classList.remove('show'); } if (ticks > 30) clearInterval(iv); }, 1000);
   })();
 </script>
 </body>
