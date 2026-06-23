@@ -4404,6 +4404,7 @@
             <div class="job-grid job-grid--premium premium-carousel-container">
               <a aria-label="프리미엄 - 한국도로공사 채용공고 이동" class="job-card" data-url="https://www.ex.co.kr/portal/biz/bbs/layout1/selectBoardList.do?bbsId=BBSMSTR_000000000211"
                 href="javascript:void(0)" role="button">
+                <span class="premium-bubble">프리미엄</span>
                 <img alt="한국도로공사" class="banner-image" src="./한국도로공사.png" />
                 <h3>한국도로공사</h3>
                 <p>신입·경력 / 사무·전기</p>
@@ -4412,7 +4413,8 @@
               </a>
               <a aria-label="프리미엄 - 국가철도공단 채용공고 이동" class="job-card" data-url="https://www.kr.or.kr/boardCnts/list.do?boardID=72"
                 href="javascript:void(0)" role="button">
-                <img alt="국가철도공단" class="banner-image" src="./images/ci/국가철도공단.png" /> 
+                <span class="premium-bubble">프리미엄</span>
+                <img alt="국가철도공단" class="banner-image" src="./images/ci/국가철도공단.png" />
                 <h3>국가철도공단</h3>
                 <p>사무·기술</p>
                 <div class="deadline"><strong>마감:</strong> <span class="deadline-date" data-deadline="2026-08-08">2026.08.08</span> <span
@@ -4420,6 +4422,7 @@
               </a>
               <a aria-label="프리미엄 - 광주광역시도시공사 채용공고 이동" class="job-card" data-url="https://gmcc.ai-recruit.kr/"
                 href="javascript:void(0)" role="button">
+                <span class="premium-bubble">프리미엄</span>
                 <img alt="광주광역시도시공사" class="banner-image" src="./images/ci/광주광역시도시공사.png" />
                 <h3>광주광역시도시공사</h3>
                 <p>토목·전기·통신</p>
@@ -4429,6 +4432,7 @@
               <a aria-label="프리미엄 - 국립공원공단 채용공고 이동" class="job-card"
                 data-url="https://knps.fairy.im/"
                 href="javascript:void(0)" role="button">
+                <span class="premium-bubble">프리미엄</span>
                 <img alt="국립공원공단" class="banner-image" src="./images/ci/국립공원공단.png" />
                 <h3>국립공원공단</h3>
                 <p>청년인턴</p>
@@ -11581,6 +11585,26 @@ function initCarousel(carouselContainer) {
   }
   @media (prefers-reduced-motion: reduce) {
     #jobs .auto-rec-card .rec-tag { animation: none; }
+  }
+
+  /* 프리미엄 채용정보 배너 '프리미엄' 말풍선 (좌우 흔들림) */
+  .job-grid--premium .job-card { position: relative; overflow: visible; }
+  .job-grid--premium .premium-bubble {
+    position: absolute; top: 6px; left: 8px; z-index: 4;
+    background: #e74c3c; color: #fff; font-size: .72rem; font-weight: 800;
+    padding: 5px 11px; border-radius: 14px; white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .22);
+    transform-origin: center bottom;
+    animation: recTagWobble 0.9s ease-in-out infinite;
+  }
+  .job-grid--premium .premium-bubble::after {
+    content: ""; position: absolute; left: 16px; bottom: -6px;
+    width: 0; height: 0;
+    border-left: 6px solid transparent; border-right: 6px solid transparent;
+    border-top: 7px solid #e74c3c;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .job-grid--premium .premium-bubble { animation: none; }
   }
 </style>
 <script>
