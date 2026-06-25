@@ -818,7 +818,7 @@
     }
 
     /* 5) Ad cards in '추천 채용정보' (last row last 3) */
-    #jobs .job-card.ad {
+    :is(#jobs, #general-jobs) .job-card.ad {
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -829,12 +829,12 @@
       min-height: 180px;
     }
 
-    #jobs .job-card.ad .ad-title {
+    :is(#jobs, #general-jobs) .job-card.ad .ad-title {
       font-size: .9rem;
       margin-bottom: .4rem;
     }
 
-    #jobs .job-card.ad .ad-phone {
+    :is(#jobs, #general-jobs) .job-card.ad .ad-phone {
       font-size: .8rem;
       display: flex;
       gap: .4rem;
@@ -842,13 +842,13 @@
       justify-content: center;
     }
 
-    #jobs .job-card.ad .ad-phone svg {
+    :is(#jobs, #general-jobs) .job-card.ad .ad-phone svg {
       width: 18px;
       height: 18px;
       fill: #adb5bd;
     }
 
-    #jobs .job-card.ad .ad-cta {
+    :is(#jobs, #general-jobs) .job-card.ad .ad-cta {
       margin-top: .6rem;
       display: inline-block;
       padding: .35rem .7rem;
@@ -860,10 +860,10 @@
       font-weight: 600;
     }
 
-    #jobs .job-card.ad .banner-image,
-    #jobs .job-card.ad h3,
-    #jobs .job-card.ad p,
-    #jobs .job-card.ad .job-badges {
+    :is(#jobs, #general-jobs) .job-card.ad .banner-image,
+    :is(#jobs, #general-jobs) .job-card.ad h3,
+    :is(#jobs, #general-jobs) .job-card.ad p,
+    :is(#jobs, #general-jobs) .job-card.ad .job-badges {
       display: none !important;
     }
 
@@ -4400,7 +4400,7 @@
     <div class="main-content-area">
       <section class="section section--compact" id="features">
         <div class="container">
-          <h2 class="section-title">프리미엄 채용정보 <span class="apply">상품신청&gt;</span></h2>
+          <h2 class="section-title">프리미엄 채용정보 <a class="apply" href="product.html" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;">상품신청&gt;</a></h2>
           <div class="premium-carousel-wrapper">
             <div class="job-grid job-grid--premium premium-carousel-container">
               <a aria-label="프리미엄 - 한국도로공사 채용공고 이동" class="job-card" data-url="https://www.ex.co.kr/portal/biz/bbs/layout1/selectBoardList.do?bbsId=BBSMSTR_000000000211"
@@ -4729,7 +4729,7 @@
       <!-- 추천 채용정보: 카드 디자인을 배너형으로 업데이트 -->
       <section class="section section--tight-top" id="jobs" style="background: white;">
         <div class="container">
-          <h2 class="section-title">추천 채용정보 <span class="apply">상품신청&gt;</span></h2>
+          <h2 class="section-title">추천 채용정보 <a class="apply" href="product.html" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;">상품신청&gt;</a></h2>
           <div class="job-grid">
             <a aria-label="기술보증기금 채용공고 상세로 이동" class="job-card" data-job="1" data-url="https://kibo.saramin.co.kr" href="javascript:void(0)"
               role="button">
@@ -4956,7 +4956,7 @@
 
       <section class="section section--tight-top" id="general-jobs" style="background: white;">
         <div class="container">
-          <h2 class="section-title" style="color:#5c7cfa;">주요 채용정보 <span class="apply">상품신청&gt;</span></h2>
+          <h2 class="section-title" style="color:#5c7cfa;">주요 채용정보 <a class="apply" href="product.html" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;">상품신청&gt;</a></h2>
           <div class="job-grid">
             <a aria-label="한국도로공사 채용공고 상세로 이동" class="job-card" data-job="g1" data-url="https://www.ex.co.kr/portal/biz/bbs/layout1/selectBoardList.do?bbsId=BBSMSTR_000000000211" href="javascript:void(0)"
               role="button">
@@ -5218,6 +5218,46 @@
                 <span class="badge">일반</span>
                 <span class="badge">온라인접수</span>
               </div>
+            </a>
+
+            <a aria-label="올공 광고 및 교육 문의" class="job-card ad" data-job="g-ad1" data-url="" href="javascript:void(0)"
+              role="button">
+              <div class="ad-title">ALLGONG(올공) 광고 문의</div>
+              <div class="ad-phone"><svg aria-hidden="true" viewbox="0 0 24 24">
+                  <path
+                    d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.97 22 2 13.03 2 2a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.2 2.2z">
+                  </path>
+                </svg> 042)629-8159</div><span class="ad-cta">상품신청</span>
+            </a>
+
+            <a aria-label="올공 광고 및 교육 문의" class="job-card ad" data-job="g-ad2" data-url="" href="javascript:void(0)"
+              role="button">
+              <div class="ad-title">ALLGONG(올공) 광고 문의</div>
+              <div class="ad-phone"><svg aria-hidden="true" viewbox="0 0 24 24">
+                  <path
+                    d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.97 22 2 13.03 2 2a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.2 2.2z">
+                  </path>
+                </svg> 042)629-7850</div><span class="ad-cta">상품신청</span>
+            </a>
+
+            <a aria-label="올공 광고 및 교육 문의" class="job-card ad" data-job="g-ad3" data-url="" href="javascript:void(0)"
+              role="button">
+              <div class="ad-title">ALLGONG(올공) 광고 문의</div>
+              <div class="ad-phone"><svg aria-hidden="true" viewbox="0 0 24 24">
+                  <path
+                    d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.97 22 2 13.03 2 2a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.2 2.2z">
+                  </path>
+                </svg> 042)629-8159</div><span class="ad-cta">상품신청</span>
+            </a>
+
+            <a aria-label="올공 광고 및 교육 문의" class="job-card ad" data-job="g-ad4" data-url="" href="javascript:void(0)"
+              role="button">
+              <div class="ad-title">ALLGONG(올공) 광고 문의</div>
+              <div class="ad-phone"><svg aria-hidden="true" viewbox="0 0 24 24">
+                  <path
+                    d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.97 22 2 13.03 2 2a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.2 2.2z">
+                  </path>
+                </svg> 042)629-7850</div><span class="ad-cta">상품신청</span>
             </a>
           </div>
         </div>
@@ -6590,7 +6630,7 @@
             <ul>
               <li class="bannerList index0">
                 <a
-                  href="https://sotong.go.kr/front/epilogue/epilogueNewViewPage.do?bbs_id=3ec7566f047d46ca8691b276e21dad31&pagetype=bbs&search_result=&search_result_cnddt=&epilogue_bgnde=&epilogue_endde=&date_range=all&epilogue_bgnde_cnddt=&epilogue_endde_cnddt=&date_range_cnddt"><img
+                  href="https://sotong.go.kr/front/epilogue/epilogueNewViewPage.do?bbs_id=3ec7566f047d46ca8691b276e21dad31&pagetype=bbs&search_result=&search_result_cnddt=&epilogue_bgnde=&epilogue_endde=&date_range=all&epilogue_bgnde_cnddt=&epilogue_endde_cnddt=&date_range_cnddt" target="_blank" rel="noopener"><img
                     alt="산림청 공모전"
                     src="https://github.com/buglerrr/puconet/blob/main/%EC%82%B0%EB%A6%BC%EC%B2%AD.jpg?raw=true"
                     srcset="https://github.com/buglerrr/puconet/blob/main/%EC%82%B0%EB%A6%BC%EC%B2%AD.jpg?raw=true" /></a>
@@ -6598,7 +6638,7 @@
 
               <li class="bannerList index0">
                 <a
-                  href="https://www.datacontest.kr/"><img
+                  href="https://www.datacontest.kr/" target="_blank" rel="noopener"><img
                     alt="산자부 공모전"
                     src="https://github.com/buglerrr/puconet/blob/main/%EC%82%B0%EC%9E%90%EB%B6%80.png?raw=true"
                     srcset="https://github.com/buglerrr/puconet/blob/main/%EC%82%B0%EC%9E%90%EB%B6%80.png?raw=true" /></a>
@@ -6606,21 +6646,21 @@
 
               <li class="bannerList index0">
                 <a
-                  href="https://www.kr.or.kr/boardCnts/view.do?boardID=1100660&boardSeq=1122449"><img
+                  href="https://www.kr.or.kr/boardCnts/view.do?boardID=1100660&boardSeq=1122449" target="_blank" rel="noopener"><img
                     alt="미래철도 공모전"
                     src="https://github.com/buglerrr/puconet/blob/main/%EB%AF%B8%EB%9E%98%EC%B2%A0%EB%8F%84.png?raw=true"
                     srcset="https://github.com/buglerrr/puconet/blob/main/%EB%AF%B8%EB%9E%98%EC%B2%A0%EB%8F%84.png?raw=true" /></a>
               </li>
               <li class="bannerList index1">
                 <a
-                  href="https://djjunggu.go.kr/prog/saeolGosi/GOSI_03/sub03_06/view.do?notAncmtMgtNo=44555"><img
+                  href="https://djjunggu.go.kr/prog/saeolGosi/GOSI_03/sub03_06/view.do?notAncmtMgtNo=44555" target="_blank" rel="noopener"><img
                     alt="대전 중구 공모전"
                     src="https://github.com/buglerrr/puconet/blob/main/%EB%8C%80%EC%A0%84%EC%A4%91%EA%B5%AC.png?raw=true"
                     srcset="https://github.com/buglerrr/puconet/blob/main/%EB%8C%80%EC%A0%84%EC%A4%91%EA%B5%AC.png?raw=true" /></a>
               </li>
               <li class="bannerList index1">
                 <a
-                  href="https://blog.naver.com/mobilehk/224310635457"><img
+                  href="https://blog.naver.com/mobilehk/224310635457" target="_blank" rel="noopener"><img
                     alt="마케팅잡 청년 모집"
                     src="https://github.com/buglerrr/puconet/blob/main/%EB%A7%88%EC%BC%80%ED%8C%85%EC%9E%A1.jpeg?raw=true"
                     srcset="https://github.com/buglerrr/puconet/blob/main/%EB%A7%88%EC%BC%80%ED%8C%85%EC%9E%A1.jpeg?raw=true" /></a>
@@ -6628,14 +6668,14 @@
 
               <li class="bannerList index1">
                 <a
-                  href="https://www.gov-eformsign.com/eform/document/external_user_view_service.html?company_id=a4970cde68f94f4590eaebfaab2524dd&recipient=&country_code=kr&template_id=d8ba518e82cb4e93ad0882bd42c2032b"><img
+                  href="https://www.gov-eformsign.com/eform/document/external_user_view_service.html?company_id=a4970cde68f94f4590eaebfaab2524dd&recipient=&country_code=kr&template_id=d8ba518e82cb4e93ad0882bd42c2032b" target="_blank" rel="noopener"><img
                     alt="국민체육진흥공단"
                     src="https://github.com/buglerrr/puconet/blob/main/%EA%B5%AD%EB%AF%BC%EC%B2%B4%EC%9C%A1%EC%A7%84%ED%9D%A5%EA%B3%B5%EB%8B%A8.png?raw=true"
                     srcset="https://github.com/buglerrr/puconet/blob/main/%EA%B5%AD%EB%AF%BC%EC%B2%B4%EC%9C%A1%EC%A7%84%ED%9D%A5%EA%B3%B5%EB%8B%A8.png?raw=true" /></a>
               </li>
               <li class="bannerList index1">
                 <a
-                  href="https://www.fss.or.kr/fss/main/main.do?menuNo=200000"><img
+                  href="https://www.fss.or.kr/fss/main/main.do?menuNo=200000" target="_blank" rel="noopener"><img
                     alt="금융감독원"
                     src="https://github.com/buglerrr/puconet/blob/main/%EA%B8%88%EC%9C%B5%EA%B0%90%EB%8F%85%EC%9B%90.png?raw=true"
                     srcset="https://github.com/buglerrr/puconet/blob/main/%EA%B8%88%EC%9C%B5%EA%B0%90%EB%8F%85%EC%9B%90.png?raw=true" /></a>
@@ -6780,6 +6820,11 @@
         while (el && el !== document) {
           if (el.classList && el.classList.contains('job-card')) {
             e.preventDefault();
+            if (el.classList.contains('ad')) {
+              // 광고 카드(ALLGONG 상품신청) → '상품안내' 페이지를 새 탭에서 열기
+              window.open('product.html', '_blank', 'noopener,noreferrer');
+              return;
+            }
             openPopup(el.getAttribute('data-url'));
             return;
           }
@@ -11763,7 +11808,7 @@ function initCarousel(carouselContainer) {
 <style>
   #jobs .auto-rec-card {
     display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch;
-    border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; box-sizing: border-box;
+    border: 1px solid #eaeaea; border-top: 4.5px solid #4dabf7; border-radius: 12px; padding: 12px; box-sizing: border-box;
     width: 100%; max-width: 100%; height: 200px; overflow: hidden; background: #ffffff;
     text-decoration: none; cursor: pointer; position: relative;
     transition: transform 0.35s ease, box-shadow 0.35s ease;
