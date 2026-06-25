@@ -2921,6 +2921,14 @@
     .story-board-subtitle { font-size: 0.82rem; color: #aaa; margin: 0; }
     .story-list-top .post-count { font-size: 0.85rem; color: #666; }
 
+    /* 게시글 검색 바 (제목/내용/제목+내용/글쓴이) */
+    .story-search-bar { display: flex; justify-content: center; align-items: center; gap: 8px; padding: 18px 12px 22px; flex-wrap: wrap; border-top: 1px solid #eee; }
+    .story-search-type { height: 40px; border: 1px solid #d0d5dd; border-radius: 8px; padding: 0 12px; font-size: 0.92rem; color: #333; background: #fff; cursor: pointer; }
+    .story-search-input { height: 40px; width: min(360px, 60vw); border: 1px solid #d0d5dd; border-radius: 8px; padding: 0 14px; font-size: 0.92rem; color: #333; outline: none; }
+    .story-search-input:focus { border-color: #2BBDF5; }
+    .story-search-btn { height: 40px; padding: 0 22px; border: none; border-radius: 8px; background: #1a9ff0; color: #fff; font-size: 0.95rem; font-weight: 700; cursor: pointer; }
+    .story-search-btn:hover { background: #1488d4; }
+
     /* 링커리어 스타일 테이블 헤더 표시 */
     .story-table-header { display: flex !important; align-items: center; padding: 12px 0; background: #fff; border-bottom: 1px solid #eee; font-size: 0.85rem; font-weight: 600; color: #888; text-align: center; }
     .story-table-header .col-num { width: 70px; }
@@ -6163,6 +6171,18 @@
                 <div id="storyPagination" class="pagination-container" style="display: none;">
                   <div class="pagination story-pagination"></div>
                 </div>
+                <!-- 게시글 검색 (제목/내용/제목+내용/글쓴이) -->
+                <div class="story-search-bar">
+                  <select id="storySearchType" class="story-search-type" aria-label="검색 기준">
+                    <option value="title">제목</option>
+                    <option value="content">내용</option>
+                    <option value="title_content" selected>제목+내용</option>
+                    <option value="author">글쓴이</option>
+                  </select>
+                  <input type="text" id="storySearchInput" class="story-search-input" placeholder="검색어를 입력해주세요"
+                    onkeydown="if(event.key==='Enter'){searchStories();return false;}" />
+                  <button type="button" class="story-search-btn" onclick="searchStories()">검색</button>
+                </div>
               </div>
 
               <!-- 게시판별 준비중 메시지 -->
@@ -8059,17 +8079,8 @@ window.enableAdminMode = async function () {
           likes: 0
         };
 
-        // 닉네임 조회
-        try {
-          const userDoc = await getDoc(doc(db, 'users', user.uid));
-          if (userDoc.exists() && userDoc.data().nickname) {
-            docData.authorName = userDoc.data().nickname;
-          } else {
-            docData.authorName = user.displayName || user.email.split('@')[0];
-          }
-        } catch (e) {
-          docData.authorName = user.displayName || user.email.split('@')[0];
-        }
+        // 실명 대신 uid 기반 자동 닉네임으로 게시자 표시 (실시간 취업 채팅방과 동일 방식)
+        docData.authorName = window.generateChatNickname(user.uid) || '익명';
 
         await window.addDoc(window.collection(window.db, 'stories'), docData);
 
@@ -8169,6 +8180,17 @@ window.enableAdminMode = async function () {
       }
     }
 
+    // 게시자 표시: 실명 대신 uid 기반 자동 닉네임 (실시간 취업 채팅방과 동일).
+    // 기존에 실명으로 저장된 글도 닉네임으로 가려집니다.
+    window.storyAuthorDisplay = function (data) {
+      const uid = data && (data.authorId || data.authorUid);
+      if (uid && typeof window.getChatIdentity === 'function') {
+        const nick = window.getChatIdentity(uid).nickname;
+        if (nick) return nick;
+      }
+      return (data && data.authorName) || '익명';
+    };
+
 function displayStoriesForPage(page) {
       const tbody = document.getElementById('storyTableBody');
       tbody.innerHTML = '';
@@ -8225,7 +8247,7 @@ function displayStoriesForPage(page) {
         window.storiesData[docId] = { ...data, dateString: dateStr };
 
         const titleText = escapeHtml(data.title);
-        const authorText = escapeHtml(data.authorName);
+        const authorText = escapeHtml(window.storyAuthorDisplay(data));
         const dataCat = data.category || 'free';
         const catLabel = catLabels[dataCat] || dataCat;
         
@@ -8252,6 +8274,49 @@ function displayStoriesForPage(page) {
         tbody.appendChild(row);
       });
     }
+
+    // 게시글 검색: 제목 / 내용 / 제목+내용 / 글쓴이 기준으로 현재 게시판 글을 필터링
+    window.searchStories = function () {
+      const typeSel = document.getElementById('storySearchType');
+      const inputEl = document.getElementById('storySearchInput');
+      if (!typeSel || !inputEl) return;
+
+      const type = typeSel.value;
+      const term = (inputEl.value || '').trim().toLowerCase();
+
+      // 현재 게시판(카테고리)의 전체 글 목록을 캐시에서 가져옴 (검색 대상)
+      const cat = window.currentStoryCategory || 'all';
+      const cached = _storiesCache.get(cat);
+      const master = (cached && cached.docs) ? cached.docs : totalStories;
+
+      if (!term) {
+        // 검색어 없으면 전체 목록 복원
+        totalStories = [...master];
+      } else {
+        totalStories = master.filter(function (d) {
+          const title = (d.title || '').toLowerCase();
+          const content = (d.content || '').toLowerCase();
+          const author = (window.storyAuthorDisplay(d) || '').toLowerCase();
+          if (type === 'title') return title.includes(term);
+          if (type === 'content') return content.includes(term);
+          if (type === 'author') return author.includes(term);
+          return title.includes(term) || content.includes(term); // 제목+내용
+        });
+      }
+
+      storyCurrentPage = 1;
+      const tbody = document.getElementById('storyTableBody');
+      const pagination = document.getElementById('storyPagination');
+      if (totalStories.length === 0) {
+        if (tbody) tbody.innerHTML = '<div class="story-empty-box"><p>검색 결과가 없습니다.</p></div>';
+        if (pagination) pagination.style.display = 'none';
+        const countEl = document.getElementById('storyPostCount');
+        if (countEl) countEl.textContent = '총 0개';
+        return;
+      }
+      displayStoriesForPage(1);
+      renderStoryPagination();
+    };
 
     function renderStoryPagination() {
       const paginationContainer = document.querySelector('.story-pagination');
@@ -8727,7 +8792,7 @@ function displayStoriesForPage(page) {
 
       // 기본 정보 채우기
       document.getElementById('story-detail-title').textContent = data.title;
-      document.getElementById('story-detail-author').textContent = data.authorName;
+      document.getElementById('story-detail-author').textContent = window.storyAuthorDisplay(data);
       
       let detailDateStr = data.dateString;
       if (data.createdAt) {
