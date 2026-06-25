@@ -4360,6 +4360,7 @@
           <button aria-label="메뉴 열기" class="menu-toggle" type="button">메뉴</button>
           <div class="nav-links">
             <a href="#" onclick="checkLoginAndExecute(showBoard, '채용정보를 보려면 로그인이 필요합니다.'); return false;">채용정보</a>
+            <a href="#" onclick="checkLoginAndExecute(showEduBoard, '공공기관 교육을 보려면 로그인이 필요합니다.'); return false;">공공기관 교육</a>
             <a href="#"
               onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '공공게시판을 보려면 로그인이 필요합니다.'); return false;">공공기관소개</a>
             <a href="#" onclick="checkLoginAndExecute(showNewsBoard, '공공기관 뉴스를 보려면 로그인이 필요합니다.'); return false;">공공기관
@@ -5660,6 +5661,202 @@
                 <p>곧 새로운 게시판이 오픈됩니다!</p>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 공공기관 교육 게시판 섹션 (채용정보 게시판과 동일 형태) ===== -->
+      <div id="edu-board-section" style="display:none; width:100%;">
+        <div class="container" style="max-width:1400px; margin:0 auto;">
+          <div class="board-layout">
+            <!-- 왼쪽 사이드바 -->
+            <aside class="board-sidebar">
+              <div class="page-title-banner">
+                <h1>공공기관 교육</h1>
+              </div>
+
+              <p class="sidebar-group-header">교육형태별</p>
+              <ul>
+                <li><a href="#" onclick="switchEduBoard('type-online'); return false;" id="edu-menu-type-online">온라인</a></li>
+                <li><a href="#" onclick="switchEduBoard('type-offline'); return false;" id="edu-menu-type-offline">오프라인</a></li>
+                <li><a href="#" onclick="switchEduBoard('type-blended'); return false;" id="edu-menu-type-blended">혼합(블렌디드)</a></li>
+              </ul>
+
+              <p class="sidebar-group-header">교육분야별</p>
+              <ul>
+                <li><a href="#" onclick="switchEduBoard('field-job'); return false;" id="edu-menu-field-job">직무역량</a></li>
+                <li><a href="#" onclick="switchEduBoard('field-ncs'); return false;" id="edu-menu-field-ncs">NCS·필기</a></li>
+                <li><a href="#" onclick="switchEduBoard('field-interview'); return false;" id="edu-menu-field-interview">면접</a></li>
+                <li><a href="#" onclick="switchEduBoard('field-cert'); return false;" id="edu-menu-field-cert">자격증</a></li>
+                <li><a href="#" onclick="switchEduBoard('field-leader'); return false;" id="edu-menu-field-leader">리더십</a></li>
+                <li><a href="#" onclick="switchEduBoard('field-lang'); return false;" id="edu-menu-field-lang">어학</a></li>
+                <li><a href="#" onclick="switchEduBoard('field-it'); return false;" id="edu-menu-field-it">IT·디지털</a></li>
+                <li><a href="#" onclick="switchEduBoard('field-etc'); return false;" id="edu-menu-field-etc">기타</a></li>
+              </ul>
+
+              <p class="sidebar-group-header">지역별</p>
+              <div class="region-grid">
+                <a href="#" onclick="switchEduBoard('region-서울'); return false;" id="edu-menu-region-서울">서울</a>
+                <a href="#" onclick="switchEduBoard('region-부산'); return false;" id="edu-menu-region-부산">부산</a>
+                <a href="#" onclick="switchEduBoard('region-대구'); return false;" id="edu-menu-region-대구">대구</a>
+                <a href="#" onclick="switchEduBoard('region-인천'); return false;" id="edu-menu-region-인천">인천</a>
+                <a href="#" onclick="switchEduBoard('region-광주'); return false;" id="edu-menu-region-광주">광주</a>
+                <a href="#" onclick="switchEduBoard('region-대전'); return false;" id="edu-menu-region-대전">대전</a>
+                <a href="#" onclick="switchEduBoard('region-울산'); return false;" id="edu-menu-region-울산">울산</a>
+                <a href="#" onclick="switchEduBoard('region-세종'); return false;" id="edu-menu-region-세종">세종</a>
+                <a href="#" onclick="switchEduBoard('region-경기'); return false;" id="edu-menu-region-경기">경기</a>
+                <a href="#" onclick="switchEduBoard('region-강원'); return false;" id="edu-menu-region-강원">강원</a>
+                <a href="#" onclick="switchEduBoard('region-충북'); return false;" id="edu-menu-region-충북">충북</a>
+                <a href="#" onclick="switchEduBoard('region-충남'); return false;" id="edu-menu-region-충남">충남</a>
+                <a href="#" onclick="switchEduBoard('region-전북'); return false;" id="edu-menu-region-전북">전북</a>
+                <a href="#" onclick="switchEduBoard('region-전남'); return false;" id="edu-menu-region-전남">전남</a>
+                <a href="#" onclick="switchEduBoard('region-경북'); return false;" id="edu-menu-region-경북">경북</a>
+                <a href="#" onclick="switchEduBoard('region-경남'); return false;" id="edu-menu-region-경남">경남</a>
+                <a href="#" onclick="switchEduBoard('region-제주'); return false;" id="edu-menu-region-제주">제주</a>
+              </div>
+            </aside>
+
+            <!-- 오른쪽 게시판 컨텐츠 -->
+            <div class="board-content">
+              <div class="board-title-banner">
+                <h2 id="currentEduBoardTitle">공공기관 교육 전체</h2>
+              </div>
+
+              <div id="eduBoardTable" style="background:transparent; padding:0; box-shadow:none; display:flex; flex-direction:column; height:100%;">
+                <!-- 로딩 -->
+                <div id="eduLoading" class="loading">
+                  <div class="spinner"></div>
+                  <p>로딩 중...</p>
+                </div>
+
+                <!-- 검색바 + 건수 -->
+                <div style="margin-bottom:1rem;">
+                  <div class="filter-top-bar" style="border:2px solid #000; border-radius:8px; border-bottom:2px solid #000;">
+                    <div style="font-size:1rem; font-weight:700; color:#2c3e50;">
+                      총 <span id="eduTotalCnt" style="color:#e74c3c;">0</span>건
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                      <input type="text" id="eduSearchInput" placeholder="기관명, 교육명 등 검색" onkeydown="if(event.key==='Enter'){applyEduSearch();}" style="padding:0.45rem 0.75rem; border:1px solid #ced4da; border-radius:4px; width:230px; font-size:0.88rem;">
+                      <button onclick="applyEduSearch()" style="background:#3498db; color:white; border:none; padding:0.45rem 0.9rem; border-radius:4px; cursor:pointer; font-size:0.88rem; font-weight:600;">검색</button>
+                      <button onclick="resetEduSearch()" style="background:#6c757d; color:white; border:none; padding:0.45rem 0.9rem; border-radius:4px; cursor:pointer; font-size:0.88rem; font-weight:600;">초기화</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 빈 상태 -->
+                <div id="eduEmptyState" class="empty-state" style="display:none;">
+                  <h3>등록된 교육정보가 없습니다</h3>
+                  <p>조건에 맞는 교육정보가 없습니다.</p>
+                </div>
+
+                <!-- 테이블 -->
+                <table class="board-table" id="eduTable" style="display:none;">
+                  <thead>
+                    <tr>
+                      <th style="width:15%; min-width:120px; padding:1rem; text-align:center;">기관명</th>
+                      <th style="width:auto; padding:1rem; text-align:center;">교육명</th>
+                      <th style="width:15%; text-align:center; padding:1rem;">교육유형</th>
+                      <th style="width:15%; text-align:center; padding:1rem;">신청마감일</th>
+                      <th id="edu-mgmt-header" style="width:80px; text-align:center; display:none;">관리</th>
+                    </tr>
+                  </thead>
+                  <tbody id="eduTableBody"></tbody>
+                </table>
+
+                <!-- 페이지네이션 -->
+                <div id="eduPagination" class="pagination-container" style="display:none;">
+                  <div class="pagination"></div>
+                </div>
+
+                <!-- 등록 버튼 (관리자) -->
+                <div class="bottom-add-button" id="eduBottomAddButton" style="display:none; text-align:center; margin-top:1.2rem;">
+                  <button class="btn-add" onclick="openEduModal()">+ 교육정보 등록</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 교육정보 등록 모달 (관리자) -->
+      <div id="eduModal" class="modal">
+        <div class="modal-content">
+          <h2>📝 교육정보 등록</h2>
+          <form onsubmit="addEducation(event)">
+            <div class="form-group">
+              <label>교육명 *</label>
+              <input type="text" id="edu_title" required placeholder="예: 2026년 공공기관 NCS 직무역량 과정">
+            </div>
+            <div class="form-group">
+              <label>기관명 *</label>
+              <input type="text" id="edu_company" required placeholder="예: 한국생산성본부">
+            </div>
+            <div class="form-group">
+              <label>교육유형</label>
+              <select id="edu_type">
+                <option value="온라인">온라인</option>
+                <option value="오프라인">오프라인</option>
+                <option value="혼합(블렌디드)">혼합(블렌디드)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>교육분야</label>
+              <select id="edu_field">
+                <option value="직무역량">직무역량</option>
+                <option value="NCS·필기">NCS·필기</option>
+                <option value="면접">면접</option>
+                <option value="자격증">자격증</option>
+                <option value="리더십">리더십</option>
+                <option value="어학">어학</option>
+                <option value="IT·디지털">IT·디지털</option>
+                <option value="기타">기타</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>지역</label>
+              <input type="text" id="edu_region" placeholder="예: 서울 (온라인은 비워두기)">
+            </div>
+            <div class="form-group">
+              <label>교육기간</label>
+              <input type="text" id="edu_period" placeholder="예: 2026.03.02 ~ 2026.03.06 (5일)">
+            </div>
+            <div class="form-group">
+              <label>신청마감일</label>
+              <input type="date" id="edu_deadline">
+            </div>
+            <div class="form-group">
+              <label>비용</label>
+              <input type="text" id="edu_cost" placeholder="예: 무료, 30만원">
+            </div>
+            <div class="form-group">
+              <label>로고 이미지 URL</label>
+              <input type="text" id="edu_image_url" placeholder="예: ./logo.png 또는 https://...">
+            </div>
+            <div class="form-group">
+              <label>신청/상세 URL</label>
+              <input type="text" id="edu_detail_url" placeholder="예: https://...">
+            </div>
+            <div class="form-group">
+              <label>상세 내용</label>
+              <textarea id="edu_content" rows="8" placeholder="교육 과정의 상세 내용을 자유롭게 작성하세요." style="resize:vertical;"></textarea>
+            </div>
+            <button type="submit" class="btn-submit">등록</button>
+            <button type="button" class="btn-cancel" onclick="closeEduModal()">취소</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- 교육정보 상세 모달 -->
+      <div id="eduDetailModal" class="modal">
+        <div class="modal-content">
+          <h2 id="eduDetailTitle" style="margin-bottom:0.3rem;"></h2>
+          <p id="eduDetailCompany" style="color:#3498db; font-weight:700; margin-bottom:1rem;"></p>
+          <img id="eduDetailImage" alt="" style="display:none; max-width:100%; border-radius:8px; margin-bottom:1rem;">
+          <div id="eduDetailMeta" style="font-size:0.92rem; color:#444; line-height:1.9; margin-bottom:1rem; border-top:1px solid #eee; border-bottom:1px solid #eee; padding:0.8rem 0;"></div>
+          <div id="eduDetailContent" style="white-space:pre-wrap; line-height:1.7; color:#333; margin-bottom:1rem;"></div>
+          <a id="eduDetailLink" href="#" target="_blank" rel="noopener" style="display:none; margin-bottom:1rem; color:#3498db; font-weight:700;">▶ 신청/상세 페이지 바로가기</a>
+          <div style="text-align:right;">
+            <button type="button" class="btn-cancel" onclick="closeEduDetail()">닫기</button>
           </div>
         </div>
       </div>
@@ -11804,6 +12001,256 @@ function initCarousel(carouselContainer) {
     // 다른 경로(헤더 등)로 로그인하면 자동으로 닫기
     var ticks = 0, iv = setInterval(function () { ticks++; if (loggedIn()) { var p = el(); if (p) p.classList.remove('show'); } if (ticks > 30) clearInterval(iv); }, 1000);
   })();
+</script>
+
+<!-- ===== [추가] 공공기관 교육 게시판 로직 (채용정보 게시판과 동일 형태, 관리자 등록형) ===== -->
+<script>
+(function () {
+  var eduAll = [];        // 전체 교육 문서
+  var eduCat = 'all';     // 현재 카테고리
+  var eduSearch = '';     // 검색어
+  var eduPage = 1;
+  var EDU_PER = 15;
+  var EDU_SS = 'allgong_edu_cache_v1';
+  var eduLoaded = false;
+
+  function esc(s) { var d = document.createElement('div'); d.textContent = (s == null ? '' : String(s)); return d.innerHTML; }
+  function isAdm() {
+    try { return (window.currentUserRole === 'admin') || (window.auth && window.auth.currentUser && window.auth.currentUser.email === 'ilovetruman@gmail.com'); }
+    catch (e) { return false; }
+  }
+
+  var TYPE_MAP = { 'type-online': '온라인', 'type-offline': '오프라인', 'type-blended': '혼합(블렌디드)' };
+  var FIELD_MAP = { 'field-job': '직무역량', 'field-ncs': 'NCS·필기', 'field-interview': '면접', 'field-cert': '자격증', 'field-leader': '리더십', 'field-lang': '어학', 'field-it': 'IT·디지털', 'field-etc': '기타' };
+
+  function catTitle(cat) {
+    if (!cat || cat === 'all') return '공공기관 교육 전체';
+    if (TYPE_MAP[cat]) return '교육유형: ' + TYPE_MAP[cat];
+    if (FIELD_MAP[cat]) return '교육분야: ' + FIELD_MAP[cat];
+    if (cat.indexOf('region-') === 0) return '지역: ' + cat.slice(7);
+    return '공공기관 교육';
+  }
+  function matchCat(d) {
+    if (eduCat === 'all') return true;
+    if (TYPE_MAP[eduCat]) return (d.eduType || '') === TYPE_MAP[eduCat];
+    if (FIELD_MAP[eduCat]) return (d.field || '') === FIELD_MAP[eduCat];
+    if (eduCat.indexOf('region-') === 0) { return (d.region || '').indexOf(eduCat.slice(7)) !== -1; }
+    return true;
+  }
+  function matchSearch(d) {
+    if (!eduSearch) return true;
+    var q = eduSearch.toLowerCase();
+    return ((d.company || '').toLowerCase().indexOf(q) !== -1) || ((d.title || '').toLowerCase().indexOf(q) !== -1);
+  }
+  function fmtDate(s) { return s ? String(s).replace(/-/g, '.') : '-'; }
+  function isExpired(s) { if (!s) return false; var t = new Date(s); if (isNaN(t.getTime())) return false; t.setHours(23, 59, 59, 999); return t.getTime() < Date.now(); }
+
+  function setActiveEduMenu() {
+    document.querySelectorAll('#edu-board-section .board-sidebar a').forEach(function (a) { a.classList.remove('active'); });
+    var m = document.getElementById('edu-menu-' + eduCat); if (m) m.classList.add('active');
+  }
+
+  window.showEduBoard = function (skipHistory) {
+    document.querySelectorAll('.content-with-sidebar-wrapper').forEach(function (el) { el.classList.add('full-width-wrapper'); });
+    ['features', 'jobs', 'general-jobs', 'hibrain-jobs', 'edu-courses', 'chatroom-section', 'story-board-section', 'detail-section', 'story-detail-section', 'news-section', 'news-detail-section', 'contest-section', 'contest-detail-section', 'board-section', 'user-manage-section'].forEach(function (id) { var el = document.getElementById(id); if (el) el.style.display = 'none'; });
+    var sec = document.getElementById('edu-board-section'); if (sec) sec.style.display = 'block';
+    if (!skipHistory) { try { history.pushState({ section: 'edu' }, '', '#edu-board'); } catch (e) {} }
+    window.scrollTo(0, 0);
+    eduCat = 'all'; eduSearch = ''; eduPage = 1;
+    var si = document.getElementById('eduSearchInput'); if (si) si.value = '';
+    var t = document.getElementById('currentEduBoardTitle'); if (t) t.textContent = catTitle('all');
+    setActiveEduMenu();
+    loadEducations();
+  };
+
+  window.switchEduBoard = function (cat) {
+    eduCat = cat || 'all'; eduPage = 1;
+    var t = document.getElementById('currentEduBoardTitle'); if (t) t.textContent = catTitle(eduCat);
+    setActiveEduMenu();
+    renderEdu();
+  };
+
+  async function loadEducations() {
+    var loading = document.getElementById('eduLoading');
+    if (!eduLoaded) {
+      try { var raw = sessionStorage.getItem(EDU_SS); if (raw) { var c = JSON.parse(raw); if (c && c.items) { eduAll = c.items; eduLoaded = true; } } } catch (e) {}
+    }
+    if (eduLoaded) { if (loading) loading.style.display = 'none'; renderEdu(); }
+    else if (loading) loading.style.display = 'block';
+    try {
+      var q = window.query(window.collection(window.db, 'educations'), window.orderBy('createdAt', 'desc'));
+      var snap = await window.getDocs(q);
+      var arr = []; snap.forEach(function (ds) { arr.push(Object.assign({}, ds.data(), { id: ds.id })); });
+      eduAll = arr; eduLoaded = true;
+      try { sessionStorage.setItem(EDU_SS, JSON.stringify({ items: arr, ts: Date.now() })); } catch (e) {}
+      if (loading) loading.style.display = 'none';
+      renderEdu();
+    } catch (e) {
+      console.error('교육정보 로딩 실패:', e);
+      if (loading) loading.style.display = 'none';
+      if (!eduLoaded) renderEdu();
+    }
+  }
+
+  function renderEdu() {
+    var tbody = document.getElementById('eduTableBody');
+    var table = document.getElementById('eduTable');
+    var empty = document.getElementById('eduEmptyState');
+    var pag = document.getElementById('eduPagination');
+    var cntEl = document.getElementById('eduTotalCnt');
+    var mgmtHeader = document.getElementById('edu-mgmt-header');
+    var addBtn = document.getElementById('eduBottomAddButton');
+    if (!tbody) return;
+    var adm = isAdm();
+    if (mgmtHeader) mgmtHeader.style.display = adm ? '' : 'none';
+    if (addBtn) addBtn.style.display = adm ? 'block' : 'none';
+
+    var filtered = eduAll.filter(function (d) { return matchCat(d) && matchSearch(d); });
+    if (cntEl) cntEl.textContent = filtered.length;
+
+    tbody.innerHTML = '';
+    if (filtered.length === 0) {
+      if (table) table.style.display = 'none';
+      if (empty) empty.style.display = 'block';
+      if (pag) pag.style.display = 'none';
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+    if (table) table.style.display = '';
+
+    var totalPages = Math.ceil(filtered.length / EDU_PER);
+    if (eduPage > totalPages) eduPage = totalPages;
+    if (eduPage < 1) eduPage = 1;
+    var start = (eduPage - 1) * EDU_PER;
+    var pageItems = filtered.slice(start, start + EDU_PER);
+
+    pageItems.forEach(function (d) {
+      var tr = document.createElement('tr');
+      tr.style.cursor = 'pointer';
+      var ddCol = isExpired(d.deadline) ? '<span style="color:#aaa;">마감</span>' : esc(fmtDate(d.deadline));
+      var mgmt = adm ? '<td style="text-align:center;"><button class="edu-del-btn" data-id="' + esc(d.id) + '" style="background:#e74c3c;color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:0.8rem;">삭제</button></td>' : '';
+      tr.innerHTML =
+        '<td style="text-align:center; font-weight:600;">' + esc(d.company || '-') + '</td>' +
+        '<td>' + esc(d.title || '-') + '</td>' +
+        '<td style="text-align:center;">' + esc(d.eduType || '-') + '</td>' +
+        '<td style="text-align:center;">' + ddCol + '</td>' +
+        mgmt;
+      var delBtn = tr.querySelector('.edu-del-btn');
+      if (delBtn) delBtn.addEventListener('click', function (ev) { ev.stopPropagation(); window.deleteEducation(d.id); });
+      tr.addEventListener('click', function () { window.viewEduDetail(d.id); });
+      tbody.appendChild(tr);
+    });
+
+    renderEduPagination(totalPages);
+  }
+
+  function renderEduPagination(totalPages) {
+    var pag = document.getElementById('eduPagination');
+    if (!pag) return;
+    var inner = pag.querySelector('.pagination');
+    if (!inner || totalPages <= 1) { pag.style.display = 'none'; if (inner) inner.innerHTML = ''; return; }
+    pag.style.display = '';
+    inner.innerHTML = '';
+    function btn(label, page, disabled, active) {
+      var b = document.createElement('button');
+      b.textContent = label;
+      if (active) b.className = 'active';
+      if (disabled) { b.disabled = true; b.style.opacity = '0.5'; }
+      else b.addEventListener('click', function () { eduPage = page; renderEdu(); var s = document.getElementById('edu-board-section'); if (s) window.scrollTo(0, Math.max(0, s.offsetTop - 20)); });
+      inner.appendChild(b);
+    }
+    btn('이전', eduPage - 1, eduPage <= 1, false);
+    var startP = Math.max(1, eduPage - 2), endP = Math.min(totalPages, startP + 4);
+    startP = Math.max(1, Math.min(startP, endP - 4));
+    for (var p = startP; p <= endP; p++) btn(String(p), p, false, p === eduPage);
+    btn('다음', eduPage + 1, eduPage >= totalPages, false);
+  }
+
+  window.applyEduSearch = function () { var si = document.getElementById('eduSearchInput'); eduSearch = si ? si.value.trim() : ''; eduPage = 1; renderEdu(); };
+  window.resetEduSearch = function () { var si = document.getElementById('eduSearchInput'); if (si) si.value = ''; eduSearch = ''; eduPage = 1; renderEdu(); };
+
+  window.openEduModal = function () { if (!isAdm()) { alert('관리자만 등록할 수 있습니다.'); return; } var m = document.getElementById('eduModal'); if (m) m.style.display = 'block'; };
+  window.closeEduModal = function () { var m = document.getElementById('eduModal'); if (m) { m.style.display = 'none'; var f = m.querySelector('form'); if (f) f.reset(); } };
+
+  window.addEducation = async function (e) {
+    e.preventDefault();
+    if (!isAdm()) { alert('관리자만 등록할 수 있습니다.'); return; }
+    var g = function (id) { var el = document.getElementById(id); return el ? el.value : ''; };
+    var data = {
+      title: (g('edu_title') || '').trim(), company: (g('edu_company') || '').trim(),
+      eduType: g('edu_type'), field: g('edu_field'), region: (g('edu_region') || '').trim(),
+      period: (g('edu_period') || '').trim(), deadline: g('edu_deadline'), cost: (g('edu_cost') || '').trim(),
+      imageUrl: (g('edu_image_url') || '').trim(), detailUrl: (g('edu_detail_url') || '').trim(),
+      content: (g('edu_content') || '').trim(), createdAt: window.Timestamp.now()
+    };
+    if (!data.title || !data.company) { alert('교육명과 기관명은 필수입니다.'); return; }
+    try {
+      await window.addDoc(window.collection(window.db, 'educations'), data);
+      alert('교육정보가 등록되었습니다.');
+      window.closeEduModal();
+      try { sessionStorage.removeItem(EDU_SS); } catch (e2) {}
+      eduLoaded = false;
+      loadEducations();
+    } catch (err) {
+      console.error('교육정보 등록 실패:', err);
+      alert('등록에 실패했습니다. Firebase 보안규칙(educations 쓰기 권한)을 확인해주세요.');
+    }
+  };
+
+  window.deleteEducation = async function (id) {
+    if (!isAdm()) return;
+    if (!confirm('이 교육정보를 삭제할까요?')) return;
+    try {
+      await window.deleteDoc(window.doc(window.db, 'educations', id));
+      eduAll = eduAll.filter(function (d) { return d.id !== id; });
+      try { sessionStorage.setItem(EDU_SS, JSON.stringify({ items: eduAll, ts: Date.now() })); } catch (e) {}
+      renderEdu();
+    } catch (err) { console.error('삭제 실패:', err); alert('삭제에 실패했습니다.'); }
+  };
+
+  window.viewEduDetail = function (id) {
+    var d = null; for (var i = 0; i < eduAll.length; i++) { if (eduAll[i].id === id) { d = eduAll[i]; break; } }
+    if (!d) return;
+    document.getElementById('eduDetailTitle').textContent = d.title || '';
+    document.getElementById('eduDetailCompany').textContent = d.company || '';
+    var img = document.getElementById('eduDetailImage');
+    if (d.imageUrl) { img.src = d.imageUrl; img.style.display = 'block'; img.onerror = function () { img.style.display = 'none'; }; } else img.style.display = 'none';
+    var rows = [];
+    if (d.eduType) rows.push('<b>교육유형</b> : ' + esc(d.eduType));
+    if (d.field) rows.push('<b>교육분야</b> : ' + esc(d.field));
+    if (d.region) rows.push('<b>지역</b> : ' + esc(d.region));
+    if (d.period) rows.push('<b>교육기간</b> : ' + esc(d.period));
+    if (d.deadline) rows.push('<b>신청마감일</b> : ' + esc(fmtDate(d.deadline)));
+    if (d.cost) rows.push('<b>비용</b> : ' + esc(d.cost));
+    document.getElementById('eduDetailMeta').innerHTML = rows.join('<br>');
+    document.getElementById('eduDetailContent').textContent = d.content || '';
+    var link = document.getElementById('eduDetailLink');
+    if (d.detailUrl) { link.href = d.detailUrl; link.style.display = 'inline-block'; } else link.style.display = 'none';
+    var m = document.getElementById('eduDetailModal'); if (m) m.style.display = 'block';
+  };
+  window.closeEduDetail = function () { var m = document.getElementById('eduDetailModal'); if (m) m.style.display = 'none'; };
+
+  // 다른 메뉴 이동 시 교육 게시판 자동 숨김 (기존 함수는 변경하지 않고 래핑만)
+  ['showBoard', 'showNewsBoard', 'showContestBoard', 'showStoryBoard', 'goHome'].forEach(function (fn) {
+    var orig = window[fn];
+    if (typeof orig === 'function') {
+      window[fn] = function () {
+        var s = document.getElementById('edu-board-section'); if (s) s.style.display = 'none';
+        var dm = document.getElementById('eduDetailModal'); if (dm) dm.style.display = 'none';
+        return orig.apply(this, arguments);
+      };
+    }
+  });
+  // 뒤로가기 시 해시가 교육이 아니면 숨김
+  window.addEventListener('popstate', function () {
+    if (location.hash !== '#edu-board') { var s = document.getElementById('edu-board-section'); if (s) s.style.display = 'none'; }
+  });
+  // 모달 바깥 클릭 닫기
+  window.addEventListener('click', function (ev) {
+    if (ev.target && ev.target.id === 'eduModal') window.closeEduModal();
+    if (ev.target && ev.target.id === 'eduDetailModal') window.closeEduDetail();
+  });
+})();
 </script>
 </body>
 </html>
