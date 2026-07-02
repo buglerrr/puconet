@@ -45,7 +45,8 @@ FILTER_MODE = os.environ.get("FILTER_MODE", "composite")
 # 제목에 이 키워드들이 포함된 공고는 업로드에서 제외 (콤마로 구분, 환경변수로 변경 가능)
 _DEFAULT_EXCLUDE = (
     "청원경찰,의사,간호,환경미화,운전,경비,"
-    "단기노무원,프로젝트계약근로자,작업원,보강공사,단순정비,일용근로자"
+    "단기노무원,프로젝트계약근로자,작업원,보강공사,단순정비,일용근로자,"
+    "배전분야,일용원,배전자동화,촉탁"
 )
 EXCLUDE_KEYWORDS = [k.strip() for k in os.environ.get("EXCLUDE_KEYWORDS", _DEFAULT_EXCLUDE).split(",") if k.strip()]
 
