@@ -4406,8 +4406,8 @@
     </div>
   </header>
 
- <div class="content-with-sidebar-wrapper" style="padding-top: 1.5rem; padding-bottom: 0.5rem; gap: 5px; padding-right: 126.6px;">
-    <a href="https://yw.work24.go.kr/main.do" target="_blank" style="flex: 1; display: flex; justify-content: center; overflow: hidden; border-radius: 8px; border: 1px solid black;">
+ <div id="topAdBannerRow" class="content-with-sidebar-wrapper" style="padding-top: 1.5rem; padding-bottom: 0.5rem; gap: 5px; padding-right: 126.6px;">
+    <a href="첫번째_배너_링크주소" target="_blank" style="flex: 1; display: flex; justify-content: center; overflow: hidden; border-radius: 8px; border: 1px solid black;">
       <img src="https://media-cdn.linkareer.com/ad/817142?d=720x120" alt="배너 1" style="width: 100%; height: auto; display: block;">
     </a>
     
@@ -7971,6 +7971,8 @@ window.enableAdminMode = async function () {
 
     // === 취업 이야기 관련 로직 ===
     window.showStoryBoard = async function (skipHistory = false, category = null, page = 1) {
+      // 상단 광고 배너 숨기기 (해당 메뉴 화면에서는 비노출 + 빈공간 제거)
+      var __topBanner = document.getElementById('topAdBannerRow'); if (__topBanner) __topBanner.style.display = 'none';
       // 1. 모든 다른 섹션 숨기기
       document.getElementById('features').style.display = 'none';
       document.getElementById('jobs').style.display = 'none';
@@ -9020,6 +9022,8 @@ function displayStoriesForPage(page) {
 
     // showNewsBoard: 뉴스 섹션 표시 + 데이터 로드
     window.showNewsBoard = async function (skipHistory = false) {
+      // 상단 광고 배너 복원 (공공기관 뉴스 화면에서는 기존과 동일하게 노출 유지)
+      var __topBanner = document.getElementById('topAdBannerRow'); if (__topBanner) __topBanner.style.display = '';
       // 1. 모든 다른 섹션 숨기기
       ['features', 'jobs', 'general-jobs', 'edu-courses', 'detail-section', 'chatroom-section'].forEach(id => {
         const el = document.getElementById(id);
@@ -9469,6 +9473,8 @@ function displayStoriesForPage(page) {
 
     // 공모전 섹션 표시 + 데이터 로드
     window.showContestBoard = async function (skipHistory = false) {
+      // 상단 광고 배너 숨기기 (해당 메뉴 화면에서는 비노출 + 빈공간 제거)
+      var __topBanner = document.getElementById('topAdBannerRow'); if (__topBanner) __topBanner.style.display = 'none';
       ['features', 'jobs', 'general-jobs', 'hibrain-jobs', 'edu-courses', 'detail-section', 'chatroom-section',
         'board-section', 'user-manage-section', 'story-board-section', 'story-detail-section',
         'news-section', 'news-detail-section', 'contest-detail-section'].forEach(id => {
@@ -9780,6 +9786,8 @@ function displayStoriesForPage(page) {
 
     // 메인 화면으로 돌아가는 함수
     window.goHome = function (skipHistory = false) {
+      // 상단 광고 배너 복원 (홈 화면에서는 노출)
+      var __topBanner = document.getElementById('topAdBannerRow'); if (__topBanner) __topBanner.style.display = '';
       restoreSidebar(); // 사이드바 복구
 
       // 모든 메인 섹션 보이기
@@ -9829,6 +9837,8 @@ function displayStoriesForPage(page) {
     // 화면 전환 함수
     // 화면 전환 함수 (채용정보 게시판) - Full Width 적용
     window.showBoard = function (skipHistory = false, category = null, page = 1) {
+      // 상단 광고 배너 숨기기 (해당 메뉴 화면에서는 비노출 + 빈공간 제거)
+      var __topBanner = document.getElementById('topAdBannerRow'); if (__topBanner) __topBanner.style.display = 'none';
       // 사이드바 숨기기
       document.querySelectorAll('.content-with-sidebar-wrapper').forEach(el => el.classList.add('full-width-wrapper'));
 
@@ -12173,6 +12183,8 @@ function initCarousel(carouselContainer) {
   }
 
   window.showEduBoard = function (skipHistory) {
+    // 상단 광고 배너 숨기기 (해당 메뉴 화면에서는 비노출 + 빈공간 제거)
+    var __topBanner = document.getElementById('topAdBannerRow'); if (__topBanner) __topBanner.style.display = 'none';
     document.querySelectorAll('.content-with-sidebar-wrapper').forEach(function (el) { el.classList.add('full-width-wrapper'); });
     ['features', 'jobs', 'general-jobs', 'hibrain-jobs', 'edu-courses', 'chatroom-section', 'story-board-section', 'detail-section', 'story-detail-section', 'news-section', 'news-detail-section', 'contest-section', 'contest-detail-section', 'board-section', 'user-manage-section'].forEach(function (id) { var el = document.getElementById(id); if (el) el.style.display = 'none'; });
     var sec = document.getElementById('edu-board-section'); if (sec) sec.style.display = 'block';
