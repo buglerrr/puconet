@@ -415,6 +415,9 @@ def sync_to_firestore(df: pd.DataFrame) -> dict:
         # 첫 화면 '추천 채용정보' 배너 대상 표시 (정규직/청년인턴(채용·체험형))
         _emp_parts = {p.strip() for p in re.split(r"[,+/]", str(row.get("고용유형", "")))}
         is_recommended = bool(_emp_parts & RECOMMENDED_EMP)
+        # 첫 화면 '프리미엄 채용정보' 배너 / '프리미엄' 게시판 대상 = 고용유형이 '정규직' 단독
+        _emp_list = [p.strip() for p in re.split(r"[,+/]", str(row.get("고용유형", ""))) if p.strip()]
+        is_premium = (len(_emp_list) == 1 and _emp_list[0] == "정규직")
 
         doc_data = {
             "title": clean_title(row.get("채용공고제목", "제목없음"), company),
@@ -437,6 +440,7 @@ def sync_to_firestore(df: pd.DataFrame) -> dict:
             "created_at": timestamp,
             "source": "alio-auto",  # 자동 등록 표시 (정리 대상 식별용)
             "recommended": is_recommended,  # 추천 배너 대상 여부 (홈 빠른 조회용)
+            "premium": is_premium,  # 프리미엄 배너/게시판 대상 여부 (고용유형 '정규직' 단독)
         }
         batch.set(col.document(doc_id), doc_data, merge=True)
         ops += 1
