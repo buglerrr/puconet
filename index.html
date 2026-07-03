@@ -1138,6 +1138,8 @@
     /* 그리드 칸(카드)이 긴 제목(nowrap) 때문에 칸 밖으로 늘어나지 않도록 → 정확히 1/4로 고정 */
     #features #premiumAutoGrid > .job-card { min-width: 0 !important; max-width: 100% !important; }
     #features #premiumAutoGrid > .job-card h3 { min-width: 0; max-width: 100%; }
+    /* '올공 문의' 광고 배너: 내용 세로 가운데 정렬 (기존 프리미엄 카드의 flex-start !important 를 덮어씀) */
+    #features #premiumAutoGrid > .job-card.ad { justify-content: center !important; }
     #premiumAutoGrid:empty { display: none !important; margin: 0 !important; }
 
     /* 자동 생성 주요 배너 그리드: 기존 주요 배너(연두색)와 동일 크기, 한 줄 4개 고정 */
