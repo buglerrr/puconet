@@ -5630,7 +5630,7 @@
                       총 <span id="jobTotalCnt" style="color:#e74c3c;">0</span>건
                     </div>
                     <div style="display:flex; gap:8px; align-items:center;">
-                      <input type="text" id="jobSearchInput" placeholder="기업명, 공고제목 등 검색" style="padding:0.45rem 0.75rem; border:1px solid #ced4da; border-radius:4px; width:230px; font-size:0.88rem;">
+                      <input type="text" id="jobSearchInput" placeholder="기업명, 공고제목 등 검색" onkeydown="if(event.key==='Enter'){applyJobFilters();}" style="padding:0.45rem 0.75rem; border:1px solid #ced4da; border-radius:4px; width:230px; font-size:0.88rem;">
                       <button onclick="applyJobFilters()" style="background:#3498db; color:white; border:none; padding:0.45rem 0.9rem; border-radius:4px; cursor:pointer; font-size:0.88rem; font-weight:600;">검색</button>
                       <button onclick="resetJobFilters()" style="background:#6c757d; color:white; border:none; padding:0.45rem 0.9rem; border-radius:4px; cursor:pointer; font-size:0.88rem; font-weight:600;">초기화</button>
                     </div>
@@ -5683,6 +5683,7 @@
                       <th style="width: auto; padding: 1rem; text-align:center;">제목</th>
                       <th style="width: 15%; text-align: center; padding: 1rem;">고용유형</th>
                       <th style="width: 15%; text-align: center; padding: 1rem;">마감일</th>
+                      <th style="width: 8%; text-align: center; padding: 1rem;">조회수</th>
                       <th id="job-mgmt-header" style="width: 100px; text-align: center; display:none;">관리</th>
                     </tr>
                   </thead>
@@ -7125,12 +7126,19 @@
         allow write: if request.auth != null && request.auth.uid == userId;
       }
       
-      // jobs 컬렉션: 모든 사용자 읽기 가능, 관리자만 쓰기/삭제 가능
+      // jobs 컬렉션: 모든 사용자 읽기 가능, 등록/삭제는 관리자만
+      //   단, 조회수(views) 필드만 변경하는 수정은 로그인한 누구나 허용 (조회수 카운팅용)
       match /jobs/{jobId} {
         allow read: if true;
-        allow create, update, delete: if request.auth != null && 
+        allow create, delete: if request.auth != null &&
           exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+        allow update: if request.auth != null && (
+          (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+          ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['views'])
+        );
       }
       
       // stories 컬렉션: 모든 사용자 읽기 가능, 인증된 사용자만 쓰기 가능
@@ -10009,6 +10017,22 @@ function displayStoriesForPage(page) {
       // 현재 페이지 번호 저장 (목록 복귀용)
       window.lastJobPage = currentPage;
 
+      // ===== 조회수 증가 (실제 클릭 시마다 카운팅; 뒤로/앞으로 이동은 제외) =====
+      if (!skipHistory) {
+        const _newViews = (job.views || 0) + 1;
+        job.views = _newViews;
+        if (window.jobsData[id]) window.jobsData[id].views = _newViews;
+        try {
+          if (Array.isArray(allRawJobs)) { const _jr = allRawJobs.find(function (j) { return j.id === id; }); if (_jr) _jr.views = _newViews; }
+          if (Array.isArray(totalJobs)) { const _jt = totalJobs.find(function (j) { return j.id === id; }); if (_jt) _jt.views = _newViews; }
+        } catch (e) { /* 무시 */ }
+        try {
+          if (window.updateDoc && window.doc && window.increment) {
+            window.updateDoc(window.doc(window.db, 'jobs', id), { views: window.increment(1) });
+          }
+        } catch (e) { /* 조회수 업데이트 실패는 무시 */ }
+      }
+
       // 섹션 전환
       document.getElementById('board-section').style.display = 'none';
       const detailSection = document.getElementById('detail-section');
@@ -10518,6 +10542,17 @@ function displayStoriesForPage(page) {
         }
       }
 
+      // ===== 마감일이 가장 늦은 날짜 순으로 정렬 (어떤 필터/메뉴에서도 항상 적용) =====
+      const _deadlineKey = function (v) {
+        if (!v) return -1;
+        const m = String(v).match(/(\d{4})\D?(\d{1,2})\D?(\d{1,2})/);
+        if (!m) return -1;
+        return parseInt(m[1], 10) * 10000 + parseInt(m[2], 10) * 100 + parseInt(m[3], 10);
+      };
+      totalJobs.sort(function (a, b) {
+        return _deadlineKey(b && b.deadline) - _deadlineKey(a && a.deadline);
+      });
+
       // 총 건수
       const cntEl = document.getElementById('jobTotalCnt');
       if (cntEl) cntEl.textContent = totalJobs.length;
@@ -10609,6 +10644,7 @@ function displayStoriesForPage(page) {
               </td>
               <td class="employment-cell" title="${displayEmploymentType}">${displayEmploymentType}</td>
               <td class="deadline-cell">${job.deadline || '-'}</td>
+              <td class="views-cell" style="text-align:center;">${job.views || 0}</td>
               <td class="mgmt-cell" style="${mgmtStyle}">
                   <button class="btn-edit" onclick="openEditModal('${job.id}')">수정</button>
                   <button class="btn-delete" onclick="deleteJob('${job.id}')">삭제</button>

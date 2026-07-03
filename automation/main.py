@@ -286,6 +286,57 @@ def clean_content(text):
     return str(text).replace("_x000D_", "").replace("\r", "").strip()
 
 
+# 말미 법인격 표기 ( (주) / (재) / (사) / (유) / (합) ) 제거용
+_CORP_SUFFIX_RE = re.compile(r"\s*\((?:주|재|사|유|합)\)\s*$")
+
+# 기관명이 감싸질 수 있는 괄호쌍 (여는 괄호, 닫는 괄호)
+_BRACKET_PAIRS = [
+    (r"\[", r"\]"), (r"\(", r"\)"), (r"\{", r"\}"),
+    ("（", "）"), ("【", "】"), ("〔", "〕"),
+    ("<", ">"), ("〈", "〉"), ("『", "』"), ("「", "」"),
+]
+
+
+def _company_variants(company):
+    """기관명 제거에 사용할 후보 문자열들 (길이 2 이상만)."""
+    c = str(company or "").strip()
+    variants = set()
+    if not c:
+        return variants
+    variants.add(c)
+    base = _CORP_SUFFIX_RE.sub("", c).strip()  # 말미 (주)/(재) 등 제거 버전
+    if base:
+        variants.add(base)
+    return {v for v in variants if len(v) >= 2}
+
+
+def clean_title(title, company):
+    """
+    '제목'에서 '기관명'을 제거해 제목이 불필요하게 길어지지 않게 한다.
+    - 기관명이 괄호( [], (), {} 등 )로 묶여 있으면 괄호까지 포함해 제거.
+    - 제거 후 앞뒤 공백은 한 칸으로 정리하여 자연스럽게 이어지게 한다.
+      예) '[한국지식재산보호원] 2026년도 제6차 인력채용' → '2026년도 제6차 인력채용'
+          '2026년도 한국임업진흥원 인재채용(기간제 3차) 공고' → '2026년도 인재채용(기간제 3차) 공고'
+    """
+    raw = "" if title is None else str(title)
+    if not raw.strip():
+        return "제목없음"
+    t = raw
+    # 긴 후보부터 제거 ( '한국동서발전(주)' 를 '한국동서발전' 보다 먼저 )
+    for v in sorted(_company_variants(company), key=len, reverse=True):
+        vp = re.escape(v)
+        # 1) 괄호로 감싼 기관명 → 괄호 포함 제거
+        for lb, rb in _BRACKET_PAIRS:
+            t = re.sub(lb + r"\s*" + vp + r"\s*" + rb, " ", t)
+        # 2) 괄호 없이 노출된 기관명 제거
+        t = re.sub(vp, " ", t)
+    # 공백 정리: 연속 공백 → 한 칸, 양끝 트림
+    t = re.sub(r"\s+", " ", t).strip()
+    # 맨 앞에 홀로 남은 구분기호 제거 (예: '- 2026 …', ': 2026 …')
+    t = re.sub(r"^[\-–—:·,]\s*", "", t).strip()
+    return t if t else raw.strip()
+
+
 def get_logo_url(company_name, logo_files):
     if company_name in logo_files:
         return logo_files[company_name]
@@ -366,7 +417,7 @@ def sync_to_firestore(df: pd.DataFrame) -> dict:
         is_recommended = bool(_emp_parts & RECOMMENDED_EMP)
 
         doc_data = {
-            "title": row.get("채용공고제목", "제목없음"),
+            "title": clean_title(row.get("채용공고제목", "제목없음"), company),
             "company": company,
             "category": category,
             "employmentType": row.get("고용유형", ""),
