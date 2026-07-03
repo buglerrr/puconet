@@ -818,7 +818,7 @@
     }
 
     /* 5) Ad cards in '추천 채용정보' (last row last 3) */
-    :is(#jobs, #general-jobs) .job-card.ad {
+    :is(#jobs, #general-jobs, #features) .job-card.ad {
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -829,12 +829,12 @@
       min-height: 180px;
     }
 
-    :is(#jobs, #general-jobs) .job-card.ad .ad-title {
+    :is(#jobs, #general-jobs, #features) .job-card.ad .ad-title {
       font-size: .9rem;
       margin-bottom: .4rem;
     }
 
-    :is(#jobs, #general-jobs) .job-card.ad .ad-phone {
+    :is(#jobs, #general-jobs, #features) .job-card.ad .ad-phone {
       font-size: .8rem;
       display: flex;
       gap: .4rem;
@@ -842,13 +842,13 @@
       justify-content: center;
     }
 
-    :is(#jobs, #general-jobs) .job-card.ad .ad-phone svg {
+    :is(#jobs, #general-jobs, #features) .job-card.ad .ad-phone svg {
       width: 18px;
       height: 18px;
       fill: #adb5bd;
     }
 
-    :is(#jobs, #general-jobs) .job-card.ad .ad-cta {
+    :is(#jobs, #general-jobs, #features) .job-card.ad .ad-cta {
       margin-top: .6rem;
       display: inline-block;
       padding: .35rem .7rem;
@@ -860,10 +860,10 @@
       font-weight: 600;
     }
 
-    :is(#jobs, #general-jobs) .job-card.ad .banner-image,
-    :is(#jobs, #general-jobs) .job-card.ad h3,
-    :is(#jobs, #general-jobs) .job-card.ad p,
-    :is(#jobs, #general-jobs) .job-card.ad .job-badges {
+    :is(#jobs, #general-jobs, #features) .job-card.ad .banner-image,
+    :is(#jobs, #general-jobs, #features) .job-card.ad h3,
+    :is(#jobs, #general-jobs, #features) .job-card.ad p,
+    :is(#jobs, #general-jobs, #features) .job-card.ad .job-badges {
       display: none !important;
     }
 
@@ -1125,12 +1125,14 @@
 
     .premium-carousel-container {
       display: flex;
-      flex-wrap: wrap;
-      row-gap: 1rem;
       gap: 1rem;
       transition: transform 0.6s ease-in-out;
       width: 100%;
     }
+
+    /* 자동 생성 프리미엄 배너 그리드: 기존(윗줄) 배너와 동일 크기, 한 줄 4개 고정 */
+    #premiumAutoGrid { margin-top: 1rem; }
+    #premiumAutoGrid:empty { display: none !important; margin: 0 !important; }
 
     .premium-carousel-container .job-card {
       flex: 0 0 calc((100% - 3rem) / 4);
@@ -4464,6 +4466,8 @@
               </a>
             </div>
           </div>
+          <!-- 자동 생성 프리미엄 배너(정규직 단독)가 기존 4개 아래에 한 줄 4개씩 채워짐 -->
+          <div id="premiumAutoGrid" class="job-grid job-grid--premium"></div>
         </div>
       </section>
 
@@ -12205,11 +12209,27 @@ function initCarousel(carouselContainer) {
     var CACHE_KEY = 'allgong_premium_banners_v1';
 
     // 아이템 배열 → 프리미엄 배너 카드 생성 (기존 고정 4개 뒤에 추가). jobsData도 채워 클릭 상세보기 가능
+    // '올공 문의' 광고 배너(마지막 줄 빈칸 채움용). 클릭 시 '상품신청'(product.html)로 이동
+    function makeAdCard(idx) {
+      var phone = (idx % 2 === 0) ? '042)629-8159' : '042)629-7850';
+      var ad = document.createElement('a');
+      ad.className = 'job-card ad premium-auto-card';
+      ad.setAttribute('href', 'javascript:void(0)');
+      ad.setAttribute('role', 'button');
+      ad.setAttribute('data-url', '');
+      ad.setAttribute('aria-label', '올공 광고 및 교육 문의');
+      ad.innerHTML =
+        '<div class="ad-title">ALLGONG(올공) 광고 문의</div>' +
+        '<div class="ad-phone"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.97 22 2 13.03 2 2a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.2 2.2z"></path></svg> ' + phone + '</div>' +
+        '<span class="ad-cta">상품신청</span>';
+      return ad;
+    }
+
     function renderItems(items) {
-      var grid = document.querySelector('#features .premium-carousel-container');
-      if (!grid || !items || !items.length) return false;
+      var grid = document.getElementById('premiumAutoGrid');
+      if (!grid || !items || !items.length) { if (grid) grid.innerHTML = ''; return false; }
       items = items.slice().sort(function (a, b) { return (b.createdMs || 0) - (a.createdMs || 0); }); // 최신순
-      Array.prototype.forEach.call(grid.querySelectorAll('.premium-auto-card'), function (el) { el.remove(); });
+      grid.innerHTML = ''; // 자동 배너 영역만 초기화 (기존 고정 4개 배너는 별도 영역이라 영향 없음)
       window.jobsData = window.jobsData || {};
       var frag = document.createDocumentFragment();
       items.forEach(function (it) {
@@ -12231,7 +12251,10 @@ function initCarousel(carouselContainer) {
           '<span style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="' + escA(dl) + '">' + esc(ddayText(dl)) + '</span></span></div>';
         frag.appendChild(a);
       });
-      grid.appendChild(frag); // 기존 4개 배너 뒤(아래)에 추가 → 한 줄 4개씩 자동 배치
+      // 마지막 줄 빈 칸(한 줄 4개 기준)을 '올공 문의' 광고 배너로 채움
+      var remainder = (4 - (items.length % 4)) % 4;
+      for (var k = 0; k < remainder; k++) { frag.appendChild(makeAdCard(k)); }
+      grid.appendChild(frag);
       return true;
     }
 
@@ -12273,7 +12296,7 @@ function initCarousel(carouselContainer) {
     }
 
     async function refreshBanners() {
-      var grid = document.querySelector('#features .premium-carousel-container');
+      var grid = document.getElementById('premiumAutoGrid');
       if (!grid) return false;
       try {
         var items = await fetchPremium();
@@ -12296,7 +12319,7 @@ function initCarousel(carouselContainer) {
     renderFromCache();  // 즉시: 캐시로 먼저 표시
     (function wait() {   // DB 준비되면 최신으로 갱신
       if (window.db && window.getDocs && window.query && window.collection
-          && document.querySelector('#features .premium-carousel-container')) {
+          && document.getElementById('premiumAutoGrid')) {
         tryRefresh();
       } else {
         setTimeout(wait, 250);
