@@ -1132,6 +1132,9 @@
 
     /* 자동 생성 프리미엄 배너 그리드: 기존(윗줄) 배너와 동일 크기, 한 줄 4개 고정 */
     #premiumAutoGrid { margin-top: 1rem; }
+    /* minmax(0,1fr): 제목 nowrap 등 콘텐츠 폭 때문에 칸이 넓어져 사이드바를 침범하지 않도록 4등분 고정
+       (#features 두 개 id 선택자로 기존 repeat(4,1fr) !important 보다 우선순위 높임) */
+    #features #premiumAutoGrid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
     #premiumAutoGrid:empty { display: none !important; margin: 0 !important; }
 
     .premium-carousel-container .job-card {
