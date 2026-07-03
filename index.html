@@ -1125,6 +1125,8 @@
 
     .premium-carousel-container {
       display: flex;
+      flex-wrap: wrap;
+      row-gap: 1rem;
       gap: 1rem;
       transition: transform 0.6s ease-in-out;
       width: 100%;
@@ -6858,6 +6860,11 @@
               window.open('product.html', '_blank', 'noopener,noreferrer');
               return;
             }
+            // 자동 생성 프리미엄 배너 → 내부 '채용정보' 해당 공고 상세글로 이동
+            if (el.classList.contains('premium-auto-card')) {
+              var _pid = el.getAttribute('data-job-id');
+              if (_pid && typeof window.openRecommendedJob === 'function') { window.openRecommendedJob(_pid); return; }
+            }
             openPopup(el.getAttribute('data-url'));
             return;
           }
@@ -9934,8 +9941,18 @@ function displayStoriesForPage(page) {
       const dl = _boardDaysLeft(job.deadline || job.closingDate);
       return dl !== null && dl >= 0 && dl <= 3;
     }
+    // '프리미엄' 게시판 = 고용유형이 '정규직' 단독(다른 유형과 합쳐지지 않은)인 자동수집 공고 (미마감)
+    function isPremiumJob(job) {
+      if (job.source !== 'alio-auto') return false;
+      const emps = String(job.employmentType || job.jobType || '').split(/[,+/、，]/).map(function (s) { return s.trim(); }).filter(Boolean);
+      if (!(emps.length === 1 && emps[0] === '정규직')) return false;
+      const dl = _boardDaysLeft(job.deadline || job.closingDate);
+      if (dl !== null && dl < 0) return false; // 마감 지난 것 제외
+      return true;
+    }
     function computeBoardTypeFilter(boardType) {
       if (!boardType) return null;
+      if (boardType === 'premium') return { predicate: isPremiumJob };
       if (boardType === 'recommended') return { predicate: isRecommendedJob };
       if (boardType === 'deadline-soon') return { predicate: isDeadlineSoonJob };
       if (BOARD_FILTER_MAP[boardType]) return BOARD_FILTER_MAP[boardType];
@@ -10633,6 +10650,15 @@ function displayStoriesForPage(page) {
         const titleText = escapeHtml(job.title);
         const companyText = escapeHtml(job.company);
 
+        // 제목 색상: 단독 '정규직' → 빨강, '청년인턴(채용형)/(체험형)' → 진한 네이비, 그 외 기본
+        const _empParts = String(job.employmentType || job.jobType || '').split(/[,+/、，]/).map(function (s) { return s.trim(); }).filter(Boolean);
+        let _titleColor = '#2c3e50';
+        if (_empParts.length === 1 && _empParts[0] === '정규직') {
+          _titleColor = '#e11900'; // 빨간색 (단독 정규직)
+        } else if (_empParts.some(function (e) { return e === '청년인턴(채용형)' || e === '청년인턴(체험형)'; })) {
+          _titleColor = '#0d1b6b'; // 진한 네이비 (청년인턴)
+        }
+
         // 연번 계산 (전체 개수에서 현재 순서를 빼서 역순으로)
         const seqNumber = totalJobs.length - startIndex - index;
 
@@ -10640,7 +10666,7 @@ function displayStoriesForPage(page) {
               ${checkboxCell}
               <td class="company-cell" title="${companyText}" style="text-align:center;">${companyText}</td>
               <td class="title-cell" title="${titleText}">
-                  <a href="#" onclick="viewDetail('${job.id}'); return false;" style="text-decoration:none; color:#2c3e50; font-weight:600;">${titleText}</a>
+                  <a href="#" onclick="viewDetail('${job.id}'); return false;" style="text-decoration:none; color:${_titleColor}; font-weight:600;">${titleText}</a>
               </td>
               <td class="employment-cell" title="${displayEmploymentType}">${displayEmploymentType}</td>
               <td class="deadline-cell">${job.deadline || '-'}</td>
@@ -12123,6 +12149,154 @@ function initCarousel(carouselContainer) {
     (function wait() {   // 그 다음 DB 준비되면 최신으로 갱신
       if (window.db && window.getDocs && window.query && window.collection
           && document.querySelector('#jobs .job-grid')) {
+        tryRefresh();
+      } else {
+        setTimeout(wait, 250);
+      }
+    })();
+  })();
+</script>
+
+<!-- ===== [추가] 프리미엄 채용정보 자동 배너 (자동수집 공고 중 고용유형 '정규직' 단독 → 기존 4개 배너 아래에 한 줄 4개씩 생성) ===== -->
+<script>
+  (function () {
+    function esc(s) { var d = document.createElement('div'); d.textContent = (s == null ? '' : String(s)); return d.innerHTML; }
+    function escA(s) { return esc(s).replace(/"/g, '&quot;'); }
+    function daysLeft(deadline) {
+      if (!deadline) return null;
+      var end = new Date(deadline); if (isNaN(end.getTime())) return null;
+      end.setHours(0, 0, 0, 0); var t = new Date(); t.setHours(0, 0, 0, 0);
+      return Math.round((end - t) / 86400000);
+    }
+    function ddayText(deadline) {
+      var dl = daysLeft(deadline);
+      if (dl === null) return '';
+      if (dl < 0) return '마감'; if (dl === 0) return 'D-DAY'; return 'D-' + dl;
+    }
+    function fmtDate(v) {
+      if (!v) return '-';
+      var s = String(v).trim();
+      var m = s.match(/(\d{4})\D?(\d{1,2})\D?(\d{1,2})/);
+      if (!m) return s;
+      return m[1] + '.' + ('0' + m[2]).slice(-2) + '.' + ('0' + m[3]).slice(-2);
+    }
+    function notExpired(it) {
+      var left = daysLeft(it.deadline || it.closingDate);
+      return left === null || left >= 0;
+    }
+    // 고용유형이 '정규직' 단독(다른 유형과 합쳐지지 않음)인지
+    function isStandaloneRegular(d) {
+      var emps = String(d.employmentType || d.jobType || '').split(/[,+/、，]/).map(function (s) { return s.trim(); }).filter(Boolean);
+      return emps.length === 1 && emps[0] === '정규직';
+    }
+    function normalizeJob(id, d) {
+      var createdMs = (d.createdAt && d.createdAt.seconds) ? d.createdAt.seconds * 1000 : 0;
+      return {
+        id: id, title: d.title || '', company: d.company || '',
+        employmentType: d.employmentType || '', jobType: d.jobType || d.employmentType || '',
+        location: d.location || '', deadline: d.deadline || d.closingDate || '', closingDate: d.closingDate || d.deadline || '',
+        ncsCode: d.ncsCode || '', careerType: d.careerType || '', recruitmentCount: d.recruitmentCount || '',
+        education: d.education || '', preference: d.preference || '', detailUrl: d.detailUrl || '#',
+        imageUrl: d.imageUrl || '', content: d.content || '', category: d.category || '',
+        createdMs: createdMs, createdDate: createdMs ? new Date(createdMs).toLocaleDateString('ko-KR') : ''
+      };
+    }
+
+    var CACHE_KEY = 'allgong_premium_banners_v1';
+
+    // 아이템 배열 → 프리미엄 배너 카드 생성 (기존 고정 4개 뒤에 추가). jobsData도 채워 클릭 상세보기 가능
+    function renderItems(items) {
+      var grid = document.querySelector('#features .premium-carousel-container');
+      if (!grid || !items || !items.length) return false;
+      items = items.slice().sort(function (a, b) { return (b.createdMs || 0) - (a.createdMs || 0); }); // 최신순
+      Array.prototype.forEach.call(grid.querySelectorAll('.premium-auto-card'), function (el) { el.remove(); });
+      window.jobsData = window.jobsData || {};
+      var frag = document.createDocumentFragment();
+      items.forEach(function (it) {
+        window.jobsData[it.id] = Object.assign({}, it, { createdDate: it.createdDate }); // 상세보기용
+        var dl = it.deadline || it.closingDate || '';
+        var img = (it.imageUrl && it.imageUrl !== './logo.png') ? it.imageUrl : './올공 CI.png';
+        var a = document.createElement('a');
+        a.className = 'job-card premium-auto-card';
+        a.setAttribute('href', 'javascript:void(0)');
+        a.setAttribute('role', 'button');
+        a.setAttribute('data-job-id', it.id);
+        a.setAttribute('aria-label', (it.title || '프리미엄 채용공고'));
+        a.innerHTML =
+          '<span class="premium-bubble">프리미엄</span>' +
+          '<img class="banner-image" alt="' + escA(it.company) + '" src="' + escA(img) + '" onerror="this.onerror=null;this.src=\'./올공 CI.png\'" />' +
+          '<h3 title="' + escA(it.title) + '">' + esc(it.title) + '</h3>' +
+          '<p>' + esc(it.employmentType || '정규직') + '</p>' +
+          '<div class="deadline"><strong>마감:</strong> <span class="deadline-date" data-deadline="' + escA(dl) + '">' + esc(fmtDate(dl)) + '</span> ' +
+          '<span style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="' + escA(dl) + '">' + esc(ddayText(dl)) + '</span></span></div>';
+        frag.appendChild(a);
+      });
+      grid.appendChild(frag); // 기존 4개 배너 뒤(아래)에 추가 → 한 줄 4개씩 자동 배치
+      return true;
+    }
+
+    function renderFromCache() {
+      try {
+        var cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+        if (!cached || !cached.items) return false;
+        return renderItems(cached.items.filter(notExpired));
+      } catch (e) { return false; }
+    }
+    function saveCache(items) {
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), items: items })); } catch (e) {}
+    }
+
+    // ① 효율 조회: premium==true 인 문서만 읽음 (실패/0건 시 폴백)
+    async function fetchPremium() {
+      try {
+        if (window.where) {
+          var q1 = window.query(window.collection(window.db, 'jobs'), window.where('premium', '==', true));
+          var s1 = await window.getDocs(q1);
+          var a1 = [];
+          s1.forEach(function (ds) { a1.push(normalizeJob(ds.id, ds.data())); });
+          a1 = a1.filter(notExpired);
+          if (a1.length) return a1;
+        }
+      } catch (e) { /* 폴백 */ }
+      // 폴백: 플래그 미적용 기간 대비 — 최근 300건 읽어 '정규직 단독' 자동수집 공고만
+      var q2 = window.query(window.collection(window.db, 'jobs'), window.orderBy('createdAt', 'desc'), window.limit(300));
+      var s2 = await window.getDocs(q2);
+      var a2 = [];
+      s2.forEach(function (ds) {
+        var d = ds.data();
+        if (d.source !== 'alio-auto') return;
+        if (!isStandaloneRegular(d)) return;
+        var it = normalizeJob(ds.id, d);
+        if (notExpired(it)) a2.push(it);
+      });
+      return a2;
+    }
+
+    async function refreshBanners() {
+      var grid = document.querySelector('#features .premium-carousel-container');
+      if (!grid) return false;
+      try {
+        var items = await fetchPremium();
+        if (!items.length) return false; // 재시도 대상
+        renderItems(items);
+        saveCache(items);
+        return true;
+      } catch (e) { console.error('프리미엄 배너 로드 실패:', e); return false; }
+    }
+
+    var _premTries = 0;
+    function tryRefresh() {
+      refreshBanners().then(function (ok) {
+        if (!ok && _premTries < 15) { _premTries++; setTimeout(tryRefresh, 1000); }
+      }).catch(function () {
+        if (_premTries < 15) { _premTries++; setTimeout(tryRefresh, 1000); }
+      });
+    }
+
+    renderFromCache();  // 즉시: 캐시로 먼저 표시
+    (function wait() {   // DB 준비되면 최신으로 갱신
+      if (window.db && window.getDocs && window.query && window.collection
+          && document.querySelector('#features .premium-carousel-container')) {
         tryRefresh();
       } else {
         setTimeout(wait, 250);
