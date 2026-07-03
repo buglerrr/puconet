@@ -1140,6 +1140,12 @@
     #features #premiumAutoGrid > .job-card h3 { min-width: 0; max-width: 100%; }
     #premiumAutoGrid:empty { display: none !important; margin: 0 !important; }
 
+    /* 자동 생성 주요 배너 그리드: 기존 주요 배너(연두색)와 동일 크기, 한 줄 4개 고정 */
+    #general-jobs #featuredAutoGrid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; margin-bottom: 1.25rem !important; }
+    #general-jobs #featuredAutoGrid > .job-card { min-width: 0 !important; max-width: 100% !important; }
+    #general-jobs #featuredAutoGrid > .job-card h3 { min-width: 0; max-width: 100%; }
+    #featuredAutoGrid:empty { display: none !important; margin: 0 !important; }
+
     .premium-carousel-container .job-card {
       flex: 0 0 calc((100% - 3rem) / 4);
       /* 4개의 카드와 3개의 gap(1rem씩) */
@@ -4989,6 +4995,8 @@
       <section class="section section--tight-top" id="general-jobs" style="background: white;">
         <div class="container">
           <h2 class="section-title" style="color:#5c7cfa;">주요 채용정보 <a class="apply" href="product.html" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;">상품신청&gt;</a></h2>
+          <!-- 자동 생성 주요 배너(비정규직/무기계약직 단독)가 기존 주요 배너 위에 한 줄 4개씩 채워짐 -->
+          <div id="featuredAutoGrid" class="job-grid"></div>
           <div class="job-grid">
             <a aria-label="한국도로공사 채용공고 상세로 이동" class="job-card" data-job="g1" data-url="https://www.ex.co.kr/portal/biz/bbs/layout1/selectBoardList.do?bbsId=BBSMSTR_000000000211" href="javascript:void(0)"
               role="button">
@@ -6870,11 +6878,9 @@
               window.open('product.html', '_blank', 'noopener,noreferrer');
               return;
             }
-            // 자동 생성 프리미엄 배너 → 내부 '채용정보' 해당 공고 상세글로 이동
-            if (el.classList.contains('premium-auto-card')) {
-              var _pid = el.getAttribute('data-job-id');
-              if (_pid && typeof window.openRecommendedJob === 'function') { window.openRecommendedJob(_pid); return; }
-            }
+            // 자동 생성 배너(프리미엄/주요 등) → 내부 '채용정보' 해당 공고 상세글로 이동
+            var _pid = el.getAttribute('data-job-id');
+            if (_pid && typeof window.openRecommendedJob === 'function') { window.openRecommendedJob(_pid); return; }
             openPopup(el.getAttribute('data-url'));
             return;
           }
@@ -9960,9 +9966,19 @@ function displayStoriesForPage(page) {
       if (dl !== null && dl < 0) return false; // 마감 지난 것 제외
       return true;
     }
+    // '주요' 게시판 = 고용유형이 '비정규직' 또는 '무기계약직' 단독인 자동수집 공고 (미마감)
+    function isFeaturedJob(job) {
+      if (job.source !== 'alio-auto') return false;
+      const emps = String(job.employmentType || job.jobType || '').split(/[,+/、，]/).map(function (s) { return s.trim(); }).filter(Boolean);
+      if (!(emps.length === 1 && (emps[0] === '비정규직' || emps[0] === '무기계약직'))) return false;
+      const dl = _boardDaysLeft(job.deadline || job.closingDate);
+      if (dl !== null && dl < 0) return false; // 마감 지난 것 제외
+      return true;
+    }
     function computeBoardTypeFilter(boardType) {
       if (!boardType) return null;
       if (boardType === 'premium') return { predicate: isPremiumJob };
+      if (boardType === 'featured') return { predicate: isFeaturedJob };
       if (boardType === 'recommended') return { predicate: isRecommendedJob };
       if (boardType === 'deadline-soon') return { predicate: isDeadlineSoonJob };
       if (BOARD_FILTER_MAP[boardType]) return BOARD_FILTER_MAP[boardType];
@@ -12326,6 +12342,159 @@ function initCarousel(carouselContainer) {
     (function wait() {   // DB 준비되면 최신으로 갱신
       if (window.db && window.getDocs && window.query && window.collection
           && document.getElementById('premiumAutoGrid')) {
+        tryRefresh();
+      } else {
+        setTimeout(wait, 250);
+      }
+    })();
+  })();
+</script>
+
+<!-- ===== [추가] 주요 채용정보 자동 배너 (자동수집 공고 중 고용유형 '비정규직'/'무기계약직' 단독 → 기존 주요 배너 위에 한 줄 4개씩 생성) ===== -->
+<script>
+  (function () {
+    function esc(s) { var d = document.createElement('div'); d.textContent = (s == null ? '' : String(s)); return d.innerHTML; }
+    function escA(s) { return esc(s).replace(/"/g, '&quot;'); }
+    function fmtLoc(loc) {
+      if (!loc) return '-';
+      var parts = String(loc).split(/[,，]/).map(function (x) { return x.trim(); }).filter(Boolean);
+      if (parts.length <= 1) return parts[0] || '-';
+      return parts[0] + ' 외';
+    }
+    function daysLeft(deadline) {
+      if (!deadline) return null;
+      var end = new Date(deadline); if (isNaN(end.getTime())) return null;
+      end.setHours(0, 0, 0, 0); var t = new Date(); t.setHours(0, 0, 0, 0);
+      return Math.round((end - t) / 86400000);
+    }
+    function ddayText(deadline) {
+      var dl = daysLeft(deadline);
+      if (dl === null) return '';
+      if (dl < 0) return '마감'; if (dl === 0) return 'D-DAY'; return 'D-' + dl;
+    }
+    function fmtDate(v) {
+      if (!v) return '-';
+      var s = String(v).trim();
+      var m = s.match(/(\d{4})\D?(\d{1,2})\D?(\d{1,2})/);
+      if (!m) return s;
+      return m[1] + '.' + ('0' + m[2]).slice(-2) + '.' + ('0' + m[3]).slice(-2);
+    }
+    function notExpired(it) {
+      var left = daysLeft(it.deadline || it.closingDate);
+      return left === null || left >= 0;
+    }
+    // 고용유형이 '비정규직' 또는 '무기계약직' 단독인지
+    function isStandaloneFeatured(d) {
+      var emps = String(d.employmentType || d.jobType || '').split(/[,+/、，]/).map(function (s) { return s.trim(); }).filter(Boolean);
+      return emps.length === 1 && (emps[0] === '비정규직' || emps[0] === '무기계약직');
+    }
+    function normalizeJob(id, d) {
+      var createdMs = (d.createdAt && d.createdAt.seconds) ? d.createdAt.seconds * 1000 : 0;
+      return {
+        id: id, title: d.title || '', company: d.company || '',
+        employmentType: d.employmentType || '', jobType: d.jobType || d.employmentType || '',
+        location: d.location || '', deadline: d.deadline || d.closingDate || '', closingDate: d.closingDate || d.deadline || '',
+        ncsCode: d.ncsCode || '', careerType: d.careerType || '', recruitmentCount: d.recruitmentCount || '',
+        education: d.education || '', preference: d.preference || '', detailUrl: d.detailUrl || '#',
+        imageUrl: d.imageUrl || '', content: d.content || '', category: d.category || '',
+        createdMs: createdMs, createdDate: createdMs ? new Date(createdMs).toLocaleDateString('ko-KR') : ''
+      };
+    }
+
+    var CACHE_KEY = 'allgong_featured_banners_v1';
+
+    // 아이템 배열 → 주요 배너 카드 생성 (기존 주요 배너 위에 표시). jobsData도 채워 클릭 상세보기 가능
+    function renderItems(items) {
+      var grid = document.getElementById('featuredAutoGrid');
+      if (!grid || !items || !items.length) { if (grid) grid.innerHTML = ''; return false; }
+      items = items.slice().sort(function (a, b) { return (b.createdMs || 0) - (a.createdMs || 0); }); // 최신순
+      grid.innerHTML = ''; // 자동 배너 영역만 초기화 (기존 주요 배너는 별도 그리드라 영향 없음)
+      window.jobsData = window.jobsData || {};
+      var frag = document.createDocumentFragment();
+      items.forEach(function (it) {
+        window.jobsData[it.id] = Object.assign({}, it, { createdDate: it.createdDate }); // 상세보기용
+        var dl = it.deadline || it.closingDate || '';
+        var img = (it.imageUrl && it.imageUrl !== './logo.png') ? it.imageUrl : './올공 CI.png';
+        var a = document.createElement('a');
+        a.className = 'job-card featured-auto-card';
+        a.setAttribute('href', 'javascript:void(0)');
+        a.setAttribute('role', 'button');
+        a.setAttribute('data-job-id', it.id);
+        a.setAttribute('aria-label', (it.title || '주요 채용공고'));
+        a.innerHTML =
+          '<img class="banner-image" alt="' + escA(it.company) + '" src="' + escA(img) + '" onerror="this.onerror=null;this.src=\'./올공 CI.png\'" />' +
+          '<h3 title="' + escA(it.title) + '">' + esc(it.title) + '</h3>' +
+          '<p>' + esc(it.employmentType || '') + '</p>' +
+          '<p><strong>근무지:</strong> ' + esc(fmtLoc(it.location)) + ' · <strong>마감:</strong> <span class="deadline-date" data-deadline="' + escA(dl) + '">' + esc(fmtDate(dl)) + '</span> ' +
+          '<span style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="' + escA(dl) + '">' + esc(ddayText(dl)) + '</span></span></p>';
+        frag.appendChild(a);
+      });
+      grid.appendChild(frag);
+      return true;
+    }
+
+    function renderFromCache() {
+      try {
+        var cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+        if (!cached || !cached.items) return false;
+        return renderItems(cached.items.filter(notExpired));
+      } catch (e) { return false; }
+    }
+    function saveCache(items) {
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), items: items })); } catch (e) {}
+    }
+
+    // ① 효율 조회: featured==true 인 문서만 읽음 (실패/0건 시 폴백)
+    async function fetchFeatured() {
+      try {
+        if (window.where) {
+          var q1 = window.query(window.collection(window.db, 'jobs'), window.where('featured', '==', true));
+          var s1 = await window.getDocs(q1);
+          var a1 = [];
+          s1.forEach(function (ds) { a1.push(normalizeJob(ds.id, ds.data())); });
+          a1 = a1.filter(notExpired);
+          if (a1.length) return a1;
+        }
+      } catch (e) { /* 폴백 */ }
+      // 폴백: 플래그 미적용 기간 대비 — 최근 300건 읽어 '비정규직/무기계약직 단독' 자동수집 공고만
+      var q2 = window.query(window.collection(window.db, 'jobs'), window.orderBy('createdAt', 'desc'), window.limit(300));
+      var s2 = await window.getDocs(q2);
+      var a2 = [];
+      s2.forEach(function (ds) {
+        var d = ds.data();
+        if (d.source !== 'alio-auto') return;
+        if (!isStandaloneFeatured(d)) return;
+        var it = normalizeJob(ds.id, d);
+        if (notExpired(it)) a2.push(it);
+      });
+      return a2;
+    }
+
+    async function refreshBanners() {
+      var grid = document.getElementById('featuredAutoGrid');
+      if (!grid) return false;
+      try {
+        var items = await fetchFeatured();
+        if (!items.length) return false; // 재시도 대상
+        renderItems(items);
+        saveCache(items);
+        return true;
+      } catch (e) { console.error('주요 배너 로드 실패:', e); return false; }
+    }
+
+    var _featTries = 0;
+    function tryRefresh() {
+      refreshBanners().then(function (ok) {
+        if (!ok && _featTries < 15) { _featTries++; setTimeout(tryRefresh, 1000); }
+      }).catch(function () {
+        if (_featTries < 15) { _featTries++; setTimeout(tryRefresh, 1000); }
+      });
+    }
+
+    renderFromCache();  // 즉시: 캐시로 먼저 표시
+    (function wait() {   // DB 준비되면 최신으로 갱신
+      if (window.db && window.getDocs && window.query && window.collection
+          && document.getElementById('featuredAutoGrid')) {
         tryRefresh();
       } else {
         setTimeout(wait, 250);
