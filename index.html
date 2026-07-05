@@ -4755,12 +4755,23 @@
         );
       };
 
-      // 페이지 로드 후 미리보기 시작
-      (function waitForDb() {
-        if (window.db && window.onSnapshot) {
-          loadChatPreviews();
+      // 페이지 로드 후: 채팅 섹션이 화면에 가까워질 때만 미리보기 시작 (첫 화면 부하/실시간 리스너 지연)
+      (function deferChatPreviews() {
+        var started = false;
+        function startWhenReady() {
+          if (started) return;
+          if (window.db && window.onSnapshot) { started = true; loadChatPreviews(); }
+          else setTimeout(startWhenReady, 200);
+        }
+        var sec = document.getElementById('chatroom-section');
+        if ('IntersectionObserver' in window && sec) {
+          var io = new IntersectionObserver(function (entries) {
+            if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); startWhenReady(); }
+          }, { rootMargin: '300px' });
+          io.observe(sec);
+          setTimeout(startWhenReady, 8000); // 안전장치: 스크롤하지 않아도 8초 후 로드
         } else {
-          setTimeout(waitForDb, 200);
+          startWhenReady();
         }
       })();
       </script>
@@ -5415,7 +5426,7 @@
             <!-- 배너 1 -->
             <a class="edu-banner" href="https://github.com/buglerrr/puconet/blob/main/images/education/1.png?raw=true" target="_blank" rel="noopener">
               <div class="thumb">
-                <img src="https://github.com/buglerrr/puconet/blob/main/images/baner/banner1.png?raw=true"
+                <img loading="lazy" decoding="async" src="https://github.com/buglerrr/puconet/blob/main/images/baner/banner1.png?raw=true"
                   alt="교육과정 1 썸네일">
               </div>
             </a>
@@ -5423,7 +5434,7 @@
             <!-- 배너 2 -->
             <a class="edu-banner" href="https://github.com/buglerrr/puconet/blob/main/images/education/2.png?raw=true" target="_blank" rel="noopener">
               <div class="thumb">
-                <img src="https://github.com/buglerrr/puconet/blob/main/images/baner/banner2.png?raw=true"
+                <img loading="lazy" decoding="async" src="https://github.com/buglerrr/puconet/blob/main/images/baner/banner2.png?raw=true"
                   alt="교육과정 2 썸네일">
               </div>
             </a>
@@ -5431,7 +5442,7 @@
             <!-- 배너 3 -->
             <a class="edu-banner" href="https://github.com/buglerrr/puconet/blob/main/images/education/3.png?raw=true" target="_blank" rel="noopener">
               <div class="thumb">
-                <img src="https://github.com/buglerrr/puconet/blob/main/images/baner/banner3.png?raw=true"
+                <img loading="lazy" decoding="async" src="https://github.com/buglerrr/puconet/blob/main/images/baner/banner3.png?raw=true"
                   alt="교육과정 3 썸네일">
               </div>
             </a>
@@ -5439,7 +5450,7 @@
             <!-- 배너 4 -->
             <a class="edu-banner" href="https://github.com/buglerrr/puconet/blob/main/images/education/4.png?raw=true" target="_blank" rel="noopener">
               <div class="thumb">
-                <img src="https://github.com/buglerrr/puconet/blob/main/images/baner/banner4.png?raw=true"
+                <img loading="lazy" decoding="async" src="https://github.com/buglerrr/puconet/blob/main/images/baner/banner4.png?raw=true"
                   alt="교육과정 3 썸네일">
               </div>
             </a>
@@ -5447,7 +5458,7 @@
             <!-- 배너 5 -->
             <a class="edu-banner" href="https://github.com/buglerrr/puconet/blob/main/images/education/5.png?raw=true" target="_blank" rel="noopener">
               <div class="thumb">
-                <img src="https://github.com/buglerrr/puconet/blob/main/images/baner/banner5.png?raw=true"
+                <img loading="lazy" decoding="async" src="https://github.com/buglerrr/puconet/blob/main/images/baner/banner5.png?raw=true"
                   alt="교육과정 3 썸네일">
               </div>
             </a>
@@ -5455,7 +5466,7 @@
             <!-- 배너 6 -->
             <a class="edu-banner" href="https://github.com/buglerrr/puconet/blob/main/images/education/6.png?raw=true" target="_blank" rel="noopener">
               <div class="thumb">
-                <img src="https://github.com/buglerrr/puconet/blob/main/images/baner/banner6.png?raw=true"
+                <img loading="lazy" decoding="async" src="https://github.com/buglerrr/puconet/blob/main/images/baner/banner6.png?raw=true"
                   alt="교육과정 3 썸네일">
               </div>
             </a>
@@ -6685,7 +6696,7 @@
             <ul>
               <li class="bannerList index0">
                 <a
-                  href="https://sotong.go.kr/front/epilogue/epilogueNewViewPage.do?bbs_id=3ec7566f047d46ca8691b276e21dad31&pagetype=bbs&search_result=&search_result_cnddt=&epilogue_bgnde=&epilogue_endde=&date_range=all&epilogue_bgnde_cnddt=&epilogue_endde_cnddt=&date_range_cnddt" target="_blank" rel="noopener"><img
+                  href="https://sotong.go.kr/front/epilogue/epilogueNewViewPage.do?bbs_id=3ec7566f047d46ca8691b276e21dad31&pagetype=bbs&search_result=&search_result_cnddt=&epilogue_bgnde=&epilogue_endde=&date_range=all&epilogue_bgnde_cnddt=&epilogue_endde_cnddt=&date_range_cnddt" target="_blank" rel="noopener"><img loading="lazy" decoding="async"
                     alt="산림청 공모전"
                     src="https://github.com/buglerrr/puconet/blob/main/%EC%82%B0%EB%A6%BC%EC%B2%AD.jpg?raw=true"
                     srcset="https://github.com/buglerrr/puconet/blob/main/%EC%82%B0%EB%A6%BC%EC%B2%AD.jpg?raw=true" /></a>
@@ -6693,7 +6704,7 @@
 
               <li class="bannerList index0">
                 <a
-                  href="https://www.datacontest.kr/" target="_blank" rel="noopener"><img
+                  href="https://www.datacontest.kr/" target="_blank" rel="noopener"><img loading="lazy" decoding="async"
                     alt="산자부 공모전"
                     src="https://github.com/buglerrr/puconet/blob/main/%EC%82%B0%EC%9E%90%EB%B6%80.png?raw=true"
                     srcset="https://github.com/buglerrr/puconet/blob/main/%EC%82%B0%EC%9E%90%EB%B6%80.png?raw=true" /></a>
@@ -6701,21 +6712,21 @@
 
               <li class="bannerList index0">
                 <a
-                  href="https://www.kr.or.kr/boardCnts/view.do?boardID=1100660&boardSeq=1122449" target="_blank" rel="noopener"><img
+                  href="https://www.kr.or.kr/boardCnts/view.do?boardID=1100660&boardSeq=1122449" target="_blank" rel="noopener"><img loading="lazy" decoding="async"
                     alt="미래철도 공모전"
                     src="https://github.com/buglerrr/puconet/blob/main/%EB%AF%B8%EB%9E%98%EC%B2%A0%EB%8F%84.png?raw=true"
                     srcset="https://github.com/buglerrr/puconet/blob/main/%EB%AF%B8%EB%9E%98%EC%B2%A0%EB%8F%84.png?raw=true" /></a>
               </li>
               <li class="bannerList index1">
                 <a
-                  href="https://djjunggu.go.kr/prog/saeolGosi/GOSI_03/sub03_06/view.do?notAncmtMgtNo=44555" target="_blank" rel="noopener"><img
+                  href="https://djjunggu.go.kr/prog/saeolGosi/GOSI_03/sub03_06/view.do?notAncmtMgtNo=44555" target="_blank" rel="noopener"><img loading="lazy" decoding="async"
                     alt="대전 중구 공모전"
                     src="https://github.com/buglerrr/puconet/blob/main/%EB%8C%80%EC%A0%84%EC%A4%91%EA%B5%AC.png?raw=true"
                     srcset="https://github.com/buglerrr/puconet/blob/main/%EB%8C%80%EC%A0%84%EC%A4%91%EA%B5%AC.png?raw=true" /></a>
               </li>
               <li class="bannerList index1">
                 <a
-                  href="https://blog.naver.com/mobilehk/224310635457" target="_blank" rel="noopener"><img
+                  href="https://blog.naver.com/mobilehk/224310635457" target="_blank" rel="noopener"><img loading="lazy" decoding="async"
                     alt="마케팅잡 청년 모집"
                     src="https://github.com/buglerrr/puconet/blob/main/%EB%A7%88%EC%BC%80%ED%8C%85%EC%9E%A1.jpeg?raw=true"
                     srcset="https://github.com/buglerrr/puconet/blob/main/%EB%A7%88%EC%BC%80%ED%8C%85%EC%9E%A1.jpeg?raw=true" /></a>
@@ -6723,14 +6734,14 @@
 
               <li class="bannerList index1">
                 <a
-                  href="https://www.gov-eformsign.com/eform/document/external_user_view_service.html?company_id=a4970cde68f94f4590eaebfaab2524dd&recipient=&country_code=kr&template_id=d8ba518e82cb4e93ad0882bd42c2032b" target="_blank" rel="noopener"><img
+                  href="https://www.gov-eformsign.com/eform/document/external_user_view_service.html?company_id=a4970cde68f94f4590eaebfaab2524dd&recipient=&country_code=kr&template_id=d8ba518e82cb4e93ad0882bd42c2032b" target="_blank" rel="noopener"><img loading="lazy" decoding="async"
                     alt="국민체육진흥공단"
                     src="https://github.com/buglerrr/puconet/blob/main/%EA%B5%AD%EB%AF%BC%EC%B2%B4%EC%9C%A1%EC%A7%84%ED%9D%A5%EA%B3%B5%EB%8B%A8.png?raw=true"
                     srcset="https://github.com/buglerrr/puconet/blob/main/%EA%B5%AD%EB%AF%BC%EC%B2%B4%EC%9C%A1%EC%A7%84%ED%9D%A5%EA%B3%B5%EB%8B%A8.png?raw=true" /></a>
               </li>
               <li class="bannerList index1">
                 <a
-                  href="https://www.fss.or.kr/fss/main/main.do?menuNo=200000" target="_blank" rel="noopener"><img
+                  href="https://www.fss.or.kr/fss/main/main.do?menuNo=200000" target="_blank" rel="noopener"><img loading="lazy" decoding="async"
                     alt="금융감독원"
                     src="https://github.com/buglerrr/puconet/blob/main/%EA%B8%88%EC%9C%B5%EA%B0%90%EB%8F%85%EC%9B%90.png?raw=true"
                     srcset="https://github.com/buglerrr/puconet/blob/main/%EA%B8%88%EC%9C%B5%EA%B0%90%EB%8F%85%EC%9B%90.png?raw=true" /></a>
@@ -7352,8 +7363,8 @@
       }
     };
 
-    // ===== 방문자 카운트 누적: IP 기준 하루 1회 =====
-    (async function countVisitor() {
+    // ===== 방문자 카운트 누적: IP 기준 하루 1회 (첫 렌더를 막지 않도록 idle 시점에 실행) =====
+    const __countVisitor = async function countVisitor() {
       try {
         const todayKey = getKstTodayKey();
         const ip = await fetchVisitorIp();
@@ -7380,7 +7391,8 @@
       } catch (e) {
         console.warn('방문자 카운트 실패:', e);
       }
-    })();
+    };
+    (window.requestIdleCallback || function (cb) { return setTimeout(cb, 1200); })(function () { __countVisitor(); });
 
     // 관리자(ilovetruman) 방문 제외 보정: 오늘 이 IP가 카운트돼 있으면 -1 하고 기록 표시
     window.excludeAdminVisit = async function () {
@@ -11981,6 +11993,22 @@ function initCarousel(carouselContainer) {
     setInterval(updateDdays, 60 * 60 * 1000);
   })();
 </script>
+<!-- ===== [추가] 배너 3종(추천/프리미엄/주요) 폴백 공통 조회: jobs 최근 300건을 1회만 읽어 공유 (중복 읽기 제거) ===== -->
+<script>
+  // 세 배너 스크립트가 플래그 미적용 시 각각 300건씩(=900건) 읽던 것을, 최초 1회 Promise를 캐시해 공유한다.
+  window.__getBannerJobs = function () {
+    if (window.__bannerJobsPromise) return window.__bannerJobsPromise;
+    window.__bannerJobsPromise = (async function () {
+      var q = window.query(window.collection(window.db, 'jobs'), window.orderBy('createdAt', 'desc'), window.limit(300));
+      var snap = await window.getDocs(q);
+      var arr = [];
+      snap.forEach(function (ds) { arr.push({ id: ds.id, data: ds.data() }); });
+      return arr;
+    })();
+    return window.__bannerJobsPromise;
+  };
+</script>
+
 <!-- ===== [추가] 추천 채용정보 자동 배너 (자동수집 공고 중 정규직/청년인턴 → 맨 윗줄 삽입) ===== -->
 <style>
   #jobs .auto-rec-card {
@@ -12139,14 +12167,13 @@ function initCarousel(carouselContainer) {
           if (a1.length) return a1;
         }
       } catch (e) { /* 폴백 */ }
-      // 폴백: 플래그 미적용 기간 대비 — 최근 300건 읽어 클라이언트 필터
-      var q2 = window.query(window.collection(window.db, 'jobs'), window.orderBy('createdAt', 'desc'), window.limit(300));
-      var s2 = await window.getDocs(q2);
+      // 폴백: 플래그 미적용 기간 대비 — 공통 조회(최근 300건, 1회)로 클라이언트 필터
+      var rows = await window.__getBannerJobs();
       var a2 = [];
-      s2.forEach(function (ds) {
-        var d = ds.data();
+      rows.forEach(function (r) {
+        var d = r.data;
         if (d.source !== 'alio-auto') return;
-        var it = normalizeJob(ds.id, d);
+        var it = normalizeJob(r.id, d);
         if (it.emps.length && notExpired(it)) a2.push(it);
       });
       return a2;
@@ -12305,15 +12332,14 @@ function initCarousel(carouselContainer) {
           if (a1.length) return a1;
         }
       } catch (e) { /* 폴백 */ }
-      // 폴백: 플래그 미적용 기간 대비 — 최근 300건 읽어 '정규직 단독' 자동수집 공고만
-      var q2 = window.query(window.collection(window.db, 'jobs'), window.orderBy('createdAt', 'desc'), window.limit(300));
-      var s2 = await window.getDocs(q2);
+      // 폴백: 플래그 미적용 기간 대비 — 공통 조회(최근 300건, 1회)에서 '정규직 단독' 자동수집 공고만
+      var rows = await window.__getBannerJobs();
       var a2 = [];
-      s2.forEach(function (ds) {
-        var d = ds.data();
+      rows.forEach(function (r) {
+        var d = r.data;
         if (d.source !== 'alio-auto') return;
         if (!isStandaloneRegular(d)) return;
-        var it = normalizeJob(ds.id, d);
+        var it = normalizeJob(r.id, d);
         if (notExpired(it)) a2.push(it);
       });
       return a2;
@@ -12458,15 +12484,14 @@ function initCarousel(carouselContainer) {
           if (a1.length) return a1;
         }
       } catch (e) { /* 폴백 */ }
-      // 폴백: 플래그 미적용 기간 대비 — 최근 300건 읽어 '비정규직/무기계약직 단독' 자동수집 공고만
-      var q2 = window.query(window.collection(window.db, 'jobs'), window.orderBy('createdAt', 'desc'), window.limit(300));
-      var s2 = await window.getDocs(q2);
+      // 폴백: 플래그 미적용 기간 대비 — 공통 조회(최근 300건, 1회)에서 '비정규직/무기계약직 단독' 자동수집 공고만
+      var rows = await window.__getBannerJobs();
       var a2 = [];
-      s2.forEach(function (ds) {
-        var d = ds.data();
+      rows.forEach(function (r) {
+        var d = r.data;
         if (d.source !== 'alio-auto') return;
         if (!isStandaloneFeatured(d)) return;
-        var it = normalizeJob(ds.id, d);
+        var it = normalizeJob(r.id, d);
         if (notExpired(it)) a2.push(it);
       });
       return a2;
