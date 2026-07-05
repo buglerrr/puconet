@@ -11805,21 +11805,6 @@ function initCarousel(carouselContainer) {
     setInterval(updateDdays, 60 * 60 * 1000);
   })();
 </script>
-<!-- ===== [추가] 배너 3종(추천/프리미엄/주요) 폴백 공통 조회: jobs 최근 300건을 1회만 읽어 공유 (중복 읽기 제거) ===== -->
-<script>
-  // 세 배너 스크립트가 플래그 미적용 시 각각 300건씩(=900건) 읽던 것을, 최초 1회 Promise를 캐시해 공유한다.
-  window.__getBannerJobs = function () {
-    if (window.__bannerJobsPromise) return window.__bannerJobsPromise;
-    window.__bannerJobsPromise = (async function () {
-      var q = window.query(window.collection(window.db, 'jobs'), window.orderBy('createdAt', 'desc'), window.limit(300));
-      var snap = await window.getDocs(q);
-      var arr = [];
-      snap.forEach(function (ds) { arr.push({ id: ds.id, data: ds.data() }); });
-      return arr;
-    })();
-    return window.__bannerJobsPromise;
-  };
-</script>
 
 <!-- ===== [추가] 추천 채용정보 자동 배너 (자동수집 공고 중 정규직/청년인턴 → 맨 윗줄 삽입) ===== -->
 <style>
@@ -11967,28 +11952,15 @@ function initCarousel(carouselContainer) {
       try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), items: items })); } catch (e) {}
     }
 
-    // ① 효율 조회: recommended==true 인 수십 건만 읽음 (실패/0건 시 기존 방식 폴백)
+    // 효율 조회: 크롤러가 세팅한 recommended==true 문서만 읽음 (300건 폴백 제거). 오류 시 빈 배열.
     async function fetchRecommended() {
       try {
-        if (window.where) {
-          var q1 = window.query(window.collection(window.db, 'jobs'), window.where('recommended', '==', true));
-          var s1 = await window.getDocs(q1);
-          var a1 = [];
-          s1.forEach(function (ds) { a1.push(normalizeJob(ds.id, ds.data())); });
-          a1 = a1.filter(notExpired);
-          if (a1.length) return a1;
-        }
-      } catch (e) { /* 폴백 */ }
-      // 폴백: 플래그 미적용 기간 대비 — 공통 조회(최근 300건, 1회)로 클라이언트 필터
-      var rows = await window.__getBannerJobs();
-      var a2 = [];
-      rows.forEach(function (r) {
-        var d = r.data;
-        if (d.source !== 'alio-auto') return;
-        var it = normalizeJob(r.id, d);
-        if (it.emps.length && notExpired(it)) a2.push(it);
-      });
-      return a2;
+        var q1 = window.query(window.collection(window.db, 'jobs'), window.where('recommended', '==', true));
+        var s1 = await window.getDocs(q1);
+        var a1 = [];
+        s1.forEach(function (ds) { a1.push(normalizeJob(ds.id, ds.data())); });
+        return a1.filter(notExpired);
+      } catch (e) { console.error('추천 배너 조회 실패:', e); return []; }
     }
 
     async function refreshBanners() {
@@ -12132,29 +12104,15 @@ function initCarousel(carouselContainer) {
       try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), items: items })); } catch (e) {}
     }
 
-    // ① 효율 조회: premium==true 인 문서만 읽음 (실패/0건 시 폴백)
+    // 효율 조회: 크롤러가 세팅한 premium==true 문서만 읽음 (300건 폴백 제거). 오류 시 빈 배열.
     async function fetchPremium() {
       try {
-        if (window.where) {
-          var q1 = window.query(window.collection(window.db, 'jobs'), window.where('premium', '==', true));
-          var s1 = await window.getDocs(q1);
-          var a1 = [];
-          s1.forEach(function (ds) { a1.push(normalizeJob(ds.id, ds.data())); });
-          a1 = a1.filter(notExpired);
-          if (a1.length) return a1;
-        }
-      } catch (e) { /* 폴백 */ }
-      // 폴백: 플래그 미적용 기간 대비 — 공통 조회(최근 300건, 1회)에서 '정규직 단독' 자동수집 공고만
-      var rows = await window.__getBannerJobs();
-      var a2 = [];
-      rows.forEach(function (r) {
-        var d = r.data;
-        if (d.source !== 'alio-auto') return;
-        if (!isStandaloneRegular(d)) return;
-        var it = normalizeJob(r.id, d);
-        if (notExpired(it)) a2.push(it);
-      });
-      return a2;
+        var q1 = window.query(window.collection(window.db, 'jobs'), window.where('premium', '==', true));
+        var s1 = await window.getDocs(q1);
+        var a1 = [];
+        s1.forEach(function (ds) { a1.push(normalizeJob(ds.id, ds.data())); });
+        return a1.filter(notExpired);
+      } catch (e) { console.error('프리미엄 배너 조회 실패:', e); return []; }
     }
 
     async function refreshBanners() {
@@ -12284,29 +12242,15 @@ function initCarousel(carouselContainer) {
       try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), items: items })); } catch (e) {}
     }
 
-    // ① 효율 조회: featured==true 인 문서만 읽음 (실패/0건 시 폴백)
+    // 효율 조회: 크롤러가 세팅한 featured==true 문서만 읽음 (300건 폴백 제거). 오류 시 빈 배열.
     async function fetchFeatured() {
       try {
-        if (window.where) {
-          var q1 = window.query(window.collection(window.db, 'jobs'), window.where('featured', '==', true));
-          var s1 = await window.getDocs(q1);
-          var a1 = [];
-          s1.forEach(function (ds) { a1.push(normalizeJob(ds.id, ds.data())); });
-          a1 = a1.filter(notExpired);
-          if (a1.length) return a1;
-        }
-      } catch (e) { /* 폴백 */ }
-      // 폴백: 플래그 미적용 기간 대비 — 공통 조회(최근 300건, 1회)에서 '비정규직/무기계약직 단독' 자동수집 공고만
-      var rows = await window.__getBannerJobs();
-      var a2 = [];
-      rows.forEach(function (r) {
-        var d = r.data;
-        if (d.source !== 'alio-auto') return;
-        if (!isStandaloneFeatured(d)) return;
-        var it = normalizeJob(r.id, d);
-        if (notExpired(it)) a2.push(it);
-      });
-      return a2;
+        var q1 = window.query(window.collection(window.db, 'jobs'), window.where('featured', '==', true));
+        var s1 = await window.getDocs(q1);
+        var a1 = [];
+        s1.forEach(function (ds) { a1.push(normalizeJob(ds.id, ds.data())); });
+        return a1.filter(notExpired);
+      } catch (e) { console.error('주요 배너 조회 실패:', e); return []; }
     }
 
     async function refreshBanners() {
