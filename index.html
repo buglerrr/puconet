@@ -10363,7 +10363,11 @@ function displayStoriesForPage(page) {
 
       // ── 3) 네트워크에서 최신 데이터 가져오기 (최초 진입 or 캐시 갱신) ──
       try {
-        const q = query(collection(db, 'jobs'), orderBy('createdAt', 'desc'));
+        // 안전 상한(limit): 크롤러가 마감 공고를 매일 삭제하므로 실제 활성 공고 수는 이보다 훨씬 적음.
+        // 비정상 누적(삭제 실패 등) 시 방문자당 읽기가 무한정 늘지 않도록 상한만 둔다(정상 데이터는 잘리지 않음).
+        // 활성 공고가 이 값에 근접하면 숫자를 올리세요.
+        const JOBS_FETCH_CAP = 5000;
+        const q = query(collection(db, 'jobs'), orderBy('createdAt', 'desc'), limit(JOBS_FETCH_CAP));
         const querySnapshot = await getDocs(q);
         const freshJobs = [];
         if (!querySnapshot.empty) {

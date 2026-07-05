@@ -27,6 +27,7 @@ import hashlib
 import math
 import os
 import re
+import time
 from datetime import datetime, timedelta
 
 import pandas as pd
@@ -94,12 +95,28 @@ COL_MAP = {
 
 
 # ─────────────────────── 공통 수집 함수 ───────────────────────
+def _request_json(url: str, params: dict, retries: int = 4, timeout: int = 30) -> dict:
+    """requests.get + JSON 파싱에 지수 백오프 재시도(1·2·4·8초).
+    일시적 네트워크 오류/5xx/파싱 실패에 견디도록 하여 크롤링 전체가 한 번에 실패하지 않게 한다."""
+    last = None
+    for attempt in range(retries):
+        try:
+            r = requests.get(url, params=params, timeout=timeout)
+            r.raise_for_status()
+            return r.json()
+        except Exception as e:  # noqa: BLE001
+            last = e
+            if attempt < retries - 1:
+                wait = 2 ** attempt  # 1, 2, 4, 8초
+                print(f"  ⚠️ 요청 실패({attempt + 1}/{retries}): {e} → {wait}초 후 재시도")
+                time.sleep(wait)
+    raise RuntimeError(f"요청 {retries}회 모두 실패: {url} :: {last}")
+
+
 def _collect_all_pages(url: str, params: dict, page_size: int = 500) -> list:
     """주어진 URL의 모든 페이지를 수집하여 items 리스트로 반환."""
     params = {**params, "pageNo": 1, "numOfRows": page_size}
-    r = requests.get(url, params=params, timeout=30)
-    r.raise_for_status()
-    j = r.json()
+    j = _request_json(url, params)
     if j.get("resultCode") != 200:
         raise RuntimeError(f"API 오류: {j}")
 
@@ -110,9 +127,7 @@ def _collect_all_pages(url: str, params: dict, page_size: int = 500) -> list:
 
     for p in range(2, pages + 1):
         params["pageNo"] = p
-        rr = requests.get(url, params=params, timeout=30)
-        rr.raise_for_status()
-        jj = rr.json()
+        jj = _request_json(url, params)
         if jj.get("resultCode") != 200:
             break
         items.extend(jj.get("result", []))
@@ -468,15 +483,33 @@ def sync_to_firestore(df: pd.DataFrame) -> dict:
     return {"upserted": len(current_ids), "deleted": deleted}
 
 
+def _notify_failure(message: str) -> None:
+    """실패 알림(선택): 환경변수 ALERT_WEBHOOK_URL 이 설정된 경우에만 웹훅으로 전송.
+    Slack/Discord/Google Chat 등 어떤 수신 웹훅이든 가능. 미설정 시 로그만 남기고 조용히 통과."""
+    print(f"❌ {message}")
+    url = os.environ.get("ALERT_WEBHOOK_URL", "").strip()
+    if not url:
+        return
+    try:
+        requests.post(url, json={"text": f"[allgongin 크롤러] {message}"}, timeout=10)
+    except Exception as e:  # noqa: BLE001
+        print(f"  (알림 전송 실패: {e})")
+
+
 def run() -> dict:
-    if not SERVICE_KEY:
-        raise RuntimeError("ALIO_SERVICE_KEY 환경변수가 설정되지 않았습니다.")
-    if not firebase_admin._apps:
-        firebase_admin.initialize_app(options={"storageBucket": STORAGE_BUCKET})
-    df = build_dataset()
-    result = sync_to_firestore(df)
-    print(f"🎉 완료: {result}")
-    return result
+    try:
+        if not SERVICE_KEY:
+            raise RuntimeError("ALIO_SERVICE_KEY 환경변수가 설정되지 않았습니다.")
+        if not firebase_admin._apps:
+            firebase_admin.initialize_app(options={"storageBucket": STORAGE_BUCKET})
+        df = build_dataset()
+        result = sync_to_firestore(df)
+        print(f"🎉 완료: {result}")
+        return result
+    except Exception as e:  # noqa: BLE001
+        # 실패 시: 알림 전송 후 재-raise → Cloud Functions 실행이 '실패'로 기록되어 모니터링/스케줄러가 감지
+        _notify_failure(f"채용공고 크롤링 실패: {e}")
+        raise
 
 
 # ──────────────────── 진입점 ───────────────────────
