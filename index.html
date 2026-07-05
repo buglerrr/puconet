@@ -7156,9 +7156,14 @@
   service cloud.firestore {
     match /databases/{database}/documents {
       
-      // users 컬렉션: 인증된 사용자만 읽기 가능, 자신의 문서만 쓰기 가능
+      // users 컬렉션: 본인 또는 관리자만 읽기(전체 회원 PII 노출 방지), 자신의 문서만 쓰기
       match /users/{userId} {
-        allow read: if request.auth != null;
+        allow read: if request.auth != null && (
+          request.auth.uid == userId
+          || request.auth.token.email == 'ilovetruman@gmail.com'
+          || (exists(/databases/$(database)/documents/users/$(request.auth.uid))
+              && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+        );
         allow write: if request.auth != null && request.auth.uid == userId;
       }
       
@@ -9302,9 +9307,10 @@ function displayStoriesForPage(page) {
       if (data.imageUrl) { img.src = data.imageUrl; imgArea.style.display = 'block'; }
       else { imgArea.style.display = 'none'; }
 
-      // 본문 (줄바꿈 보존)
+      // 본문 (줄바꿈 보존) — XSS 방지: HTML 이스케이프 후 줄바꿈만 <br> 로 변환
       const contentEl = document.getElementById('newsDetailContent');
-      contentEl.innerHTML = (data.content || '').replace(/\n/g, '<br>');
+      const _newsEsc = document.createElement('div'); _newsEsc.textContent = data.content || '';
+      contentEl.innerHTML = _newsEsc.innerHTML.replace(/\n/g, '<br>');
 
       // 관리자 버튼
       const btnEdit = document.getElementById('btnNewsEdit');
@@ -10147,7 +10153,9 @@ function displayStoriesForPage(page) {
 
       // 내용 (줄바꿈 처리)
       const content = job.content || '';
-      document.getElementById('detail-desc').innerHTML = content ? content.replace(/\n/g, '<br>') : '내용이 없습니다.';
+      // XSS 방지: 크롤링/입력 원문을 먼저 HTML 이스케이프한 뒤 줄바꿈만 <br> 로 변환
+      const _descEsc = document.createElement('div'); _descEsc.textContent = content || '';
+      document.getElementById('detail-desc').innerHTML = content ? _descEsc.innerHTML.replace(/\n/g, '<br>') : '내용이 없습니다.';
 
       // 이미지 처리
       const imgArea = document.getElementById('detail-image-area');
