@@ -7237,6 +7237,25 @@
 
     // Firebase 초기화
     const app = initializeApp(firebaseConfig);
+
+    // ===== App Check (reCAPTCHA v3) — 봇/무단 SDK 호출 방지 =====
+    // [활성화 방법] 아래 APP_CHECK_SITE_KEY 에 Google reCAPTCHA v3 '사이트 키'를 넣으면 켜집니다.
+    //   - 비워두면(''): 완전 비활성 → 사이트 동작에 아무 영향 없음(현재 상태).
+    //   - 키를 넣으면: App Check 토큰 발급 시작. Firebase 콘솔 App Check는 처음엔 '모니터링' 모드로 두고,
+    //     정상 통과가 확인된 뒤에만 'Enforce(강제)'로 전환하세요. (강제 전 전환 시 요청이 막힐 수 있음)
+    const APP_CHECK_SITE_KEY = ''; // 예: '6Lxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+    if (APP_CHECK_SITE_KEY) {
+      // 키가 설정된 경우에만 App Check SDK를 동적 로드 → 비활성 시 추가 다운로드/부하 없음
+      import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js')
+        .then(function (m) {
+          m.initializeAppCheck(app, {
+            provider: new m.ReCaptchaV3Provider(APP_CHECK_SITE_KEY),
+            isTokenAutoRefreshEnabled: true
+          });
+        })
+        .catch(function (e) { console.warn('App Check 초기화 건너뜀:', e); });
+    }
+
     const db = getFirestore(app);
     const storage = getStorage(app);
     const auth = getAuth(app);
