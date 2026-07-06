@@ -414,12 +414,24 @@ def sync_to_firestore(df: pd.DataFrame) -> dict:
         batch = db.batch()
         ops = 0
 
+    # 관리자가 수정한(adminEdited=True) 자동 공고는 크롤러가 '덮어쓰지도, 삭제하지도' 않도록 잠금 목록 확보
+    locked_ids = set()
+    try:
+        for d in col.where("adminEdited", "==", True).stream():
+            locked_ids.add(d.id)
+    except Exception as e:  # noqa: BLE001
+        print(f"  (adminEdited 조회 생략: {e})")
+    if locked_ids:
+        print(f"  🔒 관리자 수정 공고 {len(locked_ids)}건 → 덮어쓰기/삭제 제외")
+
     i = 0
     for _, row in df.iterrows():
         doc_id = stable_doc_id(row)
         if doc_id in current_ids:
             continue  # 같은 공고 중복 행 스킵
         current_ids.add(doc_id)
+        if doc_id in locked_ids:
+            continue  # 관리자 수정본은 그대로 보존(덮어쓰기 안 함). current_ids에 넣었으니 삭제도 안 됨
 
         company = row.get("기관명", "")
         category = CATEGORY_MAPPING.get(str(row.get("기관유형", "")).strip(), "public")
@@ -471,12 +483,13 @@ def sync_to_firestore(df: pd.DataFrame) -> dict:
     deleted = 0
     auto_docs = col.where("source", "==", "alio-auto").stream()
     for d in auto_docs:
-        if d.id not in current_ids:
-            batch.delete(col.document(d.id))
-            ops += 1
-            deleted += 1
-            if ops >= 450:
-                commit()
+        if d.id in current_ids or d.id in locked_ids:
+            continue  # 이번 수집분 또는 관리자 수정본은 보존
+        batch.delete(col.document(d.id))
+        ops += 1
+        deleted += 1
+        if ops >= 450:
+            commit()
     commit()
     print(f"  🗑️ 정리(삭제)된 만료 공고: {deleted}건")
 

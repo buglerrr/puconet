@@ -10823,7 +10823,10 @@ function displayStoriesForPage(page) {
           recruitmentCount: document.getElementById('edit_recruitment_count').value,
           education: document.getElementById('edit_education').value,
           closingDate: deadlineValue, // 마감일과 동일하게 설정
-          preference: document.getElementById('edit_preference').value
+          preference: document.getElementById('edit_preference').value,
+          // 관리자가 수정한 공고 표시 → 매일 크롤러가 덮어쓰거나 삭제하지 않고 이 수정본을 보존
+          adminEdited: true,
+          adminEditedAt: window.Timestamp.now()
         };
 
         /* window.uploadFile 이미 수정됨 */
