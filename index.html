@@ -18,7 +18,8 @@
   <title>올공(ALLGONG) - 국내 최초 공공기업 전문 채용 포탈</title>
   <!-- Claude Code 연동 테스트 -->
   <!-- 카카오 JavaScript SDK -->
-  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js"></script>
+  <!-- defer: 카카오 SDK가 HTML 파싱(첫 화면 표시)을 차단하지 않도록 함. 로그인 클릭 시점에 재초기화 가드 있음 -->
+  <script defer src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -4730,7 +4731,7 @@
             if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); startWhenReady(); }
           }, { rootMargin: '300px' });
           io.observe(sec);
-          setTimeout(startWhenReady, 8000); // 안전장치: 스크롤하지 않아도 8초 후 로드
+          setTimeout(startWhenReady, 3000); // 안전장치: 스크롤하지 않아도 3초 후 로드
         } else {
           startWhenReady();
         }
@@ -12611,6 +12612,49 @@ function initCarousel(carouselContainer) {
     if (ev.target && ev.target.id === 'eduModal') window.closeEduModal();
     if (ev.target && ev.target.id === 'eduDetailModal') window.closeEduDetail();
   });
+})();
+</script>
+
+<!-- ===== [추가] 공고 상세 지연 로드: 데이터 로딩 완료 전에 배너/달력/목록을 클릭해도
+     '데이터를 찾을 수 없습니다' 대신 해당 공고 1건만 즉시 조회해 표시 ===== -->
+<script>
+(function () {
+  function normalize(id, d) {
+    var ms = (d.createdAt && d.createdAt.seconds) ? d.createdAt.seconds * 1000 : 0;
+    return Object.assign({}, d, { id: id, createdDate: ms ? new Date(ms).toLocaleDateString('ko-KR') : '-' });
+  }
+  function wrap() {
+    var orig = window.viewDetail;
+    if (typeof orig !== 'function') return false;
+    if (orig.__lazyLoad) return true;
+    var wrapped = function (id, skipHistory) {
+      if (window.jobsData && window.jobsData[id]) return orig(id, skipHistory);
+      var tries = 0;
+      (function attempt() {
+        if (window.jobsData && window.jobsData[id]) return orig(id, skipHistory);
+        if (window.db && window.getDoc && window.doc) {
+          window.getDoc(window.doc(window.db, 'jobs', id)).then(function (snap) {
+            var ok = snap && (typeof snap.exists === 'function' ? snap.exists() : !!snap.exists);
+            if (!ok) { alert('데이터를 찾을 수 없습니다.'); return; }
+            window.jobsData = window.jobsData || {};
+            window.jobsData[id] = normalize(id, snap.data());
+            orig(id, skipHistory);
+          }).catch(function (e) {
+            console.error('공고 단건 조회 실패:', e);
+            alert('데이터를 찾을 수 없습니다.');
+          });
+          return;
+        }
+        // DB 준비 전이면 잠시 대기 후 재시도 (최대 약 10초)
+        if (++tries < 40) setTimeout(attempt, 250);
+        else alert('데이터를 찾을 수 없습니다.');
+      })();
+    };
+    wrapped.__lazyLoad = true;
+    window.viewDetail = wrapped;
+    return true;
+  }
+  (function wait() { if (!wrap()) setTimeout(wait, 250); })();
 })();
 </script>
 
