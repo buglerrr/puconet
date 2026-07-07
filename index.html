@@ -4407,8 +4407,6 @@
               소식</a>
             <a href="#" onclick="checkLoginAndExecute(showStoryBoard, '취업 이야기를 보려면 로그인이 필요합니다.'); return false;"
               style="color: #666; font-weight:bold;">취업 이야기</a>
-            <a href="product.html" target="_blank"
-              style="color: #e0392b; font-weight: bold;">상품신청</a>
           </div>
         </nav>
         <!-- 관리자 전용 통계 배너: 헤더 맨 오른쪽(상품신청 옆)에 표시 -->
@@ -12636,6 +12634,11 @@ function initCarousel(carouselContainer) {
   .jcal-more:hover { color: #1c7ed6; }
   .jcal-loading { padding: 2rem; text-align: center; color: #868e96; }
   #calendar-board-section .jcal-cell { min-height: 124px; }
+  .jcal-cnt { color: #868e96; font-size: .9em; }
+  #jcalPicker { position: absolute; z-index: 1500; background: #fff; border: 1px solid #d0d5dd; border-radius: 10px; box-shadow: 0 12px 32px rgba(0, 0, 0, .18); padding: 8px; min-width: 260px; max-width: 420px; }
+  #jcalPicker .jcal-pop-title { font-size: .8rem; font-weight: 700; color: #495057; padding: 4px 6px 6px; border-bottom: 1px solid #f1f3f5; margin-bottom: 4px; }
+  #jcalPicker .jcal-pop-item { display: block; font-size: .82rem; color: #1864ab; text-decoration: none; padding: 5px 6px; border-radius: 6px; line-height: 1.35; }
+  #jcalPicker .jcal-pop-item:hover { background: #e7f5ff; }
 </style>
 <script>
 (function () {
@@ -12702,6 +12705,7 @@ function initCarousel(carouselContainer) {
     var dim = new Date(y, mo, 0).getDate();
     var today = new Date();
     var dows = ['일', '월', '화', '수', '목', '금', '토'];
+    var reg = {}; var seq = 0; box.__calGroups = reg; // 기업 묶음(중복 제거) 레지스트리
 
     var h = '<div class="jcal-head">' +
       '<button type="button" class="jcal-nav" data-nav="-1" aria-label="이전 달">&#9664;</button>' +
@@ -12716,11 +12720,22 @@ function initCarousel(carouselContainer) {
       h += '<div class="jcal-cell' + (isToday ? ' today' : '') + '">' +
         '<div class="jcal-date' + (dow === 0 ? ' sun' : dow === 6 ? ' sat' : '') + '">' + d + '</div>';
       var list = byDay[d] || [];
-      var show = (mode === 'home') ? list.slice(0, 5) : list;
-      show.forEach(function (j) {
-        h += '<a href="javascript:void(0)" class="jcal-co" data-cal-job="' + esc(j.id) + '" title="' + esc(j.title || '') + ' (마감: ' + esc(j.deadline || j.closingDate || '') + ')">' + esc(j.company || '-') + '</a>';
+      // 같은 기업의 복수 공고는 1개 항목으로 묶어 표시 (기업명 중복 방지, 2건 이상이면 (N) 표기)
+      var groups = []; var gmap = {};
+      list.forEach(function (j) {
+        var key = String(j.company || '-').trim() || '-';
+        if (!gmap[key]) { gmap[key] = { company: key, jobs: [] }; groups.push(gmap[key]); }
+        gmap[key].jobs.push(j);
       });
-      if (mode === 'home' && list.length > 5) h += '<a href="javascript:void(0)" class="jcal-more" data-cal-more="1">+' + (list.length - 5) + '개 더보기</a>';
+      var show = (mode === 'home') ? groups.slice(0, 5) : groups;
+      show.forEach(function (g) {
+        var gid = 'g' + (seq++);
+        reg[gid] = g.jobs;
+        var one = g.jobs[0];
+        var tt = (g.jobs.length > 1) ? ((one.title || '') + ' 외 ' + (g.jobs.length - 1) + '건') : (one.title || '');
+        h += '<a href="javascript:void(0)" class="jcal-co" data-cal-group="' + gid + '" title="' + esc(tt) + ' (마감: ' + esc(one.deadline || one.closingDate || '') + ')">' + esc(g.company) + (g.jobs.length > 1 ? ' <span class="jcal-cnt">(' + g.jobs.length + ')</span>' : '') + '</a>';
+      });
+      if (mode === 'home' && groups.length > 5) h += '<a href="javascript:void(0)" class="jcal-more" data-cal-more="1">+' + (groups.length - 5) + '개 더보기</a>';
       h += '</div>';
     }
     var trail = (startDow + dim) % 7;
@@ -12776,13 +12791,53 @@ function initCarousel(carouselContainer) {
       var co = e.target.closest('.jcal-co');
       if (!co) return;
       if (mode === 'home') { window.showCalendarBoard(homeState.y, homeState.m); return; }
-      // 채용달력 메뉴: 해당 공고 상세로 이동
-      var id = co.getAttribute('data-cal-job');
-      if (id && typeof window.viewDetail === 'function') {
-        var sec = document.getElementById('calendar-board-section'); if (sec) sec.style.display = 'none';
-        window.viewDetail(id);
-      }
+      // 채용달력 메뉴: 공고 1건이면 바로 상세, 같은 기업 복수 공고면 제목 목록 팝업에서 선택
+      var gid = co.getAttribute('data-cal-group');
+      var grp = (box.__calGroups || {})[gid] || [];
+      if (grp.length === 1) { openJobDetail(grp[0].id); }
+      else if (grp.length > 1) { showJobPicker(co, grp); }
     });
+  }
+
+  // 채용달력 → 공고 상세 이동
+  function openJobDetail(id) {
+    if (!id || typeof window.viewDetail !== 'function') return;
+    hideJobPicker();
+    var sec = document.getElementById('calendar-board-section'); if (sec) sec.style.display = 'none';
+    window.viewDetail(id);
+  }
+
+  // 같은 기업 복수 공고 선택 팝업
+  function outsideClose(e) {
+    var p = document.getElementById('jcalPicker');
+    if (p && !p.contains(e.target)) hideJobPicker();
+  }
+  function hideJobPicker() {
+    var p = document.getElementById('jcalPicker');
+    if (p) p.remove();
+    document.removeEventListener('click', outsideClose, true);
+  }
+  function showJobPicker(anchor, jobs) {
+    hideJobPicker();
+    var pop = document.createElement('div');
+    pop.id = 'jcalPicker';
+    var h = '<div class="jcal-pop-title">' + esc(jobs[0].company || '') + ' — 공고 ' + jobs.length + '건</div>';
+    jobs.forEach(function (j) {
+      h += '<a href="javascript:void(0)" class="jcal-pop-item" data-cal-job="' + esc(j.id) + '">' + esc(j.title || '(제목 없음)') + '</a>';
+    });
+    pop.innerHTML = h;
+    document.body.appendChild(pop);
+    var r = anchor.getBoundingClientRect();
+    pop.style.top = (window.scrollY + r.bottom + 4) + 'px';
+    pop.style.left = (window.scrollX + r.left) + 'px';
+    // 화면 오른쪽 넘침 방지
+    var maxLeft = window.scrollX + document.documentElement.clientWidth - pop.offsetWidth - 8;
+    if ((window.scrollX + r.left) > maxLeft) pop.style.left = Math.max(8, maxLeft) + 'px';
+    pop.addEventListener('click', function (e2) {
+      var it = e2.target.closest('.jcal-pop-item');
+      if (it) openJobDetail(it.getAttribute('data-cal-job'));
+    });
+    setTimeout(function () { document.addEventListener('click', outsideClose, true); }, 0);
   }
 
   // 다른 메뉴로 이동 시 달력 섹션들 정리 (기존 함수는 수정하지 않고 래핑)
