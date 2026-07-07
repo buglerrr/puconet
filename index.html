@@ -5367,6 +5367,8 @@
                 <li><a href="#" onclick="switchBoard('featured'); return false;" id="board-menu-featured">주요</a></li>
                 <li><a href="#" onclick="switchBoard('deadline-soon'); return false;"
                     id="board-menu-deadline-soon">마감임박</a></li>
+                <li><a href="#" onclick="switchBoard('expired'); return false;"
+                    id="board-menu-expired">마감된 채용</a></li>
               </ul>
 
               <!-- ② 채용형태별 -->
@@ -9794,6 +9796,11 @@ function displayStoriesForPage(page) {
       const dl = _boardDaysLeft(job.deadline || job.closingDate);
       return dl !== null && dl >= 0 && dl <= 3;
     }
+    // '마감된 채용' = 마감일이 오늘(현재 일) 이전인 공고 (매일 현재 날짜 기준 자동 판정)
+    function isExpiredJob(job) {
+      const dl = _boardDaysLeft(job.deadline || job.closingDate);
+      return dl !== null && dl < 0;
+    }
     // '프리미엄' 게시판 = 고용유형이 '정규직' 단독(다른 유형과 합쳐지지 않은)인 자동수집 공고 (미마감)
     function isPremiumJob(job) {
       if (job.source !== 'alio-auto') return false;
@@ -9818,6 +9825,7 @@ function displayStoriesForPage(page) {
       if (boardType === 'featured') return { predicate: isFeaturedJob };
       if (boardType === 'recommended') return { predicate: isRecommendedJob };
       if (boardType === 'deadline-soon') return { predicate: isDeadlineSoonJob };
+      if (boardType === 'expired') return { predicate: isExpiredJob };
       if (BOARD_FILTER_MAP[boardType]) return BOARD_FILTER_MAP[boardType];
       if (boardType.indexOf('region-') === 0) return { dim: 'location', values: [boardType.slice(7)] };
       return null;
@@ -9841,6 +9849,7 @@ function displayStoriesForPage(page) {
         'recommended': '추천',
         'featured': '주요',
         'deadline-soon': '마감임박',
+        'expired': '마감된 채용',
         'intern': '인턴',
         'entry-level': '신입',
         'experienced': '경력',
@@ -10371,12 +10380,18 @@ function displayStoriesForPage(page) {
       if (filterGuideMsg) filterGuideMsg.style.display = 'none';
       if (filterHintRow) filterHintRow.style.display = 'none';
 
+      // ── 마감된 채용 분리 (현재 일 기준 자동) ──
+      //   '마감된 채용' 게시판에서는 마감 공고만, 그 외 모든 목록/검색/총건수에서는 마감 공고 제외
+      const _baseJobs = (window.currentJobCategory === 'expired')
+        ? allRawJobs
+        : allRawJobs.filter(function (j) { return !isExpiredJob(j); });
+
       // 필터 미선택 시 → 전체 공고 표시
       if (!hasFilter) {
-        totalJobs = [...allRawJobs];
+        totalJobs = [..._baseJobs];
       } else {
         // 필터 선택됨 → 필터링 적용
-        totalJobs = allRawJobs.filter(job => {
+        totalJobs = _baseJobs.filter(job => {
           // 키워드
           if (currentFilters.keyword) {
               const kw = currentFilters.keyword;
@@ -11001,6 +11016,7 @@ function displayStoriesForPage(page) {
         'recommended': '추천',
         'featured': '주요',
         'deadline-soon': '마감임박',
+        'expired': '마감된 채용',
         'intern': '인턴',
         'entry-level': '신입',
         'experienced': '경력',

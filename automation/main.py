@@ -42,6 +42,8 @@ STORAGE_BUCKET = os.environ.get("STORAGE_BUCKET", "recruit-board.firebasestorage
 COLLECTION_NAME = os.environ.get("COLLECTION_NAME", "jobs")
 MAX_DAYS = int(os.environ.get("MAX_DAYS", "20"))
 FILTER_MODE = os.environ.get("FILTER_MODE", "composite")
+# 마감된 공고 보존 일수: 사이트 '마감된 채용' 게시판 열람용으로 이 기간 동안 삭제하지 않고 보존
+EXPIRED_RETENTION_DAYS = int(os.environ.get("EXPIRED_RETENTION_DAYS", "30"))
 
 # 제목에 이 키워드들이 포함된 공고는 업로드에서 제외 (콤마로 구분, 환경변수로 변경 가능)
 _DEFAULT_EXCLUDE = (
@@ -479,21 +481,41 @@ def sync_to_firestore(df: pd.DataFrame) -> dict:
     commit()
     print(f"  ✅ upsert 완료: {len(current_ids)}건")
 
-    # ── 마감/사라진 자동등록 공고 정리 (수동 등록 공고는 보존) ──
+    # ── 마감/사라진 자동등록 공고 정리 (수동 등록·관리자 수정 공고는 보존) ──
+    #   마감된 공고는 EXPIRED_RETENTION_DAYS(기본 30일) 동안 보존 → 사이트 '마감된 채용' 게시판에서 열람.
+    #   보존기간이 지났거나 마감일 정보가 없는 공고만 실제 삭제.
     deleted = 0
+    kept_expired = 0
+    cutoff = (datetime.now() - timedelta(days=EXPIRED_RETENTION_DAYS)).strftime("%Y-%m-%d")
     auto_docs = col.where("source", "==", "alio-auto").stream()
     for d in auto_docs:
         if d.id in current_ids or d.id in locked_ids:
             continue  # 이번 수집분 또는 관리자 수정본은 보존
+        data = d.to_dict() or {}
+        dl = str(data.get("deadline") or data.get("closingDate") or "").strip()
+        if dl and dl >= cutoff:
+            # 보존: 최초 1회 배너 플래그를 꺼서(archived) 홈 배너 조회 대상에서 제외
+            if not data.get("archived"):
+                batch.update(col.document(d.id), {
+                    "archived": True,
+                    "recommended": False,
+                    "premium": False,
+                    "featured": False,
+                })
+                ops += 1
+                if ops >= 450:
+                    commit()
+            kept_expired += 1
+            continue
         batch.delete(col.document(d.id))
         ops += 1
         deleted += 1
         if ops >= 450:
             commit()
     commit()
-    print(f"  🗑️ 정리(삭제)된 만료 공고: {deleted}건")
+    print(f"  🗑️ 정리(삭제)된 만료 공고: {deleted}건 / 🗂️ 마감 보존({EXPIRED_RETENTION_DAYS}일): {kept_expired}건")
 
-    return {"upserted": len(current_ids), "deleted": deleted}
+    return {"upserted": len(current_ids), "deleted": deleted, "kept_expired": kept_expired}
 
 
 def _notify_failure(message: str) -> None:
