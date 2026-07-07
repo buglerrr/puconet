@@ -4395,14 +4395,14 @@
         <nav>
           <button aria-label="메뉴 열기" class="menu-toggle" type="button">메뉴</button>
           <div class="nav-links">
-            <a href="#" onclick="checkLoginAndExecute(showBoard, '채용정보를 보려면 로그인이 필요합니다.'); return false;">채용정보</a>
-            <a href="#" onclick="checkLoginAndExecute(showEduBoard, '공공기관 교육을 보려면 로그인이 필요합니다.'); return false;">공공기관 교육</a>
+            <a href="#" onclick="showBoard(); return false;">채용정보</a>
+            <a href="#" onclick="showEduBoard(); return false;">공공기관 교육</a>
             <a href="#"
               onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '공공게시판을 보려면 로그인이 필요합니다.'); return false;">공공기관소개</a>
-            <a href="#" onclick="checkLoginAndExecute(showNewsBoard, '공공기관 뉴스를 보려면 로그인이 필요합니다.'); return false;">공공기관
+            <a href="#" onclick="showNewsBoard(); return false;">공공기관
               뉴스</a>
             <a href="#"
-              onclick="checkLoginAndExecute(showContestBoard, '공모전 소식을 보려면 로그인이 필요합니다.'); return false;">공모전
+              onclick="showContestBoard(); return false;">공모전
               소식</a>
             <a href="#" onclick="checkLoginAndExecute(showStoryBoard, '취업 이야기를 보려면 로그인이 필요합니다.'); return false;"
               style="color: #666; font-weight:bold;">취업 이야기</a>
@@ -5108,89 +5108,89 @@
           <div class="hibrain-grid">
             <!-- 1열 -->
             <a class="hibrain-item" href="javascript:void(0)" role="button"
-               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+               onclick="showBoard(false, null, 1); return false;">
               <span class="hibrain-org">홍콩중문대학교</span><span class="hibrain-desc">대학원 2027/2028학년도 입학설명회 (…</span>
             </a>
             <a class="hibrain-item" href="javascript:void(0)" role="button"
-               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+               onclick="showBoard(false, null, 1); return false;">
               <span class="hibrain-org">한국전기연구원</span><span class="hibrain-desc">2026년도 제1차 연수직 공개경쟁 채용</span>
             </a>
             <a class="hibrain-item" href="javascript:void(0)" role="button"
-               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+               onclick="showBoard(false, null, 1); return false;">
               <span class="hibrain-org">대림대학교</span><span class="hibrain-desc">2026년도 2학기 겸임교원 신규채용</span>
             </a>
             <a class="hibrain-item" href="javascript:void(0)" role="button"
-               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+               onclick="showBoard(false, null, 1); return false;">
               <span class="hibrain-org">서울과학기술대학교</span><span class="hibrain-desc">의과학대학원 Brain Rhythm Lab …</span>
             </a>
             <a class="hibrain-item" href="javascript:void(0)" role="button"
-               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+               onclick="showBoard(false, null, 1); return false;">
               <span class="hibrain-org">경북대학교</span><span class="hibrain-desc">의료정보학교실 AIM Lab 대학원생 모집</span>
             </a>
             <a class="hibrain-item" href="javascript:void(0)" role="button"
-               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+               onclick="showBoard(false, null, 1); return false;">
               <span class="hibrain-org">가천대학교</span><span class="hibrain-desc">메디컬캠퍼스 약학대학 약학과 분자독성…</span>
             </a>
             <a class="hibrain-item" href="javascript:void(0)" role="button"
-               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+               onclick="showBoard(false, null, 1); return false;">
               <span class="hibrain-org">단국대학교</span><span class="hibrain-desc">천안캠퍼스 조직재생공학연구원 COMET L…</span>
             </a>
             <!-- 2열 -->
             <a class="hibrain-item" href="javascript:void(0)" role="button"
-               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+               onclick="showBoard(false, null, 1); return false;">
               <span class="hibrain-org">충남대학교</span><span class="hibrain-desc">에너지과학기술대학원 반응분리나노소재…</span>
             </a>
             <a class="hibrain-item" href="javascript:void(0)" role="button"
-               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+               onclick="showBoard(false, null, 1); return false;">
               <span class="hibrain-org">한국전기연구원</span><span class="hibrain-desc">2026년도 제3차 별정직 공개경쟁 채용</span>
             </a>
             <a class="hibrain-item" href="javascript:void(0)" role="button"
-               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+               onclick="showBoard(false, null, 1); return false;">
               <span class="hibrain-org">서울연구원</span><span class="hibrain-desc">2026년 제6회 정원외직원 및 대체인력(석…</span>
             </a>
             <a class="hibrain-item" href="javascript:void(0)" role="button"
-               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+               onclick="showBoard(false, null, 1); return false;">
               <span class="hibrain-org">대구과학대학교</span><span class="hibrain-desc">간호학과 2026학년도 2학기 전임교원 …</span>
             </a>
             <a class="hibrain-item" href="javascript:void(0)" role="button"
-               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+               onclick="showBoard(false, null, 1); return false;">
               <span class="hibrain-org">동의과학대학교</span><span class="hibrain-desc">2026학년도 2학기 교원 초빙 (2차)</span>
             </a>
             <a class="hibrain-item" href="javascript:void(0)" role="button"
-               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+               onclick="showBoard(false, null, 1); return false;">
               <span class="hibrain-org">캡스톤브릿지</span><span class="hibrain-desc">바이오·헬스케어·의료·융합 경영컨설턴트…</span>
             </a>
             <a class="hibrain-item" href="javascript:void(0)" role="button"
-               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+               onclick="showBoard(false, null, 1); return false;">
               <span class="hibrain-org">국립보건연구원</span><span class="hibrain-desc">2026년 하반기 Post-Doc. 상시 채용</span>
             </a>
             <!-- 3열 -->
             <a class="hibrain-item" href="javascript:void(0)" role="button"
-               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+               onclick="showBoard(false, null, 1); return false;">
               <span class="hibrain-org">수원여자대학교</span><span class="hibrain-desc">2026학년도 2학기 제1차 교수 초빙 (…</span>
             </a>
             <a class="hibrain-item" href="javascript:void(0)" role="button"
-               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+               onclick="showBoard(false, null, 1); return false;">
               <span class="hibrain-org">한국HRD원격평생교육원</span><span class="hibrain-desc">소방학/재난관리 수업 진행 …</span>
             </a>
             <a class="hibrain-item" href="javascript:void(0)" role="button"
-               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+               onclick="showBoard(false, null, 1); return false;">
               <span class="hibrain-org">UNIST</span><span class="hibrain-desc">하이퍼-컴포저블 데이터센터 연구센터 박사급 …</span>
             </a>
             <a class="hibrain-item" href="javascript:void(0)" role="button"
-               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+               onclick="showBoard(false, null, 1); return false;">
               <span class="hibrain-org">(GB)글로벌이노에듀</span><span class="hibrain-desc">사회복지현장실습 교·강사 모집</span>
             </a>
             <a class="hibrain-item" href="javascript:void(0)" role="button"
-               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+               onclick="showBoard(false, null, 1); return false;">
               <span class="hibrain-org">충남대학교</span><span class="hibrain-desc">약학대학 약물역학연구실 대학원생 모집</span>
             </a>
             <a class="hibrain-item" href="javascript:void(0)" role="button"
-               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+               onclick="showBoard(false, null, 1); return false;">
               <span class="hibrain-org">GIST</span><span class="hibrain-desc">인문사회과학부 비전임직교원(대우교수) 채용</span>
             </a>
             <a class="hibrain-item" href="javascript:void(0)" role="button"
-               onclick="checkLoginAndExecute(function(){ showBoard(false, null, 1); }, '채용정보를 보려면 로그인이 필요합니다.'); return false;">
+               onclick="showBoard(false, null, 1); return false;">
               <span class="hibrain-org">대한의사협회</span><span class="hibrain-desc">의료정책연구원 직원 채용 (연구직, 사무…</span>
             </a>
           </div>
