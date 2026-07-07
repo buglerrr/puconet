@@ -4396,6 +4396,7 @@
           <button aria-label="메뉴 열기" class="menu-toggle" type="button">메뉴</button>
           <div class="nav-links">
             <a href="#" onclick="showBoard(); return false;">채용정보</a>
+            <a href="#" onclick="showCalendarBoard(); return false;">채용달력</a>
             <a href="#" onclick="showEduBoard(); return false;">공공기관 교육</a>
             <a href="#"
               onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '공공게시판을 보려면 로그인이 필요합니다.'); return false;">공공기관소개</a>
@@ -4737,6 +4738,14 @@
       </script>
 
       
+      <!-- ===== 공공기관 채용 달력 (실시간 취업 채팅방과 추천 채용정보 사이) ===== -->
+      <section class="section section--tight-top" id="recruit-calendar" style="background: white;">
+        <div class="container">
+          <h2 class="section-title" style="color:#1c7ed6;">공공기관 채용 달력 <span class="jcal-hint">마감일 기준 · 기업명 클릭 시 채용달력 메뉴로 이동</span></h2>
+          <div id="homeCalendarBox" class="jcal-box"><div class="jcal-loading">채용 달력을 불러오는 중...</div></div>
+        </div>
+      </section>
+
       <!-- 추천 채용정보: 카드 디자인을 배너형으로 업데이트 -->
       <section class="section section--tight-top" id="jobs" style="background: white;">
         <div class="container">
@@ -5537,6 +5546,14 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- ===== 채용달력 전용 섹션 (상단 메뉴 '채용달력') ===== -->
+      <div id="calendar-board-section" style="display:none; width:100%;">
+        <div class="container" style="max-width:1400px; margin:0 auto; padding-top:1.5rem; padding-bottom:3rem;">
+          <h2 class="section-title" style="color:#1c7ed6; margin-bottom:.8rem;">공공기관 채용 달력 <span class="jcal-hint">마감일 기준 · 기업명 클릭 시 해당 채용공고로 이동</span></h2>
+          <div id="boardCalendarBox" class="jcal-box"><div class="jcal-loading">채용 달력을 불러오는 중...</div></div>
         </div>
       </div>
 
@@ -12578,6 +12595,229 @@ function initCarousel(carouselContainer) {
     if (ev.target && ev.target.id === 'eduModal') window.closeEduModal();
     if (ev.target && ev.target.id === 'eduDetailModal') window.closeEduDetail();
   });
+})();
+</script>
+
+<!-- ===== [추가] 공공기관 채용 달력 (홈 섹션 + '채용달력' 메뉴) ===== -->
+<style>
+  .jcal-hint { font-size: .55em; color: #868e96; font-weight: 600; margin-left: .5em; }
+  .jcal-box { background: #fff; }
+  .jcal-head { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 4px 0 10px; }
+  .jcal-head .jcal-title { font-size: 1.25rem; font-weight: 800; color: #1d2939; min-width: 150px; text-align: center; }
+  .jcal-nav { border: 1px solid #d0d5dd; background: #fff; color: #1c7ed6; width: 34px; height: 34px; border-radius: 8px; cursor: pointer; font-size: .95rem; font-weight: 700; line-height: 1; }
+  .jcal-nav:hover { background: #e7f5ff; border-color: #74c0fc; }
+  .jcal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border-top: 2px solid #339af0; border-left: 1px solid #e9ecef; }
+  .jcal-dow { text-align: center; font-size: .85rem; font-weight: 700; color: #495057; padding: 8px 0; background: #f8fafc; border-right: 1px solid #e9ecef; border-bottom: 1px solid #e9ecef; }
+  .jcal-dow.sun { color: #e03131; } .jcal-dow.sat { color: #1971c2; }
+  .jcal-cell { min-height: 108px; border-right: 1px solid #e9ecef; border-bottom: 1px solid #e9ecef; padding: 6px; background: #fff; overflow: hidden; }
+  .jcal-cell.empty { background: #fafafa; }
+  .jcal-cell.today { background: #e7f5ff; }
+  .jcal-date { font-size: .8rem; font-weight: 700; color: #495057; margin-bottom: 4px; }
+  .jcal-date.sun { color: #e03131; } .jcal-date.sat { color: #1971c2; }
+  .jcal-co { display: block; font-size: .78rem; line-height: 1.45; color: #1864ab; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 2px; border-radius: 4px; cursor: pointer; }
+  .jcal-co:hover { background: #e7f5ff; text-decoration: underline; }
+  .jcal-more { display: inline-block; font-size: .72rem; color: #868e96; cursor: pointer; padding: 0 2px; text-decoration: none; }
+  .jcal-more:hover { color: #1c7ed6; }
+  .jcal-loading { padding: 2rem; text-align: center; color: #868e96; }
+  #calendar-board-section .jcal-cell { min-height: 124px; }
+</style>
+<script>
+(function () {
+  var homeState = null, boardState = null; // {y, m}
+
+  function esc(s) { var d = document.createElement('div'); d.textContent = (s == null ? '' : String(s)); return d.innerHTML.replace(/"/g, '&quot;'); }
+  function parseYmd(v) {
+    var m = String(v || '').match(/(\d{4})\D?(\d{1,2})\D?(\d{1,2})/);
+    return m ? { y: +m[1], mo: +m[2], d: +m[3] } : null;
+  }
+
+  // ── 공고 데이터: 채용정보 게시판과 동일한 세션 캐시(allgong_jobs_cache_v1)를 공유 (중복 읽기 방지) ──
+  var JOBS_KEY = 'allgong_jobs_cache_v1', TTL = 3 * 60 * 1000;
+  var _jobsProm = null;
+  function fetchJobs() {
+    if (_jobsProm) return _jobsProm;
+    _jobsProm = (async function () {
+      var cached = null;
+      try { cached = JSON.parse(sessionStorage.getItem(JOBS_KEY) || 'null'); } catch (e) {}
+      if (cached && cached.jobs && (Date.now() - cached.ts) < TTL) return cached.jobs;
+      try {
+        var q = window.query(window.collection(window.db, 'jobs'), window.orderBy('createdAt', 'desc'), window.limit(5000));
+        var snap = await window.getDocs(q);
+        var jobs = [];
+        snap.forEach(function (ds) { jobs.push(Object.assign({}, ds.data(), { id: ds.id })); });
+        try { sessionStorage.setItem(JOBS_KEY, JSON.stringify({ jobs: jobs, ts: Date.now() })); } catch (e) {}
+        return jobs;
+      } catch (e) {
+        if (cached && cached.jobs) return cached.jobs; // 네트워크 실패 시 오래된 캐시라도 사용
+        throw e;
+      }
+    })();
+    _jobsProm.catch(function () { _jobsProm = null; }); // 실패 시 다음에 재시도 가능
+    return _jobsProm;
+  }
+
+  // 클릭 → 상세보기(viewDetail)가 동작하도록 jobsData 채움
+  function regJobsData(jobs) {
+    window.jobsData = window.jobsData || {};
+    jobs.forEach(function (j) {
+      var ms = (j.createdAt && j.createdAt.seconds) ? j.createdAt.seconds * 1000 : 0;
+      window.jobsData[j.id] = Object.assign({}, j, { createdDate: ms ? new Date(ms).toLocaleDateString('ko-KR') : '-' });
+    });
+  }
+
+  function groupByDay(jobs, y, mo) {
+    var map = {};
+    jobs.forEach(function (j) {
+      var p = parseYmd(j.deadline || j.closingDate);
+      if (!p || p.y !== y || p.mo !== mo) return;
+      (map[p.d] = map[p.d] || []).push(j);
+    });
+    Object.keys(map).forEach(function (k) {
+      map[k].sort(function (a, b) { return String(a.company || '').localeCompare(String(b.company || ''), 'ko'); });
+    });
+    return map;
+  }
+
+  // mode: 'home'(일별 최대 5개, 클릭→채용달력 메뉴) | 'board'(전체, 클릭→해당 공고 상세)
+  function render(box, state, mode, jobs) {
+    var y = state.y, mo = state.m;
+    var byDay = groupByDay(jobs, y, mo);
+    var startDow = new Date(y, mo - 1, 1).getDay();
+    var dim = new Date(y, mo, 0).getDate();
+    var today = new Date();
+    var dows = ['일', '월', '화', '수', '목', '금', '토'];
+
+    var h = '<div class="jcal-head">' +
+      '<button type="button" class="jcal-nav" data-nav="-1" aria-label="이전 달">&#9664;</button>' +
+      '<span class="jcal-title">' + y + '년 ' + mo + '월</span>' +
+      '<button type="button" class="jcal-nav" data-nav="1" aria-label="다음 달">&#9654;</button></div>';
+    h += '<div class="jcal-grid">';
+    dows.forEach(function (d, i) { h += '<div class="jcal-dow' + (i === 0 ? ' sun' : i === 6 ? ' sat' : '') + '">' + d + '</div>'; });
+    for (var b = 0; b < startDow; b++) h += '<div class="jcal-cell empty"></div>';
+    for (var d = 1; d <= dim; d++) {
+      var dow = (startDow + d - 1) % 7;
+      var isToday = (y === today.getFullYear() && mo === today.getMonth() + 1 && d === today.getDate());
+      h += '<div class="jcal-cell' + (isToday ? ' today' : '') + '">' +
+        '<div class="jcal-date' + (dow === 0 ? ' sun' : dow === 6 ? ' sat' : '') + '">' + d + '</div>';
+      var list = byDay[d] || [];
+      var show = (mode === 'home') ? list.slice(0, 5) : list;
+      show.forEach(function (j) {
+        h += '<a href="javascript:void(0)" class="jcal-co" data-cal-job="' + esc(j.id) + '" title="' + esc(j.title || '') + ' (마감: ' + esc(j.deadline || j.closingDate || '') + ')">' + esc(j.company || '-') + '</a>';
+      });
+      if (mode === 'home' && list.length > 5) h += '<a href="javascript:void(0)" class="jcal-more" data-cal-more="1">+' + (list.length - 5) + '개 더보기</a>';
+      h += '</div>';
+    }
+    var trail = (startDow + dim) % 7;
+    if (trail) for (var t = trail; t < 7; t++) h += '<div class="jcal-cell empty"></div>';
+    h += '</div>';
+    box.innerHTML = h;
+  }
+
+  function renderHome() {
+    var box = document.getElementById('homeCalendarBox');
+    if (!box) return;
+    fetchJobs().then(function (jobs) { regJobsData(jobs); render(box, homeState, 'home', jobs); })
+      .catch(function (e) { console.error('채용 달력 로드 실패:', e); box.innerHTML = '<div class="jcal-loading">채용 달력을 불러오지 못했습니다.</div>'; });
+  }
+  function renderBoard() {
+    var box = document.getElementById('boardCalendarBox');
+    if (!box) return;
+    fetchJobs().then(function (jobs) { regJobsData(jobs); render(box, boardState, 'board', jobs); })
+      .catch(function (e) { console.error('채용 달력 로드 실패:', e); box.innerHTML = '<div class="jcal-loading">채용 달력을 불러오지 못했습니다.</div>'; });
+  }
+
+  // ── '채용달력' 메뉴 화면 전환 ──
+  window.showCalendarBoard = function (y, m, skipHistory) {
+    var top = document.getElementById('topAdBannerRow'); if (top) top.style.display = 'none';
+    document.querySelectorAll('.content-with-sidebar-wrapper').forEach(function (el) { el.classList.add('full-width-wrapper'); });
+    ['features', 'jobs', 'general-jobs', 'hibrain-jobs', 'edu-courses', 'chatroom-section', 'recruit-calendar',
+      'story-board-section', 'detail-section', 'story-detail-section', 'news-section', 'news-detail-section',
+      'contest-section', 'contest-detail-section', 'board-section', 'user-manage-section', 'edu-board-section'
+    ].forEach(function (id) { var el = document.getElementById(id); if (el) el.style.display = 'none'; });
+    var sec = document.getElementById('calendar-board-section'); if (sec) sec.style.display = 'block';
+    if (y && m) { boardState = { y: y, m: m }; }
+    else if (!boardState) { var n = new Date(); boardState = { y: n.getFullYear(), m: n.getMonth() + 1 }; }
+    renderBoard();
+    if (!skipHistory) { try { history.pushState({ section: 'calendar' }, '', '#calendar-board'); } catch (e) {} }
+    window.scrollTo(0, 0);
+  };
+
+  // 달력 내부 클릭 (월 이동 / 기업명)
+  function bindBox(boxId, mode) {
+    var box = document.getElementById(boxId);
+    if (!box) return;
+    box.addEventListener('click', function (e) {
+      var nav = e.target.closest('.jcal-nav');
+      if (nav) {
+        var st = (mode === 'home') ? homeState : boardState;
+        st.m += parseInt(nav.getAttribute('data-nav'), 10);
+        if (st.m < 1) { st.m = 12; st.y--; } else if (st.m > 12) { st.m = 1; st.y++; }
+        (mode === 'home') ? renderHome() : renderBoard();
+        return;
+      }
+      var more = e.target.closest('.jcal-more');
+      if (more && mode === 'home') { window.showCalendarBoard(homeState.y, homeState.m); return; }
+      var co = e.target.closest('.jcal-co');
+      if (!co) return;
+      if (mode === 'home') { window.showCalendarBoard(homeState.y, homeState.m); return; }
+      // 채용달력 메뉴: 해당 공고 상세로 이동
+      var id = co.getAttribute('data-cal-job');
+      if (id && typeof window.viewDetail === 'function') {
+        var sec = document.getElementById('calendar-board-section'); if (sec) sec.style.display = 'none';
+        window.viewDetail(id);
+      }
+    });
+  }
+
+  // 다른 메뉴로 이동 시 달력 섹션들 정리 (기존 함수는 수정하지 않고 래핑)
+  function hideCalSections() {
+    var s = document.getElementById('calendar-board-section'); if (s) s.style.display = 'none';
+    var hc = document.getElementById('recruit-calendar'); if (hc) hc.style.display = 'none';
+  }
+  function wrapNavs() {
+    ['showBoard', 'showEduBoard', 'showNewsBoard', 'showContestBoard', 'showStoryBoard', 'showUserManagement'].forEach(function (name) {
+      var orig = window[name];
+      if (typeof orig !== 'function' || orig.__calWrapped) return;
+      var wrapped = function () { hideCalSections(); return orig.apply(this, arguments); };
+      wrapped.__calWrapped = true;
+      window[name] = wrapped;
+    });
+    var origHome = window.goHome;
+    if (typeof origHome === 'function' && !origHome.__calWrapped) {
+      var wrappedHome = function () {
+        var s = document.getElementById('calendar-board-section'); if (s) s.style.display = 'none';
+        var hc = document.getElementById('recruit-calendar'); if (hc) hc.style.display = '';
+        return origHome.apply(this, arguments);
+      };
+      wrappedHome.__calWrapped = true;
+      window.goHome = wrappedHome;
+    }
+  }
+
+  // 뒤로/앞으로 가기 대응
+  window.addEventListener('popstate', function () {
+    if (location.hash === '#calendar-board') { window.showCalendarBoard(null, null, true); }
+    else { var s = document.getElementById('calendar-board-section'); if (s) s.style.display = 'none'; }
+  });
+
+  // 초기화: DB/전역 함수 준비 후 실행 (매달 자동으로 '현재 월' 기준)
+  (function wait() {
+    if (window.db && window.getDocs && window.query && window.collection && window.orderBy && window.limit
+      && typeof window.showBoard === 'function' && typeof window.goHome === 'function'
+      && typeof window.showEduBoard === 'function'
+      && document.getElementById('homeCalendarBox') && document.getElementById('boardCalendarBox')) {
+      var n = new Date();
+      homeState = { y: n.getFullYear(), m: n.getMonth() + 1 };
+      boardState = { y: n.getFullYear(), m: n.getMonth() + 1 };
+      wrapNavs();
+      bindBox('homeCalendarBox', 'home');
+      bindBox('boardCalendarBox', 'board');
+      renderHome();
+      if (location.hash === '#calendar-board') window.showCalendarBoard(null, null, true);
+    } else {
+      setTimeout(wait, 250);
+    }
+  })();
 })();
 </script>
 </body>
