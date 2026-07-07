@@ -6566,6 +6566,7 @@
       <div class="footer-line muted">© 2026 - 현재 (주)한국퍼블릭잡컨설팅 | allgongin.com | 올공(ALLGONG) All rights reserved. <a href="#"
           onclick="enableAdminMode(); return false;"
           style="color:#eee; text-decoration:none; margin-left:10px; font-size:0.8rem;">[Admin Setup]</a></div>
+      <div class="footer-line muted">본 사이트의 모든 콘텐츠(화면 디자인·소스코드·데이터베이스·자동 수집 시스템 포함)에 대한 무단 복제·전재·크롤링·재배포를 금지하며, 위반 시 저작권법 및 부정경쟁방지법 등 관련 법령에 따라 민·형사상 책임을 물을 수 있습니다.</div>
     </div>
   </footer>
   <section class="section" id="login" style="padding:2rem 0;"></section>
@@ -12323,45 +12324,7 @@ function initCarousel(carouselContainer) {
   })();
 </script>
 
-<!-- [추가] 로그인 안내 팝업 (첫 화면 / 비로그인 사용자) -->
-<style>
-  #loginTipPopup { position: fixed; top: 96px; right: 24px; z-index: 990; width: 300px; background:#fff; border:1px solid #e3e8ef; border-radius:12px; box-shadow:0 12px 32px rgba(0,0,0,.18); padding:18px 18px 16px; display:none; }
-  #loginTipPopup.show { display:block; animation: loginTipIn .35s ease; }
-  @keyframes loginTipIn { from{opacity:0; transform:translateY(-12px);} to{opacity:1; transform:translateY(0);} }
-  #loginTipPopup .tip-close { position:absolute; top:8px; right:10px; border:none; background:none; font-size:22px; line-height:1; color:#98a2b3; cursor:pointer; padding:2px 6px; }
-  #loginTipPopup .tip-close:hover { color:#475467; }
-  #loginTipPopup .tip-icon { font-size:22px; }
-  #loginTipPopup .tip-msg { margin:8px 0 14px; font-size:1rem; font-weight:700; color:#1d2939; line-height:1.45; }
-  #loginTipPopup .tip-msg em { font-style:normal; color:#2BBDF5; }
-  #loginTipPopup .tip-login-btn { width:100%; border:none; background:#2BBDF5; color:#fff; font-weight:700; font-size:.95rem; padding:10px 0; border-radius:8px; cursor:pointer; }
-  #loginTipPopup .tip-login-btn:hover { background:#16a6dc; }
-  @media (max-width:768px){ #loginTipPopup{ right:12px; left:12px; width:auto; top:80px; } }
-</style>
-<div id="loginTipPopup" role="dialog" aria-label="로그인 안내">
-  <button class="tip-close" aria-label="닫기" onclick="window.closeLoginTip && window.closeLoginTip()">&times;</button>
-  <div class="tip-icon">🔎</div>
-  <p class="tip-msg"><em>로그인</em>하면 더 많은 정보 검색 가능</p>
-  <button class="tip-login-btn" onclick="window.loginTipLogin && window.loginTipLogin()">로그인하기</button>
-</div>
-<script>
-  (function () {
-    var KEY = 'allgong_login_tip_closed';
-    function el() { return document.getElementById('loginTipPopup'); }
-    function loggedIn() { try { return !!(window.auth && window.auth.currentUser); } catch (e) { return false; } }
-    window.closeLoginTip = function () { var p = el(); if (p) p.classList.remove('show'); try { sessionStorage.setItem(KEY, '1'); } catch (e) {} };
-    window.loginTipLogin = function () { window.closeLoginTip(); if (typeof window.openLoginModal === 'function') window.openLoginModal(); };
-    function maybeShow() {
-      var p = el(); if (!p) return;
-      var closed = false; try { closed = sessionStorage.getItem(KEY) === '1'; } catch (e) {}
-      if (closed || loggedIn()) { p.classList.remove('show'); return; }
-      p.classList.add('show');
-    }
-    function start() { setTimeout(maybeShow, 1200); } // 로그인 세션 복원 시간을 준 뒤 표시
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
-    // 다른 경로(헤더 등)로 로그인하면 자동으로 닫기
-    var ticks = 0, iv = setInterval(function () { ticks++; if (loggedIn()) { var p = el(); if (p) p.classList.remove('show'); } if (ticks > 30) clearInterval(iv); }, 1000);
-  })();
-</script>
+<!-- (로그인 안내 팝업 제거됨) -->
 
 <!-- ===== [추가] 공공기관 교육 게시판 로직 (채용정보 게시판과 동일 형태, 관리자 등록형) ===== -->
 <script>
