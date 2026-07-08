@@ -4794,7 +4794,7 @@
         <div class="container">
           <h2 class="section-title">추천 채용정보 <a class="apply" href="product.html" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;">상품신청&gt;</a></h2>
           <!-- ===== 정적 관리 배너 4개 (관리자가 직접 이 코드를 수정, 맨 윗줄 고정) ===== -->
-          <div class="job-grid" style="margin-bottom:1rem;">
+          <div class="job-grid" style="margin-bottom:0;">
             <a aria-label="기술보증기금 채용공고 상세로 이동" class="job-card" data-job="1" data-url="https://kibo.saramin.co.kr" href="javascript:void(0)"
               role="button">
               <img alt="기술보증기금" loading="lazy" decoding="async" class="banner-image" src="./images/ci/기술보증기금.png" />
@@ -4881,7 +4881,7 @@
         <div class="container">
           <h2 class="section-title" style="color:#5c7cfa;">주요 채용정보 <a class="apply" href="product.html" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;">상품신청&gt;</a></h2>
           <!-- ===== 정적 관리 배너 4개 (관리자가 직접 이 코드를 수정, 맨 윗줄 고정) ===== -->
-          <div class="job-grid" style="margin-bottom:1rem;">
+          <div class="job-grid" style="margin-bottom:0;">
             <a aria-label="한국도로공사 채용공고 상세로 이동" class="job-card" data-job="g1" data-url="https://www.ex.co.kr/portal/biz/bbs/layout1/selectBoardList.do?bbsId=BBSMSTR_000000000211" href="javascript:void(0)"
               role="button">
               <img alt="한국도로공사" loading="lazy" decoding="async" class="banner-image"
@@ -12609,6 +12609,18 @@ function initCarousel(carouselContainer) {
   #jcalPicker .jcal-pop-title { font-size: .8rem; font-weight: 700; color: #495057; padding: 4px 6px 6px; border-bottom: 1px solid #f1f3f5; margin-bottom: 4px; }
   #jcalPicker .jcal-pop-item { display: block; font-size: .82rem; color: #1864ab; text-decoration: none; padding: 5px 6px; border-radius: 6px; line-height: 1.35; }
   #jcalPicker .jcal-pop-item:hover { background: #e7f5ff; }
+
+  /* ===== 섹션/배너 간격 통일 ===== */
+  /* 1) 채용달력 ↔ 추천 채용정보 간격 축소 (기본 .section padding-bottom 4rem 제거) */
+  #recruit-calendar { padding-bottom: .4rem !important; margin-bottom: 0 !important; }
+  #jobs { margin-top: 0 !important; }
+  /* 2) 프리미엄: 정적 1행과 자동 그리드 사이 간격 = 그리드 행 간격(1rem)과 동일 */
+  #features .premium-carousel-wrapper { margin-bottom: 0 !important; padding-bottom: 0 !important; }
+  #features .premium-carousel-wrapper .job-grid--premium { margin-bottom: 0 !important; }
+  #features #premiumAutoGrid { margin-top: 1rem !important; }
+  /* 3) 주요/추천: 정적 1행과 자동 그리드 사이 간격 = 그리드 행 간격(1rem)과 동일 */
+  #general-jobs #featuredAutoGrid { margin-top: 1rem !important; }
+  #jobs #recAutoGrid { margin-top: 1rem !important; }
 </style>
 <script>
 (function () {
