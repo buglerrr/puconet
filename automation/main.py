@@ -454,6 +454,7 @@ def sync_to_firestore(df: pd.DataFrame) -> dict:
             "title": clean_title(row.get("채용공고제목", "제목없음"), company),
             "company": company,
             "category": category,
+            "instType": str(row.get("기관유형", "")).strip(),  # 기관유형 원문 (예: 공기업(시장형)) — 상세 화면 표시용
             "employmentType": row.get("고용유형", ""),
             "jobType": row.get("고용유형", ""),
             "location": row.get("근무지역", ""),
