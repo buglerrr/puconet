@@ -553,6 +553,14 @@ def run() -> dict:
             firebase_admin.initialize_app(options={"storageBucket": STORAGE_BUCKET})
         df = build_dataset()
         result = sync_to_firestore(df)
+        # SNS(인스타그램/쓰레드) 자동 게시 — 설정(Firestore _config/social) 없으면 무동작,
+        # 어떤 오류가 나도 크롤링 결과에는 영향 없음
+        try:
+            import social_post
+            print("📣 SNS 자동 게시 시도")
+            social_post.post_daily(firestore.client(), df)
+        except Exception as e:  # noqa: BLE001
+            print(f"  ⚠️ SNS 자동 게시 오류(무시): {e}")
         print(f"🎉 완료: {result}")
         return result
     except Exception as e:  # noqa: BLE001
