@@ -5330,6 +5330,40 @@
 
             <div class="detail-footer"
               style="margin-top:2rem; border-top:1px solid #eee; padding-top:1rem; text-align:center;">
+              <!-- ===== 접수기간 · 방법 (남은 기간 실시간 카운트다운) ===== -->
+              <style>
+                .apply-info-box { text-align: left; border-bottom: 1px solid #eee; padding-bottom: 1.25rem; margin-bottom: 1.25rem; }
+                .apply-info-title { font-size: 1.15rem; font-weight: 800; color: #1d2939; margin: 0 0 12px; }
+                .apply-info-body { display: flex; border: 1px solid #f1f3f5; border-radius: 10px; overflow: hidden; }
+                .apply-info-left { flex: 0 0 280px; background: #f8f9fa; padding: 18px 20px; text-align: center; }
+                .apply-left-label { font-size: .85rem; color: #868e96; margin-bottom: 6px; }
+                .apply-remaining { font-size: 1.6rem; font-weight: 800; color: #1c7ed6; margin-bottom: 12px; font-variant-numeric: tabular-nums; }
+                .apply-remaining.closed { color: #e03131; }
+                .apply-date-row { display: flex; justify-content: center; gap: 10px; font-size: .88rem; color: #495057; margin-top: 4px; }
+                .apply-date-row .lbl { color: #868e96; }
+                .apply-info-right { flex: 1; padding: 18px 24px; display: flex; flex-direction: column; justify-content: center; }
+                .apply-right-row { display: flex; align-items: center; gap: 24px; padding: 10px 0; font-size: .95rem; color: #212529; }
+                .apply-right-row + .apply-right-row { border-top: 1px solid #f1f3f5; }
+                .apply-right-row .lbl { color: #868e96; min-width: 80px; }
+                .apply-right-row a { color: #1c7ed6; font-weight: 700; text-decoration: underline; }
+                .apply-info-note { font-size: .8rem; color: #adb5bd; margin-top: 10px; }
+              </style>
+              <div id="apply-info-box" class="apply-info-box">
+                <h3 class="apply-info-title">접수기간 · 방법</h3>
+                <div class="apply-info-body">
+                  <div class="apply-info-left">
+                    <div class="apply-left-label">남은 기간</div>
+                    <div class="apply-remaining" id="apply-remaining">-</div>
+                    <div class="apply-date-row"><span class="lbl">시작일</span><span id="apply-start-date">-</span></div>
+                    <div class="apply-date-row"><span class="lbl">마감일</span><span id="apply-end-date">-</span></div>
+                  </div>
+                  <div class="apply-info-right">
+                    <div class="apply-right-row"><span class="lbl">접수방법</span><span id="apply-method">-</span></div>
+                    <div class="apply-right-row"><span class="lbl">인사담당자</span><span id="apply-manager">-</span></div>
+                  </div>
+                </div>
+                <div class="apply-info-note">ⓘ 마감일은 기관의 사정으로 인해 조기 마감 또는 변경될 수 있습니다</div>
+              </div>
               <div id="detail-attachment-area" style="margin-bottom:1rem; text-align:left; display:none;">
                 <strong>💾 첨부파일:</strong> <a id="detail-attachment-link" href="#" target="_blank"
                   style="color:#3498db; text-decoration:underline;"></a>
@@ -6559,14 +6593,14 @@
   <footer class="site-footer">
     <div class="container">
       <div class="brand">(주)한국퍼블릭잡컨설팅</div>
-      <div class="footer-line">올공(ALLGONG) | 사업자등록번호 : 12-725-87957 </div>
-      <div class="footer-line">(34430) 대전광역시 대덕구 한남로70 (오정동133) </div>
+      <div class="footer-line">대표 : 이경한·노성민 | 사업자등록번호 : 12-725-87957 </div>
+      <div class="footer-line">(34430) 대전광역시 대덕구 한남로70 (오정동133) 경상대학 315호실</div>
       <div class="footer-line">통신판매업 신고번호 : 314-2345호 제 2026-대전의창-371호| 직업정보제공사업 : 대전 제 2026-321</div>
       <div class="footer-line">청소년보호책임자 : 서동훈 | 공공기관뉴스 기사배열 책임자 : 서동훈</div>
       <div class="footer-line muted">© 2026 - 현재 (주)한국퍼블릭잡컨설팅 | allgongin.com | 올공(ALLGONG) All rights reserved. <a href="#"
           onclick="enableAdminMode(); return false;"
           style="color:#eee; text-decoration:none; margin-left:10px; font-size:0.8rem;">[Admin Setup]</a></div>
-      <div class="footer-line muted">본 사이트의 모든 콘텐츠에 대한 무단 복제·전재·크롤링·재배포를 금지하며, 위반 시 저작권법 및 부정경쟁방지법 등 관련 법령에 따라 민·형사상 책임을 물을 수 있습니다.</div>
+      <div class="footer-line muted">본 사이트의 모든 콘텐츠(화면 디자인·소스코드·데이터베이스·자동 수집 시스템 포함)에 대한 무단 복제·전재·크롤링·재배포를 금지하며, 위반 시 저작권법 및 부정경쟁방지법 등 관련 법령에 따라 민·형사상 책임을 물을 수 있습니다.</div>
     </div>
   </footer>
   <section class="section" id="login" style="padding:2rem 0;"></section>
@@ -9978,6 +10012,54 @@ function displayStoriesForPage(page) {
         daysLeftEl.textContent = '-';
         daysLeftEl.style.color = '#6c757d';
       }
+
+      // ===== 접수기간 · 방법 박스 채우기 (남은 기간 실시간 카운트다운) =====
+      try {
+        const _wd = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+        const _fmtApply = function (dt) {
+          if (!dt || isNaN(dt.getTime())) return '-';
+          return dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0') + '. (' + _wd[dt.getDay()] + ')';
+        };
+        // 시작일 = 등록일
+        const _startD = (job.createdAt && job.createdAt.seconds) ? new Date(job.createdAt.seconds * 1000) : null;
+        document.getElementById('apply-start-date').textContent = _startD ? _fmtApply(_startD) : '-';
+        // 마감일
+        const _dlm = String(job.deadline || job.closingDate || '').match(/(\d{4})\D?(\d{1,2})\D?(\d{1,2})/);
+        const _endD = _dlm ? new Date(+_dlm[1], +_dlm[2] - 1, +_dlm[3]) : null;
+        document.getElementById('apply-end-date').textContent = _endD ? _fmtApply(_endD) : '-';
+        // 접수방법: 채용 사이트 링크(= '채용 사이트 방문' 버튼과 동일 URL)
+        const _methodEl = document.getElementById('apply-method');
+        if (job.detailUrl && job.detailUrl !== '#' && String(job.detailUrl).startsWith('http')) {
+          _methodEl.innerHTML = '';
+          const _ma = document.createElement('a');
+          _ma.href = job.detailUrl; _ma.target = '_blank'; _ma.rel = 'noopener noreferrer'; _ma.textContent = '홈페이지';
+          _methodEl.appendChild(_ma);
+        } else { _methodEl.textContent = '-'; }
+        // 인사담당자 = 공고 기관명
+        document.getElementById('apply-manager').textContent = job.company ? (job.company + ' (인사팀)') : '-';
+        // 남은 기간: 마감일 자정까지 1초 단위 카운트다운
+        const _remEl = document.getElementById('apply-remaining');
+        if (window.__applyCntTimer) { clearInterval(window.__applyCntTimer); window.__applyCntTimer = null; }
+        if (!_endD) { _remEl.textContent = '-'; _remEl.classList.remove('closed'); }
+        else {
+          const _endMs = _endD.getTime() + 24 * 60 * 60 * 1000; // 마감일 당일 24시까지
+          const _tick = function () {
+            const diff = _endMs - Date.now();
+            if (diff <= 0) {
+              _remEl.textContent = '마감'; _remEl.classList.add('closed');
+              if (window.__applyCntTimer) { clearInterval(window.__applyCntTimer); window.__applyCntTimer = null; }
+              return;
+            }
+            _remEl.classList.remove('closed');
+            _remEl.textContent = Math.floor(diff / 86400000) + '일 '
+              + String(Math.floor(diff % 86400000 / 3600000)).padStart(2, '0') + ':'
+              + String(Math.floor(diff % 3600000 / 60000)).padStart(2, '0') + ':'
+              + String(Math.floor(diff % 60000 / 1000)).padStart(2, '0');
+          };
+          _tick();
+          window.__applyCntTimer = setInterval(_tick, 1000);
+        }
+      } catch (e) { console.warn('접수기간 박스 표시 실패:', e); }
 
       // 내용 (줄바꿈 처리)
       const content = job.content || '';
