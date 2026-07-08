@@ -5360,7 +5360,7 @@
                   <div class="apply-info-left">
                     <div class="apply-left-label">남은 기간</div>
                     <div class="apply-remaining" id="apply-remaining">-</div>
-                    <div class="apply-date-row"><span class="lbl">시작일</span><span id="apply-start-date">-</span></div>
+                    <div class="apply-date-row"><span class="lbl">금일</span><span id="apply-start-date">-</span></div>
                     <div class="apply-date-row"><span class="lbl">마감일</span><span id="apply-end-date">-</span></div>
                   </div>
                   <div class="apply-info-right">
@@ -10037,9 +10037,8 @@ function displayStoriesForPage(page) {
           if (!dt || isNaN(dt.getTime())) return '-';
           return dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0') + '. (' + _wd[dt.getDay()] + ')';
         };
-        // 시작일 = 등록일
-        const _startD = (job.createdAt && job.createdAt.seconds) ? new Date(job.createdAt.seconds * 1000) : null;
-        document.getElementById('apply-start-date').textContent = _startD ? _fmtApply(_startD) : '-';
+        // 금일 = 접속 시점의 오늘 날짜 (자정 넘김 대비 카운트다운에서 매초 갱신)
+        document.getElementById('apply-start-date').textContent = _fmtApply(new Date());
         // 마감일
         const _dlm = String(job.deadline || job.closingDate || '').match(/(\d{4})\D?(\d{1,2})\D?(\d{1,2})/);
         const _endD = _dlm ? new Date(+_dlm[1], +_dlm[2] - 1, +_dlm[3]) : null;
@@ -10061,6 +10060,10 @@ function displayStoriesForPage(page) {
         else {
           const _endMs = _endD.getTime() + 24 * 60 * 60 * 1000; // 마감일 당일 24시까지
           const _tick = function () {
+            // '금일' 날짜도 실시간 유지 (자정 넘김 시 자동 갱신)
+            const _sdEl = document.getElementById('apply-start-date');
+            const _nowStr = _fmtApply(new Date());
+            if (_sdEl && _sdEl.textContent !== _nowStr) _sdEl.textContent = _nowStr;
             const diff = _endMs - Date.now();
             if (diff <= 0) {
               _remEl.textContent = '마감'; _remEl.classList.add('closed');
