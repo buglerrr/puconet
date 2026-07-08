@@ -1,0 +1,6 @@
+NanumGothic / NanumGothicExtraBold
+Copyright (c) NAVER Corporation (https://hangeul.naver.com)
+Licensed under the SIL Open Font License, Version 1.1 (OFL-1.1).
+License text: https://openfontlicense.org/open-font-license-official-text/
+These fonts are bundled solely to render Korean text on auto-generated
+social media card images.
