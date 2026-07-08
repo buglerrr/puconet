@@ -19,6 +19,8 @@ SNS(인스타그램/쓰레드) 자동 게시 모듈
   - 같은 날 크롤러가 여러 번 돌아도 게시는 하루 1회만
 """
 
+import time
+
 import requests
 from datetime import datetime, timedelta, timezone
 
@@ -101,25 +103,46 @@ def _post_instagram(cfg: dict, caption: str) -> bool:
     uid = cfg.get("ig_user_id")
     if not uid:
         r0 = requests.get(f"{IG_API}/me", params={"fields": "user_id,username", "access_token": tok}, timeout=30)
-        r0.raise_for_status()
+        if not r0.ok:
+            raise RuntimeError(f"계정 조회 실패: {r0.status_code} {r0.text[:300]}")
         j0 = r0.json()
         uid = j0.get("user_id") or j0.get("id")
         print(f"  (인스타그램 계정 자동 확인: @{j0.get('username')} / {uid})")
+    # 1) 미디어 컨테이너 생성
     r = requests.post(
         f"{IG_API}/{uid}/media",
         data={"image_url": img, "caption": caption[:2100], "access_token": tok},
         timeout=60,
     )
-    r.raise_for_status()
+    if not r.ok:
+        raise RuntimeError(f"컨테이너 생성 실패: {r.status_code} {r.text[:300]}")
     creation_id = r.json().get("id")
-    r2 = requests.post(
-        f"{IG_API}/{uid}/media_publish",
-        data={"creation_id": creation_id, "access_token": tok},
-        timeout=60,
-    )
-    r2.raise_for_status()
-    print(f"  ✅ 인스타그램 게시 완료: {r2.json().get('id')}")
-    return True
+    # 2) 컨테이너 처리 완료 대기 (인스타그램이 이미지를 내려받아 검증하는 데 수 초 걸림)
+    status = ""
+    for _ in range(20):  # 최대 약 60초
+        s = requests.get(f"{IG_API}/{creation_id}", params={"fields": "status_code", "access_token": tok}, timeout=30)
+        if s.ok:
+            status = str((s.json() or {}).get("status_code") or "")
+            if status == "FINISHED":
+                break
+            if status == "ERROR":
+                raise RuntimeError("이미지 처리 실패(status=ERROR) — ig_image_url 이 외부에서 접근 가능한 JPG인지 확인 필요")
+        time.sleep(3)
+    print(f"  (컨테이너 상태: {status or '확인불가'} → 발행 시도)")
+    # 3) 발행 (일시 오류 대비 재시도)
+    last_err = ""
+    for attempt in range(3):
+        r2 = requests.post(
+            f"{IG_API}/{uid}/media_publish",
+            data={"creation_id": creation_id, "access_token": tok},
+            timeout=60,
+        )
+        if r2.ok:
+            print(f"  ✅ 인스타그램 게시 완료: {r2.json().get('id')}")
+            return True
+        last_err = f"{r2.status_code} {r2.text[:300]}"
+        time.sleep(5)
+    raise RuntimeError(f"발행 실패: {last_err}")
 
 
 def _maybe_refresh_ig_token(db, cfg: dict) -> None:
@@ -182,27 +205,33 @@ def post_daily(db, df) -> None:
         print("  (SNS 자동 게시 설정 없음/비활성 → 건너뜀)")
         return
     today = _today_kst()
-    if str(cfg.get("last_posted_date") or "") == today:
-        print("  (오늘 이미 SNS 게시함 → 건너뜀)")
-        _maybe_refresh_threads_token(db, cfg)
-        _maybe_refresh_ig_token(db, cfg)
-        return
+    # 플랫폼별 하루 1회 게시 (과거 필드 last_posted_date 는 쓰레드 기록으로 인정)
+    legacy = str(cfg.get("last_posted_date") or "")
+    threads_done = (str(cfg.get("last_posted_threads") or "") or legacy) == today
+    ig_done = str(cfg.get("last_posted_ig") or "") == today
     if df is None or len(df) == 0:
         print("  (게시할 공고 없음 → 건너뜀)")
         return
 
     caption = _build_caption(df)
-    ok_threads = ok_ig = False
-    try:
-        ok_threads = _post_threads(cfg, caption)
-    except Exception as e:  # noqa: BLE001
-        print(f"  ⚠️ 쓰레드 게시 실패: {e}")
-    try:
-        ok_ig = _post_instagram(cfg, caption)
-    except Exception as e:  # noqa: BLE001
-        print(f"  ⚠️ 인스타그램 게시 실패: {e}")
 
-    if ok_threads or ok_ig:
-        _cfg_ref(db).set({"last_posted_date": today}, merge=True)
+    if threads_done:
+        print("  (쓰레드: 오늘 이미 게시함 → 건너뜀)")
+    else:
+        try:
+            if _post_threads(cfg, caption):
+                _cfg_ref(db).set({"last_posted_threads": today}, merge=True)
+        except Exception as e:  # noqa: BLE001
+            print(f"  ⚠️ 쓰레드 게시 실패: {e}")
+
+    if ig_done:
+        print("  (인스타그램: 오늘 이미 게시함 → 건너뜀)")
+    else:
+        try:
+            if _post_instagram(cfg, caption):
+                _cfg_ref(db).set({"last_posted_ig": today}, merge=True)
+        except Exception as e:  # noqa: BLE001
+            print(f"  ⚠️ 인스타그램 게시 실패: {e}")
+
     _maybe_refresh_threads_token(db, cfg)
     _maybe_refresh_ig_token(db, cfg)
