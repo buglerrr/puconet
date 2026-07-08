@@ -185,7 +185,7 @@ def post_daily(db, df) -> None:
     if str(cfg.get("last_posted_date") or "") == today:
         print("  (오늘 이미 SNS 게시함 → 건너뜀)")
         _maybe_refresh_threads_token(db, cfg)
-    _maybe_refresh_ig_token(db, cfg)
+        _maybe_refresh_ig_token(db, cfg)
         return
     if df is None or len(df) == 0:
         print("  (게시할 공고 없음 → 건너뜀)")
