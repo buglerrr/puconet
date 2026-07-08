@@ -26,7 +26,9 @@ KST = timezone(timedelta(hours=9))
 SITE_URL = "https://www.allgongin.com"
 THREADS_HOST = "https://graph.threads.net"
 THREADS_API = THREADS_HOST + "/v1.0"
-GRAPH_API = "https://graph.facebook.com/v19.0"
+# 인스타그램: '인스타그램 로그인' 방식(신규 API, 페이스북 페이지 불필요)
+IG_HOST = "https://graph.instagram.com"
+IG_API = IG_HOST + "/v21.0"
 
 
 def _today_kst() -> str:
@@ -90,26 +92,60 @@ def _post_threads(cfg: dict, caption: str) -> bool:
 
 
 def _post_instagram(cfg: dict, caption: str) -> bool:
-    """인스타그램 이미지+캡션 게시 (2단계: 미디어 컨테이너 생성 → 발행)."""
-    uid, tok, img = cfg.get("ig_user_id"), cfg.get("ig_access_token"), cfg.get("ig_image_url")
-    if not uid or not tok or not img:
-        print("  (인스타그램 설정 없음(계정ID/토큰/이미지URL) → 건너뜀)")
+    """인스타그램 이미지+캡션 게시 (인스타그램 로그인 방식, 2단계: 컨테이너 생성 → 발행).
+    ig_user_id 가 없으면 토큰으로 자동 조회."""
+    tok, img = cfg.get("ig_access_token"), cfg.get("ig_image_url")
+    if not tok or not img:
+        print("  (인스타그램 설정 없음(토큰/이미지URL) → 건너뜀)")
         return False
+    uid = cfg.get("ig_user_id")
+    if not uid:
+        r0 = requests.get(f"{IG_API}/me", params={"fields": "user_id,username", "access_token": tok}, timeout=30)
+        r0.raise_for_status()
+        j0 = r0.json()
+        uid = j0.get("user_id") or j0.get("id")
+        print(f"  (인스타그램 계정 자동 확인: @{j0.get('username')} / {uid})")
     r = requests.post(
-        f"{GRAPH_API}/{uid}/media",
+        f"{IG_API}/{uid}/media",
         data={"image_url": img, "caption": caption[:2100], "access_token": tok},
         timeout=60,
     )
     r.raise_for_status()
     creation_id = r.json().get("id")
     r2 = requests.post(
-        f"{GRAPH_API}/{uid}/media_publish",
+        f"{IG_API}/{uid}/media_publish",
         data={"creation_id": creation_id, "access_token": tok},
         timeout=60,
     )
     r2.raise_for_status()
     print(f"  ✅ 인스타그램 게시 완료: {r2.json().get('id')}")
     return True
+
+
+def _maybe_refresh_ig_token(db, cfg: dict) -> None:
+    """인스타그램 장기 토큰(유효 60일)을 7일마다 자동 연장 → 별도 관리 없이 영구 유지."""
+    tok = cfg.get("ig_access_token")
+    if not tok:
+        return
+    last = str(cfg.get("ig_token_refreshed") or "")
+    if last >= (datetime.now(KST) - timedelta(days=7)).strftime("%Y-%m-%d"):
+        return
+    try:
+        r = requests.get(
+            f"{IG_HOST}/refresh_access_token",
+            params={"grant_type": "ig_refresh_token", "access_token": tok},
+            timeout=30,
+        )
+        r.raise_for_status()
+        new_tok = r.json().get("access_token")
+        if new_tok:
+            _cfg_ref(db).set(
+                {"ig_access_token": new_tok, "ig_token_refreshed": _today_kst()},
+                merge=True,
+            )
+            print("  🔄 인스타그램 토큰 자동 연장 완료")
+    except Exception as e:  # noqa: BLE001
+        print(f"  (인스타그램 토큰 연장 실패 — 다음 실행 때 재시도: {e})")
 
 
 def _maybe_refresh_threads_token(db, cfg: dict) -> None:
@@ -149,6 +185,7 @@ def post_daily(db, df) -> None:
     if str(cfg.get("last_posted_date") or "") == today:
         print("  (오늘 이미 SNS 게시함 → 건너뜀)")
         _maybe_refresh_threads_token(db, cfg)
+    _maybe_refresh_ig_token(db, cfg)
         return
     if df is None or len(df) == 0:
         print("  (게시할 공고 없음 → 건너뜀)")
@@ -168,3 +205,4 @@ def post_daily(db, df) -> None:
     if ok_threads or ok_ig:
         _cfg_ref(db).set({"last_posted_date": today}, merge=True)
     _maybe_refresh_threads_token(db, cfg)
+    _maybe_refresh_ig_token(db, cfg)
