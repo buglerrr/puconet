@@ -416,13 +416,14 @@ def sync_to_firestore(df: pd.DataFrame) -> dict:
         batch = db.batch()
         ops = 0
 
-    # 관리자가 수정한(adminEdited=True) 자동 공고는 크롤러가 '덮어쓰지도, 삭제하지도' 않도록 잠금 목록 확보
-    locked_ids = set()
+    # 기존 자동등록 공고 스냅샷 1회 조회 (관리자수정 잠금 / 등록일 보존 / 만료 정리에 공용)
+    existing_docs = {}
     try:
-        for d in col.where("adminEdited", "==", True).stream():
-            locked_ids.add(d.id)
+        for d in col.where("source", "==", "alio-auto").stream():
+            existing_docs[d.id] = d.to_dict() or {}
     except Exception as e:  # noqa: BLE001
-        print(f"  (adminEdited 조회 생략: {e})")
+        print(f"  (기존 공고 조회 생략: {e})")
+    locked_ids = {k for k, v in existing_docs.items() if v.get("adminEdited")}
     if locked_ids:
         print(f"  🔒 관리자 수정 공고 {len(locked_ids)}건 → 덮어쓰기/삭제 제외")
 
@@ -438,7 +439,17 @@ def sync_to_firestore(df: pd.DataFrame) -> dict:
         company = row.get("기관명", "")
         category = CATEGORY_MAPPING.get(str(row.get("기관유형", "")).strip(), "public")
         deadline = format_deadline(row.get("공고종료일", ""))
-        timestamp = base_time + timedelta(seconds=i)
+        # 등록일(createdAt) = 실제 공고 게시일(공고시작일).
+        # 문서ID 해시로 같은 날짜 안의 순서를 고정 → 매일 재수집해도 값이 흔들리지 않음(결정적).
+        # 공고시작일이 없으면: 기존 문서는 원래 등록일 보존, 신규 문서만 수집 시각 사용.
+        _start = row.get("공고시작일")
+        _has_start = _start is not None and not pd.isna(_start)
+        if _has_start:
+            _base = _start.to_pydatetime() if hasattr(_start, "to_pydatetime") else _start
+            _off = int(hashlib.md5(doc_id.encode("utf-8")).hexdigest()[:6], 16) % 86400
+            timestamp = _base + timedelta(seconds=_off)
+        else:
+            timestamp = base_time + timedelta(seconds=i)
         i += 1
 
         # 첫 화면 '추천 채용정보' 배너 대상 표시 (정규직/청년인턴(채용·체험형))
@@ -475,6 +486,10 @@ def sync_to_firestore(df: pd.DataFrame) -> dict:
             "premium": is_premium,  # 프리미엄 배너/게시판 대상 여부 (고용유형 '정규직' 단독)
             "featured": is_featured,  # 주요 배너/게시판 대상 여부 (고용유형 '비정규직'/'무기계약직' 단독)
         }
+        if not _has_start and doc_id in existing_docs:
+            # 공고시작일이 없는 기존 문서는 원래 등록일을 덮어쓰지 않음
+            doc_data.pop("createdAt", None)
+            doc_data.pop("created_at", None)
         batch.set(col.document(doc_id), doc_data, merge=True)
         ops += 1
         if ops >= 450:
@@ -488,16 +503,14 @@ def sync_to_firestore(df: pd.DataFrame) -> dict:
     deleted = 0
     kept_expired = 0
     cutoff = (datetime.now() - timedelta(days=EXPIRED_RETENTION_DAYS)).strftime("%Y-%m-%d")
-    auto_docs = col.where("source", "==", "alio-auto").stream()
-    for d in auto_docs:
-        if d.id in current_ids or d.id in locked_ids:
+    for did, data in existing_docs.items():
+        if did in current_ids or did in locked_ids:
             continue  # 이번 수집분 또는 관리자 수정본은 보존
-        data = d.to_dict() or {}
         dl = str(data.get("deadline") or data.get("closingDate") or "").strip()
         if dl and dl >= cutoff:
             # 보존: 최초 1회 배너 플래그를 꺼서(archived) 홈 배너 조회 대상에서 제외
             if not data.get("archived"):
-                batch.update(col.document(d.id), {
+                batch.update(col.document(did), {
                     "archived": True,
                     "recommended": False,
                     "premium": False,
@@ -508,7 +521,7 @@ def sync_to_firestore(df: pd.DataFrame) -> dict:
                     commit()
             kept_expired += 1
             continue
-        batch.delete(col.document(d.id))
+        batch.delete(col.document(did))
         ops += 1
         deleted += 1
         if ops >= 450:

@@ -5332,10 +5332,14 @@
                 <img id="detail-main-image" src="" style="max-width:100%; max-height:400px; border-radius:8px;">
               </div>
               <div id="detail-desc" style="white-space: pre-wrap;"></div>
+              <!-- 첨부 이미지(채용공고문): 본문 마지막 줄 아래 한 줄 간격 후 표시 -->
+              <div id="detail-content-image-area" style="text-align:center; margin-top:1.8rem; display:none;">
+                <img id="detail-content-image" src="" style="max-width:100%; border-radius:8px;">
+              </div>
             </div>
 
             <div class="detail-footer"
-              style="margin-top:2rem; border-top:1px solid #eee; padding-top:1rem; text-align:center;">
+              style="margin-top:2rem; border-top:1px solid #eee; padding-top:1rem; text-align:center; position:relative;">
               <!-- ===== 접수기간 · 방법 (남은 기간 실시간 카운트다운) ===== -->
               <style>
                 .apply-info-box { text-align: left; border-bottom: 1px solid #eee; padding-bottom: 1.25rem; margin-bottom: 1.25rem; }
@@ -5360,7 +5364,7 @@
                   <div class="apply-info-left">
                     <div class="apply-left-label">남은 기간</div>
                     <div class="apply-remaining" id="apply-remaining">-</div>
-                    <div class="apply-date-row"><span class="lbl">금일</span><span id="apply-start-date">-</span></div>
+                    <div class="apply-date-row"><span class="lbl">등록일</span><span id="apply-start-date">-</span></div>
                     <div class="apply-date-row"><span class="lbl">마감일</span><span id="apply-end-date">-</span></div>
                   </div>
                   <div class="apply-info-right">
@@ -5381,6 +5385,9 @@
                 style="display:none; background:#e74c3c; color:white; padding:12px 24px; border-radius:5px; text-decoration:none; font-weight:bold; font-size:1.05rem; line-height:1.2; vertical-align:middle;">
                 채용 사이트 방문 →
               </a>
+              <!-- 관리자 전용: 게시글 수정 (버튼 라인 맨 오른쪽) -->
+              <button id="detail-admin-edit" onclick="openEditModal(window.currentJobId)"
+                style="display:none; position:absolute; right:0; bottom:0; background:#6c757d; border:none; color:white; padding:12px 20px; border-radius:5px; cursor:pointer; font-family:inherit; font-weight:bold; font-size:1.05rem; line-height:1.2;">수정</button>
             </div>
           </div>
         </div>
@@ -10037,8 +10044,9 @@ function displayStoriesForPage(page) {
           if (!dt || isNaN(dt.getTime())) return '-';
           return dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0') + '. (' + _wd[dt.getDay()] + ')';
         };
-        // 금일 = 접속 시점의 오늘 날짜 (자정 넘김 대비 카운트다운에서 매초 갱신)
-        document.getElementById('apply-start-date').textContent = _fmtApply(new Date());
+        // 등록일 = 실제 공고 게시일(createdAt; 크롤러가 공고시작일로 저장)
+        const _startD = (job.createdAt && job.createdAt.seconds) ? new Date(job.createdAt.seconds * 1000) : null;
+        document.getElementById('apply-start-date').textContent = _startD ? _fmtApply(_startD) : '-';
         // 마감일
         const _dlm = String(job.deadline || job.closingDate || '').match(/(\d{4})\D?(\d{1,2})\D?(\d{1,2})/);
         const _endD = _dlm ? new Date(+_dlm[1], +_dlm[2] - 1, +_dlm[3]) : null;
@@ -10060,10 +10068,6 @@ function displayStoriesForPage(page) {
         else {
           const _endMs = _endD.getTime() + 24 * 60 * 60 * 1000; // 마감일 당일 24시까지
           const _tick = function () {
-            // '금일' 날짜도 실시간 유지 (자정 넘김 시 자동 갱신)
-            const _sdEl = document.getElementById('apply-start-date');
-            const _nowStr = _fmtApply(new Date());
-            if (_sdEl && _sdEl.textContent !== _nowStr) _sdEl.textContent = _nowStr;
             const diff = _endMs - Date.now();
             if (diff <= 0) {
               _remEl.textContent = '마감'; _remEl.classList.add('closed');
@@ -10091,17 +10095,26 @@ function displayStoriesForPage(page) {
       const imgArea = document.getElementById('detail-image-area');
       const mainImg = document.getElementById('detail-main-image');
 
-      // 1. 본문 이미지가 있으면 우선 표시
-      if (job.contentImageUrl) {
-        mainImg.src = job.contentImageUrl;
-        imgArea.style.display = 'block';
-      }
-      // 2. 본문 이미지는 없고 로고 이미지만 있는데, 로고가 기본(./logo.png)이 아니면 표시
-      else if (job.imageUrl && job.imageUrl !== './logo.png' && !job.imageUrl.startsWith('./')) {
+      // 상단 영역: 기관 로고 표시 (기본 로고 제외)
+      if (job.imageUrl && job.imageUrl !== './logo.png' && !job.imageUrl.startsWith('./')) {
         mainImg.src = job.imageUrl;
         imgArea.style.display = 'block';
       } else {
         imgArea.style.display = 'none';
+      }
+      // 첨부 이미지(채용공고문): 본문 마지막 줄 아래 한 줄 간격 후 표시
+      const _cImgArea = document.getElementById('detail-content-image-area');
+      const _cImg = document.getElementById('detail-content-image');
+      if (_cImgArea && _cImg) {
+        if (job.contentImageUrl) { _cImg.src = job.contentImageUrl; _cImgArea.style.display = 'block'; }
+        else { _cImg.src = ''; _cImgArea.style.display = 'none'; }
+      }
+      // 관리자 전용 '수정' 버튼 표시
+      const _editBtn = document.getElementById('detail-admin-edit');
+      if (_editBtn) {
+        const _isAdm = (window.currentUserRole === 'admin') ||
+          (window.auth && window.auth.currentUser && window.auth.currentUser.email === 'ilovetruman@gmail.com');
+        _editBtn.style.display = _isAdm ? 'inline-block' : 'none';
       }
 
       // 첨부파일 처리
