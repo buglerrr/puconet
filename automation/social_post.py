@@ -261,29 +261,52 @@ def _upload_card(jpg_bytes: bytes, slot: str):
 
 
 # ─────────────────────── 플랫폼별 게시 ───────────────────────
-def _post_threads(cfg: dict, caption: str) -> bool:
+def _post_threads(cfg: dict, caption: str, image_url: str = None) -> bool:
+    """쓰레드 게시. image_url 이 있으면 카드 이미지+텍스트, 없으면 텍스트만."""
     uid, tok = cfg.get("threads_user_id"), cfg.get("threads_access_token")
     if not uid or not tok:
         print("  (쓰레드 설정 없음 → 건너뜀)")
         return False
     text = caption if len(caption) <= 480 else caption[:477] + "..."
-    r = requests.post(
-        f"{THREADS_API}/{uid}/threads",
-        data={"media_type": "TEXT", "text": text, "access_token": tok},
-        timeout=30,
-    )
+    payload = {"access_token": tok, "text": text}
+    if image_url:
+        payload["media_type"] = "IMAGE"
+        payload["image_url"] = image_url
+    else:
+        payload["media_type"] = "TEXT"
+    r = requests.post(f"{THREADS_API}/{uid}/threads", data=payload, timeout=30)
     if not r.ok:
         raise RuntimeError(f"컨테이너 생성 실패: {r.status_code} {r.text[:300]}")
     creation_id = r.json().get("id")
-    r2 = requests.post(
-        f"{THREADS_API}/{uid}/threads_publish",
-        data={"creation_id": creation_id, "access_token": tok},
-        timeout=30,
-    )
-    if not r2.ok:
-        raise RuntimeError(f"발행 실패: {r2.status_code} {r2.text[:300]}")
-    print(f"  ✅ 쓰레드 게시 완료: {r2.json().get('id')}")
-    return True
+    # 이미지 게시는 처리 완료까지 대기 (텍스트는 즉시 발행 가능)
+    if image_url:
+        for _ in range(20):  # 최대 약 60초
+            s = requests.get(
+                f"{THREADS_API}/{creation_id}",
+                params={"fields": "status", "access_token": tok},
+                timeout=30,
+            )
+            if s.ok:
+                st = str((s.json() or {}).get("status") or "")
+                if st == "FINISHED":
+                    break
+                if st == "ERROR":
+                    raise RuntimeError("이미지 처리 실패(status=ERROR) — 이미지 URL 접근 가능 여부 확인 필요")
+            time.sleep(3)
+    # 발행 (일시 오류 대비 재시도)
+    last_err = ""
+    for _ in range(3):
+        r2 = requests.post(
+            f"{THREADS_API}/{uid}/threads_publish",
+            data={"creation_id": creation_id, "access_token": tok},
+            timeout=30,
+        )
+        if r2.ok:
+            print(f"  ✅ 쓰레드 게시 완료{'(이미지 포함)' if image_url else ''}: {r2.json().get('id')}")
+            return True
+        last_err = f"{r2.status_code} {r2.text[:300]}"
+        time.sleep(5)
+    raise RuntimeError(f"발행 실패: {last_err}")
 
 
 def _post_instagram(cfg: dict, caption: str, image_url: str) -> bool:
@@ -410,11 +433,21 @@ def post_daily(db, df) -> None:
     rows = _select_rows(df, slot)
     caption = _build_caption(slot, df, rows)
 
+    # 게시 기관 CI가 들어간 카드 이미지 1회 생성 → 쓰레드/인스타 공용
+    card_url = None
+    if not threads_done or not ig_done:
+        try:
+            card_url = _upload_card(_make_card(slot, rows), slot)
+            if card_url:
+                print("  (기관 CI 카드 이미지 생성 완료)")
+        except Exception as e:  # noqa: BLE001
+            print(f"  (카드 생성 실패 → 쓰레드는 텍스트만, 인스타는 기본 이미지 사용: {e})")
+
     if threads_done:
         print("  (쓰레드: 이 슬롯은 오늘 이미 게시함 → 건너뜀)")
     else:
         try:
-            if _post_threads(cfg, caption):
+            if _post_threads(cfg, caption, card_url):
                 _cfg_ref(db).set({f"last_threads_{slot}": today}, merge=True)
         except Exception as e:  # noqa: BLE001
             print(f"  ⚠️ 쓰레드 게시 실패: {e}")
@@ -422,15 +455,7 @@ def post_daily(db, df) -> None:
     if ig_done:
         print("  (인스타그램: 이 슬롯은 오늘 이미 게시함 → 건너뜀)")
     else:
-        # 게시 기관 CI가 들어간 카드 이미지 생성 (실패 시 기본 이미지로 폴백)
-        image_url = None
-        try:
-            image_url = _upload_card(_make_card(slot, rows), slot)
-            if image_url:
-                print("  (기관 CI 카드 이미지 생성 완료)")
-        except Exception as e:  # noqa: BLE001
-            print(f"  (카드 생성 실패 → 기본 이미지 사용: {e})")
-        image_url = image_url or cfg.get("ig_image_url")
+        image_url = card_url or cfg.get("ig_image_url")
         try:
             if _post_instagram(cfg, caption, image_url):
                 _cfg_ref(db).set({f"last_ig_{slot}": today}, merge=True)
