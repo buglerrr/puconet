@@ -5298,6 +5298,12 @@
                     <td id="detail-employment-type" style="padding:0.5rem; width:30%; color:#212529;">-</td>
                   </tr>
                   <tr>
+                    <td style="padding:0.5rem; font-weight:600; color:#495057;">기관유형</td>
+                    <td id="detail-inst-type" style="padding:0.5rem; color:#212529;">-</td>
+                    <td style="padding:0.5rem; font-weight:600; color:#495057;">근무지</td>
+                    <td id="detail-work-location" style="padding:0.5rem; color:#212529;">-</td>
+                  </tr>
+                  <tr>
                     <td style="padding:0.5rem; font-weight:600; color:#495057;">채용구분</td>
                     <td id="detail-career-type" style="padding:0.5rem; color:#212529;">-</td>
                     <td style="padding:0.5rem; font-weight:600; color:#495057;">채용인원</td>
@@ -9984,6 +9990,17 @@ function displayStoriesForPage(page) {
       // 추가 정보 바인딩
       document.getElementById('detail-ncs-code').textContent = formatNcsCode(job.ncsCode);
       document.getElementById('detail-employment-type').textContent = displayEmploymentType;
+      // 기관유형: 크롤러가 저장한 원문(instType) 우선, 없으면 카테고리 코드로 표시
+      const _instLabels = {
+        'market-public': '공기업', 'quasi-market-public': '공기업(준시장형)',
+        'fund-quasi': '준정부기관(기금관리형)', 'entrust-quasi': '준정부기관(위탁집행형)',
+        'other-public': '기타공공기관', 'local-public': '지방공기업',
+        'local-investment': '지방출자·출연기관', 'public': '공공기관'
+      };
+      const _instEl = document.getElementById('detail-inst-type');
+      if (_instEl) _instEl.textContent = job.instType || _instLabels[job.category] || '-';
+      const _workLocEl = document.getElementById('detail-work-location');
+      if (_workLocEl) _workLocEl.textContent = job.location ? formatLocation(job.location) : '-';
       document.getElementById('detail-career-type').textContent = job.careerType || '-';
       document.getElementById('detail-recruitment-count').textContent = job.recruitmentCount || '-';
       document.getElementById('detail-education').textContent = job.education || '-';
