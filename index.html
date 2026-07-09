@@ -10033,13 +10033,15 @@ function displayStoriesForPage(page) {
     };
 
     // ── sessionStorage 캐시 키 ──
-    const JOBS_SS_KEY = 'allgong_jobs_cache_v1';
+    const JOBS_SS_KEY = 'allgong_jobs_cache_v1'; // (구) 세션 캐시 — 정리용
+    const JOBS_LS_KEY = 'allgong_jobs_ls_v1';    // 로컬 캐시: 브라우저를 껐다 켜도 유지 → 재방문 즉시 표시
 
     // 채용공고가 추가/수정/삭제되면 캐시를 비워 다음 loadJobs()가 새로 받아오게 함
     function invalidateJobsCache() {
       _jobsCache.delete('_all_jobs');
       _lastFilterSignature = null;
       try { sessionStorage.removeItem(JOBS_SS_KEY); } catch (e) {}
+      try { localStorage.removeItem(JOBS_LS_KEY); } catch (e) {}
     }
 
     // 캐시(allRawJobs)가 준비된 뒤, 화면에 그려주는 공통 렌더 함수
@@ -10056,7 +10058,13 @@ function displayStoriesForPage(page) {
                     (window.auth && window.auth.currentUser && window.auth.currentUser.email === 'ilovetruman@gmail.com');
 
       if (!allRawJobs || allRawJobs.length === 0) {
-        if (emptyState) emptyState.style.display = 'block';
+        // 아직 한 번도 데이터를 받지 못했다면 '없습니다'가 아니라 로딩 표시 (오탐 방지)
+        if (!window.__jobsLoadedOnce) {
+          if (loading) loading.style.display = 'block';
+          if (emptyState) emptyState.style.display = 'none';
+        } else {
+          if (emptyState) emptyState.style.display = 'block';
+        }
         if (bottomAddButton) bottomAddButton.style.display = isAdm ? 'block' : 'none';
         return;
       }
@@ -10073,6 +10081,37 @@ function displayStoriesForPage(page) {
       if (bottomAddButton) bottomAddButton.style.display = isAdm ? 'block' : 'none';
     }
 
+    // ── 공유 네트워크 로더: 게시판/채용달력이 같은 요청을 공유 (중복 풀로드 방지) + 자동 재시도 ──
+    window.__fetchJobsShared = function () {
+      if (window.__jobsFetchPromise) return window.__jobsFetchPromise;
+      const attempt = async (n) => {
+        try {
+          // 안전 상한: 크롤러가 마감 공고를 정리하므로 실데이터는 이보다 훨씬 적음
+          const q = query(collection(db, 'jobs'), orderBy('createdAt', 'desc'), limit(5000));
+          const snap = await getDocs(q);
+          const jobs = [];
+          snap.forEach((ds) => jobs.push({ ...ds.data(), id: ds.id }));
+          const payload = { jobs: jobs, ts: Date.now() };
+          _jobsCache.set('_all_jobs', payload);
+          try { localStorage.setItem(JOBS_LS_KEY, JSON.stringify(payload)); } catch (e) { /* 용량 초과 등 무시 */ }
+          window.__jobsLoadedOnce = true;
+          try { window.dispatchEvent(new CustomEvent('allgong:jobs-updated')); } catch (e) {}
+          return jobs;
+        } catch (e) {
+          if (n < 2) { // 일시 오류 자동 재시도 (1.5초 → 3초)
+            await new Promise((r) => setTimeout(r, 1500 * (n + 1)));
+            return attempt(n + 1);
+          }
+          throw e;
+        }
+      };
+      window.__jobsFetchPromise = attempt(0).finally(() => { window.__jobsFetchPromise = null; });
+      return window.__jobsFetchPromise;
+    };
+
+    const EMPTY_STATE_DEFAULT_HTML = '<h3>등록된 채용정보가 없습니다</h3>\n' +
+      '<p>조건에 맞는 채용정보가 없거나 첫 번째 채용정보를 등록해보세요!</p>';
+
     async function loadJobs() {
       const loading = document.getElementById('loading');
       const emptyState = document.getElementById('emptyState');
@@ -10083,32 +10122,41 @@ function displayStoriesForPage(page) {
 
       if (!loading || !tbody) return;
 
+      // ── 0) Firebase SDK 준비 대기 (최대 25초) — 접속 직후 클릭 시 '없습니다' 오탐/멈춤 방지 ──
+      if (!(window.db && window.getDocs && window.query && window.collection && window.orderBy && window.limit)) {
+        loading.style.display = 'block';
+        if (emptyState) emptyState.style.display = 'none';
+        if (jobTable) jobTable.style.display = 'none';
+        window.__dbWaitTries = (window.__dbWaitTries || 0) + 1;
+        if (window.__dbWaitTries < 100) { setTimeout(loadJobs, 250); return; }
+        window.__dbWaitTries = 0;
+      } else {
+        window.__dbWaitTries = 0;
+      }
+
       const now = Date.now();
 
-      // ── 1) 캐시 확인: 메모리 → sessionStorage 순 ──
+      // ── 1) 캐시 확인: 메모리 → localStorage(브라우저 재시작에도 유지) ──
       let cached = _jobsCache.get('_all_jobs');
       if (!cached) {
         try {
-          const raw = sessionStorage.getItem(JOBS_SS_KEY);
+          const raw = localStorage.getItem(JOBS_LS_KEY);
           if (raw) {
             cached = JSON.parse(raw);
             if (cached && cached.jobs) _jobsCache.set('_all_jobs', cached);
           }
-        } catch (e) { /* sessionStorage 사용 불가 시 무시 */ }
+        } catch (e) { /* localStorage 사용 불가 시 무시 */ }
       }
 
-      // ── 2) 캐시가 있으면 네트워크를 기다리지 않고 '즉시' 화면 표시 ──
-      if (cached && cached.jobs && cached.jobs.length >= 0) {
+      // ── 2) 캐시가 있으면 나이와 무관하게 '즉시' 표시 (재방문 즉시 렌더) ──
+      if (cached && cached.jobs && cached.jobs.length > 0) {
         allRawJobs = cached.jobs;
+        window.__jobsLoadedOnce = true;
         renderJobsFromCache();
-
-        // 충분히 최신(3분 이내)이면 네트워크 요청 자체를 생략
-        if ((now - cached.ts) < JOBS_CACHE_TTL) {
-          return;
-        }
-        // 오래된 캐시면: 화면은 그대로 둔 채 아래에서 백그라운드 갱신만 진행
+        // 충분히 최신(3분 이내)이면 네트워크 생략, 오래됐으면 아래에서 백그라운드 갱신
+        if ((now - cached.ts) < JOBS_CACHE_TTL) return;
       } else {
-        // 캐시가 전혀 없을 때(최초 진입)만 로딩 표시
+        // 캐시가 전혀 없을 때(최초 방문)만 로딩 표시
         loading.style.display = 'block';
         if (emptyState) emptyState.style.display = 'none';
         if (jobTable) jobTable.style.display = 'none';
@@ -10118,34 +10166,21 @@ function displayStoriesForPage(page) {
         if (filterGuideMsg) filterGuideMsg.style.display = 'none';
       }
 
-      // ── 3) 네트워크에서 최신 데이터 가져오기 (최초 진입 or 캐시 갱신) ──
+      // ── 3) 네트워크 (공유 요청 + 자동 재시도) ──
       try {
-        // 안전 상한(limit): 크롤러가 마감 공고를 매일 삭제하므로 실제 활성 공고 수는 이보다 훨씬 적음.
-        // 비정상 누적(삭제 실패 등) 시 방문자당 읽기가 무한정 늘지 않도록 상한만 둔다(정상 데이터는 잘리지 않음).
-        // 활성 공고가 이 값에 근접하면 숫자를 올리세요.
-        const JOBS_FETCH_CAP = 5000;
-        const q = query(collection(db, 'jobs'), orderBy('createdAt', 'desc'), limit(JOBS_FETCH_CAP));
-        const querySnapshot = await getDocs(q);
-        const freshJobs = [];
-        if (!querySnapshot.empty) {
-          querySnapshot.forEach((docSnap) => {
-            const d = docSnap.data();
-            freshJobs.push({ ...d, id: docSnap.id });
-          });
-        }
-
-        allRawJobs = freshJobs;
-        const payload = { jobs: freshJobs, ts: Date.now() };
-        _jobsCache.set('_all_jobs', payload);
-        try {
-          sessionStorage.setItem(JOBS_SS_KEY, JSON.stringify(payload));
-        } catch (e) { /* 용량 초과 등 저장 실패 시 무시 */ }
-
+        const jobs = await window.__fetchJobsShared();
+        allRawJobs = jobs;
+        if (emptyState) emptyState.innerHTML = EMPTY_STATE_DEFAULT_HTML; // 오류 안내가 남아있다면 원복
         renderJobsFromCache();
       } catch (error) {
         console.error('데이터 로딩 실패:', error);
         if (loading) loading.style.display = 'none';
-        // 네트워크 실패 시 캐시로 이미 화면이 떠 있으면 그대로 둠
+        // 캐시로 이미 화면이 떠 있으면 그대로 두고, 최초 방문 실패 시에만 재시도 안내 표시
+        if (!(cached && cached.jobs && cached.jobs.length > 0) && emptyState) {
+          emptyState.innerHTML = '<h3>채용정보를 불러오지 못했습니다</h3>' +
+            '<p>네트워크 상태를 확인한 뒤 <a href="#" onclick="loadJobs(); return false;" style="color:#1c7ed6; font-weight:700; text-decoration:underline;">다시 시도</a>해 주세요.</p>';
+          emptyState.style.display = 'block';
+        }
       }
     }
 
@@ -12633,25 +12668,29 @@ function initCarousel(carouselContainer) {
   }
 
   // ── 공고 데이터: 채용정보 게시판과 동일한 세션 캐시(allgong_jobs_cache_v1)를 공유 (중복 읽기 방지) ──
-  var JOBS_KEY = 'allgong_jobs_cache_v1', TTL = 3 * 60 * 1000;
+  var JOBS_KEY = 'allgong_jobs_ls_v1', TTL = 3 * 60 * 1000; // 게시판과 동일한 로컬 캐시 공유
   var _jobsProm = null;
   function fetchJobs() {
     if (_jobsProm) return _jobsProm;
     _jobsProm = (async function () {
       var cached = null;
-      try { cached = JSON.parse(sessionStorage.getItem(JOBS_KEY) || 'null'); } catch (e) {}
-      if (cached && cached.jobs && (Date.now() - cached.ts) < TTL) return cached.jobs;
-      try {
-        var q = window.query(window.collection(window.db, 'jobs'), window.orderBy('createdAt', 'desc'), window.limit(5000));
-        var snap = await window.getDocs(q);
-        var jobs = [];
-        snap.forEach(function (ds) { jobs.push(Object.assign({}, ds.data(), { id: ds.id })); });
-        try { sessionStorage.setItem(JOBS_KEY, JSON.stringify({ jobs: jobs, ts: Date.now() })); } catch (e) {}
-        return jobs;
-      } catch (e) {
-        if (cached && cached.jobs) return cached.jobs; // 네트워크 실패 시 오래된 캐시라도 사용
-        throw e;
+      try { cached = JSON.parse(localStorage.getItem(JOBS_KEY) || 'null'); } catch (e) {}
+      if (cached && cached.jobs && cached.jobs.length) {
+        // 캐시는 나이와 무관하게 즉시 사용(재방문 즉시 표시).
+        // 오래됐으면 백그라운드로 갱신 → 완료 시 'allgong:jobs-updated' 이벤트로 자동 재렌더
+        if ((Date.now() - cached.ts) >= TTL && window.__fetchJobsShared) {
+          window.__fetchJobsShared().catch(function () {});
+        }
+        return cached.jobs;
       }
+      if (window.__fetchJobsShared) return await window.__fetchJobsShared(); // 게시판과 요청 공유(중복 방지)
+      // 폴백: 공유 로더가 없을 때 직접 조회
+      var q = window.query(window.collection(window.db, 'jobs'), window.orderBy('createdAt', 'desc'), window.limit(5000));
+      var snap = await window.getDocs(q);
+      var jobs = [];
+      snap.forEach(function (ds) { jobs.push(Object.assign({}, ds.data(), { id: ds.id })); });
+      try { localStorage.setItem(JOBS_KEY, JSON.stringify({ jobs: jobs, ts: Date.now() })); } catch (e) {}
+      return jobs;
     })();
     _jobsProm.catch(function () { _jobsProm = null; }); // 실패 시 다음에 재시도 가능
     return _jobsProm;
@@ -12851,6 +12890,16 @@ function initCarousel(carouselContainer) {
   window.addEventListener('popstate', function () {
     if (location.hash === '#calendar-board') { window.showCalendarBoard(null, null, true); }
     else { var s = document.getElementById('calendar-board-section'); if (s) s.style.display = 'none'; }
+  });
+
+  // 공고 데이터가 백그라운드에서 갱신되면 달력을 자동으로 다시 그림
+  window.addEventListener('allgong:jobs-updated', function () {
+    _jobsProm = null; // 다음 렌더부터 새 캐시 사용
+    try {
+      if (homeState) renderHome();
+      var sec = document.getElementById('calendar-board-section');
+      if (boardState && sec && sec.style.display !== 'none') renderBoard();
+    } catch (e) { /* 무시 */ }
   });
 
   // 초기화: DB/전역 함수 준비 후 실행 (매달 자동으로 '현재 월' 기준)
