@@ -7761,7 +7761,10 @@ window.enableAdminMode = async function () {
     window.showStoryBoard = async function (skipHistory = false, category = null, page = 1) {
       // 상단 광고 배너 숨기기 (해당 메뉴 화면에서는 비노출 + 빈공간 제거)
       var __topBanner = document.getElementById('topAdBannerRow'); if (__topBanner) __topBanner.style.display = 'none';
-      // 1. 모든 다른 섹션 숨기기
+      // 1. 모든 다른 섹션 숨기기 (교육/달력 포함 — 래핑 시점과 무관하게 직접 처리)
+      ['edu-board-section', 'calendar-board-section', 'recruit-calendar'].forEach(function (id) {
+        var el = document.getElementById(id); if (el) el.style.display = 'none';
+      });
       document.getElementById('features').style.display = 'none';
       document.getElementById('jobs').style.display = 'none';
       document.getElementById('general-jobs').style.display = 'none';
@@ -8818,7 +8821,8 @@ function displayStoriesForPage(page) {
         if (el) el.style.display = 'none';
       });
       ['board-section', 'user-manage-section', 'story-board-section',
-        'story-detail-section', 'news-detail-section', 'contest-section', 'contest-detail-section'].forEach(id => {
+        'story-detail-section', 'news-detail-section', 'contest-section', 'contest-detail-section',
+        'edu-board-section', 'calendar-board-section', 'recruit-calendar', 'hibrain-jobs'].forEach(id => {
           const el = document.getElementById(id);
           if (el) el.style.display = 'none';
         });
@@ -9266,7 +9270,8 @@ function displayStoriesForPage(page) {
       var __topBanner = document.getElementById('topAdBannerRow'); if (__topBanner) __topBanner.style.display = 'none';
       ['features', 'jobs', 'general-jobs', 'hibrain-jobs', 'edu-courses', 'detail-section', 'chatroom-section',
         'board-section', 'user-manage-section', 'story-board-section', 'story-detail-section',
-        'news-section', 'news-detail-section', 'contest-detail-section'].forEach(id => {
+        'news-section', 'news-detail-section', 'contest-detail-section',
+        'edu-board-section', 'calendar-board-section', 'recruit-calendar'].forEach(id => {
           const el = document.getElementById(id); if (el) el.style.display = 'none';
         });
       document.querySelectorAll('.content-with-sidebar-wrapper').forEach(el => el.classList.add('full-width-wrapper'));
@@ -12986,6 +12991,14 @@ function initCarousel(carouselContainer) {
       homeState = { y: n.getFullYear(), m: n.getMonth() + 1 };
       boardState = { y: n.getFullYear(), m: n.getMonth() + 1 };
       wrapNavs();
+      // 취업이야기/뉴스/공모전 함수는 지연 실행 모듈에서 정의되므로, 전부 래핑될 때까지 재시도
+      var _wrapTries = 0;
+      var _wrapIv = setInterval(function () {
+        wrapNavs();
+        var done = ['showBoard', 'showEduBoard', 'showNewsBoard', 'showContestBoard', 'showStoryBoard', 'goHome']
+          .every(function (n) { return typeof window[n] === 'function' && window[n].__calWrapped; });
+        if (done || ++_wrapTries > 120) clearInterval(_wrapIv);
+      }, 300);
       bindBox('homeCalendarBox', 'home');
       bindBox('boardCalendarBox', 'board');
       renderHome();

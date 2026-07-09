@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="robots" content="noindex">
+  <title>올공 - 채용 페이지로 이동 중...</title>
+  <style>body{font-family:'Malgun Gothic',sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;color:#495057}</style>
+</head>
+<body>
+  <p>채용 페이지로 이동 중입니다...</p>
+  <script>
+    // SNS 게시물용 짧은 링크: ?c=짧은코드 또는 ?j=문서ID → 해당 공고의 지원 URL로 리다이렉트
+    (function () {
+      var FS = 'https://firestore.googleapis.com/v1/projects/recruit-board/databases/(default)/documents';
+      var p = new URLSearchParams(location.search);
+      var HOME = 'https://www.allgongin.com';
+      function fail() { location.replace(HOME); }
+      function goUrl(u) {
+        if (u && /^https?:\/\//.test(u)) location.replace(u);
+        else fail();
+      }
+      var j = p.get('j'), c = p.get('c');
+      if (j) {
+        fetch(FS + '/jobs/' + encodeURIComponent(j))
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (d) { goUrl(d && d.fields && d.fields.detailUrl && d.fields.detailUrl.stringValue); })
+          .catch(fail);
+      } else if (c) {
+        fetch(FS + ':runQuery', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ structuredQuery: { from: [{ collectionId: 'jobs' }], where: { fieldFilter: { field: { fieldPath: 'sc' }, op: 'EQUAL', value: { stringValue: c } } }, limit: 1 } })
+        })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (rows) {
+            var f = rows && rows[0] && rows[0].document && rows[0].document.fields;
+            goUrl(f && f.detailUrl && f.detailUrl.stringValue);
+          })
+          .catch(fail);
+      } else { fail(); }
+    })();
+  </script>
+</body>
+</html>
