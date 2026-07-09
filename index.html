@@ -9665,6 +9665,19 @@ function displayStoriesForPage(page) {
         const el = document.getElementById(id); if (el) el.style.display = 'none';
       });
 
+      // 새로 '채용정보'에 진입할 때(메뉴/홈 클릭 등 = 뒤로/앞으로가 아닌 경우)
+      // 이전에 선택했던 필터·게시판 선택을 초기화한다. (뒤로/앞으로: skipHistory=true → 상태 유지)
+      if (!skipHistory) {
+        currentFilters = {
+          keyword: '', ncsCode: [], location: [], education: [],
+          employmentType: [], careerType: [], category: []
+        };
+        window.boardTypeFilter = null;
+        _lastFilterSignature = null; // 필터 UI를 초기화된 상태로 다시 그리도록 강제
+        const __jobSearchInput = document.getElementById('jobSearchInput');
+        if (__jobSearchInput) __jobSearchInput.value = '';
+      }
+
       // 게시판 섹션 보이기
       const boardSection = document.getElementById('board-section');
       if (boardSection) {
@@ -11903,25 +11916,9 @@ function initCarousel(carouselContainer) {
     #jobs .auto-rec-card .rec-tag { animation: none; }
   }
 
-  /* 프리미엄 채용정보 배너 '프리미엄' 말풍선 (좌우 흔들림) */
+  /* 프리미엄 채용정보 배너 '프리미엄' 말풍선 → 노출하지 않음 (현재/향후 배너 모두 숨김) */
   .job-grid--premium .job-card { position: relative; overflow: visible; }
-  .job-grid--premium .premium-bubble {
-    position: absolute; top: 6px; left: 8px; z-index: 4;
-    background: #e74c3c; color: #fff; font-size: .72rem; font-weight: 800;
-    padding: 5px 11px; border-radius: 14px; white-space: nowrap;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, .22);
-    transform-origin: center bottom;
-    animation: recTagWobble 0.9s ease-in-out infinite;
-  }
-  .job-grid--premium .premium-bubble::after {
-    content: ""; position: absolute; left: 16px; bottom: -6px;
-    width: 0; height: 0;
-    border-left: 6px solid transparent; border-right: 6px solid transparent;
-    border-top: 7px solid #e74c3c;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .job-grid--premium .premium-bubble { animation: none; }
-  }
+  .premium-bubble { display: none !important; }
 </style>
 <script>
   (function () {
