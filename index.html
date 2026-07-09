@@ -18,8 +18,45 @@
   <title>올공(ALLGONG) - 국내 최초 공공기업 전문 채용 포탈</title>
   <!-- Claude Code 연동 테스트 -->
   <!-- 카카오 JavaScript SDK -->
-  <!-- defer: 카카오 SDK가 HTML 파싱(첫 화면 표시)을 차단하지 않도록 함. 로그인 클릭 시점에 재초기화 가드 있음 -->
-  <script defer src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js"></script>
+  <!-- async: 카카오 SDK가 느리거나 차단돼도 Firebase 초기화(배너/채팅/달력)를 막지 않도록 완전 분리.
+       로그인 클릭 시점에 Kakao.init 재시도 가드가 있어 순서 무관하게 동작 -->
+  <script async src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js"></script>
+  <script>
+    // [부팅 가속] Firebase SDK 없이도 공고 데이터를 즉시 읽는 REST 조회기.
+    // SDK(약 1MB 모듈 체인) 로딩이 느린 기기/망에서도 배너·달력·게시판이 먼저 뜨게 한다.
+    // (읽기 전용, Firestore 보안규칙의 '누구나 읽기' 범위 내에서만 동작)
+    window.__fsRestQuery = async function (flagField) {
+      var q = { from: [{ collectionId: 'jobs' }], limit: 5000 };
+      if (flagField) {
+        q.where = { fieldFilter: { field: { fieldPath: flagField }, op: 'EQUAL', value: { booleanValue: true } } };
+        q.limit = 300;
+      }
+      var res = await fetch(
+        'https://firestore.googleapis.com/v1/projects/recruit-board/databases/(default)/documents:runQuery',
+        { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ structuredQuery: q }) }
+      );
+      if (!res.ok) throw new Error('REST ' + res.status);
+      var rows = await res.json();
+      var out = [];
+      (rows || []).forEach(function (r) {
+        if (!r.document) return;
+        var f = r.document.fields || {};
+        var o = {};
+        Object.keys(f).forEach(function (k) {
+          var v = f[k];
+          if ('stringValue' in v) o[k] = v.stringValue;
+          else if ('booleanValue' in v) o[k] = v.booleanValue;
+          else if ('integerValue' in v) o[k] = Number(v.integerValue);
+          else if ('doubleValue' in v) o[k] = v.doubleValue;
+          else if ('timestampValue' in v) o[k] = { seconds: Math.floor(Date.parse(v.timestampValue) / 1000) };
+        });
+        var name = r.document.name;
+        o.__id = name.substring(name.lastIndexOf('/') + 1);
+        out.push(o);
+      });
+      return out;
+    };
+  </script>
   <style>
     * {
       margin: 0;
@@ -10086,11 +10123,20 @@ function displayStoriesForPage(page) {
       if (window.__jobsFetchPromise) return window.__jobsFetchPromise;
       const attempt = async (n) => {
         try {
-          // 안전 상한: 크롤러가 마감 공고를 정리하므로 실데이터는 이보다 훨씬 적음
-          const q = query(collection(db, 'jobs'), orderBy('createdAt', 'desc'), limit(5000));
-          const snap = await getDocs(q);
-          const jobs = [];
-          snap.forEach((ds) => jobs.push({ ...ds.data(), id: ds.id }));
+          let jobs;
+          if (window.db && window.getDocs && window.query && window.collection && window.orderBy && window.limit) {
+            // 안전 상한: 크롤러가 마감 공고를 정리하므로 실데이터는 이보다 훨씬 적음
+            const q = query(collection(db, 'jobs'), orderBy('createdAt', 'desc'), limit(5000));
+            const snap = await getDocs(q);
+            jobs = [];
+            snap.forEach((ds) => jobs.push({ ...ds.data(), id: ds.id }));
+          } else if (window.__fsRestQuery) {
+            // SDK 미준비: REST 로 즉시 조회 (첫 방문 표시가 SDK 로딩에 묶이지 않게)
+            const rest = await window.__fsRestQuery(null);
+            jobs = rest.map((o) => { const t = { ...o, id: o.__id }; delete t.__id; return t; });
+          } else {
+            throw new Error('SDK not ready');
+          }
           const payload = { jobs: jobs, ts: Date.now() };
           _jobsCache.set('_all_jobs', payload);
           try { localStorage.setItem(JOBS_LS_KEY, JSON.stringify(payload)); } catch (e) { /* 용량 초과 등 무시 */ }
@@ -10122,8 +10168,8 @@ function displayStoriesForPage(page) {
 
       if (!loading || !tbody) return;
 
-      // ── 0) Firebase SDK 준비 대기 (최대 25초) — 접속 직후 클릭 시 '없습니다' 오탐/멈춤 방지 ──
-      if (!(window.db && window.getDocs && window.query && window.collection && window.orderBy && window.limit)) {
+      // ── 0) Firebase SDK 준비 대기 — 단, REST 조회기가 있으면 SDK 를 기다리지 않고 즉시 진행 ──
+      if (!(window.db && window.getDocs && window.query && window.collection && window.orderBy && window.limit) && !window.__fsRestQuery) {
         loading.style.display = 'block';
         if (emptyState) emptyState.style.display = 'none';
         if (jobTable) jobTable.style.display = 'none';
@@ -11975,6 +12021,14 @@ function initCarousel(carouselContainer) {
 
     // 효율 조회: 크롤러가 세팅한 recommended==true 문서만 읽음 (300건 폴백 제거). 오류 시 빈 배열.
     async function fetchRecommended() {
+      // SDK 미준비 시 REST 로 즉시 조회 (첫 화면 배너가 SDK 로딩에 묶이지 않게)
+      if (!(window.db && window.getDocs && window.query) && window.__fsRestQuery) {
+        try {
+          var restRows = await window.__fsRestQuery('recommended');
+          var a = restRows.map(function (o) { return normalizeJob(o.__id, o); }).filter(notExpired);
+          return a.filter(function (x) { return x.emps && x.emps.length; });
+        } catch (eRest) { console.warn('recommended REST 조회 실패:', eRest); }
+      }
       try {
         var q1 = window.query(window.collection(window.db, 'jobs'), window.where('recommended', '==', true));
         var s1 = await window.getDocs(q1);
@@ -12007,7 +12061,7 @@ function initCarousel(carouselContainer) {
 
     renderFromCache();  // 즉시: 캐시로 먼저 표시 (DB 준비 전)
     (function wait() {   // 그 다음 DB 준비되면 최신으로 갱신
-      if (window.db && window.getDocs && window.query && window.collection
+      if (((window.db && window.getDocs && window.query && window.collection) || window.__fsRestQuery)
           && document.getElementById('recAutoGrid')) {
         tryRefresh();
       } else {
@@ -12127,6 +12181,14 @@ function initCarousel(carouselContainer) {
 
     // 효율 조회: 크롤러가 세팅한 premium==true 문서만 읽음 (300건 폴백 제거). 오류 시 빈 배열.
     async function fetchPremium() {
+      // SDK 미준비 시 REST 로 즉시 조회 (첫 화면 배너가 SDK 로딩에 묶이지 않게)
+      if (!(window.db && window.getDocs && window.query) && window.__fsRestQuery) {
+        try {
+          var restRows = await window.__fsRestQuery('premium');
+          var a = restRows.map(function (o) { return normalizeJob(o.__id, o); }).filter(notExpired);
+          return a;
+        } catch (eRest) { console.warn('premium REST 조회 실패:', eRest); }
+      }
       try {
         var q1 = window.query(window.collection(window.db, 'jobs'), window.where('premium', '==', true));
         var s1 = await window.getDocs(q1);
@@ -12159,7 +12221,7 @@ function initCarousel(carouselContainer) {
 
     renderFromCache();  // 즉시: 캐시로 먼저 표시
     (function wait() {   // DB 준비되면 최신으로 갱신
-      if (window.db && window.getDocs && window.query && window.collection
+      if (((window.db && window.getDocs && window.query && window.collection) || window.__fsRestQuery)
           && document.getElementById('premiumAutoGrid')) {
         tryRefresh();
       } else {
@@ -12278,6 +12340,14 @@ function initCarousel(carouselContainer) {
 
     // 효율 조회: 크롤러가 세팅한 featured==true 문서만 읽음 (300건 폴백 제거). 오류 시 빈 배열.
     async function fetchFeatured() {
+      // SDK 미준비 시 REST 로 즉시 조회 (첫 화면 배너가 SDK 로딩에 묶이지 않게)
+      if (!(window.db && window.getDocs && window.query) && window.__fsRestQuery) {
+        try {
+          var restRows = await window.__fsRestQuery('featured');
+          var a = restRows.map(function (o) { return normalizeJob(o.__id, o); }).filter(notExpired);
+          return a;
+        } catch (eRest) { console.warn('featured REST 조회 실패:', eRest); }
+      }
       try {
         var q1 = window.query(window.collection(window.db, 'jobs'), window.where('featured', '==', true));
         var s1 = await window.getDocs(q1);
@@ -12310,7 +12380,7 @@ function initCarousel(carouselContainer) {
 
     renderFromCache();  // 즉시: 캐시로 먼저 표시
     (function wait() {   // DB 준비되면 최신으로 갱신
-      if (window.db && window.getDocs && window.query && window.collection
+      if (((window.db && window.getDocs && window.query && window.collection) || window.__fsRestQuery)
           && document.getElementById('featuredAutoGrid')) {
         tryRefresh();
       } else {
@@ -12861,10 +12931,12 @@ function initCarousel(carouselContainer) {
     setTimeout(function () { document.addEventListener('click', outsideClose, true); }, 0);
   }
 
-  // 다른 메뉴로 이동 시 달력 섹션들 정리 (기존 함수는 수정하지 않고 래핑)
+  // 다른 메뉴로 이동 시 달력/교육 등 잔존 섹션 정리 (기존 함수는 수정하지 않고 래핑)
+  // ※ 교육 게시판(edu-board-section)이 일부 메뉴의 숨김 목록에 빠져 있어 화면이 겹치던 버그도 여기서 해결
   function hideCalSections() {
-    var s = document.getElementById('calendar-board-section'); if (s) s.style.display = 'none';
-    var hc = document.getElementById('recruit-calendar'); if (hc) hc.style.display = 'none';
+    ['calendar-board-section', 'recruit-calendar', 'edu-board-section'].forEach(function (id) {
+      var el = document.getElementById(id); if (el) el.style.display = 'none';
+    });
   }
   function wrapNavs() {
     ['showBoard', 'showEduBoard', 'showNewsBoard', 'showContestBoard', 'showStoryBoard', 'showUserManagement'].forEach(function (name) {
@@ -12877,7 +12949,9 @@ function initCarousel(carouselContainer) {
     var origHome = window.goHome;
     if (typeof origHome === 'function' && !origHome.__calWrapped) {
       var wrappedHome = function () {
-        var s = document.getElementById('calendar-board-section'); if (s) s.style.display = 'none';
+        ['calendar-board-section', 'edu-board-section'].forEach(function (id) {
+          var el = document.getElementById(id); if (el) el.style.display = 'none';
+        });
         var hc = document.getElementById('recruit-calendar'); if (hc) hc.style.display = '';
         return origHome.apply(this, arguments);
       };
@@ -12904,7 +12978,7 @@ function initCarousel(carouselContainer) {
 
   // 초기화: DB/전역 함수 준비 후 실행 (매달 자동으로 '현재 월' 기준)
   (function wait() {
-    if (window.db && window.getDocs && window.query && window.collection && window.orderBy && window.limit
+    if (((window.db && window.getDocs && window.query && window.collection && window.orderBy && window.limit) || window.__fsRestQuery)
       && typeof window.showBoard === 'function' && typeof window.goHome === 'function'
       && typeof window.showEduBoard === 'function'
       && document.getElementById('homeCalendarBox') && document.getElementById('boardCalendarBox')) {
