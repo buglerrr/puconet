@@ -101,6 +101,19 @@ def _select_rows(df, slot):
         d = df
     if len(d) == 0:
         d = df
+    # 같은 기관은 1건만 — 서로 다른 기관 5곳으로 구성 (다양성 확보)
+    seen = set()
+    picked = []
+    for _, r in d.iterrows():
+        org = str(r.get("기관명", "")).strip()
+        if org in seen:
+            continue
+        seen.add(org)
+        picked.append(r)
+        if len(picked) == 5:
+            break
+    if picked:
+        return pd.DataFrame(picked)
     return d.head(5)
 
 
@@ -127,14 +140,39 @@ def _dday_text(end) -> str:
         return ""
 
 
-def _build_caption(slot: str, df, rows) -> str:
+def _short_link(row) -> str:
+    """공고별 짧은 지원 링크 (go.html 리다이렉트). 실패 시 사이트 주소."""
+    try:
+        import main as _crawler
+        doc_id = _crawler.stable_doc_id(row)
+        return f"{SITE_URL}/go.html?c={doc_id[5:13]}"
+    except Exception:  # noqa: BLE001
+        return SITE_URL
+
+
+def _build_caption_ig(slot: str, df, rows) -> str:
+    """인스타그램용(2200자): 기관명 | 제목 (~마감) + 즉시 지원 링크."""
     meta = SLOT_META[slot]
     lines = [meta["cap_title"].format(total=len(df)), ""]
     for _, r in rows.iterrows():
         org = str(r.get("기관명", "")).strip()
         title = str(r.get("채용공고제목", "")).strip()
         lines.append(f"▪ {org} | {title}{_end_suffix(r.get('공고종료일'))}")
-    lines += ["", f"👉 전체 공고와 채용달력은 올공에서: {SITE_URL}", "", meta["tags"]]
+        lines.append(f"   👉 즉시 지원: {_short_link(r)}")
+    lines += ["", f"전체 공고와 채용달력은 올공에서: {SITE_URL}", "", meta["tags"]]
+    return "\n".join(lines)
+
+
+def _build_caption_threads(slot: str, df, rows) -> str:
+    """쓰레드용(500자 제한): 기관명 (~마감) + 지원 링크(자동 클릭 링크화).
+    공고 제목은 함께 첨부되는 카드 이미지에 표시되므로 본문에서는 생략해 5개 기관+링크를 모두 담는다."""
+    meta = SLOT_META[slot]
+    lines = [meta["cap_title"].format(total=len(df)), ""]
+    for _, r in rows.iterrows():
+        org = str(r.get("기관명", "")).strip()
+        lines.append(f"▪ {org}{_end_suffix(r.get('공고종료일'))}")
+        lines.append(f"👉 {_short_link(r)}")
+    lines += ["", meta["tags"]]
     return "\n".join(lines)
 
 
@@ -431,7 +469,8 @@ def post_daily(db, df) -> None:
     )
 
     rows = _select_rows(df, slot)
-    caption = _build_caption(slot, df, rows)
+    caption_threads = _build_caption_threads(slot, df, rows)
+    caption_ig = _build_caption_ig(slot, df, rows)
 
     # 게시 기관 CI가 들어간 카드 이미지 1회 생성 → 쓰레드/인스타 공용
     card_url = None
@@ -447,7 +486,7 @@ def post_daily(db, df) -> None:
         print("  (쓰레드: 이 슬롯은 오늘 이미 게시함 → 건너뜀)")
     else:
         try:
-            if _post_threads(cfg, caption, card_url):
+            if _post_threads(cfg, caption_threads, card_url):
                 _cfg_ref(db).set({f"last_threads_{slot}": today}, merge=True)
         except Exception as e:  # noqa: BLE001
             print(f"  ⚠️ 쓰레드 게시 실패: {e}")
@@ -457,7 +496,7 @@ def post_daily(db, df) -> None:
     else:
         image_url = card_url or cfg.get("ig_image_url")
         try:
-            if _post_instagram(cfg, caption, image_url):
+            if _post_instagram(cfg, caption_ig, image_url):
                 _cfg_ref(db).set({f"last_ig_{slot}": today}, merge=True)
         except Exception as e:  # noqa: BLE001
             print(f"  ⚠️ 인스타그램 게시 실패: {e}")

@@ -481,6 +481,7 @@ def sync_to_firestore(df: pd.DataFrame) -> dict:
             "content": clean_content(row.get("전형절차", "")),
             "createdAt": timestamp,
             "created_at": timestamp,
+            "sc": doc_id[5:13],  # SNS 짧은 링크 코드 (go.html?c=... 리다이렉트용)
             "source": "alio-auto",  # 자동 등록 표시 (정리 대상 식별용)
             "recommended": is_recommended,  # 추천 배너 대상 여부 (홈 빠른 조회용)
             "premium": is_premium,  # 프리미엄 배너/게시판 대상 여부 (고용유형 '정규직' 단독)
