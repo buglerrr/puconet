@@ -6652,6 +6652,21 @@
           nav.classList.toggle('open');
           btn.setAttribute('aria-label', nav.classList.contains('open') ? '메뉴 닫기' : '메뉴 열기');
         });
+        // [모바일] 열린 메뉴는 (1) 메뉴 항목 클릭 시, (2) 메뉴 밖 아무 곳이나 클릭/터치 시 닫힘
+        // (PC에서는 메뉴 버튼이 숨겨져 'open' 상태가 될 수 없으므로 아무 영향 없음)
+        function closeMenu() {
+          nav.classList.remove('open');
+          btn.setAttribute('aria-label', '메뉴 열기');
+        }
+        document.addEventListener('click', function (e) {
+          if (!nav.classList.contains('open')) return;
+          if (nav.contains(e.target)) {
+            // 메뉴 내부: 세부 메뉴(링크)를 눌렀다면 이동과 함께 닫기 (토글 버튼 자체는 기존 동작 유지)
+            if (e.target.closest('.nav-links a')) closeMenu();
+            return;
+          }
+          closeMenu(); // 메뉴 밖 클릭 → 닫기
+        }, true);
       }
     })();
 
@@ -7714,7 +7729,8 @@
               name: name,
               email: email,
               phone: phone || '',
-              createdAt: new Date().toISOString()
+              // 구글/카카오 가입 경로와 동일하게 Firestore Timestamp로 저장 (가입일 표기 통일)
+              createdAt: (window.Timestamp && window.Timestamp.now) ? window.Timestamp.now() : new Date().toISOString()
             }, { merge: true });
           }
         } catch (saveErr) {
@@ -8797,8 +8813,18 @@ function displayStoriesForPage(page) {
         querySnapshot.forEach((docSnap) => {
           const user = docSnap.data();
           const tr = document.createElement('tr');
-          const created = user.createdAt ? new Date(user.createdAt.seconds * 1000).toLocaleDateString('ko-KR') : '-';
-          const lastLogin = user.lastLoginAt ? new Date(user.lastLoginAt.seconds * 1000).toLocaleDateString('ko-KR') : '-';
+          // 가입일/최근로그인: 저장 형식이 계정 경로마다 달라 모두 호환 처리
+          // (구글/카카오 = Firestore Timestamp{seconds}, 이메일 가입 = ISO 문자열)
+          const _fmtUserDate = function (v) {
+            if (!v) return '-';
+            let d = null;
+            if (typeof v === 'object' && typeof v.seconds === 'number') d = new Date(v.seconds * 1000);
+            else if (typeof v === 'object' && typeof v.toDate === 'function') d = v.toDate();
+            else d = new Date(v);
+            return (d && !isNaN(d.getTime())) ? d.toLocaleDateString('ko-KR') : '-';
+          };
+          const created = _fmtUserDate(user.createdAt);
+          const lastLogin = _fmtUserDate(user.lastLoginAt);
 
           tr.innerHTML = `
                     <td>${escapeHtml(user.name)}</td>
@@ -13430,6 +13456,30 @@ function initCarousel(carouselContainer) {
   html.mobile-view #detail-admin-edit { position: static !important; width: 100%; margin-top: 2px; }
 
   /* ---------- 12. 취업 이야기(스토리) 게시판 ---------- */
+  /* BEST 인기글: PC의 '5행 × 2열(세로 흐름)' 그리드가 좁은 화면에서
+     오른쪽 열이 잘리므로 → 모바일은 한 줄에 하나씩(1열) 표시 */
+  html.mobile-view .best-story-body {
+    grid-template-rows: none !important;
+    grid-auto-flow: row !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    column-gap: 0 !important;
+    row-gap: .85rem !important;
+  }
+  html.mobile-view .best-story-item { min-width: 0; }
+  html.mobile-view .best-story-item .best-item-title { font-size: .9rem !important; }
+  /* (실제 사용 중인 신형 BEST 위젯: .tc-body 2열 → 모바일 1열) */
+  html.mobile-view .tc-body {
+    grid-template-columns: minmax(0, 1fr) !important;
+    column-gap: 0 !important;
+    row-gap: 10px !important;
+    padding: 14px 8px !important;
+  }
+  html.mobile-view .tc-item { min-width: 0; font-size: 14px !important; }
+  html.mobile-view .tc-empty { grid-column: auto !important; }
+  html.mobile-view .best-story-header { flex-wrap: wrap; gap: 8px; }
+  html.mobile-view .best-filters { flex-wrap: wrap; }
+  html.mobile-view .story-header h1 { font-size: 1.35rem !important; }
+  html.mobile-view .btn-write-story { font-size: .85rem !important; padding: .5rem .9rem !important; }
   html.mobile-view .story-table-header .col-num,
   html.mobile-view .story-post-row .col-num,
   html.mobile-view .story-table-header .col-views,
