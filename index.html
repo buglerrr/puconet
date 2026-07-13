@@ -5,6 +5,26 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=1480" />
+  <!-- ===== [모바일 전용] 핸드폰 감지 시에만 viewport를 기기 폭으로 전환 =====
+       - PC/태블릿: 기존 width=1480 유지 → 레이아웃 절대 변동 없음
+       - 핸드폰(스마트폰): width=device-width 로 전환 + <html>에 mobile-view 클래스 부여
+         → 문서 하단의 '모바일 전용 CSS'(html.mobile-view 스코프)가 활성화됨 -->
+  <script>
+    (function () {
+      try {
+        var ua = navigator.userAgent || '';
+        // 스마트폰 판별: UA(Android 'Mobile' 포함/iPhone/iPod) 또는 화면 짧은 변이 500px 이하
+        // (태블릿: Android 태블릿은 'Mobile' 미포함, iPad는 짧은 변 744px 이상 → 제외되어 기존 PC 화면 유지)
+        var isPhone = /Android.+Mobile|iPhone|iPod|Windows Phone/i.test(ua) ||
+                      (Math.min(screen.width, screen.height) <= 500);
+        if (isPhone) {
+          var mv = document.querySelector('meta[name="viewport"]');
+          if (mv) mv.setAttribute('content', 'width=device-width, initial-scale=1, viewport-fit=cover');
+          document.documentElement.classList.add('mobile-view');
+        }
+      } catch (e) { /* 감지 실패 시 기존 PC 레이아웃 그대로 표시 */ }
+    })();
+  </script>
   <!-- [성능] Firebase SDK/Firestore 미리 연결 + 모듈 선다운로드 → 첫 로딩 단축 -->
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
@@ -13006,5 +13026,327 @@ function initCarousel(carouselContainer) {
   })();
 })();
 </script>
+
+<!-- ============================================================
+     ===== [모바일 전용 CSS] =====
+     핸드폰으로 접속했을 때만 적용됩니다.
+     (문서 상단 <head>의 감지 스크립트가 스마트폰에서만 <html>에
+      mobile-view 클래스를 부여 → 아래 규칙 전체가 그때만 활성화)
+     PC/태블릿에서는 mobile-view 클래스가 없으므로 이 블록은
+     단 한 줄도 적용되지 않아 기존 레이아웃이 절대 변하지 않습니다.
+     ============================================================ -->
+<style id="mobile-responsive-css">
+  /* ---------- 0. 기본 골격: 고정폭(1540px) 해제 ---------- */
+  html.mobile-view body {
+    min-width: 0 !important;
+    width: 100% !important;
+    padding-left: 0 !important;
+    overflow-x: hidden !important;
+    font-size: 15px;
+  }
+  html.mobile-view .container {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 12px !important;
+  }
+  html.mobile-view .section { padding: 1.4rem 0 !important; }
+  html.mobile-view .section-title {
+    font-size: 1.05rem !important;
+    margin-bottom: .9rem !important;
+    display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap;
+  }
+  html.mobile-view .section-title .apply { font-size: .72rem; }
+  html.mobile-view img { max-width: 100%; height: auto; }
+
+  /* ---------- 1. 상단 글로벌 바 (로그인/회원가입 등) ---------- */
+  html.mobile-view #global_bar {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin-left: 0 !important;
+    overflow-x: hidden;
+  }
+  html.mobile-view #global_bar .wrap {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 10px !important;
+    height: auto !important;
+    min-height: 34px;
+    flex-wrap: wrap;
+    gap: 2px;
+  }
+  html.mobile-view #global_bar .global-slogan { display: none !important; } /* 좁은 화면: 슬로건 숨김 */
+  html.mobile-view #global_bar ul.right { display: flex; flex-wrap: wrap; gap: 0 2px; }
+  html.mobile-view #global_bar ul.right a { font-size: .74rem !important; padding: 6px 6px !important; display: inline-block; }
+
+  /* ---------- 2. 헤더: 로고 + 햄버거 메뉴 ---------- */
+  html.mobile-view header {
+    margin-left: 0 !important;
+    width: 100% !important;
+    position: sticky !important; /* 모바일: 스크롤해도 헤더(메뉴) 상단 고정 */
+    top: 0;
+    z-index: 400 !important; /* 드롭다운 메뉴가 본문 위에 그려지도록 */
+  }
+  html.mobile-view header > .container { padding: 0 12px !important; }
+  html.mobile-view .header-content {
+    flex-wrap: wrap;
+    align-items: center !important;
+    gap: .5rem !important;
+    padding: .6rem 0 !important;
+  }
+  html.mobile-view .logo img { height: 38px !important; }
+  html.mobile-view .admin-stats-group { display: none !important; } /* 관리자 통계 배너: 모바일 숨김 */
+  html.mobile-view header nav {
+    margin-left: auto;
+    position: relative; /* 드롭다운 메뉴의 기준점 */
+  }
+  /* 햄버거 버튼 표시 (기존 .menu-toggle + nav.open 토글 JS 재사용) */
+  html.mobile-view .menu-toggle {
+    display: inline-block !important;
+    font-size: .85rem;
+  }
+  html.mobile-view header nav .nav-links {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px); right: 0; left: auto;
+    width: min(240px, 88vw);
+    flex-direction: column;
+    background: #ffffff;
+    border: 1px solid #cce8f8;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,.16);
+    padding: .3rem 0;
+    z-index: 500;
+    overflow: hidden;
+  }
+  html.mobile-view header nav.open .nav-links { display: flex; }
+  html.mobile-view header nav .nav-links a {
+    display: block;
+    width: 100%;
+    padding: .7rem 1.2rem !important;
+    margin: 0 !important;
+    border-bottom: 1px solid #f1f3f5;
+    font-size: .95rem !important;
+    background: #ffffff;
+  }
+  html.mobile-view header nav .nav-links a:last-child { border-bottom: none; }
+
+  /* ---------- 3. 상단 광고 배너: 세로 스택 ---------- */
+  html.mobile-view #topAdBannerRow {
+    flex-direction: column;
+    padding: .8rem 12px .3rem 12px !important;
+    gap: 8px !important;
+  }
+
+  /* ---------- 4. 본문 래퍼: 사이드바를 본문 아래로 ----------
+     (:not(#topAdBannerRow): 상단 배너 행도 같은 클래스를 쓰므로 제외 —
+      display를 !important로 강제하면 메뉴 이동 시 JS의 인라인 숨김(display:none)이 안 먹게 됨) */
+  html.mobile-view .content-with-sidebar-wrapper:not(#topAdBannerRow) {
+    display: block !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+  html.mobile-view #topAdBannerRow {
+    max-width: 100% !important;
+  }
+  html.mobile-view .main-content-area { width: 100%; }
+  html.mobile-view .research-sidebar {
+    width: 100% !important;
+    flex: none !important;
+    padding: 0 12px;
+    margin-top: 1rem;
+  }
+  /* 사이드바(공모전정보) 배너: 2열 그리드 */
+  html.mobile-view .research-sidebar .bannerBody ul {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    list-style: none;
+  }
+  html.mobile-view .research-sidebar .bannerList { width: 100% !important; margin: 0 !important; }
+  html.mobile-view .research-sidebar .bannerList img { width: 100% !important; height: auto !important; }
+
+  /* ---------- 5. 배너 그리드: 4열 → 2열 ---------- */
+  html.mobile-view .job-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: .6rem !important;
+  }
+  html.mobile-view #features .job-grid.job-grid--premium {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: .6rem !important;
+  }
+  html.mobile-view #features #premiumAutoGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  html.mobile-view #general-jobs #featuredAutoGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  /* 프리미엄 정적 4개(flex 캐러셀 컨테이너) → 2열 그리드로 재배치 */
+  html.mobile-view .premium-carousel-container {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: .6rem !important;
+    transform: none !important;
+  }
+  html.mobile-view .premium-carousel-container .job-card { flex: none !important; width: 100%; }
+  /* 카드 내부 여백/글자 소폭 축소 */
+  html.mobile-view .job-card { padding: .7rem !important; }
+  html.mobile-view .job-card h3 { font-size: .85rem !important; }
+  html.mobile-view .job-card p { font-size: .74rem !important; }
+  html.mobile-view #features .job-card .banner-image { height: 64px !important; }
+  html.mobile-view #general-jobs .job-card .banner-image { height: 56px !important; }
+  /* 고정 높이(200px) 카드: 좁은 화면에서 내용이 잘리지 않도록 자동 높이로 전환
+     (그리드 특성상 같은 행의 카드끼리는 여전히 같은 높이로 정렬됨) */
+  html.mobile-view #features .job-grid.job-grid--premium .job-card,
+  html.mobile-view #jobs .job-card,
+  html.mobile-view #general-jobs .job-card {
+    height: auto !important;
+    min-height: 180px;
+  }
+  /* 마감일 표시줄: 한 줄에 들어가도록 글자/여백 축소 */
+  html.mobile-view .job-card .deadline {
+    font-size: .68rem !important;
+    padding: .35rem .4rem !important;
+    letter-spacing: -0.3px;
+  }
+  html.mobile-view .job-card .deadline strong,
+  html.mobile-view .job-card .deadline span { font-size: .68rem !important; }
+
+  /* ---------- 6. 공공기관 채용 달력: 가로 스크롤 ---------- */
+  html.mobile-view .jcal-box { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  html.mobile-view .jcal-grid { min-width: 640px; }
+  html.mobile-view .jcal-cell { min-height: 84px; }
+
+  /* ---------- 7. 대학·연구기관 채용(줄글): 3열 → 1열 ---------- */
+  html.mobile-view #hibrain-jobs .hibrain-grid {
+    grid-template-columns: 1fr !important;
+    column-gap: 0 !important;
+    row-gap: 8px !important;
+  }
+
+  /* ---------- 8. 교육과정 배너: 3열 → 1열 ---------- */
+  html.mobile-view #edu-courses .edu-banner-list {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+  html.mobile-view #edu-courses .edu-banner { height: 300px !important; }
+
+  /* ---------- 9. 실시간 채팅방: 3열 → 1열 ---------- */
+  html.mobile-view .chatroom-section .container { width: 100% !important; padding: 0 12px !important; }
+  html.mobile-view .chatroom-grid { grid-template-columns: 1fr !important; gap: 1rem !important; }
+  html.mobile-view .chatroom-modal { width: 94vw !important; }
+
+  /* ---------- 10. 채용정보 게시판 ---------- */
+  html.mobile-view .board-layout { flex-direction: column !important; }
+  html.mobile-view .board-sidebar {
+    width: 100% !important;
+    margin-bottom: 1rem;
+  }
+  /* 사이드바 목록 → 알약(chip) 가로 배열 */
+  html.mobile-view .board-sidebar ul {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px 10px !important;
+  }
+  html.mobile-view .board-sidebar li {
+    border: none !important;
+    width: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  html.mobile-view .board-sidebar ul a {
+    display: inline-block !important;
+    padding: 6px 12px !important;
+    border: 1px solid #d5d5d5 !important;
+    border-radius: 999px !important;
+    font-size: .8rem !important;
+    background: #fff;
+  }
+  html.mobile-view .board-sidebar ul a.active {
+    background: #3498db !important;
+    color: #fff !important;
+    border-color: #3498db !important;
+  }
+  html.mobile-view .board-sidebar a.active::after { display: none !important; } /* 화살표 장식 제거 */
+  html.mobile-view .board-sidebar .sidebar-group-header { padding: 8px 12px 0 12px !important; }
+  html.mobile-view .board-sidebar .region-grid { grid-template-columns: repeat(4, 1fr) !important; padding: 0 10px; }
+  html.mobile-view .board-content { width: 100% !important; }
+
+  /* 검색바: 세로 스택 + 입력창 전체 폭 */
+  html.mobile-view .filter-top-bar {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 8px;
+  }
+  html.mobile-view .filter-top-bar input#jobSearchInput { width: 100% !important; flex: 1; }
+  html.mobile-view .filter-top-bar > div { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  /* 필터 패널: 6열 → 2열씩 줄바꿈 */
+  html.mobile-view .job-filter-panel { flex-wrap: wrap !important; }
+  html.mobile-view .filter-col {
+    flex: 1 1 46% !important;
+    min-width: 46% !important;
+    border-top: 1px solid #e0e0e0;
+  }
+  html.mobile-view .filter-col-items { max-height: 120px !important; }
+
+  /* 게시판 테이블: 조회수 숨김 + 여백 축소 (한 화면에 맞춤) */
+  html.mobile-view .board-table th,
+  html.mobile-view .board-table td {
+    padding: .55rem .4rem !important;
+    font-size: .78rem !important;
+    word-break: keep-all;
+  }
+  html.mobile-view #jobTable th:nth-child(6):not(#job-mgmt-header),
+  html.mobile-view #jobTable td.views-cell { display: none !important; }
+  html.mobile-view .board-table .title-cell a { font-size: .8rem; }
+
+  /* 페이지네이션 줄바꿈 허용 */
+  html.mobile-view .pagination { flex-wrap: wrap; justify-content: center; }
+
+  /* ---------- 11. 채용정보 상세 ---------- */
+  html.mobile-view #detail-section .detail-content-box { padding: 1rem !important; }
+  html.mobile-view #detail-section table { width: 100% !important; }
+  html.mobile-view #detail-section td { display: block; width: 100% !important; padding: .35rem .5rem !important; }
+  html.mobile-view #detail-title { font-size: 1.15rem !important; line-height: 1.4; }
+
+  /* ---------- 12. 취업 이야기(스토리) 게시판 ---------- */
+  html.mobile-view .story-table-header .col-num,
+  html.mobile-view .story-post-row .col-num,
+  html.mobile-view .story-table-header .col-views,
+  html.mobile-view .story-post-row .col-views,
+  html.mobile-view .story-table-header .col-likes,
+  html.mobile-view .story-post-row .col-likes,
+  html.mobile-view .story-table-header .col-scrap,
+  html.mobile-view .story-post-row .col-scrap { display: none !important; }
+  html.mobile-view .story-table-header .col-board,
+  html.mobile-view .story-post-row .col-board { width: 84px !important; }
+  html.mobile-view .story-table-header .col-author,
+  html.mobile-view .story-post-row .col-author { width: 70px !important; font-size: .78rem; }
+  html.mobile-view .story-table-header .col-date,
+  html.mobile-view .story-post-row .col-date { width: 64px !important; font-size: .78rem; }
+
+  /* ---------- 13. 뉴스/공모전 ---------- */
+  html.mobile-view .news-board-container {
+    flex-direction: column !important;
+    padding: 12px !important;
+    gap: 16px !important;
+  }
+  html.mobile-view .news-aside { width: 100% !important; }
+  html.mobile-view .news-article-item { gap: 10px !important; padding: 14px 0 !important; }
+  html.mobile-view .contest-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 1rem .8rem !important; }
+  html.mobile-view .contest-title-wrap h1 { font-size: 1.3rem !important; }
+
+  /* ---------- 14. 모달/푸터 ---------- */
+  html.mobile-view .modal-content { width: 94% !important; padding: 1.2rem !important; }
+  html.mobile-view .site-footer { padding: 1.2rem 0 !important; }
+  html.mobile-view .site-footer .container { max-width: 100% !important; }
+
+  /* ---------- 15. 좌우 스크롤 유발 요소 일반 방어 ---------- */
+  html.mobile-view .main-content-area .container,
+  html.mobile-view #board-section .container {
+    max-width: 100% !important;
+  }
+</style>
 </body>
 </html>
