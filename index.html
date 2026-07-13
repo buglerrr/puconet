@@ -13037,6 +13037,11 @@ function initCarousel(carouselContainer) {
      ============================================================ -->
 <style id="mobile-responsive-css">
   /* ---------- 0. 기본 골격: 고정폭(1540px) 해제 ---------- */
+  /* 페이지 자체가 옆으로 밀리지 않도록 문서(html) 레벨에서 가로 넘침 차단 */
+  html.mobile-view {
+    overflow-x: hidden;
+    overflow-x: clip; /* 지원 브라우저: 스크롤 컨테이너를 만들지 않고 자르기만 함 */
+  }
   html.mobile-view body {
     min-width: 0 !important;
     width: 100% !important;
@@ -13165,13 +13170,23 @@ function initCarousel(carouselContainer) {
   html.mobile-view .research-sidebar .bannerList { width: 100% !important; margin: 0 !important; }
   html.mobile-view .research-sidebar .bannerList img { width: 100% !important; height: auto !important; }
 
-  /* ---------- 5. 배너 그리드: 4열 → 2열 ---------- */
+  /* ---------- 5. 배너 그리드: 4열 → 2열 ----------
+     minmax(0, 1fr): '1fr'만 쓰면 카드 내용(긴 제목 등)이 열을 강제로 넓혀
+     화면 밖으로 넘칠 수 있음 → 최소폭 0으로 고정해 항상 화면의 절반씩 차지 */
   html.mobile-view .job-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: .6rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  /* 그리드 안 모든 카드: 내용이 길어도 칸 폭을 넘지 못하게 고정 */
+  html.mobile-view .job-grid > * {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow: hidden;
   }
   html.mobile-view #features .job-grid.job-grid--premium {
-    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: .6rem !important;
   }
   html.mobile-view #features #premiumAutoGrid {
@@ -13183,7 +13198,7 @@ function initCarousel(carouselContainer) {
   /* 프리미엄 정적 4개(flex 캐러셀 컨테이너) → 2열 그리드로 재배치 */
   html.mobile-view .premium-carousel-container {
     display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: .6rem !important;
     transform: none !important;
   }
@@ -13202,6 +13217,18 @@ function initCarousel(carouselContainer) {
     height: auto !important;
     min-height: 180px;
   }
+  /* 자동 생성 '추천' 배너 카드: 칸 폭에 맞춰 글자 축소 + 넘침 차단 */
+  html.mobile-view #jobs .auto-rec-card {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    min-height: 170px !important;
+    padding: 10px !important;
+    overflow: hidden !important;
+  }
+  html.mobile-view #jobs .auto-rec-card h3 { font-size: .85rem !important; line-height: 1.35 !important; }
+  html.mobile-view #jobs .auto-rec-card p { font-size: .74rem !important; }
+  html.mobile-view #jobs .auto-rec-card .meta { font-size: .7rem !important; }
+  html.mobile-view #jobs .auto-rec-card .banner-image { height: 52px !important; }
   /* 마감일 표시줄: 한 줄에 들어가도록 글자/여백 축소 */
   html.mobile-view .job-card .deadline {
     font-size: .68rem !important;
@@ -13211,10 +13238,37 @@ function initCarousel(carouselContainer) {
   html.mobile-view .job-card .deadline strong,
   html.mobile-view .job-card .deadline span { font-size: .68rem !important; }
 
-  /* ---------- 6. 공공기관 채용 달력: 가로 스크롤 ---------- */
-  html.mobile-view .jcal-box { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  html.mobile-view .jcal-grid { min-width: 640px; }
-  html.mobile-view .jcal-cell { min-height: 84px; }
+  /* ---------- 6. 공공기관 채용 달력: 화면 폭에 맞춰 7열 전체 표시 (잘림 없음) ---------- */
+  html.mobile-view .jcal-box { width: 100%; max-width: 100%; overflow: hidden; }
+  html.mobile-view .jcal-grid {
+    width: 100%;
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+  }
+  html.mobile-view .jcal-head { gap: 8px !important; }
+  html.mobile-view .jcal-head .jcal-title { font-size: 1rem !important; min-width: 100px !important; }
+  html.mobile-view .jcal-nav { width: 28px !important; height: 28px !important; font-size: .8rem !important; }
+  html.mobile-view .jcal-dow { font-size: .68rem !important; padding: 5px 0 !important; }
+  html.mobile-view .jcal-cell {
+    min-height: 58px !important;
+    padding: 3px 2px !important;
+    min-width: 0;
+    overflow: hidden !important;
+  }
+  html.mobile-view .jcal-date { font-size: .62rem !important; margin-bottom: 2px !important; }
+  html.mobile-view .jcal-co {
+    font-size: .56rem !important;
+    line-height: 1.5 !important;
+    padding: 0 1px !important;
+  }
+  html.mobile-view .jcal-more {
+    font-size: .54rem !important;
+    padding: 0 1px !important;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  html.mobile-view .jcal-hint { display: block; margin-left: 0 !important; margin-top: 2px; font-size: .6rem !important; }
 
   /* ---------- 7. 대학·연구기관 채용(줄글): 3열 → 1열 ---------- */
   html.mobile-view #hibrain-jobs .hibrain-grid {
