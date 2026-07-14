@@ -4479,6 +4479,19 @@
           </div>
         </div>
       </div>
+      <!-- ===== 모바일 전용 검색바 (PC에서는 표시되지 않음 — 하단 모바일 CSS에서만 노출) ===== -->
+      <div class="mobile-search-bar" id="mobileSearchBar">
+        <form class="mobile-search-form" onsubmit="return window.mobileJobSearch(event);">
+          <button type="submit" class="mobile-search-btn" aria-label="검색">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#111" stroke-width="2.4" stroke-linecap="round">
+              <circle cx="11" cy="11" r="7"></circle>
+              <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+            </svg>
+          </button>
+          <input type="search" id="mobileSearchInput" placeholder="기업명, 공고제목 등 채용 정보 검색"
+            autocomplete="off" enterkeyhint="search" />
+        </form>
+      </div>
     </div>
   </header>
 
@@ -6669,6 +6682,22 @@
         }, true);
       }
     })();
+
+    /* [모바일] 헤더 검색바: 검색어 입력 → 채용정보 게시판으로 이동해 결과 나열
+       (게시판의 기존 키워드 필터를 그대로 사용 — 제목/기관명/NCS/근무지/고용유형 등 검색) */
+    window.mobileJobSearch = function (e) {
+      if (e) e.preventDefault();
+      var inp = document.getElementById('mobileSearchInput');
+      var q = inp ? inp.value.trim() : '';
+      if (!q) return false;
+      try { if (typeof window.showBoard === 'function') window.showBoard(); } catch (err) { /* 무시 */ }
+      // showBoard가 필터를 초기화한 뒤 검색어를 게시판 검색창에 넣고 즉시 적용
+      var si = document.getElementById('jobSearchInput');
+      if (si) si.value = q;
+      try { if (typeof window.applyJobFilters === 'function') window.applyJobFilters(); } catch (err) { /* 데이터 로드 후 자동 적용됨 */ }
+      if (inp) inp.blur(); // 모바일 키보드 닫기
+      return false;
+    };
 
     /* NOTE on m-dot domains:
        'm.example.com'은 DNS/서버(또는 CDN) 레벨에서 별도 호스트를 구성하고,
@@ -10498,12 +10527,14 @@ function displayStoriesForPage(page) {
       } else {
         // 필터 선택됨 → 필터링 적용
         totalJobs = _baseJobs.filter(job => {
-          // 키워드
+          // 키워드: 제목/기관명 + NCS코드명/근무지/고용유형/채용구분까지 통합 검색
           if (currentFilters.keyword) {
               const kw = currentFilters.keyword;
-              const t = (job.title || '').toLowerCase();
-              const c = (job.company || '').toLowerCase();
-              if (!t.includes(kw) && !c.includes(kw)) return false;
+              const hay = [
+                job.title, job.company, job.ncsCode, job.location,
+                job.employmentType || job.jobType, job.careerType
+              ].map(v => String(v || '').toLowerCase());
+              if (!hay.some(v => v.includes(kw))) return false;
           }
           // 기관유형 (정확히 일치)
           if (currentFilters.category.length > 0 && !currentFilters.category.includes(job.category)) return false;
@@ -13172,6 +13203,51 @@ function initCarousel(carouselContainer) {
   }
   html.mobile-view header nav .nav-links a:last-child { border-bottom: none; }
 
+  /* ----- 모바일 전용 검색바 (링커리어 스타일: 둥근 흰색 입력창 + 왼쪽 돋보기) ----- */
+  .mobile-search-bar { display: none; } /* PC/태블릿: 항상 숨김 (아래 모바일 규칙에서만 노출) */
+  html.mobile-view .mobile-search-bar {
+    display: block;
+    padding: 2px 0 10px 0;
+  }
+  html.mobile-view .mobile-search-form {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    height: 44px;
+    background: #ffffff;
+    border: 1.5px solid #d7dde3;
+    border-radius: 12px;
+    padding: 0 10px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .05);
+  }
+  html.mobile-view .mobile-search-form:focus-within {
+    border-color: #3498db;
+    box-shadow: 0 1px 6px rgba(52, 152, 219, .2);
+  }
+  html.mobile-view .mobile-search-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  html.mobile-view .mobile-search-bar input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: .95rem;
+    color: #111;
+  }
+  html.mobile-view .mobile-search-bar input::placeholder { color: #9aa4ae; }
+  html.mobile-view .mobile-search-bar input::-webkit-search-cancel-button { -webkit-appearance: none; }
+
   /* ---------- 3. 상단 광고 배너: 세로 스택 ---------- */
   html.mobile-view #topAdBannerRow {
     flex-direction: column;
@@ -13393,10 +13469,27 @@ function initCarousel(carouselContainer) {
     padding: .55rem .4rem !important;
     font-size: .78rem !important;
     word-break: keep-all;
+    overflow-wrap: anywhere;
   }
   html.mobile-view #jobTable th:nth-child(6):not(#job-mgmt-header),
   html.mobile-view #jobTable td.views-cell { display: none !important; }
   html.mobile-view .board-table .title-cell a { font-size: .8rem; }
+  /* 테이블이 화면 폭(390px)을 넘지 않도록 고정 레이아웃 + 열 폭 재배분
+     (내용이 길면 칸 안에서 줄바꿈 — 옆으로 잘리지 않음) */
+  html.mobile-view .board-table {
+    table-layout: fixed;
+    width: 100% !important;
+  }
+  html.mobile-view .board-table th { min-width: 0 !important; }
+  html.mobile-view #jobTable th:nth-child(2) { width: 24% !important; }  /* 기관명 */
+  html.mobile-view #jobTable th:nth-child(3) { width: auto !important; } /* 제목 */
+  html.mobile-view #jobTable th:nth-child(4) { width: 21% !important; }  /* 고용유형 */
+  html.mobile-view #jobTable th:nth-child(5) { width: 76px !important; } /* 마감일 */
+  html.mobile-view #jobTable td.deadline-cell {
+    font-size: .72rem !important;
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+  }
 
   /* 페이지네이션 줄바꿈 허용 */
   html.mobile-view .pagination { flex-wrap: wrap; justify-content: center; }
