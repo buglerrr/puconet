@@ -8800,8 +8800,10 @@ function displayStoriesForPage(page) {
       tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem;">로딩 중...</td></tr>';
 
       try {
-        const q = query(collection(db, 'users'), orderBy('createdAt', 'desc'));
-        const querySnapshot = await getDocs(q);
+        // 주의: Firestore orderBy('createdAt')는 저장 형식이 혼재(Timestamp/문자열)라
+        // 타입별로 묶여 뒤죽박죽으로 보이고, createdAt이 없는 회원은 목록에서 누락됨
+        // → 전체를 가져와 아래에서 형식 호환 파서로 '가입일 최신순' 정렬
+        const querySnapshot = await getDocs(collection(db, 'users'));
 
         tbody.innerHTML = '';
 
@@ -8810,19 +8812,28 @@ function displayStoriesForPage(page) {
           return;
         }
 
-        querySnapshot.forEach((docSnap) => {
-          const user = docSnap.data();
+        // 가입일/최근로그인: 저장 형식이 계정 경로마다 달라 모두 호환 처리
+        // (구글/카카오 = Firestore Timestamp{seconds}, 이메일 가입 = ISO 문자열)
+        const _userDateMs = function (v) {
+          if (!v) return 0;
+          let d = null;
+          if (typeof v === 'object' && typeof v.seconds === 'number') d = new Date(v.seconds * 1000);
+          else if (typeof v === 'object' && typeof v.toDate === 'function') d = v.toDate();
+          else d = new Date(v);
+          return (d && !isNaN(d.getTime())) ? d.getTime() : 0;
+        };
+        const _fmtUserDate = function (v) {
+          const ms = _userDateMs(v);
+          return ms ? new Date(ms).toLocaleDateString('ko-KR') : '-';
+        };
+
+        // 가입일 최신순 정렬 (가입일 정보가 없는 회원은 맨 뒤로)
+        const users = [];
+        querySnapshot.forEach((docSnap) => users.push(docSnap.data()));
+        users.sort((a, b) => _userDateMs(b.createdAt) - _userDateMs(a.createdAt));
+
+        users.forEach((user) => {
           const tr = document.createElement('tr');
-          // 가입일/최근로그인: 저장 형식이 계정 경로마다 달라 모두 호환 처리
-          // (구글/카카오 = Firestore Timestamp{seconds}, 이메일 가입 = ISO 문자열)
-          const _fmtUserDate = function (v) {
-            if (!v) return '-';
-            let d = null;
-            if (typeof v === 'object' && typeof v.seconds === 'number') d = new Date(v.seconds * 1000);
-            else if (typeof v === 'object' && typeof v.toDate === 'function') d = v.toDate();
-            else d = new Date(v);
-            return (d && !isNaN(d.getTime())) ? d.toLocaleDateString('ko-KR') : '-';
-          };
           const created = _fmtUserDate(user.createdAt);
           const lastLogin = _fmtUserDate(user.lastLoginAt);
 
