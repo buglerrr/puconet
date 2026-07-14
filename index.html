@@ -5568,6 +5568,24 @@
               </div>
 
               <div id="eduBoardTable" style="background:transparent; padding:0; box-shadow:none; display:flex; flex-direction:column; height:100%;">
+                <!-- ===== 홈 '공공기관 임직원 교육과정' 배너 자동 미러링 영역 =====
+                     홈 화면 맨 아래(#edu-courses)에 배너를 등록하면 이 게시판에도 자동 표출됨
+                     (showEduBoard()가 열릴 때마다 홈 배너를 복제해 채움 — 별도 등록 불필요) -->
+                <style>
+                  #eduBannerMirror { margin-bottom: 1.4rem; }
+                  #eduBannerMirror .edu-mirror-title { font-size: 1.02rem; font-weight: 800; color: #5c7cfa; margin: 0 0 .8rem; }
+                  #eduBannerMirror .edu-mirror-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; width: 100%; }
+                  #eduBannerMirror .edu-banner { display: flex; flex-direction: column; height: 360px; border-radius: 16px; overflow: hidden; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,.08); transition: transform .12s ease; text-decoration: none; }
+                  #eduBannerMirror .edu-banner:hover { transform: translateY(-2px); }
+                  #eduBannerMirror .edu-banner .thumb { width: 100%; height: 100%; flex: 1 1 auto; min-height: 0; background: #f1f3f5; }
+                  #eduBannerMirror .edu-banner .thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
+                  /* 홈 배너에 제목/일정(.meta) 요소가 있는 경우도 동일하게 표시 */
+                  #eduBannerMirror .edu-banner .meta { padding: 12px 14px; }
+                  #eduBannerMirror .edu-banner .meta h3 { font-size: 16px; line-height: 1.35; margin: 0 0 6px; font-weight: 700; color: #222; }
+                  #eduBannerMirror .edu-banner .meta p { font-size: 13px; color: #666; margin: 0; }
+                </style>
+                <div id="eduBannerMirror" style="display:none;"></div>
+
                 <!-- 로딩 -->
                 <div id="eduLoading" class="loading">
                   <div class="spinner"></div>
@@ -12590,8 +12608,33 @@ function initCarousel(carouselContainer) {
     var si = document.getElementById('eduSearchInput'); if (si) si.value = '';
     var t = document.getElementById('currentEduBoardTitle'); if (t) t.textContent = catTitle('all');
     setActiveEduMenu();
+    renderEduBannerMirror(); // 홈 '임직원 교육과정' 배너를 게시판 상단에 자동 표출
     loadEducations();
   };
+
+  // ===== 홈(#edu-courses)의 교육과정 배너 → '공공기관 교육' 게시판 자동 미러링 =====
+  // 홈 맨 아래에 배너를 등록/수정하면 이 게시판에도 그대로 반영됨 (열 때마다 최신 상태 복제)
+  function renderEduBannerMirror() {
+    var mirror = document.getElementById('eduBannerMirror');
+    if (!mirror) return;
+    var banners = document.querySelectorAll('#edu-courses .edu-banner');
+    if (!banners.length) { mirror.style.display = 'none'; return; }
+    var title = document.createElement('div');
+    title.className = 'edu-mirror-title';
+    title.textContent = '공공기관 임직원 교육과정';
+    var list = document.createElement('div');
+    list.className = 'edu-mirror-list';
+    banners.forEach(function (a) {
+      var clone = a.cloneNode(true); // 링크/이미지/제목(있다면) 전부 복제
+      clone.setAttribute('target', '_blank');
+      clone.setAttribute('rel', 'noopener');
+      list.appendChild(clone);
+    });
+    mirror.innerHTML = '';
+    mirror.appendChild(title);
+    mirror.appendChild(list);
+    mirror.style.display = 'block';
+  }
 
   window.switchEduBoard = function (cat) {
     eduCat = cat || 'all'; eduPage = 1;
@@ -13451,6 +13494,12 @@ function initCarousel(carouselContainer) {
     gap: 14px !important;
   }
   html.mobile-view #edu-courses .edu-banner { height: 300px !important; }
+  /* '공공기관 교육' 게시판의 미러 배너도 동일하게 1열 */
+  html.mobile-view #eduBannerMirror .edu-mirror-list {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+  html.mobile-view #eduBannerMirror .edu-banner { height: 300px !important; }
 
   /* ---------- 9. 실시간 채팅방: 3열 → 1열 ---------- */
   html.mobile-view .chatroom-section .container { width: 100% !important; padding: 0 12px !important; }
