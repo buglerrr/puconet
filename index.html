@@ -9385,11 +9385,39 @@ function displayStoriesForPage(page) {
     window.applyContestSort = function () { const s = document.getElementById('contestSort'); contestSortMode = s ? s.value : 'latest'; contestCurrentPage = 1; applyContestFilters(); };
 
     // Firestore에서 공모전 로드 (3분 캐시)
+    // ===== 사이드바(공모전정보) 배너 → 공모전 소식 게시판 자동 표출 =====
+    // 관리자가 오른쪽 사이드바에 배너(<li class="bannerList"><a><img></a></li>)를 등록하면
+    // 별도 작업 없이 '공모전 소식' 메뉴에도 같은 배너가 카드로 자동 나열됨
+    function getSidebarContestBanners() {
+      const out = [];
+      try {
+        document.querySelectorAll('.research-sidebar .bannerSection.research .bannerList').forEach(function (li, i) {
+          const a = li.querySelector('a');
+          const img = li.querySelector('img');
+          if (!a || !img) return;
+          const src = img.getAttribute('src') || '';
+          if (!src) return;
+          out.push({
+            id: '__sidebar_banner_' + i,
+            isSidebarBanner: true,                       // 클릭 시 상세 대신 원본 링크로 이동
+            externalUrl: a.getAttribute('href') || '#',
+            imageUrl: src,
+            title: img.getAttribute('alt') || '공모전',   // 배너의 alt 문구가 카드 제목이 됨
+            org: '공모전정보',
+            category: 'etc',
+            views: 0
+          });
+        });
+      } catch (e) { /* 사이드바가 없는 화면이면 무시 */ }
+      return out;
+    }
+
     window.loadContests = async function () {
       const loading = document.getElementById('contestLoading');
       const now = Date.now();
+      const sidebarBanners = getSidebarContestBanners(); // 사이드바 배너: 항상 맨 앞에 표출
       if (_contestCache && (now - _contestCache.ts < 3 * 60 * 1000)) {
-        allContestData = _contestCache.docs;
+        allContestData = [...sidebarBanners, ..._contestCache.docs];
         if (loading) loading.style.display = 'none';
         applyContestFilters();
         return;
@@ -9398,14 +9426,21 @@ function displayStoriesForPage(page) {
       try {
         const q = window.query(window.collection(window.db, 'contests'), window.orderBy('createdAt', 'desc'));
         const snap = await window.getDocs(q);
-        allContestData = [];
-        snap.forEach(d => allContestData.push({ id: d.id, ...d.data() }));
-        _contestCache = { docs: [...allContestData], ts: now };
+        const dbDocs = [];
+        snap.forEach(d => dbDocs.push({ id: d.id, ...d.data() }));
+        _contestCache = { docs: dbDocs, ts: now };
+        allContestData = [...sidebarBanners, ...dbDocs];
         if (loading) loading.style.display = 'none';
         applyContestFilters();
       } catch (err) {
         console.error('공모전 로딩 오류:', err);
         if (loading) loading.style.display = 'none';
+        // DB 로딩에 실패해도 사이드바 배너만큼은 표출
+        if (sidebarBanners.length > 0) {
+          allContestData = sidebarBanners;
+          applyContestFilters();
+          return;
+        }
         const grid = document.getElementById('contestGrid');
         if (grid) grid.innerHTML = '<div class="contest-empty" style="display:block;">⚠️ 데이터 로딩 실패. 새로고침 해주세요.</div>';
       }
@@ -9460,6 +9495,20 @@ function displayStoriesForPage(page) {
         const thumb = c.imageUrl
           ? `<img src="${escapeHtml(c.imageUrl)}" alt="${escapeHtml(c.title || '')}">`
           : `<div class="no-img">🏆</div>`;
+        // 사이드바 배너 카드: 클릭 시 상세 페이지 대신 배너 원본 링크를 새 탭으로 열기
+        if (c.isSidebarBanner) {
+          const safeUrl = escapeHtml(String(c.externalUrl || '#').replace(/'/g, '%27'));
+          return `<div class="contest-card" onclick="window.open('${safeUrl}', '_blank', 'noopener')">
+            <div class="contest-card-thumb">
+              ${thumb}
+            </div>
+            <div class="contest-card-body">
+              <span class="contest-card-org">${escapeHtml(c.org || '공모전정보')}</span>
+              <span class="contest-card-title">${escapeHtml(c.title || '')}</span>
+              <span class="contest-card-meta"><span>바로가기 ↗</span><span>${escapeHtml(contestCatLabel(c.category))}</span></span>
+            </div>
+          </div>`;
+        }
         return `<div class="contest-card" onclick="viewContestDetail('${c.id}')">
           <div class="contest-card-thumb">
             ${thumb}
