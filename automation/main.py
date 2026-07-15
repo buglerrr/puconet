@@ -562,6 +562,14 @@ def run() -> dict:
             social_post.post_daily(firestore.client(), df)
         except Exception as e:  # noqa: BLE001
             print(f"  ⚠️ SNS 자동 게시 오류(무시): {e}")
+        # 쇼츠(마감임박 TOP5) 자동 생성 — 설정(Firestore _config/shorts) 없으면 무동작,
+        # 어떤 오류가 나도 크롤링 결과에는 영향 없음
+        try:
+            import shorts_video
+            print("🎬 쇼츠 자동 생성 시도")
+            shorts_video.run_daily(firestore.client(), df)
+        except Exception as e:  # noqa: BLE001
+            print(f"  ⚠️ 쇼츠 생성 오류(무시): {e}")
         print(f"🎉 완료: {result}")
         return result
     except Exception as e:  # noqa: BLE001

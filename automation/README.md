@@ -140,3 +140,32 @@ export GOOGLE_APPLICATION_CREDENTIALS=/경로/serviceAccountKey.json
 export ALIO_SERVICE_KEY='서비스키'
 python main.py
 ```
+
+---
+
+## 🎬 쇼츠(마감임박 TOP 5) 자동 생성 — `shorts_video.py`
+
+매일 크롤링 직후, **마감임박 TOP 5 쇼츠 영상**(1080×1920, 약 30초)을 자동 생성해
+① 구글 드라이브 `[shorts]` 폴더 저장 ② 인스타그램 릴스 게시까지 수행합니다.
+- MZ 톤 스크립트 자동 생성(매일 로테이션) + Google TTS 나레이션(생동감 있는 목소리)
+- 장면마다 해당 기관 CI/공고 정보 화면 전환 + 줌 모션 + 배경음악
+- BGM: `automation/assets/bgm.mp3` 를 넣으면 그 음원 사용(유튜브 오디오 라이브러리 등
+  무료 음원 권장), 없으면 저작권 걱정 없는 자체 합성 루프 사용
+
+### 설정 (한 번만)
+
+1. **드라이브 폴더 공유**: 구글 드라이브에서 `[교원창업]/[공기업 브레인넷]/[shorts]` 폴더를
+   함수 서비스계정 이메일(기본: `recruit-board@appspot.gserviceaccount.com`,
+   `gcloud iam service-accounts list` 로 확인)에 **편집자**로 공유.
+   폴더를 연 상태의 URL 마지막 조각(`folders/` 뒤)이 **폴더 ID**.
+2. **Firestore 설정 문서**: `_config` 컬렉션 → `shorts` 문서 생성:
+   ```
+   enabled         : true
+   drive_folder_id : (위 폴더 ID)
+   ig_reels        : true        ← 인스타 릴스 게시 (기존 social 토큰 재사용)
+   ```
+3. **재배포**: `./deploy.sh` 재실행 (TTS·Drive API 활성화와 메모리 2Gi 반영).
+
+컴퓨터를 켜지 않아도 영상은 드라이브 클라우드에 저장되며, PC를 켜면
+`G:\내 드라이브\[교원창업]\[공기업 브레인넷]\[shorts]` 경로로 자동 동기화됩니다.
+비용: TTS는 무료 한도(월 100만 자) 내, 함수 실행 1~2분/일 수준입니다.

@@ -3,3 +3,8 @@ firebase-admin==6.*
 requests==2.*
 pandas==2.*
 pillow==10.*
+# ── 쇼츠(마감임박 TOP5) 자동 생성용 ──
+numpy==2.*
+imageio-ffmpeg==0.*
+google-cloud-texttospeech==2.*
+google-api-python-client==2.*

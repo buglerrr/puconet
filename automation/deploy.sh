@@ -27,7 +27,8 @@ gcloud config set project "$PROJECT"
 echo "▶ [1/6] API 활성화..."
 gcloud services enable \
   cloudfunctions.googleapis.com run.googleapis.com cloudbuild.googleapis.com \
-  cloudscheduler.googleapis.com secretmanager.googleapis.com
+  cloudscheduler.googleapis.com secretmanager.googleapis.com \
+  texttospeech.googleapis.com drive.googleapis.com
 
 # ── 2) 알리오 서비스키를 Secret Manager에 저장 ──
 echo "▶ [2/6] 알리오 서비스키 입력 (입력 내용은 화면에 표시되지 않습니다)"
@@ -60,7 +61,7 @@ gcloud functions deploy "$FUNC_NAME" \
   --gen2 --region="$REGION" --runtime="$RUNTIME" \
   --source=. --entry-point=job_sync \
   --trigger-http --no-allow-unauthenticated \
-  --memory=1Gi --timeout=540s \
+  --memory=2Gi --timeout=540s \
   --set-secrets=ALIO_SERVICE_KEY=ALIO_SERVICE_KEY:latest
 
 FUNC_URL=$(gcloud functions describe "$FUNC_NAME" --region="$REGION" --gen2 --format='value(serviceConfig.uri)')
