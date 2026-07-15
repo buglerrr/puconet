@@ -4457,7 +4457,7 @@
             <a href="#" onclick="showCalendarBoard(); return false;">채용달력</a>
             <a href="#" onclick="showEduBoard(); return false;">공공기관 교육</a>
             <a href="#"
-              onclick="checkLoginAndExecute(function() { alert('준비 중입니다.'); }, '공공게시판을 보려면 로그인이 필요합니다.'); return false;">공공기관소개</a>
+              onclick="checkLoginAndExecute(window.showInstIntroBoard, '공공기관소개를 보려면 로그인이 필요합니다.'); return false;">공공기관소개</a>
             <a href="#" onclick="showNewsBoard(); return false;">공공기관
               뉴스</a>
             <a href="#"
@@ -5933,6 +5933,151 @@
           </div>
         </div>
       </div>
+
+      <!-- ===== 공공기관소개: 기관 CI 디렉터리 (채용정보에 수집된 기관 로고를 유형별로 자동 나열) ===== -->
+      <div id="inst-intro-section" style="display:none; width:100%;">
+        <style>
+          #inst-intro-section .inst-intro-head { display: flex; align-items: baseline; gap: 24px; flex-wrap: wrap; border-bottom: 3px solid #2c3e50; padding-bottom: 12px; margin-bottom: 1.6rem; }
+          #inst-intro-section .inst-intro-title { font-size: 1.7rem; font-weight: 800; color: #2c3e50; margin: 0; }
+          #inst-intro-section .inst-intro-summary { font-size: .95rem; color: #333; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+          #inst-intro-section .inst-sum-item b { color: #1c7ed6; }
+          #inst-intro-section .inst-sum-sep { color: #d0d5dd; }
+          #inst-intro-section .inst-group { margin-bottom: 2.2rem; }
+          #inst-intro-section .inst-group-header { font-size: 1.05rem; font-weight: 700; color: #333; margin-bottom: 14px; }
+          #inst-intro-section .inst-group-header .arrow { color: #1c7ed6; margin-right: 6px; }
+          #inst-intro-section .inst-group-header .cnt { color: #666; font-weight: 500; font-size: .92rem; margin-left: 6px; }
+          #inst-intro-section .inst-logo-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+          #inst-intro-section .inst-logo-card {
+            background: #fff; border: 1px solid #e2e5e9; border-radius: 4px;
+            height: 104px; padding: 10px 12px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px;
+            overflow: hidden;
+          }
+          #inst-intro-section .inst-logo-card img { max-width: 100%; max-height: 52px; object-fit: contain; display: block; }
+          #inst-intro-section .inst-logo-name { font-size: .76rem; color: #555; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+          #inst-intro-section .inst-logo-name.noimg { font-size: .9rem; font-weight: 700; color: #333; white-space: normal; text-align: center; line-height: 1.35; }
+        </style>
+        <div class="container" style="max-width:1400px; margin:0 auto; padding-top:1.5rem; padding-bottom:3rem;">
+          <div class="inst-intro-head">
+            <h1 class="inst-intro-title">공공기관 소개</h1>
+            <div id="instIntroSummary" class="inst-intro-summary"></div>
+          </div>
+          <div id="instIntroLoading" class="loading" style="display:none;">
+            <div class="spinner"></div>
+            <p>공공기관 정보를 불러오는 중...</p>
+          </div>
+          <div id="instIntroBody"></div>
+        </div>
+      </div>
+      <script>
+        (function () {
+          // 표출 순서: 공기업 → 준정부 → 기타공공기관 → 지방공기업 → 지방출자/출연기관
+          var INST_GROUPS = [
+            { label: '공기업', cats: ['market-public', 'quasi-market-public'] },
+            { label: '준정부기관', cats: ['fund-quasi', 'entrust-quasi'] },
+            { label: '기타공공기관', cats: ['other-public'] },
+            { label: '지방공기업', cats: ['local-public'] },
+            { label: '지방출자·출연기관', cats: ['local-investment'] }
+          ];
+          function esc(s) { var d = document.createElement('div'); d.textContent = (s == null ? '' : String(s)); return d.innerHTML.replace(/"/g, '&quot;'); }
+
+          // 채용정보(크롤링 수집분)에서 기관명·CI 이미지(Firebase 저장소 URL)·기관유형 추출
+          async function getJobsForIntro() {
+            try {
+              var c = JSON.parse(localStorage.getItem('allgong_jobs_ls_v1') || 'null');
+              if (c && c.jobs && c.jobs.length) return c.jobs;
+            } catch (e) { /* 무시 */ }
+            if (window.__fetchJobsShared) { try { return await window.__fetchJobsShared(); } catch (e) { /* 무시 */ } }
+            return [];
+          }
+          function buildInstDirectory(jobs) {
+            var byCat = {}; // { category: { 기관명: 로고URL } }
+            (jobs || []).forEach(function (j) {
+              var cat = j.category, co = String(j.company || '').trim();
+              if (!cat || !co) return;
+              var img = (j.imageUrl && j.imageUrl !== './logo.png' && j.imageUrl !== 'logo.png') ? j.imageUrl : '';
+              if (!byCat[cat]) byCat[cat] = {};
+              if (byCat[cat][co] === undefined || (!byCat[cat][co] && img)) byCat[cat][co] = img;
+            });
+            return byCat;
+          }
+
+          window.renderInstIntro = async function () {
+            var body = document.getElementById('instIntroBody');
+            var summary = document.getElementById('instIntroSummary');
+            var loading = document.getElementById('instIntroLoading');
+            if (!body) return;
+            if (!body.innerHTML && loading) loading.style.display = 'block';
+            var jobs = await getJobsForIntro();
+            if (loading) loading.style.display = 'none';
+            var byCat = buildInstDirectory(jobs);
+            var sumParts = [], html = '';
+            INST_GROUPS.forEach(function (g) {
+              var merged = {};
+              g.cats.forEach(function (c) { var m = byCat[c]; if (m) Object.keys(m).forEach(function (k) { if (merged[k] === undefined || (!merged[k] && m[k])) merged[k] = m[k]; }); });
+              var names = Object.keys(merged).sort(function (a, b) { return a.localeCompare(b, 'ko'); });
+              sumParts.push('<span class="inst-sum-item">' + g.label + ' <b>' + names.length + '</b>개</span>');
+              if (!names.length) return;
+              html += '<div class="inst-group">'
+                + '<div class="inst-group-header"><span class="arrow">▶</span>' + g.label + '<span class="cnt">총 ' + names.length + '개</span></div>'
+                + '<div class="inst-logo-grid">';
+              names.forEach(function (n) {
+                var img = merged[n];
+                html += '<div class="inst-logo-card" title="' + esc(n) + '">'
+                  + (img ? '<img loading="lazy" decoding="async" src="' + esc(img) + '" alt="' + esc(n) + '" onerror="this.style.display=\'none\'; if(this.nextElementSibling) this.nextElementSibling.classList.add(\'noimg\');">' : '')
+                  + '<span class="inst-logo-name' + (img ? '' : ' noimg') + '">' + esc(n) + '</span>'
+                  + '</div>';
+              });
+              html += '</div></div>';
+            });
+            if (!html) {
+              html = '<div class="empty-state" style="display:block;"><h3>표시할 공공기관 정보가 없습니다</h3><p>채용정보가 수집되면 자동으로 채워집니다.</p></div>';
+            }
+            if (summary) summary.innerHTML = sumParts.join('<span class="inst-sum-sep">|</span>');
+            body.innerHTML = html;
+          };
+
+          window.showInstIntroBoard = function (skipHistory) {
+            var __topBanner = document.getElementById('topAdBannerRow'); if (__topBanner) __topBanner.style.display = 'none';
+            document.querySelectorAll('.content-with-sidebar-wrapper').forEach(function (el) { el.classList.add('full-width-wrapper'); });
+            ['features', 'jobs', 'general-jobs', 'hibrain-jobs', 'edu-courses', 'chatroom-section',
+             'story-board-section', 'detail-section', 'story-detail-section', 'news-section', 'news-detail-section',
+             'contest-section', 'contest-detail-section', 'board-section', 'user-manage-section',
+             'edu-board-section', 'calendar-board-section', 'recruit-calendar'].forEach(function (id) {
+              var el = document.getElementById(id); if (el) el.style.display = 'none';
+            });
+            var sec = document.getElementById('inst-intro-section'); if (sec) sec.style.display = 'block';
+            if (!skipHistory) { try { history.pushState({ section: 'inst-intro' }, '', '#inst-intro'); } catch (e) { } }
+            window.scrollTo(0, 0);
+            window.renderInstIntro();
+          };
+
+          // 다른 메뉴로 이동하면 이 섹션이 자동으로 숨겨지도록 기존 화면 전환 함수들을 래핑
+          // (일부 함수는 나중에 정의되므로 준비될 때까지 재시도)
+          var WRAP_FNS = ['goHome', 'showBoard', 'showCalendarBoard', 'showEduBoard', 'showNewsBoard',
+                          'showContestBoard', 'showStoryBoard', 'showUserManagement'];
+          function wrapNavFns() {
+            var remaining = 0;
+            WRAP_FNS.forEach(function (fn) {
+              var orig = window[fn];
+              if (typeof orig !== 'function') { remaining++; return; }
+              if (orig.__instIntroWrapped) return;
+              var wrapped = function () {
+                var el = document.getElementById('inst-intro-section');
+                if (el) el.style.display = 'none';
+                return orig.apply(this, arguments);
+              };
+              wrapped.__instIntroWrapped = true;
+              window[fn] = wrapped;
+            });
+            return remaining;
+          }
+          var _wrapTries = 0;
+          (function tryWrap() {
+            if (wrapNavFns() > 0 && _wrapTries++ < 40) setTimeout(tryWrap, 500);
+          })();
+        })();
+      </script>
 
       <!-- 취업 이야기 게시판 섹션 -->
       <div id="story-board-section" style="display:none; width:100%;">
@@ -11608,6 +11753,9 @@ function initCarousel(carouselContainer) {
       } else if (hash === '#contest') {
         window.showContestBoard(true);
         history.replaceState({ section: 'contest' }, '', hash);
+      } else if (hash === '#inst-intro') {
+        if (typeof window.showInstIntroBoard === 'function') window.showInstIntroBoard(true);
+        history.replaceState({ section: 'inst-intro' }, '', hash);
       } else {
         // 기본: 홈으로
         history.replaceState({ section: 'home' }, '', '#home');
@@ -11676,6 +11824,9 @@ function initCarousel(carouselContainer) {
         window.showContestBoard(true).then(() => {
           if (state.contestId) window.viewContestDetail(state.contestId, true);
         });
+      } else if (state.section === 'inst-intro') {
+        // 공공기관소개로 이동
+        if (typeof window.showInstIntroBoard === 'function') window.showInstIntroBoard(true);
       } else {
         // 기본: 홈으로
         window.goHome(true);
@@ -13583,6 +13734,15 @@ function initCarousel(carouselContainer) {
     gap: 14px !important;
   }
   html.mobile-view #eduBannerMirror .edu-banner { height: 300px !important; }
+
+  /* ---------- 8-1. 공공기관소개(CI 디렉터리): 5열 → 2열 ---------- */
+  html.mobile-view #inst-intro-section .inst-logo-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+  html.mobile-view #inst-intro-section .inst-intro-title { font-size: 1.25rem !important; }
+  html.mobile-view #inst-intro-section .inst-intro-summary { font-size: .8rem !important; }
+  html.mobile-view #inst-intro-section .container { padding: 1rem 12px 2rem 12px !important; }
 
   /* ---------- 9. 실시간 채팅방: 3열 → 1열 ---------- */
   html.mobile-view .chatroom-section .container { width: 100% !important; padding: 0 12px !important; }
