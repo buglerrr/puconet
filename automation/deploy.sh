@@ -94,3 +94,15 @@ echo "✅ 배포 완료!"
 echo "   - 매일 ${SCHEDULE} (${TZ}) 자동 실행됩니다."
 echo "   - 로그: gcloud functions logs read $FUNC_NAME --region=$REGION --gen2 --limit=50"
 echo "   - 올공 '채용정보' 게시판에서 결과를 확인하세요."
+
+# ── 7) 쇼츠용: 함수가 실제 사용하는 서비스계정(로봇 계정) 이메일 안내 ──
+RUNTIME_SA=$(gcloud functions describe "$FUNC_NAME" --gen2 --region="$REGION" \
+  --format='value(serviceConfig.serviceAccountEmail)' 2>/dev/null || true)
+if [ -n "$RUNTIME_SA" ]; then
+  echo
+  echo "🎬 [쇼츠 사용 시] 구글 드라이브 '[shorts]' 폴더를 아래 이메일에 '편집자'로 공유하세요:"
+  echo "   👉 $RUNTIME_SA"
+  echo "   (drive.google.com 웹에서 폴더 우클릭 → 공유 → 위 이메일 입력)"
+  echo "   공유를 마친 뒤 다음 명령으로 즉시 다시 실행해 확인할 수 있습니다:"
+  echo "   gcloud scheduler jobs run ${FUNC_NAME}-daily --location=$REGION"
+fi
