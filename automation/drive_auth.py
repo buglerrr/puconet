@@ -65,12 +65,15 @@ def main():
     print(f"│ 2) 코드 입력:        {dev['user_code']}")
     print("│ 3) 본인 구글 계정으로 로그인 후 '허용' 클릭")
     print("└─────────────────────────────────────────────")
-    print("(승인을 기다리는 중...)")
+    print("(승인을 기다리는 중입니다 — 브라우저에서 '허용'을 누른 뒤 이 창에서 몇 초만 기다려 주세요.")
+    print(" 점(.)이 계속 찍히는 것은 정상입니다. 창을 닫거나 Ctrl+C 를 누르지 마세요!)")
 
     interval = int(dev.get("interval", 5))
     token = None
+    waited = 0
     for _ in range(int(dev.get("expires_in", 1800) / interval)):
         time.sleep(interval)
+        waited += interval
         t = _post(TOKEN_URL, {
             "client_id": client_id, "client_secret": client_secret,
             "device_code": dev["device_code"],
@@ -81,12 +84,15 @@ def main():
             break
         err = t.get("error")
         if err == "authorization_pending":
+            sys.stdout.write(f". ({waited}초 경과 — 승인 대기 중)\n" if waited % 30 == 0 else ".")
+            sys.stdout.flush()
             continue
         if err == "slow_down":
             interval += 2
             continue
-        print(f"인증 실패: {t}")
+        print(f"\n인증 실패: {t}")
         sys.exit(1)
+    print()
     if not token:
         print("시간 초과 — 다시 실행해 주세요.")
         sys.exit(1)
