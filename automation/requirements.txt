@@ -8,3 +8,4 @@ numpy==2.*
 imageio-ffmpeg==0.*
 google-cloud-texttospeech==2.*
 google-api-python-client==2.*
+python-docx==1.*
