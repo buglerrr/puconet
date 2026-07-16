@@ -104,15 +104,17 @@ def main():
         "drive_refresh_token": token["refresh_token"],
     }
     try:
-        try:
-            from google.cloud import firestore  # noqa: PLC0415
-        except ImportError:
-            print("(필요한 패키지를 설치합니다...)")
-            subprocess.run([sys.executable, "-m", "pip", "install", "--user", "-q",
-                            "google-cloud-firestore"], check=True)
-            from google.cloud import firestore  # noqa: PLC0415
-        db = firestore.Client(project=PROJECT)
-        db.collection("_config").document("shorts").set(fields, merge=True)
+        # Cloud Shell 은 파이썬 패키지 없이도 되는 REST 방식으로 저장 (gcloud 토큰 사용)
+        tok = subprocess.run(["gcloud", "auth", "print-access-token"],
+                             capture_output=True, text=True, check=True).stdout.strip()
+        mask = "&".join(f"updateMask.fieldPaths={k}" for k in fields)
+        url = (f"https://firestore.googleapis.com/v1/projects/{PROJECT}/databases/(default)"
+               f"/documents/_config/shorts?{mask}")
+        body = json.dumps({"fields": {k: {"stringValue": v} for k, v in fields.items()}}).encode()
+        req = urllib.request.Request(url, data=body, method="PATCH", headers={
+            "Authorization": f"Bearer {tok}", "Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=30) as r:
+            r.read()
         print("✅ 저장 완료! (_config/shorts)")
         print()
         print("다음 단계: Cloud Scheduler 에서 'job-sync-daily' 를 강제 실행하면")
