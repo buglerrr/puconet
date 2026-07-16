@@ -114,12 +114,20 @@ INTRO_HOOKS = [
     "이 영상 뜬 순간이 지원 타이밍! 마감 임박 채용 TOP 파이브!",
     "저장 필수! 지금 아니면 못 쓰는 공공기관 공고 다섯 개 정리해드림!",
 ]
-JOB_TEMPLATES = [
-    "{rank}위, {org}! {title}. {dday}! 바로 지원 각!",
-    "{rank}위는 {org}! {title}. {dday}! 미루면 무조건 후회!",
-    "{rank}위, {org} 떴습니다! {title}. {dday}!",
-    "{rank}위는 바로 {org}! {title}. {dday}! 서두르세요!",
-    "{rank}위, {org}! {title}. {dday}! 지금이 골든타임!",
+# 형식: "{N}위는 {기관명}입니다. {공고내용}입니다. {독려 멘트}"
+JOB_TEMPLATE = "{rank}위는 {org}입니다. {title}입니다. {cta}"
+# 지원 독려 멘트 풀 — 한 영상 안에서는 서로 다른 멘트가 뽑히고, 날마다 조합이 바뀜
+JOB_CTAS = [
+    "얼른 지원해야겠죠?",
+    "지원을 깜빡하면 안 되겠죠?",
+    "이건 못 참죠, 바로 지원 각!",
+    "놓치면 두고두고 생각날걸요?",
+    "마감 전에 클릭, 잊지 마세요!",
+    "기회는 준비된 사람이 잡는 법이죠!",
+    "오늘의 할 일, 지원서 제출!",
+    "고민하는 사이에 마감됩니다!",
+    "일단 지원! 후회는 없습니다!",
+    "합격의 주인공, 바로 당신일지도요?",
 ]
 OUTRO_LINES = [
     "상세 공고는 올공인닷컴에서! 좋아요 누르고 최종합격 가즈아!",
@@ -140,14 +148,14 @@ def _clean_for_speech(text: str, limit: int = 38) -> str:
 def build_script(rows) -> dict:
     """{'intro': str, 'jobs': [str×5], 'outro': str} — 날짜 시드로 매일 로테이션."""
     rnd = random.Random(_today_kst())  # 같은 날은 같은 문구(재실행 대비), 날마다 변화
+    ctas = rnd.sample(JOB_CTAS, min(len(rows), len(JOB_CTAS)))  # 영상 안에서 멘트 중복 없음
     jobs = []
     for i, r in enumerate(rows):
-        tpl = rnd.choice(JOB_TEMPLATES)
-        jobs.append(tpl.format(
+        jobs.append(JOB_TEMPLATE.format(
             rank=i + 1,  # TTS가 '1위'를 '일위'로 자연스럽게 읽음
             org=str(r.get("기관명", "")),
             title=_clean_for_speech(r.get("채용공고제목", "")),
-            dday=_dday_spoken(r.get("공고종료일")),
+            cta=ctas[i % len(ctas)],
         ))
     return {
         "intro": rnd.choice(INTRO_HOOKS),
@@ -157,23 +165,34 @@ def build_script(rows) -> dict:
 
 
 # ─────────────────────── ③ TTS 나레이션 (실패해도 영상은 계속) ───────────────────────
+DEFAULT_VOICE = "ko-KR-Chirp3-HD-Leda"   # 구글 최신 고품질 음성 (자연스러운 대화체)
+FALLBACK_VOICE = "ko-KR-Neural2-A"       # 위 음성 사용 불가 시 대체
+
+
+def _tts_once(text: str, out_path: str, voice_name: str, rate: float) -> bool:
+    from google.cloud import texttospeech
+    client = texttospeech.TextToSpeechClient()
+    audio_kwargs = {"audio_encoding": texttospeech.AudioEncoding.MP3, "speaking_rate": rate}
+    if "Chirp" not in voice_name:
+        audio_kwargs["pitch"] = 1.5  # Chirp 계열은 pitch 미지원 → 기존 음성에만 적용
+    resp = client.synthesize_speech(
+        input=texttospeech.SynthesisInput(text=text),
+        voice=texttospeech.VoiceSelectionParams(language_code="ko-KR", name=voice_name),
+        audio_config=texttospeech.AudioConfig(**audio_kwargs),
+    )
+    with open(out_path, "wb") as f:
+        f.write(resp.audio_content)
+    return True
+
+
 def synth_tts(text: str, out_path: str, voice_name: str, rate: float = TTS_RATE) -> bool:
-    """Google Cloud TTS → mp3 파일. 성공 여부 반환."""
+    """Google Cloud TTS → mp3 파일. 지정 음성 실패 시 대체 음성으로 재시도."""
     try:
-        from google.cloud import texttospeech
-        client = texttospeech.TextToSpeechClient()
-        resp = client.synthesize_speech(
-            input=texttospeech.SynthesisInput(text=text),
-            voice=texttospeech.VoiceSelectionParams(language_code="ko-KR", name=voice_name),
-            audio_config=texttospeech.AudioConfig(
-                audio_encoding=texttospeech.AudioEncoding.MP3,
-                speaking_rate=rate,   # 빠릿한 템포
-                pitch=1.5,            # 살짝 높은 톤 → 생동감
-            ),
-        )
-        with open(out_path, "wb") as f:
-            f.write(resp.audio_content)
-        return True
+        return _tts_once(text, out_path, voice_name, rate)
+    except Exception as e:  # noqa: BLE001
+        print(f"  (음성 '{voice_name}' 실패 → 대체 음성 시도: {e})")
+    try:
+        return _tts_once(text, out_path, FALLBACK_VOICE, rate)
     except Exception as e:  # noqa: BLE001
         print(f"  (TTS 실패 → 해당 장면 무음 진행: {e})")
         return False
@@ -558,6 +577,65 @@ def upload_to_drive(mp4_path: str, cfg: dict, ref):
         return None
 
 
+# ─────────────────────── ⑥-1b 스크립트 Word 파일 → 드라이브 '[script]' 폴더 ───────────────────────
+def build_script_docx(script: dict, rows, path: str):
+    """그날의 나레이션 스크립트를 Word(.docx) 문서로 생성."""
+    from docx import Document
+    from docx.shared import Pt
+    doc = Document()
+    doc.add_heading(f"올공 쇼츠 스크립트 — 마감임박 TOP 5 ({_today_kst()})", level=1)
+    doc.add_paragraph("")
+    doc.add_heading("인트로", level=2)
+    doc.add_paragraph(script["intro"])
+    for i, (line, r) in enumerate(zip(script["jobs"], rows), start=1):
+        doc.add_heading(f"{i}위 — {r.get('기관명', '')}", level=2)
+        doc.add_paragraph(line)
+        meta = doc.add_paragraph(
+            f"(공고: {r.get('채용공고제목', '')} / 고용유형: {r.get('고용유형', '-')}"
+            f" / 마감: {_dday(r.get('공고종료일'))})")
+        for run in meta.runs:
+            run.font.size = Pt(9)
+    doc.add_heading("아웃트로", level=2)
+    doc.add_paragraph(script["outro"])
+    doc.save(path)
+
+
+def upload_script_docx(docx_path: str, cfg: dict, ref):
+    """'[script]' 하위 폴더(없으면 쇼츠 폴더 아래 자동 생성)에 Word 파일 업로드."""
+    try:
+        from googleapiclient.http import MediaFileUpload
+        svc = _drive_service_user(cfg)
+        if svc is None:
+            print("  (드라이브 개인 인증 미설정 → 스크립트 저장 건너뜀)")
+            return None
+        # 쇼츠 폴더 확보 → 그 아래 '[script]' 폴더 확보
+        parent = cfg.get("drive_folder_id") or _ensure_app_folder(svc, ref, cfg)
+        sub = cfg.get("drive_script_folder_id")
+        if not sub:
+            name = cfg.get("drive_script_folder_name") or "[script]"
+            res = svc.files().list(
+                q=(f"name = '{name}' and mimeType = 'application/vnd.google-apps.folder'"
+                   f" and '{parent}' in parents and trashed = false"),
+                fields="files(id)", pageSize=5).execute()
+            if res.get("files"):
+                sub = res["files"][0]["id"]
+            else:
+                f = svc.files().create(
+                    body={"name": name, "mimeType": "application/vnd.google-apps.folder",
+                          "parents": [parent]}, fields="id").execute()
+                sub = f["id"]
+            ref.set({"drive_script_folder_id": sub}, merge=True)
+        meta = {"name": os.path.basename(docx_path), "parents": [sub]}
+        mime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        media = MediaFileUpload(docx_path, mimetype=mime)
+        f = svc.files().create(body=meta, media_body=media, fields="id,webViewLink").execute()
+        print(f"  ✅ 스크립트 문서 저장 완료: {f.get('webViewLink')}")
+        return f.get("id")
+    except Exception as e:  # noqa: BLE001
+        print(f"  ⚠️ 스크립트 문서 저장 실패: {e}")
+        return None
+
+
 # ─────────────────────── ⑥-2 인스타그램 릴스 게시 ───────────────────────
 def _upload_public(mp4_path: str) -> str:
     """릴스 게시용 공개 URL 확보 (Firebase Storage)."""
@@ -637,10 +715,11 @@ def run_daily(db, df):
     today = _today_kst()
     state = cfg.get("state") if isinstance(cfg.get("state"), dict) else {}
     if state.get("date") != today:
-        state = {"date": today, "drive": False, "ig": False}
+        state = {"date": today, "drive": False, "ig": False, "script": False}
     need_drive = not state.get("drive")
     need_ig = bool(cfg.get("ig_reels", True)) and not state.get("ig")
-    if not need_drive and not need_ig:
+    need_script = not state.get("script")
+    if not need_drive and not need_ig and not need_script:
         print("  (오늘 쇼츠는 이미 저장·게시 완료 → 건너뜀)")
         return
 
@@ -649,7 +728,7 @@ def run_daily(db, df):
         print(f"  (마감임박 공고가 {len(rows)}건뿐 → 쇼츠 생략)")
         return
     script = build_script(rows)
-    tts_voice = cfg.get("tts_voice") or "ko-KR-Neural2-A"
+    tts_voice = cfg.get("tts_voice") or DEFAULT_VOICE
 
     with tempfile.TemporaryDirectory() as workdir:
         print("🎬 쇼츠 렌더링 시작 (마감임박 TOP 5)")
@@ -660,6 +739,16 @@ def run_daily(db, df):
         if need_drive:
             if upload_to_drive(mp4, cfg, ref):
                 state["drive"] = True
+
+        if need_script:
+            # 그날의 나레이션 스크립트를 Word 문서로 '[script]' 폴더에 저장
+            try:
+                docx_path = os.path.join(workdir, f"올공_쇼츠_스크립트_{today}.docx")
+                build_script_docx(script, rows, docx_path)
+                if upload_script_docx(docx_path, cfg, ref):
+                    state["script"] = True
+            except Exception as e:  # noqa: BLE001
+                print(f"  ⚠️ 스크립트 문서 생성 실패: {e}")
 
         if need_ig:
             if post_reels(db, mp4, rows):
