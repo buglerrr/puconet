@@ -73,12 +73,24 @@ SCHED_ARGS=(
   --location="$REGION" --schedule="$SCHEDULE" --time-zone="$TZ"
   --uri="$FUNC_URL" --http-method=POST
   --oidc-service-account-email="$SA" --oidc-token-audience="$FUNC_URL"
+  --attempt-deadline=540s   # 함수 타임아웃과 동일하게 — 쇼츠 생성 등으로 3분을 넘겨도 '실패'로 오기록되지 않게
 )
 if gcloud scheduler jobs describe "${FUNC_NAME}-daily" --location="$REGION" >/dev/null 2>&1; then
   gcloud scheduler jobs update http "${FUNC_NAME}-daily" "${SCHED_ARGS[@]}"
 else
   gcloud scheduler jobs create http "${FUNC_NAME}-daily" "${SCHED_ARGS[@]}"
 fi
+# 정오/저녁 SNS 슬롯 작업이 별도로 있으면 같은 설정(기한 540초 포함)으로 갱신
+for _slot in noon evening; do
+  if gcloud scheduler jobs describe "${FUNC_NAME}-${_slot}" --location="$REGION" >/dev/null 2>&1; then
+    _sched="0 12 * * *"; [ "$_slot" = "evening" ] && _sched="0 18 * * *"
+    gcloud scheduler jobs update http "${FUNC_NAME}-${_slot}" \
+      --location="$REGION" --schedule="$_sched" --time-zone="$TZ" \
+      --uri="$FUNC_URL" --http-method=POST \
+      --oidc-service-account-email="$SA" --oidc-token-audience="$FUNC_URL" \
+      --attempt-deadline=540s || true
+  fi
+done
 
 # 함수를 호출할 수 있도록 스케줄러 SA에 Invoker 권한
 gcloud run services add-iam-policy-binding "$FUNC_NAME" \
