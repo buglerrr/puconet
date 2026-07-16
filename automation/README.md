@@ -154,17 +154,24 @@ python main.py
 
 ### 설정 (한 번만)
 
-1. **드라이브 폴더 공유**: 구글 드라이브에서 `[교원창업]/[공기업 브레인넷]/[shorts]` 폴더를
-   함수 서비스계정 이메일(기본: `recruit-board@appspot.gserviceaccount.com`,
-   `gcloud iam service-accounts list` 로 확인)에 **편집자**로 공유.
-   폴더를 연 상태의 URL 마지막 조각(`folders/` 뒤)이 **폴더 ID**.
-2. **Firestore 설정 문서**: `_config` 컬렉션 → `shorts` 문서 생성:
+1. **OAuth 동의화면**: <https://console.cloud.google.com/apis/credentials/consent?project=recruit-board>
+   → User Type **외부** → 앱 이름/이메일 입력 후 저장 → **앱 게시**(프로덕션 전환).
+   (drive.file 은 비민감 범위라 심사 불필요. '테스트' 상태로 두면 7일마다 인증 만료됨)
+2. **OAuth 클라이언트**: <https://console.cloud.google.com/apis/credentials?project=recruit-board>
+   → 사용자 인증 정보 만들기 → OAuth 클라이언트 ID → 유형 **'TV 및 제한된 입력 장치'**
+   → 클라이언트 ID/보안 비밀 복사.
+3. **1회 인증**: Cloud Shell 에서 `cd ~/puconet/automation && python3 drive_auth.py`
+   → ID/비밀 붙여넣기 → 안내되는 URL 에서 코드 입력·허용. (Firestore 에 자동 저장됨)
+   ※ 구글 정책상 서비스계정은 개인 드라이브에 파일을 소유할 수 없어(storageQuotaExceeded)
+     소유자 본인 인증 방식을 사용합니다. 폴더 공유는 필요 없습니다.
+4. **Firestore 설정 문서**: `_config` 컬렉션 → `shorts` 문서:
    ```
-   enabled         : true
-   drive_folder_id : (위 폴더 ID)
-   ig_reels        : true        ← 인스타 릴스 게시 (기존 social 토큰 재사용)
+   enabled  : true
+   ig_reels : true        ← 인스타 릴스 게시 (기존 social 토큰 재사용)
    ```
-3. **재배포**: `./deploy.sh` 재실행 (TTS·Drive API 활성화와 메모리 2Gi 반영).
+   (drive_folder_id 는 첫 실행 때 자동 설정됩니다. 첫 실행 후 드라이브에 생긴
+   '올공 쇼츠' 폴더를 원하는 위치로 옮기면 이후에도 계속 그곳에 저장됩니다.)
+5. **재배포**: `./deploy.sh` 재실행.
 
 컴퓨터를 켜지 않아도 영상은 드라이브 클라우드에 저장되며, PC를 켜면
 `G:\내 드라이브\[교원창업]\[공기업 브레인넷]\[shorts]` 경로로 자동 동기화됩니다.
