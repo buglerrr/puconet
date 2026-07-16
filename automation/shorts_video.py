@@ -46,7 +46,10 @@ ASSET_BGM = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "
 
 W, H = 1080, 1920          # 쇼츠 규격 (9:16)
 FPS = 30
-SCENE_MIN, SCENE_MAX = 3.2, 5.6   # 공고 장면 길이(초): 나레이션 길이에 맞춰 신축
+SCENE_MIN = 3.2            # 장면 최소 길이(초)
+SCENE_MAX = 10.0           # 장면 최대 길이(초) — 나레이션이 끝까지 재생되도록 여유 확보
+TTS_RATE = 1.16            # 기본 말 속도
+TTS_RATE_MAX = 1.45        # 문장이 길어 장면 한도를 넘을 때 올릴 수 있는 최대 속도
 INTRO_MIN, OUTRO_MIN = 2.2, 2.6
 
 # 순위별 포인트 컬러 (장면마다 화면 분위기가 바뀌도록)
@@ -154,7 +157,7 @@ def build_script(rows) -> dict:
 
 
 # ─────────────────────── ③ TTS 나레이션 (실패해도 영상은 계속) ───────────────────────
-def synth_tts(text: str, out_path: str, voice_name: str) -> bool:
+def synth_tts(text: str, out_path: str, voice_name: str, rate: float = TTS_RATE) -> bool:
     """Google Cloud TTS → mp3 파일. 성공 여부 반환."""
     try:
         from google.cloud import texttospeech
@@ -164,7 +167,7 @@ def synth_tts(text: str, out_path: str, voice_name: str) -> bool:
             voice=texttospeech.VoiceSelectionParams(language_code="ko-KR", name=voice_name),
             audio_config=texttospeech.AudioConfig(
                 audio_encoding=texttospeech.AudioEncoding.MP3,
-                speaking_rate=1.16,   # 빠릿한 템포
+                speaking_rate=rate,   # 빠릿한 템포
                 pitch=1.5,            # 살짝 높은 톤 → 생동감
             ),
         )
@@ -177,7 +180,7 @@ def synth_tts(text: str, out_path: str, voice_name: str) -> bool:
 
 
 def _audio_duration(path: str) -> float:
-    """ffmpeg로 오디오 길이(초) 측정."""
+    """ffmpeg로 오디오 길이(초) 측정 (디코딩 진행시간 → 실패 시 Duration 헤더)."""
     try:
         p = subprocess.run([_ffmpeg(), "-i", path, "-f", "null", "-"],
                            capture_output=True, text=True, timeout=60)
@@ -185,6 +188,9 @@ def _audio_duration(path: str) -> float:
         if m:
             h, mnt, s = m[-1]
             return int(h) * 3600 + int(mnt) * 60 + float(s)
+        m = re.search(r"Duration:\s*(\d+):(\d+):(\d+\.?\d*)", p.stderr)
+        if m:
+            return int(m.group(1)) * 3600 + int(m.group(2)) * 60 + float(m.group(3))
     except Exception:  # noqa: BLE001
         pass
     return 0.0
@@ -422,6 +428,13 @@ def build_video(rows, script: dict, workdir: str, tts_voice: str) -> str:
         nar = None
         if text and synth_tts(text, mp3, tts_voice):
             alen = _audio_duration(mp3)
+            # 나레이션이 장면 한도보다 길면: 그 문장만 말 속도를 올려 재합성
+            # → 어떤 문장도 중간에 끊기지 않음 (전체 영상은 쇼츠 60초 미만 유지)
+            if alen > 0 and alen + 0.45 > SCENE_MAX:
+                faster = min(TTS_RATE * (alen + 0.6) / SCENE_MAX, TTS_RATE_MAX)
+                print(f"  (나레이션 {alen:.1f}s > 한도 {SCENE_MAX}s → 속도 {faster:.2f}배로 재합성)")
+                if synth_tts(text, mp3, tts_voice, rate=faster):
+                    alen = _audio_duration(mp3)
             if alen > 0:
                 dur = min(max(alen + 0.45, min_dur), SCENE_MAX)
                 nar = mp3
