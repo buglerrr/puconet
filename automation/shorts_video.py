@@ -467,18 +467,77 @@ def build_video(rows, script: dict, workdir: str, tts_voice: str) -> str:
 
 
 # ─────────────────────── ⑥-1 Google Drive 업로드 ───────────────────────
-def upload_to_drive(mp4_path: str, folder_id: str):
-    """서비스계정 기본 자격증명으로 드라이브 '[shorts]' 폴더에 업로드."""
+# ※ 구글 정책상 서비스계정(로봇 계정)은 개인 '내 드라이브'에 파일을 소유할 수 없음
+#   (storageQuotaExceeded). → 소유자 본인 계정의 OAuth(1회 인증, drive.file 범위)로 업로드.
+#   1회 설정: Cloud Shell 에서 `python3 drive_auth.py` 실행 (README '쇼츠' 섹션 참고)
+DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file"
+
+
+def _drive_service_user(cfg):
+    """_config/shorts 에 저장된 소유자 OAuth 자격증명으로 Drive 클라이언트 생성."""
+    cid = cfg.get("drive_client_id")
+    csec = cfg.get("drive_client_secret")
+    rtok = cfg.get("drive_refresh_token")
+    if not (cid and csec and rtok):
+        return None
+    from google.oauth2.credentials import Credentials
+    from googleapiclient.discovery import build
+    creds = Credentials(
+        None, refresh_token=rtok, token_uri="https://oauth2.googleapis.com/token",
+        client_id=cid, client_secret=csec, scopes=[DRIVE_SCOPE],
+    )
+    return build("drive", "v3", credentials=creds, cache_discovery=False)
+
+
+def _ensure_app_folder(svc, ref, cfg) -> str:
+    """이 앱이 만든 쇼츠 폴더를 찾거나 생성해 ID 반환 (+ Firestore 에 저장).
+    drive.file 범위는 '앱이 만든 파일/폴더'만 다룰 수 있으므로, 앱 소유 폴더를 사용.
+    (생성된 폴더는 드라이브에서 원하는 위치로 옮겨도 계속 사용 가능 — ID 불변)"""
+    name = cfg.get("drive_folder_name") or "올공 쇼츠"
+    res = svc.files().list(
+        q=f"name = '{name}' and mimeType = 'application/vnd.google-apps.folder' and trashed = false",
+        fields="files(id,name)", pageSize=5).execute()
+    if res.get("files"):
+        fid = res["files"][0]["id"]
+    else:
+        f = svc.files().create(body={"name": name, "mimeType": "application/vnd.google-apps.folder"},
+                               fields="id").execute()
+        fid = f["id"]
+        print(f"  📁 드라이브에 '{name}' 폴더를 새로 만들었습니다. "
+              "드라이브에서 이 폴더를 원하는 위치([공기업 브레인넷] 등)로 옮겨두시면 계속 그곳에 저장됩니다.")
+    ref.set({"drive_folder_id": fid}, merge=True)
+    return fid
+
+
+def upload_to_drive(mp4_path: str, cfg: dict, ref):
+    """소유자 OAuth 로 드라이브에 업로드. 성공 시 파일 ID 반환."""
     try:
-        import google.auth
-        from googleapiclient.discovery import build
+        from googleapiclient.errors import HttpError
         from googleapiclient.http import MediaFileUpload
-        creds, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/drive"])
-        svc = build("drive", "v3", credentials=creds, cache_discovery=False)
-        meta = {"name": os.path.basename(mp4_path), "parents": [folder_id]}
-        media = MediaFileUpload(mp4_path, mimetype="video/mp4", resumable=True)
-        f = svc.files().create(body=meta, media_body=media,
-                               fields="id,webViewLink", supportsAllDrives=True).execute()
+        svc = _drive_service_user(cfg)
+        if svc is None:
+            print("  ⚠️ 드라이브 개인 인증 미설정 → Cloud Shell 에서 `python3 drive_auth.py` 를 "
+                  "한 번 실행해 주세요 (README '쇼츠' 섹션 참고)")
+            return None
+
+        def _create(fid):
+            meta = {"name": os.path.basename(mp4_path), "parents": [fid]}
+            media = MediaFileUpload(mp4_path, mimetype="video/mp4", resumable=True)
+            return svc.files().create(body=meta, media_body=media, fields="id,webViewLink").execute()
+
+        folder_id = cfg.get("drive_folder_id")
+        if folder_id:
+            try:
+                f = _create(folder_id)
+                print(f"  ✅ 드라이브 업로드 완료: {f.get('webViewLink')}")
+                return f.get("id")
+            except HttpError as e:
+                if e.resp.status not in (403, 404):
+                    raise
+                # 앱이 만들지 않은 폴더(권한 없음) → 앱 폴더로 자동 전환
+                print("  (지정 폴더에 권한 없음 → 앱 전용 폴더로 전환)")
+        fid = _ensure_app_folder(svc, ref, cfg)
+        f = _create(fid)
         print(f"  ✅ 드라이브 업로드 완료: {f.get('webViewLink')}")
         return f.get("id")
     except Exception as e:  # noqa: BLE001
@@ -503,10 +562,20 @@ def post_reels(db, mp4_path: str, rows) -> bool:
     try:
         cfg = db.collection("_config").document("social").get()
         cfg = cfg.to_dict() if cfg.exists else {}
-        tok, uid = cfg.get("ig_access_token"), cfg.get("ig_user_id")
-        if not tok or not uid:
+        tok = cfg.get("ig_access_token")
+        if not tok:
             print("  (인스타 설정 없음 → 릴스 건너뜀)")
             return False
+        uid = cfg.get("ig_user_id")
+        if not uid:
+            # social_post 와 동일: ig_user_id 미설정 시 토큰으로 자동 조회
+            r0 = requests.get(f"{IG_API}/me", params={"fields": "user_id,username", "access_token": tok}, timeout=30)
+            if not r0.ok:
+                print(f"  ⚠️ 인스타 계정 조회 실패: {r0.status_code} {r0.text[:200]}")
+                return False
+            j0 = r0.json()
+            uid = j0.get("user_id") or j0.get("id")
+            print(f"  (인스타 계정 자동 확인: @{j0.get('username')} / {uid})")
         video_url = _upload_public(mp4_path)
         orgs = " · ".join(str(r.get("기관명", "")) for r in rows[:3])
         caption = (f"⏰ 오늘 마감임박 공공기관 채용 TOP 5!\n{orgs} 외\n"
@@ -556,7 +625,7 @@ def run_daily(db, df):
     state = cfg.get("state") if isinstance(cfg.get("state"), dict) else {}
     if state.get("date") != today:
         state = {"date": today, "drive": False, "ig": False}
-    need_drive = bool(cfg.get("drive_folder_id")) and not state.get("drive")
+    need_drive = not state.get("drive")
     need_ig = bool(cfg.get("ig_reels", True)) and not state.get("ig")
     if not need_drive and not need_ig:
         print("  (오늘 쇼츠는 이미 저장·게시 완료 → 건너뜀)")
@@ -576,10 +645,8 @@ def run_daily(db, df):
         print(f"  🎞️ 생성 완료: {os.path.basename(mp4)} ({size_mb:.1f}MB)")
 
         if need_drive:
-            if upload_to_drive(mp4, cfg["drive_folder_id"]):
+            if upload_to_drive(mp4, cfg, ref):
                 state["drive"] = True
-        elif not cfg.get("drive_folder_id"):
-            print("  (drive_folder_id 미설정 → 드라이브 업로드 건너뜀)")
 
         if need_ig:
             if post_reels(db, mp4, rows):
