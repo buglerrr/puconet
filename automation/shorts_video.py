@@ -541,16 +541,25 @@ def post_reels(db, mp4_path: str, rows) -> bool:
 
 # ─────────────────────── 메인 진입점 ───────────────────────
 def run_daily(db, df):
-    """크롤링 완료 후 호출. 설정이 없거나 오늘 이미 실행했으면 무동작."""
+    """크롤링 완료 후 호출. 설정이 없으면 무동작.
+    같은 날 다시 실행되면 이미 성공한 단계(드라이브/인스타)는 건너뛰고
+    실패했던 단계만 재시도한다. (예: 폴더 공유를 늦게 한 경우
+    스케줄러를 한 번 더 돌리면 드라이브 업로드만 다시 수행, 인스타 중복 게시 없음)"""
     ref = db.collection("_config").document("shorts")
     snap = ref.get()
     cfg = snap.to_dict() if snap.exists else {}
     if not cfg.get("enabled"):
         print("  (쇼츠 비활성 — _config/shorts.enabled=true 로 켜세요)")
         return
+
     today = _today_kst()
-    if cfg.get("last_run") == today:
-        print("  (오늘 쇼츠는 이미 생성됨 → 건너뜀)")
+    state = cfg.get("state") if isinstance(cfg.get("state"), dict) else {}
+    if state.get("date") != today:
+        state = {"date": today, "drive": False, "ig": False}
+    need_drive = bool(cfg.get("drive_folder_id")) and not state.get("drive")
+    need_ig = bool(cfg.get("ig_reels", True)) and not state.get("ig")
+    if not need_drive and not need_ig:
+        print("  (오늘 쇼츠는 이미 저장·게시 완료 → 건너뜀)")
         return
 
     rows = select_top5(df)
@@ -566,12 +575,14 @@ def run_daily(db, df):
         size_mb = os.path.getsize(mp4) / 1e6
         print(f"  🎞️ 생성 완료: {os.path.basename(mp4)} ({size_mb:.1f}MB)")
 
-        if cfg.get("drive_folder_id"):
-            upload_to_drive(mp4, cfg["drive_folder_id"])
-        else:
+        if need_drive:
+            if upload_to_drive(mp4, cfg["drive_folder_id"]):
+                state["drive"] = True
+        elif not cfg.get("drive_folder_id"):
             print("  (drive_folder_id 미설정 → 드라이브 업로드 건너뜀)")
 
-        if cfg.get("ig_reels", True):
-            post_reels(db, mp4, rows)
+        if need_ig:
+            if post_reels(db, mp4, rows):
+                state["ig"] = True
 
-    ref.set({"last_run": today}, merge=True)
+    ref.set({"last_run": today, "state": state}, merge=True)
