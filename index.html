@@ -5222,14 +5222,16 @@
                   display: inline-block; background: #e8590c; color: #fff;
                   font-size: .85rem; font-weight: 700; padding: 7px 14px; border-radius: 8px;
                 }
-                .aff-disclosure { font-size: .76rem; color: #adb5bd; margin-top: 10px; }
+                .aff-disclosure { font-size: .84rem; color: #212529; font-weight: 600; margin-top: 10px; }
               </style>
               <div id="affiliate-box" style="display:none;">
                 <div class="aff-top">
                   올공(ALLGong)은 구직자에게 공공기관 채용정보를 <span class="aff-top-strong">100% 무료</span>로 제공합니다.<br>
                   아래 링크를 통한 제품 구매는 <span class="aff-top-strong">올공 운영에 큰 힘</span>이 됩니다. 감사합니다 🙏
                 </div>
-                <a id="affiliateLink" class="aff-card" href="#" target="_blank" rel="noopener sponsored">
+                <!-- 주의: href 초기값을 "#" 로 두면 안 됨 — 페이지의 부드러운 스크롤 스크립트가
+                     a[href^="#"] 전체에 클릭 차단을 걸어 쿠팡 이동이 막힘 -->
+                <a id="affiliateLink" class="aff-card" href="javascript:void(0)" target="_blank" rel="noopener sponsored">
                   <img id="affiliateImg" src="" alt="추천 교재">
                   <div class="aff-body">
                     <span class="aff-badge">🎓 공공기관 경영평가위원 현직 교수 PICK</span>
