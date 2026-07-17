@@ -4401,6 +4401,8 @@
         return;
       }
       var ci = 'https://github.com/buglerrr/puconet/blob/main/ALLGONG%20CI.png?raw=true';
+      // 팝업(about:blank)에서는 상대 경로가 안 통할 수 있어 절대 주소로 만들어 전달
+      var inquiryUrl = location.href.replace(/[?#].*$/, '').replace(/[^/]*$/, '') + 'product.html?inquiry=1';
       var doc = win.document;
       doc.open();
       doc.write(
@@ -4416,12 +4418,16 @@
         '.info .label{font-weight:700;color:#1a1a1a;}' +
         '.info a{color:#5c7cfa;text-decoration:none;}' +
         '.info a:hover{text-decoration:underline;}' +
+        '.inq-btn{display:inline-block;margin-top:28px;background:#5a6268;color:#fff;' +
+        'font-size:1.02rem;font-weight:700;padding:12px 26px;border-radius:6px;text-decoration:none;}' +
+        '.inq-btn:hover{background:#495057;}' +
         '</style></head><body>' +
         '<img class="ci" src="' + ci + '" alt="올공(ALLGONG) CI">' +
         '<div class="info">' +
         '<div><span class="label">고객센터(직통):</span> 042-629-8159</div>' +
         '<div><span class="label">문의:</span> <a href="mailto:trumanlee@hnu.kr">trumanlee@hnu.kr</a></div>' +
         '</div>' +
+        '<a class="inq-btn" href="' + inquiryUrl + '">1:1 문의하기</a>' +
         '</body></html>'
       );
       doc.close();
@@ -6877,7 +6883,7 @@
           <div class="footer-cs-title">고객센터 〉</div>
           <div class="footer-cs-line">전화 : <a href="tel:042-629-8159">042)629-8159</a>, <a href="tel:042-629-7850">042)629-7850</a></div>
           <div class="footer-cs-line">이메일 : <a href="mailto:trumanlee@hnu.kr">trumanlee@hnu.kr</a></div>
-          <a class="footer-cs-btn" href="product.html" target="_blank" rel="noopener">1:1 문의하기</a>
+          <a class="footer-cs-btn" href="product.html?inquiry=1" target="_blank" rel="noopener">1:1 문의하기</a>
         </div>
       </div>
       <div class="footer-bottom">

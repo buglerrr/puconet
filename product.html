@@ -523,6 +523,12 @@
         history.pushState({ section: 'service-apply' }, '', '#service-apply');
       }
     }
+
+    // 주소에 ?inquiry=1 또는 #inquiry 가 있으면 1:1 광고 문의 폼을 바로 열기
+    // (메인 페이지의 고객센터 팝업 / 푸터 '1:1 문의하기' 버튼에서 사용)
+    if (/[?&]inquiry=1/.test(location.search) || location.hash === '#inquiry') {
+      document.getElementById('inquiryModal').classList.add('open');
+    }
   </script>
 </body>
 </html>
