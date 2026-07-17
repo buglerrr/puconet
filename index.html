@@ -5228,7 +5228,7 @@
               </style>
               <div id="affiliate-box" style="display:none;">
                 <div class="aff-top">
-                  올공(ALLGong)은 구직자에게 공공기관 채용정보를 <span class="aff-top-strong">100% 무료</span>로 제공합니다.<br>
+                  올공(ALLGong)은 모든 구직자에게 공공기관 채용정보를 <span class="aff-top-strong">100% 무료</span>로 제공합니다.<br>
                   아래 링크를 통한 제품 구매는 <span class="aff-top-strong">올공 운영에 큰 힘</span>이 됩니다. 감사합니다 🙏
                 </div>
                 <!-- 주의: href 초기값을 "#" 로 두면 안 됨 — 페이지의 부드러운 스크롤 스크립트가
@@ -6116,20 +6116,25 @@
           #mall-section .mall-copy { font-size: .88rem; font-weight: 700; color: #212529; line-height: 1.45; margin: 0 0 6px; }
           #mall-section .mall-product { font-size: .74rem; color: #868e96; line-height: 1.4; margin: 0 0 10px; }
           #mall-section .mall-cta { margin-top: auto; background: #e8590c; color: #fff; font-size: .82rem; font-weight: 700; padding: 7px 14px; border-radius: 8px; }
+          #mall-section .mall-card-disclosure {
+            margin-top: 10px; padding-top: 8px; border-top: 1px solid #f1f3f5;
+            font-size: .66rem; color: #212529; line-height: 1.45; word-break: keep-all;
+          }
           #mall-section .mall-disclosure {
             margin-top: 1.6rem; padding: 14px 18px;
             background: #f1f3f5; border-left: 5px solid #495057; border-radius: 8px;
             font-size: .92rem; font-weight: 700; color: #212529;
           }
         </style>
-        <div class="container" style="max-width:1400px; margin:0 auto; padding-top:1.5rem; padding-bottom:3rem;">
+        <div class="container" style="max-width:1400px; margin:0 auto; padding-top:3rem; padding-bottom:3rem;">
           <div class="mall-head">
             <h1 class="mall-title">올공몰 🛒</h1>
             <span class="mall-sub">공기업 취준 필수템 셀렉션 — 경영평가위원 현직 교수 PICK</span>
           </div>
           <div class="mall-notice">
-            올공(ALLGong)은 구직자에게 공공기관 채용정보를 <b>100% 무료</b>로 제공합니다.<br>
-            아래 링크를 통한 제품 구매는 <b>올공 운영에 큰 힘</b>이 됩니다. 감사합니다 🙏
+            올공(ALLGong)은 모든 구직자에게 공공기관 채용정보를 <b>100% 무료</b>로 제공합니다.<br>
+            아래 링크를 통한 제품 구매는 <b>올공 운영에 큰 힘</b>이 됩니다. 감사합니다 🙏<br>
+            <span style="color:#212529;">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</span>
           </div>
           <div id="mallGrid" class="mall-grid"></div>
           <div class="mall-disclosure">
@@ -6152,6 +6157,7 @@
                 + '<p class="mall-copy">' + esc(b.copy) + '</p>'
                 + '<p class="mall-product">' + esc(b.product) + '</p>'
                 + '<span class="mall-cta">쿠팡에서 보기 →</span>'
+                + '<span class="mall-card-disclosure">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</span>'
                 + '</a>';
             }).join('');
           }
