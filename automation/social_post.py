@@ -341,11 +341,65 @@ def _post_threads(cfg: dict, caption: str, image_url: str = None) -> bool:
             timeout=30,
         )
         if r2.ok:
-            print(f"  ✅ 쓰레드 게시 완료{'(이미지 포함)' if image_url else ''}: {r2.json().get('id')}")
-            return True
+            tid = r2.json().get("id")
+            print(f"  ✅ 쓰레드 게시 완료{'(이미지 포함)' if image_url else ''}: {tid}")
+            return tid or True  # 게시글 ID 반환 (댓글 작성용)
         last_err = f"{r2.status_code} {r2.text[:300]}"
         time.sleep(5)
     raise RuntimeError(f"발행 실패: {last_err}")
+
+
+# ─────────── 쿠팡파트너스 교재 댓글 (게시 직후 첫 답글로 자동 작성) ───────────
+# 본문에 상업 링크를 넣으면 도달률이 떨어질 수 있어 '링크는 댓글에' 방식 사용.
+# 끄려면 _config/social 문서에 coupang_reply: false 추가.
+COUPANG_REPLY_BOOKS = {
+    "morning": {  # 신규 공고 → 이제 시작하는 취준생
+        "copy": "오늘부터 NCS 시작하는 분들 주목! 기본기는 이 책으로 잡는 게 국룰 📚",
+        "url": "https://link.coupang.com/a/fseb3PYXym",
+    },
+    "noon": {  # 마감 임박 → 단기 실전
+        "copy": "마감 임박 = 벼락치기 타임 ⏰ 6대 출제사 찐기출로 실전 감각 급속충전!",
+        "url": "https://link.coupang.com/a/fseEVLUOdM",
+    },
+    "evening": {  # 정규직 → 피셋형 대비
+        "copy": "정규직 필기는 피셋형이 대세! 기출예상문제로 미리 적응하세요 ✍️",
+        "url": "https://link.coupang.com/a/fsdNI9YCEn",
+    },
+}
+COUPANG_DISCLOSURE = "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."
+
+
+def _post_coupang_reply(cfg: dict, thread_id: str, slot: str) -> bool:
+    """방금 올린 쓰레드 게시글에 교재 추천 댓글(첫 답글)을 단다. 실패해도 본 게시에는 영향 없음."""
+    if cfg.get("coupang_reply") is False:
+        return False
+    uid, tok = cfg.get("threads_user_id"), cfg.get("threads_access_token")
+    book = COUPANG_REPLY_BOOKS.get(slot)
+    if not uid or not tok or not book or not thread_id or thread_id is True:
+        return False
+    text = (f"{book['copy']}\n"
+            f"🎓 공공기관 경영평가위원 현직 교수 PICK\n"
+            f"👉 {book['url']}\n\n{COUPANG_DISCLOSURE}")
+    r = requests.post(f"{THREADS_API}/{uid}/threads", data={
+        "access_token": tok, "media_type": "TEXT",
+        "text": text, "reply_to_id": thread_id,
+    }, timeout=30)
+    if not r.ok:
+        msg = r.text[:300]
+        if "permission" in msg.lower() or "scope" in msg.lower() or r.status_code == 403:
+            print("  ⚠️ 교재 댓글 실패: 쓰레드 토큰에 답글 권한(threads_manage_replies)이 없습니다."
+                  " 토큰 재발급 시 이 권한을 포함해 주세요.")
+        else:
+            print(f"  ⚠️ 교재 댓글 컨테이너 실패: {r.status_code} {msg}")
+        return False
+    creation_id = r.json().get("id")
+    r2 = requests.post(f"{THREADS_API}/{uid}/threads_publish",
+                       data={"creation_id": creation_id, "access_token": tok}, timeout=30)
+    if r2.ok:
+        print(f"  ✅ 교재 추천 댓글 작성 완료: {r2.json().get('id')}")
+        return True
+    print(f"  ⚠️ 교재 댓글 발행 실패: {r2.status_code} {r2.text[:300]}")
+    return False
 
 
 def _post_instagram(cfg: dict, caption: str, image_url: str) -> bool:
@@ -487,8 +541,14 @@ def post_daily(db, df) -> None:
         print("  (쓰레드: 이 슬롯은 오늘 이미 게시함 → 건너뜀)")
     else:
         try:
-            if _post_threads(cfg, caption_threads, card_url):
+            _tid = _post_threads(cfg, caption_threads, card_url)
+            if _tid:
                 _cfg_ref(db).set({f"last_threads_{slot}": today}, merge=True)
+                # 게시 직후 첫 댓글로 쿠팡 교재 추천 자동 작성 (실패해도 게시에는 영향 없음)
+                try:
+                    _post_coupang_reply(cfg, _tid, slot)
+                except Exception as e:  # noqa: BLE001
+                    print(f"  ⚠️ 교재 댓글 오류(무시): {e}")
         except Exception as e:  # noqa: BLE001
             print(f"  ⚠️ 쓰레드 게시 실패: {e}")
 
