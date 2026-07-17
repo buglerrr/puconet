@@ -27,13 +27,17 @@ Gemini(Vertex AI)로 완전히 새 문장으로 재작성(패러프레이징)한
 """
 
 import html
+import io
 import json
+import os
 import re
 import hashlib
 from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 
 import requests
+
+FONT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts")
 
 KST = timezone(timedelta(hours=9))
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -271,7 +275,117 @@ def _paraphrase(cfg: dict, item: dict, article: dict):
         return None
 
 
-# ─────────────────── 4) 게시판 저장 ───────────────────
+# ─────────────── 4) 자동 썸네일 생성 ───────────────
+# 언론사 사진은 별도 저작권이 있어 쓰지 않고, 직접 만든 카드 이미지를 사용:
+#   ① 기사에 등장하는 공공기관의 CI 로고(Storage `logos/` 보유분)를 찾으면 → 로고 카드
+#   ② 없으면 → 제목을 넣은 브랜드 카드 (색상은 제목 해시로 선택 → 글마다 다양)
+_CARD_PALETTES = [
+    ("#1b2a6b", "#2f54c9"), ("#0b5e57", "#159a8e"), ("#4c2f8f", "#7048c9"),
+    ("#20455e", "#3f7fae"), ("#7a3a16", "#c05621"), ("#5c164e", "#a61e8e"),
+]
+
+
+def _wrap_chars(draw, text, font, max_w: int, max_lines: int) -> list:
+    """한글용 글자 단위 줄바꿈 (다 못 담으면 마지막 줄을 말줄임 처리)."""
+    lines, cur, truncated = [], "", False
+    for ch in text:
+        if draw.textlength(cur + ch, font=font) <= max_w:
+            cur += ch
+        else:
+            lines.append(cur)
+            cur = ch
+            if len(lines) == max_lines:
+                truncated = True
+                break
+    if not truncated and cur:
+        lines.append(cur)
+    if truncated and lines:
+        lines[-1] = lines[-1][:-1] + "…"
+    return [ln.strip() for ln in lines if ln.strip()]
+
+
+def _find_logo(bucket, text: str):
+    """기사 텍스트에 등장하는 기관의 로고(Storage logos/)를 찾아 PIL 이미지로 반환."""
+    from PIL import Image
+    candidates = []
+    flat = text.replace(" ", "")
+    for blob in bucket.list_blobs(prefix="logos/"):
+        name = blob.name.replace("logos/", "")
+        if not name:
+            continue
+        company = name.rsplit(".", 1)[0].strip()
+        if len(company.replace(" ", "")) >= 3 and company.replace(" ", "") in flat:
+            candidates.append((company, blob))
+    if not candidates:
+        return None, ""
+    company, blob = max(candidates, key=lambda c: len(c[0]))  # 가장 구체적(긴) 기관명 우선
+    img = Image.open(io.BytesIO(blob.download_as_bytes())).convert("RGBA")
+    return img, company
+
+
+def _make_thumbnail(post: dict) -> str:
+    """썸네일 카드를 생성해 Storage 에 올리고 공개 URL 반환. 실패 시 예외."""
+    from firebase_admin import storage
+    from PIL import Image, ImageDraw, ImageFont
+
+    xb = lambda s: ImageFont.truetype(os.path.join(FONT_DIR, "NanumGothicExtraBold.ttf"), s)  # noqa: E731
+    rg = lambda s: ImageFont.truetype(os.path.join(FONT_DIR, "NanumGothic.ttf"), s)  # noqa: E731
+    bucket = storage.bucket()
+    W, H = 800, 450
+
+    logo, company = (None, "")
+    try:
+        logo, company = _find_logo(bucket, post["title"] + " " + post["content"][:300])
+    except Exception as e:  # noqa: BLE001
+        print(f"  (로고 탐색 실패 — 텍스트 카드로 대체: {e})")
+
+    def _hex(c):
+        return tuple(int(c[i:i + 2], 16) for i in (1, 3, 5))
+
+    if logo is not None:
+        # ① 기관 CI 카드: 흰 바탕 + 로고 중앙 + 상단 포인트 라인 + 하단 안내 바
+        img = Image.new("RGB", (W, H), "#ffffff")
+        d = ImageDraw.Draw(img)
+        d.rectangle((0, 0, W, 10), fill="#1c7ed6")
+        logo.thumbnail((520, 230))
+        img.paste(logo, (int((W - logo.width) / 2), int((H - 64 - logo.height) / 2) + 5), logo)
+        d.rectangle((0, H - 64, W, H), fill="#f1f3f5")
+        label = f"공공기관 뉴스 | {company}"
+        d.text((32, H - 64 + 18), label, font=xb(26), fill="#495057")
+        site = "allgongin.com"
+        d.text((W - 32 - d.textlength(site, font=rg(24)), H - 64 + 20), site, font=rg(24), fill="#868e96")
+    else:
+        # ② 브랜드 텍스트 카드: 세로 그라데이션 + 뉴스 배지 + 제목
+        top, bottom = _CARD_PALETTES[int(_h(post["title"]), 16) % len(_CARD_PALETTES)]
+        (r1, g1, b1), (r2, g2, b2) = _hex(top), _hex(bottom)
+        img = Image.new("RGB", (W, H))
+        d = ImageDraw.Draw(img)
+        for y in range(H):
+            t = y / H
+            d.line((0, y, W, y), fill=(int(r1 + (r2 - r1) * t), int(g1 + (g2 - g1) * t), int(b1 + (b2 - b1) * t)))
+        badge = "공공기관 NEWS"
+        bw = d.textlength(badge, font=xb(26))
+        d.rounded_rectangle((48, 48, 48 + bw + 36, 48 + 46), radius=10, outline="#ffffff", width=2)
+        d.text((48 + 18, 48 + 9), badge, font=xb(26), fill="#ffffff")
+        y = 140
+        for ln in _wrap_chars(d, post["title"], xb(52), W - 96, 3):
+            d.text((48, y), ln, font=xb(52), fill="#ffffff")
+            y += 74
+        d.text((48, H - 64), "allgongin.com", font=rg(26), fill=(255, 255, 255))
+
+    buf = io.BytesIO()
+    img.save(buf, "PNG")
+    blob = bucket.blob(f"news_images/auto/{datetime.now(KST):%Y%m%d}_{_h(post['title'])}.png")
+    blob.upload_from_string(buf.getvalue(), content_type="image/png")
+    try:
+        blob.make_public()
+    except Exception:  # noqa: BLE001
+        pass  # 균일 버킷 접근이면 ACL 불가 → public_url 그대로 사용
+    print(f"  🖼️ 썸네일 생성: {'기관 CI(' + company + ')' if logo is not None else '텍스트 카드'}")
+    return blob.public_url
+
+
+# ─────────────────── 5) 게시판 저장 ───────────────────
 def _save_post(db, post: dict, item: dict, article: dict, cfg: dict):
     now = datetime.now(KST)
     press = article["press"] or "원문 기사"
@@ -281,6 +395,11 @@ def _save_post(db, post: dict, item: dict, article: dict, cfg: dict):
     image_url = ""
     if str(cfg.get("use_og_image", "")).lower() in ("true", "1", "yes"):
         image_url = article.get("image", "")
+    if not image_url:
+        try:  # 저작권 안전한 자동 썸네일 (기관 CI 카드 또는 브랜드 텍스트 카드)
+            image_url = _make_thumbnail(post)
+        except Exception as e:  # noqa: BLE001
+            print(f"  (썸네일 생성 실패 — 이미지 없이 게시: {e})")
     db.collection("news").add({
         "title": post["title"][:120],
         "desc": post["desc"][:200],
