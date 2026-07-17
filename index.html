@@ -929,7 +929,7 @@
     header nav a {
       font-size: 1.44rem !important;
       /* 1.6x of 0.9rem */
-      margin-right: 3rem !important;
+      margin-right: 1.75rem !important; /* 올공몰 추가로 8개 메뉴가 한 줄에 맞도록 간격 축소 */
       /* wider spacing */
     }
 
@@ -985,7 +985,7 @@
 
     /* Navigation spacing (keep as is from v13 unless overridden elsewhere) */
     header nav a {
-      margin-right: 3rem !important;
+      margin-right: 1.75rem !important;
     }
 
     /* '상품신청>' stays slightly lighter */
@@ -4463,6 +4463,8 @@
             <a href="#"
               onclick="showContestBoard(); return false;">공모전
               소식</a>
+            <a href="#" onclick="showMallBoard(); return false;"
+              style="color: #e8590c; font-weight:bold;">올공몰</a>
             <a href="#" onclick="checkLoginAndExecute(showStoryBoard, '취업 이야기를 보려면 로그인이 필요합니다.'); return false;"
               style="color: #666; font-weight:bold;">취업 이야기</a>
           </div>
@@ -6046,7 +6048,7 @@
             ['features', 'jobs', 'general-jobs', 'hibrain-jobs', 'edu-courses', 'chatroom-section',
              'story-board-section', 'detail-section', 'story-detail-section', 'news-section', 'news-detail-section',
              'contest-section', 'contest-detail-section', 'board-section', 'user-manage-section',
-             'edu-board-section', 'calendar-board-section', 'recruit-calendar'].forEach(function (id) {
+             'edu-board-section', 'calendar-board-section', 'recruit-calendar', 'mall-section'].forEach(function (id) {
               var el = document.getElementById(id); if (el) el.style.display = 'none';
             });
             var sec = document.getElementById('inst-intro-section'); if (sec) sec.style.display = 'block';
@@ -6066,8 +6068,11 @@
               if (typeof orig !== 'function') { remaining++; return; }
               if (orig.__instIntroWrapped) return;
               var wrapped = function () {
-                var el = document.getElementById('inst-intro-section');
-                if (el) el.style.display = 'none';
+                // 다른 메뉴로 이동 시 공공기관소개·올공몰 섹션 숨김
+                ['inst-intro-section', 'mall-section'].forEach(function (id) {
+                  var el = document.getElementById(id);
+                  if (el) el.style.display = 'none';
+                });
                 return orig.apply(this, arguments);
               };
               wrapped.__instIntroWrapped = true;
@@ -6079,6 +6084,93 @@
           (function tryWrap() {
             if (wrapNavFns() > 0 && _wrapTries++ < 40) setTimeout(tryWrap, 500);
           })();
+        })();
+      </script>
+
+      <!-- ===== 올공몰: 쿠팡파트너스 추천 교재 모음 (로그인 불필요) ===== -->
+      <div id="mall-section" style="display:none; width:100%;">
+        <style>
+          #mall-section .mall-head { border-bottom: 3px solid #e8590c; padding-bottom: 12px; margin-bottom: 1.2rem; display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+          #mall-section .mall-title { font-size: 1.7rem; font-weight: 800; color: #2c3e50; margin: 0; }
+          #mall-section .mall-sub { font-size: .95rem; color: #868e96; }
+          #mall-section .mall-notice {
+            background: linear-gradient(135deg, #fff3bf 0%, #ffe8cc 100%);
+            border: 2px solid #ffd43b; border-radius: 12px;
+            padding: 14px 18px; margin-bottom: 1.4rem;
+            font-size: .95rem; font-weight: 700; color: #5c3c00; line-height: 1.6;
+          }
+          #mall-section .mall-notice b { color: #d9480f; }
+          #mall-section .mall-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+          #mall-section .mall-card {
+            display: flex; flex-direction: column; align-items: center;
+            background: #fff; border: 1px solid #e9ecef; border-radius: 12px;
+            padding: 16px 14px; text-decoration: none; text-align: center;
+            transition: box-shadow .15s, transform .15s;
+          }
+          #mall-section .mall-card:hover { box-shadow: 0 6px 18px rgba(0,0,0,.12); transform: translateY(-3px); }
+          #mall-section .mall-label {
+            align-self: flex-start; background: #1c7ed6; color: #fff;
+            font-size: .72rem; font-weight: 800; padding: 3px 10px; border-radius: 999px; margin-bottom: 10px;
+          }
+          #mall-section .mall-card img { width: 110px; height: 175px; object-fit: contain; background: #f8f9fa; border-radius: 8px; margin-bottom: 10px; }
+          #mall-section .mall-copy { font-size: .88rem; font-weight: 700; color: #212529; line-height: 1.45; margin: 0 0 6px; }
+          #mall-section .mall-product { font-size: .74rem; color: #868e96; line-height: 1.4; margin: 0 0 10px; }
+          #mall-section .mall-cta { margin-top: auto; background: #e8590c; color: #fff; font-size: .82rem; font-weight: 700; padding: 7px 14px; border-radius: 8px; }
+          #mall-section .mall-disclosure {
+            margin-top: 1.6rem; padding: 14px 18px;
+            background: #f1f3f5; border-left: 5px solid #495057; border-radius: 8px;
+            font-size: .92rem; font-weight: 700; color: #212529;
+          }
+        </style>
+        <div class="container" style="max-width:1400px; margin:0 auto; padding-top:1.5rem; padding-bottom:3rem;">
+          <div class="mall-head">
+            <h1 class="mall-title">올공몰 🛒</h1>
+            <span class="mall-sub">공기업 취준 필수템 셀렉션 — 경영평가위원 현직 교수 PICK</span>
+          </div>
+          <div class="mall-notice">
+            올공(ALLGong)은 구직자에게 공공기관 채용정보를 <b>100% 무료</b>로 제공합니다.<br>
+            아래 링크를 통한 제품 구매는 <b>올공 운영에 큰 힘</b>이 됩니다. 감사합니다 🙏
+          </div>
+          <div id="mallGrid" class="mall-grid"></div>
+          <div class="mall-disclosure">
+            이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+          </div>
+        </div>
+      </div>
+      <script>
+        (function () {
+          function esc(s) { var d = document.createElement('div'); d.textContent = (s == null ? '' : String(s)); return d.innerHTML.replace(/"/g, '&quot;'); }
+
+          function renderMall() {
+            var grid = document.getElementById('mallGrid');
+            var cat = window.__affiliateCatalog || [];
+            if (!grid || !cat.length) return;
+            grid.innerHTML = cat.map(function (b) {
+              return '<a class="mall-card" href="' + esc(b.url) + '" target="_blank" rel="noopener sponsored">'
+                + (b.label ? '<span class="mall-label">' + esc(b.label) + '</span>' : '')
+                + '<img loading="lazy" decoding="async" src="' + esc(b.img) + '" alt="' + esc(b.product) + '">'
+                + '<p class="mall-copy">' + esc(b.copy) + '</p>'
+                + '<p class="mall-product">' + esc(b.product) + '</p>'
+                + '<span class="mall-cta">쿠팡에서 보기 →</span>'
+                + '</a>';
+            }).join('');
+          }
+
+          // 로그인 없이 접근 가능
+          window.showMallBoard = function (skipHistory) {
+            var __topBanner = document.getElementById('topAdBannerRow'); if (__topBanner) __topBanner.style.display = 'none';
+            document.querySelectorAll('.content-with-sidebar-wrapper').forEach(function (el) { el.classList.add('full-width-wrapper'); });
+            ['features', 'jobs', 'general-jobs', 'hibrain-jobs', 'edu-courses', 'chatroom-section',
+             'story-board-section', 'detail-section', 'story-detail-section', 'news-section', 'news-detail-section',
+             'contest-section', 'contest-detail-section', 'board-section', 'user-manage-section',
+             'edu-board-section', 'calendar-board-section', 'recruit-calendar', 'inst-intro-section'].forEach(function (id) {
+              var el = document.getElementById(id); if (el) el.style.display = 'none';
+            });
+            var sec = document.getElementById('mall-section'); if (sec) sec.style.display = 'block';
+            if (!skipHistory) { try { history.pushState({ section: 'mall' }, '', '#mall'); } catch (e) { } }
+            window.scrollTo(0, 0);
+            renderMall();
+          };
         })();
       </script>
 
@@ -11762,6 +11854,9 @@ function initCarousel(carouselContainer) {
       } else if (hash === '#inst-intro') {
         if (typeof window.showInstIntroBoard === 'function') window.showInstIntroBoard(true);
         history.replaceState({ section: 'inst-intro' }, '', hash);
+      } else if (hash === '#mall') {
+        if (typeof window.showMallBoard === 'function') window.showMallBoard(true);
+        history.replaceState({ section: 'mall' }, '', hash);
       } else {
         // 기본: 홈으로
         history.replaceState({ section: 'home' }, '', '#home');
@@ -11833,6 +11928,9 @@ function initCarousel(carouselContainer) {
       } else if (state.section === 'inst-intro') {
         // 공공기관소개로 이동
         if (typeof window.showInstIntroBoard === 'function') window.showInstIntroBoard(true);
+      } else if (state.section === 'mall') {
+        // 올공몰로 이동
+        if (typeof window.showMallBoard === 'function') window.showMallBoard(true);
       } else {
         // 기본: 홈으로
         window.goHome(true);
@@ -13524,6 +13622,21 @@ function initCarousel(carouselContainer) {
       copy: '어떤 직렬이든 NCS 기본기가 합격의 시작! 기본서로 탄탄하게 출발 🚀'
     };
 
+    // 올공몰 페이지에서 사용할 전체 카탈로그 (분류 라벨 부여 + 중복 링크 제거)
+    var MALL_LABELS = ['경영·회계·사무', '금융·보험', '전기·전자', '기계', '건설(토목)', '건설(건축)',
+                       '화학·바이오', '정보통신(IT)', '보건·의료', '환경·에너지·안전',
+                       '운전·운송(물류)', '법률·법무', '연구직'];
+    window.__affiliateCatalog = (function () {
+      var out = [], seen = {};
+      AFFILIATE_BOOKS.forEach(function (b, i) {
+        if (seen[b.url]) return;
+        seen[b.url] = 1;
+        out.push(Object.assign({ label: MALL_LABELS[i] || '' }, b));
+      });
+      out.push(Object.assign({ label: '종합(전 직렬)' }, AFFILIATE_ETC));
+      return out;
+    })();
+
     window.renderAffiliateBox = function (job) {
       var box = document.getElementById('affiliate-box');
       if (!box) return;
@@ -13930,6 +14043,16 @@ function initCarousel(carouselContainer) {
     gap: 14px !important;
   }
   html.mobile-view #eduBannerMirror .edu-banner { height: 300px !important; }
+
+  /* ---------- 8-0. 올공몰: 4열 → 2열 ---------- */
+  html.mobile-view #mall-section .mall-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+  html.mobile-view #mall-section .mall-title { font-size: 1.3rem !important; }
+  html.mobile-view #mall-section .container { padding: 1rem 12px 2rem 12px !important; }
+  html.mobile-view #mall-section .mall-notice { font-size: .85rem !important; }
+  html.mobile-view #mall-section .mall-card img { width: 90px !important; height: 145px !important; }
 
   /* ---------- 8-1. 공공기관소개(CI 디렉터리): 5열 → 2열 ---------- */
   html.mobile-view #inst-intro-section .inst-logo-grid {
