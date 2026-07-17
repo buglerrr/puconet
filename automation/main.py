@@ -570,6 +570,14 @@ def run() -> dict:
             shorts_video.run_daily(firestore.client(), df)
         except Exception as e:  # noqa: BLE001
             print(f"  ⚠️ 쇼츠 생성 오류(무시): {e}")
+        # 공공기관 뉴스 자동 게시(하루 3건) — 설정(Firestore _config/news) 없으면 무동작,
+        # 어떤 오류가 나도 크롤링 결과에는 영향 없음
+        try:
+            import news_sync
+            print("📰 공공기관 뉴스 자동 게시 시도")
+            news_sync.run_daily(firestore.client())
+        except Exception as e:  # noqa: BLE001
+            print(f"  ⚠️ 뉴스 자동 게시 오류(무시): {e}")
         print(f"🎉 완료: {result}")
         return result
     except Exception as e:  # noqa: BLE001
