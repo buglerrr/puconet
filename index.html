@@ -6090,6 +6090,9 @@
       <!-- ===== 올공몰: 쿠팡파트너스 추천 교재 모음 (로그인 불필요) ===== -->
       <div id="mall-section" style="display:none; width:100%;">
         <style>
+          /* 헤더(하늘색 선)와 '올공몰' 제목 사이 간격 — 기존 .main-content-area .container 의
+             padding:0 !important 규칙이 인라인 값을 덮어쓰므로 ID 선택자로 더 강하게 지정 */
+          #mall-section .container { padding-top: 3rem !important; }
           #mall-section .mall-head { border-bottom: 3px solid #e8590c; padding-bottom: 12px; margin-bottom: 1.2rem; display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
           #mall-section .mall-title { font-size: 1.7rem; font-weight: 800; color: #2c3e50; margin: 0; }
           #mall-section .mall-sub { font-size: .95rem; color: #868e96; }
