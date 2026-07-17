@@ -5191,6 +5191,56 @@
                 </div>
                 <div class="apply-info-note">ⓘ 마감일은 기관의 사정으로 인해 조기 마감 또는 변경될 수 있습니다</div>
               </div>
+
+              <!-- ===== 쿠팡파트너스 추천 교재 (공고의 NCS코드명과 자동 매칭, 하단 스크립트가 채움) ===== -->
+              <style>
+                #affiliate-box { text-align: left; border-bottom: 1px solid #eee; padding-bottom: 1.25rem; margin-bottom: 1.25rem; }
+                .aff-top {
+                  background: linear-gradient(135deg, #fff3bf 0%, #ffe8cc 100%);
+                  border: 2px solid #ffd43b; border-radius: 12px;
+                  padding: 14px 18px; margin-bottom: 14px;
+                  font-size: .95rem; font-weight: 700; color: #5c3c00; line-height: 1.6;
+                }
+                .aff-top .aff-top-strong { color: #d9480f; }
+                .aff-card {
+                  display: flex; align-items: center; gap: 18px;
+                  border: 1px solid #e9ecef; border-radius: 12px;
+                  padding: 14px 18px; text-decoration: none; background: #fff;
+                  transition: box-shadow .15s, transform .15s;
+                }
+                .aff-card:hover { box-shadow: 0 6px 18px rgba(0,0,0,.1); transform: translateY(-2px); }
+                .aff-card img { width: 96px; height: 150px; object-fit: contain; flex-shrink: 0; background: #f8f9fa; border-radius: 8px; }
+                .aff-card .aff-body { min-width: 0; }
+                .aff-badge {
+                  display: inline-block; background: #1c7ed6; color: #fff;
+                  font-size: .74rem; font-weight: 800; padding: 4px 10px;
+                  border-radius: 999px; margin-bottom: 8px;
+                }
+                .aff-copy { font-size: 1rem; font-weight: 700; color: #212529; margin: 0 0 6px; line-height: 1.5; }
+                .aff-product { font-size: .82rem; color: #868e96; margin: 0 0 10px; line-height: 1.45; }
+                .aff-cta {
+                  display: inline-block; background: #e8590c; color: #fff;
+                  font-size: .85rem; font-weight: 700; padding: 7px 14px; border-radius: 8px;
+                }
+                .aff-disclosure { font-size: .76rem; color: #adb5bd; margin-top: 10px; }
+              </style>
+              <div id="affiliate-box" style="display:none;">
+                <div class="aff-top">
+                  올공(ALLGong)은 구직자에게 공공기관 채용정보를 <span class="aff-top-strong">100% 무료</span>로 제공합니다.<br>
+                  아래 링크를 통한 제품 구매는 <span class="aff-top-strong">올공 운영에 큰 힘</span>이 됩니다. 감사합니다 🙏
+                </div>
+                <a id="affiliateLink" class="aff-card" href="#" target="_blank" rel="noopener sponsored">
+                  <img id="affiliateImg" src="" alt="추천 교재">
+                  <div class="aff-body">
+                    <span class="aff-badge">🎓 공공기관 경영평가위원 현직 교수 PICK</span>
+                    <p id="affiliateCopy" class="aff-copy"></p>
+                    <p id="affiliateProduct" class="aff-product"></p>
+                    <span class="aff-cta">쿠팡에서 자세히 보기 →</span>
+                  </div>
+                </a>
+                <p class="aff-disclosure">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
+              </div>
+
               <div id="detail-attachment-area" style="margin-bottom:1rem; text-align:left; display:none;">
                 <strong>💾 첨부파일:</strong> <a id="detail-attachment-link" href="#" target="_blank"
                   style="color:#3498db; text-decoration:underline;"></a>
@@ -10311,6 +10361,9 @@ function displayStoriesForPage(page) {
       const _descEsc = document.createElement('div'); _descEsc.textContent = content || '';
       document.getElementById('detail-desc').innerHTML = content ? _descEsc.innerHTML.replace(/\n/g, '<br>') : '내용이 없습니다.';
 
+      // 쿠팡파트너스 추천 교재: 공고 NCS코드명과 매칭되는 카드 표시 (하단 스크립트에서 정의)
+      try { if (typeof window.renderAffiliateBox === 'function') window.renderAffiliateBox(job); } catch (e) { /* 무시 */ }
+
       // 이미지 처리
       const imgArea = document.getElementById('detail-image-area');
       const mainImg = document.getElementById('detail-main-image');
@@ -13387,6 +13440,110 @@ function initCarousel(carouselContainer) {
 })();
 </script>
 
+<!-- ===== [추가] 쿠팡파트너스 추천 교재: 공고 NCS코드명 ↔ 교재 자동 매칭 =====
+     - 채용공고 상세를 열 때마다 그 공고의 NCS코드명(대분류)에 맞는 교재 카드를 하단에 표시
+     - 기존 공고·새로 크롤링되는 공고 모두 자동 적용 (열람 시점에 매칭)
+     - 링크 교체/추가: 아래 AFFILIATE_BOOKS 배열만 수정하면 됨 -->
+<script>
+  (function () {
+    // keys: 공고의 NCS코드명에 이 단어가 포함되면 매칭 (위에서부터 순서대로 검사, 첫 매칭 사용)
+    var AFFILIATE_BOOKS = [
+      { keys: ['경영', '회계', '사무'],
+        url: 'https://link.coupang.com/a/fsdNI9YCEn',
+        img: 'https://image15.coupangcdn.com/image/affiliate/banner/1a386cdecdcb1029fc2ac351c9d5025d@2x.jpg',
+        product: '공기업 PSAT형 NCS 기출예상문제집 의사소통능력, 에듀윌',
+        copy: '사무직 필기는 결국 NCS 싸움! 기출로 감 잡고 시작하는 게 국룰입니다 ✍️' },
+      { keys: ['금융', '보험'],
+        url: 'https://link.coupang.com/a/fsedWljjtA',
+        img: 'https://img1a.coupangcdn.com/image/affiliate/banner/004417270b96de525cc7cf13dcfa9ec9@2x.jpg',
+        product: '혼잡 JOB 금융 NCS를 위한 피셋 300제, 커리어빅',
+        copy: '금융 공기업 노린다면 피셋형은 선택이 아니라 필수! 300제로 한 번에 정리 💰' },
+      { keys: ['전기', '전자'],
+        url: 'https://link.coupang.com/a/fsef8D9lYq',
+        img: 'https://image7.coupangcdn.com/image/affiliate/banner/1dd9cdfa74690f8665d3a16c3ca3e983@2x.jpg',
+        product: '2026 최신판 시대에듀 공기업 전공필기 전기직 통합기본서',
+        copy: '전기직 전공필기, 통합기본서 한 권이면 세팅 끝 ⚡' },
+      { keys: ['기계'],
+        url: 'https://link.coupang.com/a/fsehSaTM4a',
+        img: 'https://img1c.coupangcdn.com/image/affiliate/banner/abda02c035a8b82a863b2d482b1e809d@2x.jpg',
+        product: '2026 공기업 [2주완성] NCS 통합 기본서 + 실전모의고사 5회분, 에듀윌',
+        copy: '기계직도 결국 NCS부터! 2주 완성으로 단기 승부 보세요 🔧' },
+      { keys: ['토목'],
+        url: 'https://link.coupang.com/a/fsel3gBPPg',
+        img: 'https://img3c.coupangcdn.com/image/affiliate/banner/6ed1f873d87efa376d167f0b36293b8c@2x.jpg',
+        product: 'NCS 인천교통공사 토목 분야 필기시험 봉투모의고사 3회분, 서원각',
+        copy: '토목직 필기는 기출동형 모의고사로 실전 감각부터 끌어올리기 🏗️' },
+      { keys: ['건축'],
+        url: 'https://link.coupang.com/a/fseqg338TY',
+        img: 'https://image6.coupangcdn.com/image/affiliate/banner/26666bd84e057a8682253676d0d12ea5@2x.jpg',
+        product: '2026 단기 합격 해커스공기업 NCS 통합 기본서 모듈형+피듈형+PSAT형, 해커스잡',
+        copy: '건축직 준비는 모듈형+피듈형+PSAT형 한 권 정리가 정답 🏢' },
+      { keys: ['화학', '바이오'],
+        url: 'https://link.coupang.com/a/fsevNaGgsS',
+        img: 'https://image14.coupangcdn.com/image/affiliate/banner/e7fd690d3cb91d53c93e71b9314dfc6e@2x.jpg',
+        product: 'NCS기반 직무분야별 직무능력평가 17 화학, 씨마스',
+        copy: '화학 직무능력평가, 개념부터 실전까지 이 책 하나로 🧪' },
+      { keys: ['정보통신', '정보기술', '소프트웨어', 'IT'],
+        url: 'https://link.coupang.com/a/fsevNaGgsS',
+        img: 'https://image14.coupangcdn.com/image/affiliate/banner/e7fd690d3cb91d53c93e71b9314dfc6e@2x.jpg',
+        product: 'NCS기반 직무분야별 직무능력평가 17 화학, 씨마스',
+        copy: 'IT 직렬도 NCS 기본기가 먼저! 직무능력평가 대비는 미리미리 💻' },
+      { keys: ['보건', '의료', '간호'],
+        url: 'https://link.coupang.com/a/fseAQKTpFQ',
+        img: 'https://image1.coupangcdn.com/image/affiliate/banner/8ebee050f9cf51ae977b02047ad8cd42@2x.jpg',
+        product: '2026 시대에듀 안전보건공단 통합기본서 (무료 NCS특강 + 모의고사 쿠폰)',
+        copy: '보건·의료 계열 공공기관, 통합기본서로 필기 한 방에 🩺' },
+      { keys: ['환경', '에너지', '안전'],
+        url: 'https://link.coupang.com/a/fseEVLUOdM',
+        img: 'https://img5c.coupangcdn.com/image/affiliate/banner/b1cb81b187555ddc2ef67db3ba188dcf@2x.jpg',
+        product: '에듀윌 공기업 NCS 6대 출제사 찐기출문제집 + 무료특강',
+        copy: '6대 출제사 찐기출! 환경·안전 직렬 필기는 기출이 답 ♻️' },
+      { keys: ['운전', '운송', '물류'],
+        url: 'https://link.coupang.com/a/fseHuEQlci',
+        img: 'https://img1c.coupangcdn.com/image/affiliate/banner/b1cb81b187555ddc2ef67db3ba188dcf@2x.jpg',
+        product: '에듀윌 공기업 NCS 6대 출제사 찐기출문제집 + 무료특강',
+        copy: '물류·운송 직렬도 NCS는 필수! 찐기출로 유형 완전 정복 🚚' },
+      { keys: ['법률', '법무'],
+        url: 'https://link.coupang.com/a/fseJjCIUuG',
+        img: 'https://image1.coupangcdn.com/image/affiliate/banner/8edb8d4ac0486a31acaa06e702bdda69@2x.jpg',
+        product: '2026 공기업 법학 최단기 문제풀이, 서원각',
+        copy: '법무직 전공필기, 최단기 문제풀이로 효율 극대화 ⚖️' },
+      { keys: ['연구'],
+        url: 'https://link.coupang.com/a/fseKIsQjIq',
+        img: 'https://img1a.coupangcdn.com/image/affiliate/banner/66ddb4d38df4c2018e4286c6f0945f29@2x.jpg',
+        product: '시대에듀 과학기술분야 정부출연연구기관(정출연) 통합편 NCS + 모의고사 4회',
+        copy: '정출연 노리는 연구자라면? 통합편 NCS로 필기 준비 완료 🔬' }
+    ];
+    // 기타(위 분류에 해당하지 않는 모든 공고)
+    var AFFILIATE_ETC = {
+      url: 'https://link.coupang.com/a/fseb3PYXym',
+      img: 'https://image1.coupangcdn.com/image/affiliate/banner/a4d93379d0d99bc5ef09f7696e9b9b77@2x.jpg',
+      product: '2026 고시넷 공기업 NCS 기본서: 초록이 1 (모듈형/피듈형)',
+      copy: '어떤 직렬이든 NCS 기본기가 합격의 시작! 기본서로 탄탄하게 출발 🚀'
+    };
+
+    window.renderAffiliateBox = function (job) {
+      var box = document.getElementById('affiliate-box');
+      if (!box) return;
+      try {
+        var ncs = String((job && (job.ncsCode || '')) || '');
+        var pick = AFFILIATE_ETC;
+        for (var i = 0; i < AFFILIATE_BOOKS.length; i++) {
+          var hit = AFFILIATE_BOOKS[i].keys.some(function (k) { return ncs.indexOf(k) !== -1; });
+          if (hit) { pick = AFFILIATE_BOOKS[i]; break; }
+        }
+        document.getElementById('affiliateLink').setAttribute('href', pick.url);
+        var img = document.getElementById('affiliateImg');
+        img.src = pick.img;
+        img.alt = pick.product;
+        document.getElementById('affiliateCopy').textContent = pick.copy;
+        document.getElementById('affiliateProduct').textContent = pick.product;
+        box.style.display = 'block';
+      } catch (e) { box.style.display = 'none'; }
+    };
+  })();
+</script>
+
 <!-- ===== [추가] '마감 임박 채용' 자동 목록 (내일 마감(D-1) 공고 → 홈 줄글 섹션에 자동 채움, 매일 갱신) ===== -->
 <script>
   (function () {
@@ -13932,6 +14089,13 @@ function initCarousel(carouselContainer) {
     flex-wrap: wrap;
   }
   html.mobile-view .apply-right-row .lbl { min-width: 68px !important; }
+
+  /* 11-3b. 쿠팡파트너스 추천 교재 카드: 좁은 화면 보정 */
+  html.mobile-view .aff-top { font-size: .85rem !important; padding: 12px 14px !important; }
+  html.mobile-view .aff-card { gap: 12px !important; padding: 12px !important; }
+  html.mobile-view .aff-card img { width: 76px !important; height: 120px !important; }
+  html.mobile-view .aff-copy { font-size: .9rem !important; }
+  html.mobile-view .aff-product { font-size: .74rem !important; }
 
   /* 11-4. 하단 버튼(목록으로/채용 사이트 방문): 전체 폭 세로 스택 */
   html.mobile-view .detail-footer .cta-button {
