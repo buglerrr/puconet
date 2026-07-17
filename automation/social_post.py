@@ -172,7 +172,8 @@ def _build_caption_threads(slot: str, df, rows) -> str:
         org = str(r.get("기관명", "")).strip()
         lines.append(f"▪ {org}{_end_suffix(r.get('공고종료일'))}")
         lines.append(f"👉 {_short_link(r)}")
-    lines += ["", meta["tags"]]
+    # 웹사이트 유입 유도 문구 (모든 슬롯 공통)
+    lines += ["", "👉 전체 공고와 채용달력은 올공에서: allgongin.com", "", meta["tags"]]
     return "\n".join(lines)
 
 
