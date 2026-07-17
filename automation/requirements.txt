@@ -9,3 +9,5 @@ imageio-ffmpeg==0.*
 google-cloud-texttospeech==2.*
 google-api-python-client==2.*
 python-docx==1.*
+# ── 공공기관 뉴스 자동 게시용 (기사 본문 추출) ──
+beautifulsoup4==4.*

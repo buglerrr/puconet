@@ -28,7 +28,7 @@ echo "▶ [1/6] API 활성화..."
 gcloud services enable \
   cloudfunctions.googleapis.com run.googleapis.com cloudbuild.googleapis.com \
   cloudscheduler.googleapis.com secretmanager.googleapis.com \
-  texttospeech.googleapis.com drive.googleapis.com
+  texttospeech.googleapis.com drive.googleapis.com aiplatform.googleapis.com
 
 # ── 2) 알리오 서비스키를 Secret Manager에 저장 ──
 echo "▶ [2/6] 알리오 서비스키 입력 (입력 내용은 화면에 표시되지 않습니다)"
@@ -50,6 +50,9 @@ gcloud projects add-iam-policy-binding "$PROJECT" \
   --member="serviceAccount:$SA" --role="roles/datastore.user" >/dev/null
 gcloud projects add-iam-policy-binding "$PROJECT" \
   --member="serviceAccount:$SA" --role="roles/storage.objectAdmin" >/dev/null
+# 뉴스 패러프레이징(Vertex AI Gemini) 호출 권한
+gcloud projects add-iam-policy-binding "$PROJECT" \
+  --member="serviceAccount:$SA" --role="roles/aiplatform.user" >/dev/null
 # 시크릿 접근 권한
 gcloud secrets add-iam-policy-binding ALIO_SERVICE_KEY \
   --member="serviceAccount:$SA" --role="roles/secretmanager.secretAccessor" >/dev/null || true
