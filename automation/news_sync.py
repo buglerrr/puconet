@@ -70,6 +70,21 @@ def _norm_title(t: str) -> str:
     return re.sub(r"[^0-9가-힣a-zA-Z]", "", t).lower()
 
 
+def _trim_to_complete_sentence(text: str) -> str:
+    """미완성으로 끝난 본문을 마지막 '완결된 문장'까지만 남긴다.
+    (모델 출력이 잘렸을 때 '…다뤄졌으며' 같은 끊긴 문장이 게시되는 것을 방지)"""
+    t = (text or "").rstrip()
+    if not t:
+        return t
+    # 문장 종결로 인정: . ! ? … 및 닫는 따옴표/괄호가 바로 뒤따르는 경우
+    if re.search(r"[.!?…][\"”')\]]*$", t):
+        return t
+    ends = [m.end() for m in re.finditer(r"[.!?…][\"”')\]]*", t)]
+    if not ends:
+        return t  # 종결부호가 하나도 없으면 원문 유지 (아래 길이 검사에서 걸러짐)
+    return t[:ends[-1]].rstrip()
+
+
 def _cfg(db) -> dict:
     try:
         doc = db.collection("_config").document("news").get()
@@ -172,16 +187,23 @@ def _gemini_generate(cfg: dict, prompt: str) -> str:
     creds.refresh(GARequest())
     project = (cfg.get("project") or adc_project or "recruit-board")
     models = [cfg["model"]] if cfg.get("model") else GEMINI_MODELS
-    body = {
-        "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-        "generationConfig": {
-            "temperature": 0.7,
-            "maxOutputTokens": 2048,
-            "responseMimeType": "application/json",
-        },
-    }
     last = None
     for model in models:
+        gen_cfg = {
+            "temperature": 0.7,
+            # 한도가 작으면 JSON 강제 출력이 문장 중간에 잘린 채 '유효한 JSON'으로
+            # 마감되어 미완성 글이 그대로 게시될 수 있음 → 넉넉하게 확보
+            "maxOutputTokens": 8192,
+            "responseMimeType": "application/json",
+        }
+        if model.startswith("gemini-2.5"):
+            # 2.5 모델의 '생각(thinking)' 토큰이 출력 한도를 잠식해 본문이 잘리는
+            # 것을 방지 (뉴스 재작성에는 사고 과정이 필요 없음)
+            gen_cfg["thinkingConfig"] = {"thinkingBudget": 0}
+        body = {
+            "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+            "generationConfig": gen_cfg,
+        }
         url = (f"https://aiplatform.googleapis.com/v1/projects/{project}"
                f"/locations/global/publishers/google/models/{model}:generateContent")
         try:
@@ -191,8 +213,14 @@ def _gemini_generate(cfg: dict, prompt: str) -> str:
                 last = f"모델 없음: {model}"
                 continue
             r.raise_for_status()
-            parts = r.json()["candidates"][0]["content"]["parts"]
-            return "".join(p.get("text", "") for p in parts)
+            cand = r.json()["candidates"][0]
+            finish = cand.get("finishReason", "STOP")
+            if finish == "MAX_TOKENS":
+                # 잘린 응답은 미완성 글이 게시되므로 사용하지 않음
+                last = f"출력이 한도에서 잘림(MAX_TOKENS): {model}"
+                continue
+            parts = cand["content"]["parts"]
+            return "".join(p.get("text", "") for p in parts if not p.get("thought"))
         except Exception as e:  # noqa: BLE001
             last = e
     raise RuntimeError(f"Gemini 호출 실패: {last}")
@@ -233,7 +261,7 @@ def _paraphrase(cfg: dict, item: dict, article: dict):
         raw = re.sub(r"^```(?:json)?|```$", "", raw.strip(), flags=re.M).strip()
         data = json.loads(raw)
         title = str(data.get("title", "")).strip()
-        content = str(data.get("content", "")).strip()
+        content = _trim_to_complete_sentence(str(data.get("content", "")).strip())
         desc = str(data.get("desc", "")).strip() or content[:80]
         if len(title) < 5 or len(content) < 200:
             raise ValueError("생성 결과가 너무 짧음")
