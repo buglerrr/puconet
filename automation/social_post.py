@@ -351,22 +351,46 @@ def _post_threads(cfg: dict, caption: str, image_url: str = None) -> bool:
 
 # ─────────── 쿠팡파트너스 교재 댓글 (게시 직후 첫 답글로 자동 작성) ───────────
 # 본문에 상업 링크를 넣으면 도달률이 떨어질 수 있어 '링크는 댓글에' 방식 사용.
-# 끄려면 _config/social 문서에 coupang_reply: false 추가.
-COUPANG_REPLY_BOOKS = {
-    "morning": {  # 신규 공고 → 이제 시작하는 취준생
-        "copy": "오늘부터 NCS 시작하는 분들 주목! 기본기는 이 책으로 잡는 게 국룰 📚",
-        "url": "https://link.coupang.com/a/fseb3PYXym",
-    },
-    "noon": {  # 마감 임박 → 단기 실전
-        "copy": "마감 임박 = 벼락치기 타임 ⏰ 6대 출제사 찐기출로 실전 감각 급속충전!",
-        "url": "https://link.coupang.com/a/fseEVLUOdM",
-    },
-    "evening": {  # 정규직 → 피셋형 대비
-        "copy": "정규직 필기는 피셋형이 대세! 기출예상문제로 미리 적응하세요 ✍️",
-        "url": "https://link.coupang.com/a/fsdNI9YCEn",
-    },
-}
+# 게시 때마다 아래 카탈로그에서 무작위로 한 권 선택.
+# 끄려면 _config/social 문서에 coupang_reply: false (쓰레드) / coupang_reply_ig: false (인스타) 추가.
+COUPANG_CATALOG = [
+    {"copy": "사무직 필기는 결국 NCS 싸움! 기출로 감 잡고 시작하는 게 국룰 ✍️",
+     "url": "https://link.coupang.com/a/fsdNI9YCEn"},   # 경영·회계·사무 (PSAT형 기출예상)
+    {"copy": "금융 공기업 노린다면 피셋형은 선택이 아니라 필수! 300제로 한 번에 정리 💰",
+     "url": "https://link.coupang.com/a/fsedWljjtA"},   # 금융·보험
+    {"copy": "전기직 전공필기, 통합기본서 한 권이면 세팅 끝 ⚡",
+     "url": "https://link.coupang.com/a/fsef8D9lYq"},   # 전기·전자
+    {"copy": "기계직도 결국 NCS부터! 2주 완성으로 단기 승부 🔧",
+     "url": "https://link.coupang.com/a/fsehSaTM4a"},   # 기계
+    {"copy": "토목직 필기는 기출동형 모의고사로 실전 감각부터 🏗️",
+     "url": "https://link.coupang.com/a/fsel3gBPPg"},   # 건설(토목)
+    {"copy": "모듈형+피듈형+PSAT형 한 권 정리가 정답 🏢",
+     "url": "https://link.coupang.com/a/fseqg338TY"},   # 건설(건축)
+    {"copy": "화학 직무능력평가, 개념부터 실전까지 이 책 하나로 🧪",
+     "url": "https://link.coupang.com/a/fsevNaGgsS"},   # 화학·바이오 (=IT 동일 링크라 1회만 수록)
+    {"copy": "보건·의료 계열 공공기관, 통합기본서로 필기 한 방에 🩺",
+     "url": "https://link.coupang.com/a/fseAQKTpFQ"},   # 보건·의료
+    {"copy": "6대 출제사 찐기출! 필기는 결국 기출이 답 ♻️",
+     "url": "https://link.coupang.com/a/fseEVLUOdM"},   # 환경·에너지·안전
+    {"copy": "벼락치기 타임 ⏰ 찐기출로 실전 감각 급속충전!",
+     "url": "https://link.coupang.com/a/fseHuEQlci"},   # 운전·운송(물류)
+    {"copy": "법무직 전공필기, 최단기 문제풀이로 효율 극대화 ⚖️",
+     "url": "https://link.coupang.com/a/fseJjCIUuG"},   # 법률·법무
+    {"copy": "정출연 노리는 연구자라면? 통합편 NCS로 필기 준비 완료 🔬",
+     "url": "https://link.coupang.com/a/fseKIsQjIq"},   # 연구직
+    {"copy": "어떤 직렬이든 NCS 기본기가 합격의 시작! 기본서로 탄탄하게 🚀",
+     "url": "https://link.coupang.com/a/fseb3PYXym"},   # 종합 기본서(초록이)
+]
 COUPANG_DISCLOSURE = "이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."
+
+
+def _coupang_comment_text() -> str:
+    """카탈로그에서 무작위 교재를 뽑아 댓글 문구 생성 (쓰레드/인스타 공용)."""
+    import random
+    book = random.choice(COUPANG_CATALOG)
+    return (f"{book['copy']}\n"
+            f"🎓 공공기관 경영평가위원 현직 교수 PICK\n"
+            f"👉 {book['url']}\n\n{COUPANG_DISCLOSURE}")
 
 
 def _post_coupang_reply(cfg: dict, thread_id: str, slot: str) -> bool:
@@ -374,12 +398,9 @@ def _post_coupang_reply(cfg: dict, thread_id: str, slot: str) -> bool:
     if cfg.get("coupang_reply") is False:
         return False
     uid, tok = cfg.get("threads_user_id"), cfg.get("threads_access_token")
-    book = COUPANG_REPLY_BOOKS.get(slot)
-    if not uid or not tok or not book or not thread_id or thread_id is True:
+    if not uid or not tok or not thread_id or thread_id is True:
         return False
-    text = (f"{book['copy']}\n"
-            f"🎓 공공기관 경영평가위원 현직 교수 PICK\n"
-            f"👉 {book['url']}\n\n{COUPANG_DISCLOSURE}")
+    text = _coupang_comment_text()
     r = requests.post(f"{THREADS_API}/{uid}/threads", data={
         "access_token": tok, "media_type": "TEXT",
         "text": text, "reply_to_id": thread_id,
@@ -445,11 +466,35 @@ def _post_instagram(cfg: dict, caption: str, image_url: str) -> bool:
             timeout=60,
         )
         if r2.ok:
-            print(f"  ✅ 인스타그램 게시 완료: {r2.json().get('id')}")
-            return True
+            mid = r2.json().get("id")
+            print(f"  ✅ 인스타그램 게시 완료: {mid}")
+            return mid or True  # 미디어 ID 반환 (댓글 작성용)
         last_err = f"{r2.status_code} {r2.text[:300]}"
         time.sleep(5)
     raise RuntimeError(f"발행 실패: {last_err}")
+
+
+def _post_coupang_comment_ig(cfg: dict, media_id: str) -> bool:
+    """방금 올린 인스타그램 게시물에 교재 추천 댓글을 단다. 실패해도 본 게시에는 영향 없음.
+    ※ 인스타그램 댓글의 URL은 앱에서 클릭이 안 되고 복사해야 함(플랫폼 제한)."""
+    if cfg.get("coupang_reply_ig") is False:
+        return False
+    tok = cfg.get("ig_access_token")
+    if not tok or not media_id or media_id is True:
+        return False
+    text = _coupang_comment_text()
+    r = requests.post(f"{IG_API}/{media_id}/comments",
+                      data={"message": text, "access_token": tok}, timeout=30)
+    if r.ok:
+        print(f"  ✅ 인스타 교재 댓글 작성 완료: {r.json().get('id')}")
+        return True
+    msg = r.text[:300]
+    if "permission" in msg.lower() or "scope" in msg.lower() or r.status_code == 403:
+        print("  ⚠️ 인스타 교재 댓글 실패: 토큰에 댓글 권한(instagram_business_manage_comments)이 "
+              "없습니다. 토큰 재발급 시 이 권한을 포함해 주세요.")
+    else:
+        print(f"  ⚠️ 인스타 교재 댓글 실패: {r.status_code} {msg}")
+    return False
 
 
 # ─────────────────────── 토큰 자동 연장 ───────────────────────
@@ -557,8 +602,14 @@ def post_daily(db, df) -> None:
     else:
         image_url = card_url or cfg.get("ig_image_url")
         try:
-            if _post_instagram(cfg, caption_ig, image_url):
+            _mid = _post_instagram(cfg, caption_ig, image_url)
+            if _mid:
                 _cfg_ref(db).set({f"last_ig_{slot}": today}, merge=True)
+                # 게시 직후 교재 추천 댓글 자동 작성 (실패해도 게시에는 영향 없음)
+                try:
+                    _post_coupang_comment_ig(cfg, _mid)
+                except Exception as e:  # noqa: BLE001
+                    print(f"  ⚠️ 인스타 교재 댓글 오류(무시): {e}")
         except Exception as e:  # noqa: BLE001
             print(f"  ⚠️ 인스타그램 게시 실패: {e}")
 
