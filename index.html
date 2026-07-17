@@ -6809,6 +6809,9 @@
 
   <footer class="site-footer">
     <style>
+      /* 본문 콘텐츠(우측 사이드바 왼쪽 경계) 안으로 푸터 내용 정렬:
+         사이드바(320px)+간격(30px)만큼 오른쪽 여백 확보 */
+      .site-footer .container { padding-right: 350px !important; }
       .site-footer .footer-grid { display: flex; gap: 48px; text-align: left; align-items: flex-start; flex-wrap: wrap; padding-top: 1rem; }
       .site-footer .footer-col-info { flex: 1.4; min-width: 320px; }
       .site-footer .footer-col-links { flex: 1; min-width: 260px; }
@@ -14458,6 +14461,7 @@ function initCarousel(carouselContainer) {
   html.mobile-view .modal-content { width: 94% !important; padding: 1.2rem !important; }
   html.mobile-view .site-footer { padding: 1.2rem 0 !important; }
   html.mobile-view .site-footer .container { max-width: 100% !important; }
+  html.mobile-view .site-footer .container { padding: 0 12px !important; } /* PC용 우측 여백(350px) 해제 */
   html.mobile-view .site-footer .footer-grid { flex-direction: column; gap: 24px !important; }
   html.mobile-view .site-footer .footer-col-info,
   html.mobile-view .site-footer .footer-col-links,
