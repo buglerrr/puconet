@@ -163,18 +163,47 @@ def _build_caption_ig(slot: str, df, rows) -> str:
     return "\n".join(lines)
 
 
+def _utf16_len(s: str) -> int:
+    """메타(쓰레드)가 세는 방식(UTF-16 단위)의 글자 수 — 이모지는 2로 계산됨."""
+    return len(s.encode("utf-16-le")) // 2
+
+
+def _hard_trim_utf16(s: str, max_units: int) -> str:
+    """UTF-16 단위 기준으로 안전하게 자르기 (이모지 중간에서 깨지지 않게)."""
+    if _utf16_len(s) <= max_units:
+        return s
+    cut = s.encode("utf-16-le")[: (max_units - 1) * 2]
+    return cut.decode("utf-16-le", errors="ignore").rstrip() + "…"
+
+
+# 쓰레드 글자 수 한도는 500 (초과 시 'Invalid parameter' 400 오류로 게시 거부됨)
+THREADS_BUDGET = 440  # 한도 대비 여유 마진
+
+
 def _build_caption_threads(slot: str, df, rows) -> str:
     """쓰레드용(500자 제한): 기관명 (~마감) + 지원 링크(자동 클릭 링크화).
-    공고 제목은 함께 첨부되는 카드 이미지에 표시되므로 본문에서는 생략해 5개 기관+링크를 모두 담는다."""
+    공고 제목은 함께 첨부되는 카드 이미지에 표시되므로 본문에서는 생략.
+    한도(500자, 메타는 이모지를 2자로 계산)를 넘지 않도록 기관 수를 5→4→3으로
+    자동 감축하고, 그래도 길면 안전하게 잘라낸다 — 기관명이 긴 날 게시가
+    통째로 거부되는 사고 방지."""
     meta = SLOT_META[slot]
-    lines = [meta["cap_title"].format(total=len(df)), ""]
-    for _, r in rows.iterrows():
-        org = str(r.get("기관명", "")).strip()
-        lines.append(f"▪ {org}{_end_suffix(r.get('공고종료일'))}")
-        lines.append(f"👉 {_short_link(r)}")
-    # 웹사이트 유입 유도 문구 (모든 슬롯 공통)
-    lines += ["", "👉 전체 공고와 채용달력은 올공에서: allgongin.com", "", meta["tags"]]
-    return "\n".join(lines)
+    items = [r for _, r in rows.iterrows()]
+
+    def compose(n):
+        lines = [meta["cap_title"].format(total=len(df)), ""]
+        for r in items[:n]:
+            org = str(r.get("기관명", "")).strip()
+            lines.append(f"▪ {org}{_end_suffix(r.get('공고종료일'))}")
+            lines.append(f"👉 {_short_link(r)}")
+        # 웹사이트 유입 유도 문구 (모든 슬롯 공통)
+        lines += ["", "👉 전체 공고와 채용달력은 올공에서: allgongin.com", "", meta["tags"]]
+        return "\n".join(lines)
+
+    for n in range(len(items), 2, -1):  # 5개 → 4개 → 3개
+        cap = compose(n)
+        if _utf16_len(cap) <= THREADS_BUDGET:
+            return cap
+    return _hard_trim_utf16(compose(min(3, len(items))), THREADS_BUDGET)
 
 
 # ─────────────────────── 카드 이미지 생성 ───────────────────────
@@ -306,17 +335,36 @@ def _post_threads(cfg: dict, caption: str, image_url: str = None) -> bool:
     if not uid or not tok:
         print("  (쓰레드 설정 없음 → 건너뜀)")
         return False
-    text = caption if len(caption) <= 480 else caption[:477] + "..."
-    payload = {"access_token": tok, "text": text}
-    if image_url:
-        payload["media_type"] = "IMAGE"
-        payload["image_url"] = image_url
-    else:
-        payload["media_type"] = "TEXT"
-    r = requests.post(f"{THREADS_API}/{uid}/threads", data=payload, timeout=30)
-    if not r.ok:
-        raise RuntimeError(f"컨테이너 생성 실패: {r.status_code} {r.text[:300]}")
-    creation_id = r.json().get("id")
+    # 파라미터 거부(400) 대비 단계적 재시도:
+    #   ① 정상 캡션(한도 내로 컷) → ② 300자 축약본 → ③ 텍스트 전용 초단축본
+    #   (글자 수 초과·이미지 문제 등 어떤 이유로든 게시가 통째로 빠지지 않게)
+    minimal = caption.split("\n")[0] + "\n\n👉 전체 공고와 채용달력은 올공에서: allgongin.com"
+    attempts = [
+        (_hard_trim_utf16(caption, 480), image_url),
+        (_hard_trim_utf16(caption, 300), image_url),
+        (_hard_trim_utf16(minimal, 200), None),
+    ]
+    creation_id, last_err = None, ""
+    for i, (text, img) in enumerate(attempts):
+        payload = {"access_token": tok, "text": text}
+        if img:
+            payload["media_type"] = "IMAGE"
+            payload["image_url"] = img
+        else:
+            payload["media_type"] = "TEXT"
+        r = requests.post(f"{THREADS_API}/{uid}/threads", data=payload, timeout=30)
+        if r.ok:
+            creation_id = r.json().get("id")
+            image_url = img  # 실제 사용된 형태 기준으로 이후 처리(이미지 대기 여부)
+            if i:
+                print(f"  (쓰레드: {i + 1}단계 축약 재시도로 컨테이너 생성 성공)")
+            break
+        last_err = f"{r.status_code} {r.text[:300]}"
+        if r.status_code != 400:
+            break  # 파라미터 문제(400)가 아니면(토큰 만료 등) 축약 재시도 무의미
+        print(f"  (쓰레드 컨테이너 거부({i + 1}차) → 축약 재시도: {last_err[:120]})")
+    if not creation_id:
+        raise RuntimeError(f"컨테이너 생성 실패: {last_err}")
     # 이미지 게시는 처리 완료까지 대기 (텍스트는 즉시 발행 가능)
     if image_url:
         for _ in range(20):  # 최대 약 60초
