@@ -6121,7 +6121,8 @@
             align-self: flex-start; background: #1c7ed6; color: #fff;
             font-size: .72rem; font-weight: 800; padding: 3px 10px; border-radius: 999px; margin-bottom: 10px;
           }
-          #mall-section .mall-card img { width: 110px; height: 175px; object-fit: contain; background: #f8f9fa; border-radius: 8px; margin-bottom: 10px; }
+          /* 쿠팡 배너 원본이 240x480(@2x)이므로 200x400 표시까지 선명함 — 책 제목이 읽히는 크기로 확대 */
+          #mall-section .mall-card img { width: 200px; max-width: 100%; height: 400px; object-fit: contain; background: #f8f9fa; border-radius: 8px; margin-bottom: 12px; }
           #mall-section .mall-copy { font-size: .88rem; font-weight: 700; color: #212529; line-height: 1.45; margin: 0 0 6px; }
           #mall-section .mall-product { font-size: .74rem; color: #868e96; line-height: 1.4; margin: 0 0 10px; }
           #mall-section .mall-cta { margin-top: auto; background: #e8590c; color: #fff; font-size: .82rem; font-weight: 700; padding: 7px 14px; border-radius: 8px; }
@@ -14232,7 +14233,7 @@ function initCarousel(carouselContainer) {
   html.mobile-view #mall-section .mall-title { font-size: 1.3rem !important; }
   html.mobile-view #mall-section .container { padding: 1rem 12px 2rem 12px !important; }
   html.mobile-view #mall-section .mall-notice { font-size: .85rem !important; }
-  html.mobile-view #mall-section .mall-card img { width: 90px !important; height: 145px !important; }
+  html.mobile-view #mall-section .mall-card img { width: 150px !important; max-width: 100% !important; height: 300px !important; }
 
   /* ---------- 8-1. 공공기관소개(CI 디렉터리): 5열 → 2열 ---------- */
   html.mobile-view #inst-intro-section .inst-logo-grid {
