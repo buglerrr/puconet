@@ -178,32 +178,48 @@ def _hard_trim_utf16(s: str, max_units: int) -> str:
 
 # 쓰레드 글자 수 한도는 500 (초과 시 'Invalid parameter' 400 오류로 게시 거부됨)
 THREADS_BUDGET = 440  # 한도 대비 여유 마진
+# 2025-12-22부터 게시물당 링크 수(본문+첨부 합산) 최대 5개 — 초과 시 400 거부.
+# → 공고 링크는 4개까지만 넣고, 올공 유입 링크가 항상 5번째 링크로 들어가게 한다.
+THREADS_JOB_LINK_MAX = 4
+# 웹사이트 유입 유도 문구 (모든 슬롯 공통 · 모든 축약 단계에서도 유지)
+THREADS_PROMO = "👉 전체 공고와 채용달력은 올공에서: https://www.allgongin.com"
 
 
-def _build_caption_threads(slot: str, df, rows) -> str:
-    """쓰레드용(500자 제한): 기관명 (~마감) + 지원 링크(자동 클릭 링크화).
-    공고 제목은 함께 첨부되는 카드 이미지에 표시되므로 본문에서는 생략.
-    한도(500자, 메타는 이모지를 2자로 계산)를 넘지 않도록 기관 수를 5→4→3으로
-    자동 감축하고, 그래도 길면 안전하게 잘라낸다 — 기관명이 긴 날 게시가
-    통째로 거부되는 사고 방지."""
+def _build_caption_threads(slot: str, df, rows) -> list:
+    """쓰레드용 캡션 '후보 목록'(큰 것 → 작은 것 순) 생성.
+    모든 후보가 두 제한(글자 500자·링크 5개)을 지키고, 올공 유입 문구를 항상 포함한다.
+    게시가 거부되면 _post_threads 가 다음 후보로 재시도 — 문구가 잘려나가는 일 방지.
+    공고 제목은 함께 첨부되는 카드 이미지에 표시되므로 본문에서는 생략."""
     meta = SLOT_META[slot]
     items = [r for _, r in rows.iterrows()]
 
-    def compose(n):
+    def compose(n_linked, n_named, with_tags=True):
         lines = [meta["cap_title"].format(total=len(df)), ""]
-        for r in items[:n]:
+        for i, r in enumerate(items[:n_named]):
             org = str(r.get("기관명", "")).strip()
             lines.append(f"▪ {org}{_end_suffix(r.get('공고종료일'))}")
-            lines.append(f"👉 {_short_link(r)}")
-        # 웹사이트 유입 유도 문구 (모든 슬롯 공통)
-        lines += ["", "👉 전체 공고와 채용달력은 올공에서: allgongin.com", "", meta["tags"]]
+            if i < n_linked:
+                lines.append(f"👉 {_short_link(r)}")
+        lines += ["", THREADS_PROMO]
+        if with_tags:
+            lines += ["", meta["tags"]]
         return "\n".join(lines)
 
-    for n in range(len(items), 2, -1):  # 5개 → 4개 → 3개
-        cap = compose(n)
-        if _utf16_len(cap) <= THREADS_BUDGET:
-            return cap
-    return _hard_trim_utf16(compose(min(3, len(items))), THREADS_BUDGET)
+    n = min(THREADS_JOB_LINK_MAX, len(items))
+    minimal = meta["cap_title"].format(total=len(df)) + "\n\n" + THREADS_PROMO
+    candidates = [
+        compose(n, n),                       # 공고 4곳 + 링크 4개 + 올공 링크
+        compose(max(n - 1, 1), max(n - 1, 1)),  # 공고 3곳으로 축소
+        compose(0, min(5, len(items))),      # 공고 링크 없이 기관명만 5곳 + 올공 링크
+        minimal,                             # 최소: 제목 + 올공 문구
+    ]
+    out = []
+    for c in candidates:
+        if _utf16_len(c) <= THREADS_BUDGET and c not in out:
+            out.append(c)
+    if minimal not in out:
+        out.append(minimal)
+    return out
 
 
 # ─────────────────────── 카드 이미지 생성 ───────────────────────
@@ -335,15 +351,12 @@ def _post_threads(cfg: dict, caption: str, image_url: str = None) -> bool:
     if not uid or not tok:
         print("  (쓰레드 설정 없음 → 건너뜀)")
         return False
-    # 파라미터 거부(400) 대비 단계적 재시도:
-    #   ① 정상 캡션(한도 내로 컷) → ② 300자 축약본 → ③ 텍스트 전용 초단축본
-    #   (글자 수 초과·이미지 문제 등 어떤 이유로든 게시가 통째로 빠지지 않게)
-    minimal = caption.split("\n")[0] + "\n\n👉 전체 공고와 채용달력은 올공에서: allgongin.com"
-    attempts = [
-        (_hard_trim_utf16(caption, 480), image_url),
-        (_hard_trim_utf16(caption, 300), image_url),
-        (_hard_trim_utf16(minimal, 200), None),
-    ]
+    # 파라미터 거부(400) 대비 단계적 재시도: 미리 만들어 둔 후보 캡션(큰 것→작은 것,
+    # 모두 글자·링크 제한 준수 + 올공 유입 문구 포함)을 순서대로 시도하고,
+    # 최후에는 텍스트 전용으로도 시도 — 어떤 이유로든 게시가 통째로 빠지지 않게.
+    cands = [c for c in (caption if isinstance(caption, list) else [caption]) if str(c).strip()]
+    attempts = [(_hard_trim_utf16(c, 480), image_url) for c in cands[:3]]
+    attempts.append((_hard_trim_utf16(cands[-1], 480), None))  # 이미지가 문제인 경우 대비
     creation_id, last_err = None, ""
     for i, (text, img) in enumerate(attempts):
         payload = {"access_token": tok, "text": text}
