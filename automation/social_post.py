@@ -543,17 +543,19 @@ def _maybe_refresh_ig_token(db, cfg: dict) -> None:
 
 
 # ─────────────────────── 진입점 ───────────────────────
-def post_daily(db, df) -> None:
+def post_daily(db, df) -> dict:
     """크롤링 완료 후 호출. 실행 시각에 따라 슬롯(아침/점심/저녁)을 정해
-    슬롯별로 하루 1회만, 각기 다른 내용으로 게시한다."""
+    슬롯별로 하루 1회만, 각기 다른 내용으로 게시한다.
+    반환값: 플랫폼별 결과 요약(dict) — main 이 _config/status 에 기록."""
+    report = {}
     snap = _cfg_ref(db).get()
     cfg = snap.to_dict() if snap.exists else None
     if not cfg or cfg.get("enabled") is False:
         print("  (SNS 자동 게시 설정 없음/비활성 → 건너뜀)")
-        return
+        return {"skip": "설정 없음/비활성"}
     if df is None or len(df) == 0:
         print("  (게시할 공고 없음 → 건너뜀)")
-        return
+        return {"skip": "실패: 게시할 공고 데이터 없음"}
 
     slot = _slot_now()
     today = _today_kst()
@@ -582,36 +584,52 @@ def post_daily(db, df) -> None:
         except Exception as e:  # noqa: BLE001
             print(f"  (카드 생성 실패 → 쓰레드는 텍스트만, 인스타는 기본 이미지 사용: {e})")
 
+    report["slot"] = slot
     if threads_done:
         print("  (쓰레드: 이 슬롯은 오늘 이미 게시함 → 건너뜀)")
+        report["threads"] = "오늘 이미 게시(스킵)"
     else:
         try:
             _tid = _post_threads(cfg, caption_threads, card_url)
             if _tid:
                 _cfg_ref(db).set({f"last_threads_{slot}": today}, merge=True)
+                report["threads"] = "게시 완료"
                 # 게시 직후 첫 댓글로 쿠팡 교재 추천 자동 작성 (실패해도 게시에는 영향 없음)
                 try:
-                    _post_coupang_reply(cfg, _tid, slot)
+                    _ok = _post_coupang_reply(cfg, _tid, slot)
+                    report["threads_comment"] = "완료" if _ok else "실패/비활성 — 함수 로그 확인"
                 except Exception as e:  # noqa: BLE001
                     print(f"  ⚠️ 교재 댓글 오류(무시): {e}")
+                    report["threads_comment"] = f"실패: {str(e)[:150]}"
+            else:
+                report["threads"] = "실패: 설정 없음(threads_user_id/threads_access_token)"
         except Exception as e:  # noqa: BLE001
             print(f"  ⚠️ 쓰레드 게시 실패: {e}")
+            report["threads"] = f"실패: {str(e)[:200]}"
 
     if ig_done:
         print("  (인스타그램: 이 슬롯은 오늘 이미 게시함 → 건너뜀)")
+        report["instagram"] = "오늘 이미 게시(스킵)"
     else:
         image_url = card_url or cfg.get("ig_image_url")
         try:
             _mid = _post_instagram(cfg, caption_ig, image_url)
             if _mid:
                 _cfg_ref(db).set({f"last_ig_{slot}": today}, merge=True)
+                report["instagram"] = "게시 완료"
                 # 게시 직후 교재 추천 댓글 자동 작성 (실패해도 게시에는 영향 없음)
                 try:
-                    _post_coupang_comment_ig(cfg, _mid)
+                    _ok = _post_coupang_comment_ig(cfg, _mid)
+                    report["ig_comment"] = "완료" if _ok else "실패/비활성 — 함수 로그 확인"
                 except Exception as e:  # noqa: BLE001
                     print(f"  ⚠️ 인스타 교재 댓글 오류(무시): {e}")
+                    report["ig_comment"] = f"실패: {str(e)[:150]}"
+            else:
+                report["instagram"] = "실패: 설정 없음(ig_access_token/이미지)"
         except Exception as e:  # noqa: BLE001
             print(f"  ⚠️ 인스타그램 게시 실패: {e}")
+            report["instagram"] = f"실패: {str(e)[:200]}"
 
     _maybe_refresh_threads_token(db, cfg)
     _maybe_refresh_ig_token(db, cfg)
+    return report

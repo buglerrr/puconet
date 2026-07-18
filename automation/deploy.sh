@@ -64,7 +64,7 @@ gcloud functions deploy "$FUNC_NAME" \
   --gen2 --region="$REGION" --runtime="$RUNTIME" \
   --source=. --entry-point=job_sync \
   --trigger-http --no-allow-unauthenticated \
-  --memory=2Gi --timeout=540s \
+  --memory=2Gi --timeout=900s \
   --set-secrets=ALIO_SERVICE_KEY=ALIO_SERVICE_KEY:latest
 
 FUNC_URL=$(gcloud functions describe "$FUNC_NAME" --region="$REGION" --gen2 --format='value(serviceConfig.uri)')
@@ -76,7 +76,7 @@ SCHED_ARGS=(
   --location="$REGION" --schedule="$SCHEDULE" --time-zone="$TZ"
   --uri="$FUNC_URL" --http-method=POST
   --oidc-service-account-email="$SA" --oidc-token-audience="$FUNC_URL"
-  --attempt-deadline=540s   # 함수 타임아웃과 동일하게 — 쇼츠 생성 등으로 3분을 넘겨도 '실패'로 오기록되지 않게
+  --attempt-deadline=900s   # 함수 타임아웃과 동일하게 — 쇼츠·뉴스 등 작업 증가에 여유 확보
 )
 if gcloud scheduler jobs describe "${FUNC_NAME}-daily" --location="$REGION" >/dev/null 2>&1; then
   gcloud scheduler jobs update http "${FUNC_NAME}-daily" "${SCHED_ARGS[@]}"
@@ -91,7 +91,7 @@ for _slot in noon evening; do
       --location="$REGION" --schedule="$_sched" --time-zone="$TZ" \
       --uri="$FUNC_URL" --http-method=POST \
       --oidc-service-account-email="$SA" --oidc-token-audience="$FUNC_URL" \
-      --attempt-deadline=540s || true
+      --attempt-deadline=900s || true
   fi
 done
 

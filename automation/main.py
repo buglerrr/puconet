@@ -28,13 +28,15 @@ import math
 import os
 import re
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import pandas as pd
 import requests
 
 import firebase_admin
 from firebase_admin import firestore, storage
+
+KST = timezone(timedelta(hours=9))
 
 # ─────────────────────────── 설정 ───────────────────────────
 SERVICE_KEY = os.environ.get("ALIO_SERVICE_KEY", "")
@@ -533,6 +535,57 @@ def sync_to_firestore(df: pd.DataFrame) -> dict:
     return {"upserted": len(current_ids), "deleted": deleted, "kept_expired": kept_expired}
 
 
+def load_dataset_from_firestore() -> pd.DataFrame:
+    """알리오 API 장애 시 대체 데이터: 이미 Firestore `jobs` 에 올라와 있는
+    자동등록 공고(마감 전)를 크롤러 DataFrame 과 같은 컬럼으로 복원한다.
+    → 크롤링이 실패한 날에도 SNS/쇼츠 게시가 멈추지 않게 하는 안전장치."""
+    db = firestore.client()
+    today = datetime.now(KST).strftime("%Y-%m-%d")
+    rows = []
+    for d in db.collection(COLLECTION_NAME).where("source", "==", "alio-auto").stream():
+        v = d.to_dict() or {}
+        if v.get("archived"):
+            continue
+        dl = str(v.get("deadline") or v.get("closingDate") or "").strip()
+        if dl and dl < today:
+            continue  # 마감 지난 공고 제외
+        rows.append({
+            "기관명": v.get("company", ""),
+            "채용공고제목": v.get("title", ""),
+            "공고종료일": dl or None,
+            "공고시작일": v.get("createdAt"),
+            "고용유형": v.get("employmentType", ""),
+            "NCS코드명": v.get("ncsCode", ""),
+            "근무지역": v.get("location", ""),
+            "채용구분": v.get("careerType", ""),
+            "원본공고URL": v.get("detailUrl", ""),
+            "imageUrl": v.get("imageUrl", ""),
+            "category": v.get("category", ""),
+        })
+    df = pd.DataFrame(rows)
+    if len(df):
+        df["공고종료일"] = pd.to_datetime(df["공고종료일"], errors="coerce")
+        df["공고시작일"] = (pd.to_datetime(df["공고시작일"], errors="coerce", utc=True)
+                            .dt.tz_convert("Asia/Seoul").dt.tz_localize(None))
+    print(f"  → 대체 데이터(Firestore 보유 공고)로 진행: {len(df)}건")
+    return df
+
+
+def _write_status(stage: str, ok: bool, detail="") -> None:
+    """실행 단계별 결과를 Firestore `_config/status` 에 기록.
+    (교수님이 로그 없이 Firebase 콘솔에서 바로 상태를 확인할 수 있게)"""
+    try:
+        firestore.client().collection("_config").document("status").set({
+            stage: {
+                "ok": ok,
+                "detail": detail if isinstance(detail, dict) else str(detail)[:500],
+                "at": datetime.now(KST).strftime("%Y-%m-%d %H:%M:%S"),
+            }
+        }, merge=True)
+    except Exception as e:  # noqa: BLE001
+        print(f"  (상태 기록 실패: {e})")
+
+
 def _notify_failure(message: str) -> None:
     """실패 알림(선택): 환경변수 ALERT_WEBHOOK_URL 이 설정된 경우에만 웹훅으로 전송.
     Slack/Discord/Google Chat 등 어떤 수신 웹훅이든 가능. 미설정 시 로그만 남기고 조용히 통과."""
@@ -547,43 +600,74 @@ def _notify_failure(message: str) -> None:
 
 
 def run() -> dict:
+    if not firebase_admin._apps:
+        firebase_admin.initialize_app(options={"storageBucket": STORAGE_BUCKET})
+
+    # ── ① 크롤링 + Firestore 동기화 ──
+    # 실패해도 여기서 멈추지 않고, 보유 공고 데이터로 SNS/쇼츠/뉴스를 계속 진행한다.
+    df, result, crawl_err = None, {}, None
+    t0 = time.time()
     try:
         if not SERVICE_KEY:
             raise RuntimeError("ALIO_SERVICE_KEY 환경변수가 설정되지 않았습니다.")
-        if not firebase_admin._apps:
-            firebase_admin.initialize_app(options={"storageBucket": STORAGE_BUCKET})
         df = build_dataset()
         result = sync_to_firestore(df)
-        # SNS(인스타그램/쓰레드) 자동 게시 — 설정(Firestore _config/social) 없으면 무동작,
-        # 어떤 오류가 나도 크롤링 결과에는 영향 없음
-        try:
-            import social_post
-            print("📣 SNS 자동 게시 시도")
-            social_post.post_daily(firestore.client(), df)
-        except Exception as e:  # noqa: BLE001
-            print(f"  ⚠️ SNS 자동 게시 오류(무시): {e}")
-        # 쇼츠(마감임박 TOP5) 자동 생성 — 설정(Firestore _config/shorts) 없으면 무동작,
-        # 어떤 오류가 나도 크롤링 결과에는 영향 없음
-        try:
-            import shorts_video
-            print("🎬 쇼츠 자동 생성 시도")
-            shorts_video.run_daily(firestore.client(), df)
-        except Exception as e:  # noqa: BLE001
-            print(f"  ⚠️ 쇼츠 생성 오류(무시): {e}")
-        # 공공기관 뉴스 자동 게시(하루 3건) — 설정(Firestore _config/news) 없으면 무동작,
-        # 어떤 오류가 나도 크롤링 결과에는 영향 없음
-        try:
-            import news_sync
-            print("📰 공공기관 뉴스 자동 게시 시도")
-            news_sync.run_daily(firestore.client())
-        except Exception as e:  # noqa: BLE001
-            print(f"  ⚠️ 뉴스 자동 게시 오류(무시): {e}")
-        print(f"🎉 완료: {result}")
-        return result
+        _write_status("crawl", True, result)
     except Exception as e:  # noqa: BLE001
-        # 실패 시: 알림 전송 후 재-raise → Cloud Functions 실행이 '실패'로 기록되어 모니터링/스케줄러가 감지
-        _notify_failure(f"채용공고 크롤링 실패: {e}")
-        raise
+        crawl_err = e
+        _notify_failure(f"채용공고 크롤링 실패(SNS/뉴스는 보유 데이터로 계속 진행): {e}")
+        _write_status("crawl", False, e)
+        try:
+            df = load_dataset_from_firestore()
+        except Exception as e2:  # noqa: BLE001
+            print(f"  ⚠️ 대체 데이터 로드도 실패: {e2}")
+    print(f"⏱️ 크롤링 단계: {time.time() - t0:.0f}초")
+
+    # ── ② SNS(인스타그램/쓰레드) 자동 게시 — 설정 없으면 무동작 ──
+    t0 = time.time()
+    try:
+        import social_post
+        print("📣 SNS 자동 게시 시도")
+        rep = social_post.post_daily(firestore.client(), df)
+        ok = not any("실패" in str(v) for v in (rep or {}).values())
+        _write_status("social", ok, rep or "게시 조건 아님(설정/데이터 없음)")
+    except Exception as e:  # noqa: BLE001
+        print(f"  ⚠️ SNS 자동 게시 오류(무시): {e}")
+        _write_status("social", False, e)
+    print(f"⏱️ SNS 단계: {time.time() - t0:.0f}초")
+
+    # ── ③ 쇼츠(마감임박 TOP5) 자동 생성 — 설정 없으면 무동작 ──
+    t0 = time.time()
+    try:
+        import shorts_video
+        print("🎬 쇼츠 자동 생성 시도")
+        if df is not None and len(df):
+            shorts_video.run_daily(firestore.client(), df)
+            _write_status("shorts", True, "실행됨 (_config/shorts 의 state 참고)")
+        else:
+            print("  (데이터 없음 → 쇼츠 생략)")
+    except Exception as e:  # noqa: BLE001
+        print(f"  ⚠️ 쇼츠 생성 오류(무시): {e}")
+        _write_status("shorts", False, e)
+    print(f"⏱️ 쇼츠 단계: {time.time() - t0:.0f}초")
+
+    # ── ④ 공공기관 뉴스 자동 게시(하루 3건) — 설정 없으면 무동작 ──
+    t0 = time.time()
+    try:
+        import news_sync
+        print("📰 공공기관 뉴스 자동 게시 시도")
+        news_sync.run_daily(firestore.client())
+        _write_status("news", True, "실행됨 (_config/news 의 state 참고)")
+    except Exception as e:  # noqa: BLE001
+        print(f"  ⚠️ 뉴스 자동 게시 오류(무시): {e}")
+        _write_status("news", False, e)
+    print(f"⏱️ 뉴스 단계: {time.time() - t0:.0f}초")
+
+    if crawl_err is not None:
+        # 크롤링 실패는 마지막에 재-raise → 실행이 '실패'로 기록되어 모니터링/재시도가 동작
+        raise crawl_err
+    print(f"🎉 완료: {result}")
+    return result
 
 
 # ──────────────────── 진입점 ───────────────────────
