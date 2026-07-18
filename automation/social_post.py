@@ -413,7 +413,9 @@ def _post_threads(cfg: dict, caption: str, image_url: str = None) -> bool:
 # ─────────── 쿠팡파트너스 교재 댓글 (게시 직후 첫 답글로 자동 작성) ───────────
 # 본문에 상업 링크를 넣으면 도달률이 떨어질 수 있어 '링크는 댓글에' 방식 사용.
 # 게시 때마다 아래 카탈로그에서 무작위로 한 권 선택.
-# 끄려면 _config/social 문서에 coupang_reply: false (쓰레드) / coupang_reply_ig: false (인스타) 추가.
+# ※ 쓰레드 댓글은 현재 '일시 중지' 상태(2026-07, 유입 감소 우려로 교수님 요청).
+#    재개하려면 _config/social 문서에 coupang_reply: true (boolean) 필드 추가 — 재배포 불필요.
+# 인스타그램 댓글은 계속 동작. 끄려면 coupang_reply_ig: false 추가.
 COUPANG_CATALOG = [
     {"copy": "사무직 필기는 결국 NCS 싸움! 기출로 감 잡고 시작하는 게 국룰 ✍️",
      "url": "https://link.coupang.com/a/fsdNI9YCEn"},   # 경영·회계·사무 (PSAT형 기출예상)
@@ -455,8 +457,9 @@ def _coupang_comment_text() -> str:
 
 
 def _post_coupang_reply(cfg: dict, thread_id: str, slot: str) -> bool:
-    """방금 올린 쓰레드 게시글에 교재 추천 댓글(첫 답글)을 단다. 실패해도 본 게시에는 영향 없음."""
-    if cfg.get("coupang_reply") is False:
+    """방금 올린 쓰레드 게시글에 교재 추천 댓글(첫 답글)을 단다. 실패해도 본 게시에는 영향 없음.
+    ※ 기본 '일시 중지' — _config/social 에 coupang_reply: true 를 넣어야만 동작."""
+    if cfg.get("coupang_reply") is not True:
         return False
     uid, tok = cfg.get("threads_user_id"), cfg.get("threads_access_token")
     if not uid or not tok or not thread_id or thread_id is True:
@@ -656,12 +659,17 @@ def post_daily(db, df) -> dict:
                 _cfg_ref(db).set({f"last_threads_{slot}": today}, merge=True)
                 report["threads"] = "게시 완료"
                 # 게시 직후 첫 댓글로 쿠팡 교재 추천 자동 작성 (실패해도 게시에는 영향 없음)
-                try:
-                    _ok = _post_coupang_reply(cfg, _tid, slot)
-                    report["threads_comment"] = "완료" if _ok else "실패/비활성 — 함수 로그 확인"
-                except Exception as e:  # noqa: BLE001
-                    print(f"  ⚠️ 교재 댓글 오류(무시): {e}")
-                    report["threads_comment"] = f"실패: {str(e)[:150]}"
+                if cfg.get("coupang_reply") is not True:
+                    # 일시 중지 상태(기본) — 재개: _config/social 에 coupang_reply: true
+                    print("  (쓰레드 교재 댓글: 일시 중지 상태 → 건너뜀)")
+                    report["threads_comment"] = "일시 중지(설정)"
+                else:
+                    try:
+                        _ok = _post_coupang_reply(cfg, _tid, slot)
+                        report["threads_comment"] = "완료" if _ok else "실패/비활성 — 함수 로그 확인"
+                    except Exception as e:  # noqa: BLE001
+                        print(f"  ⚠️ 교재 댓글 오류(무시): {e}")
+                        report["threads_comment"] = f"실패: {str(e)[:150]}"
             else:
                 report["threads"] = "실패: 설정 없음(threads_user_id/threads_access_token)"
         except Exception as e:  # noqa: BLE001
