@@ -121,6 +121,17 @@ gcloud scheduler jobs run job-sync-daily --location=asia-northeast3
 예: 전체 공고를 올리고 싶다면
 `--set-env-vars=FILTER_MODE=all` 추가.
 
+## 장애 대비/상태 확인
+
+- **알리오 API 장애 시에도 SNS/쇼츠/뉴스는 계속**: 크롤링이 실패하면 이미
+  Firestore 에 올라와 있는 공고(마감 전)로 대체해 게시를 진행합니다.
+  (실행 자체는 '실패'로 기록되어 모니터링에는 잡힙니다)
+- **실행 상태 확인(로그 없이)**: Firebase 콘솔 → Firestore → `_config` → `status` 문서.
+  단계별(crawl/social/shorts/news)로 마지막 실행 시각(`at`), 성공 여부(`ok`),
+  상세(`detail` — 쓰레드/인스타/댓글별 결과)가 기록됩니다.
+- 함수 제한시간은 900초(스케줄러 대기시간 동일)로, 쇼츠·뉴스 등 작업 증가에
+  여유를 확보했습니다.
+
 ## 동작 원리 메모
 
 - **중복 방지**: 각 공고는 원본공고URL(없으면 기관명+제목+마감일) 해시를 문서 ID로 사용 →
