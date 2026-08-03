@@ -699,6 +699,98 @@ def post_reels(db, mp4_path: str, rows) -> bool:
         return False
 
 
+# ─────────────────────── ⑥-3 유튜브 쇼츠 업로드 ───────────────────────
+# 업로드는 API 키로는 불가(읽기 전용)라서, 드라이브와 동일한 '기기 코드' OAuth 1회 인증 사용.
+#   1회 설정: Cloud Shell 에서 `python3 youtube_auth.py` 실행 (README '쇼츠' 섹션 참고)
+#   끄려면 _config/shorts 문서에 youtube: false 추가.
+YOUTUBE_SCOPE = "https://www.googleapis.com/auth/youtube.upload"
+
+
+def _yt_access_token(cfg):
+    """유튜브용 액세스 토큰 발급 (드라이브와 같은 OAuth 클라이언트 + 유튜브 전용 리프레시 토큰)."""
+    cid, csec = cfg.get("drive_client_id"), cfg.get("drive_client_secret")
+    rtok = cfg.get("youtube_refresh_token")
+    if not (cid and csec and rtok):
+        return None
+    r = requests.post("https://oauth2.googleapis.com/token", data={
+        "client_id": cid, "client_secret": csec,
+        "refresh_token": rtok, "grant_type": "refresh_token",
+    }, timeout=30)
+    if not r.ok:
+        print(f"  ⚠️ 유튜브 토큰 갱신 실패: {r.status_code} {r.text[:200]}")
+        print("     → Cloud Shell 에서 `python3 youtube_auth.py` 를 다시 실행해 재인증해 주세요.")
+        return None
+    return r.json().get("access_token")
+
+
+def _yt_meta(rows):
+    """유튜브 제목(100자 한도)·설명·해시태그 자동 생성 — 그날 공고 내용 기반."""
+    now = datetime.now(KST)
+    orgs = [str(r.get("기관명", "")).strip() for r in rows]
+    title = f"{now.month}월 {now.day}일 마감임박 공공기관 채용 TOP{len(rows)} | {orgs[0]} 외 #Shorts"
+    if len(title) > 95:  # 유튜브 제목 한도(100자) 안전 마진
+        title = f"{now.month}월 {now.day}일 마감임박 공공기관 채용 TOP{len(rows)} #Shorts"
+    lines = [f"⏰ 오늘 놓치면 안 될 공공기관 채용공고 TOP {len(rows)}!", ""]
+    for i, r in enumerate(rows, start=1):
+        org = str(r.get("기관명", "")).strip()
+        jt = str(r.get("채용공고제목", "")).strip()
+        dd = _dday(r.get("공고종료일"))
+        lines.append(f"{i}위 {org} | {jt}" + (f" ({dd} 마감)" if dd else ""))
+    lines += [
+        "",
+        f"👉 전체 공고와 채용달력은 올공에서: {SITE_URL}",
+        "매일 아침, 공공기관 채용정보를 가장 빠르게 전해드립니다.",
+        "",
+        "#공공기관채용 #공기업채용 #채용공고 #취업 #취준 #마감임박 #NCS #공기업 #Shorts",
+    ]
+    tags = ["공공기관 채용", "공기업 채용", "채용공고", "취업", "취준",
+            "마감임박", "NCS", "공기업", "공채", "올공", "shorts"]
+    return title, "\n".join(lines), tags
+
+
+def upload_to_youtube(mp4_path: str, cfg: dict, rows) -> bool:
+    """유튜브 쇼츠 업로드 (재개형 업로드). 성공 시 True."""
+    try:
+        tok = _yt_access_token(cfg)
+        if not tok:
+            print("  (유튜브 개인 인증 미설정 → Cloud Shell 에서 `python3 youtube_auth.py` 를 "
+                  "한 번 실행해 주세요)")
+            return False
+        title, desc, tags = _yt_meta(rows)
+        body = {
+            "snippet": {"title": title, "description": desc, "tags": tags,
+                        "categoryId": str(cfg.get("youtube_category") or "22"),
+                        "defaultLanguage": "ko", "defaultAudioLanguage": "ko"},
+            "status": {"privacyStatus": str(cfg.get("youtube_privacy") or "public"),
+                       "selfDeclaredMadeForKids": False},
+        }
+        r = requests.post(
+            "https://www.googleapis.com/upload/youtube/v3/videos"
+            "?uploadType=resumable&part=snippet,status",
+            json=body, timeout=30,
+            headers={"Authorization": f"Bearer {tok}", "X-Upload-Content-Type": "video/mp4"})
+        if not r.ok:
+            print(f"  ⚠️ 유튜브 업로드 시작 실패: {r.status_code} {r.text[:300]}")
+            return False
+        loc = r.headers.get("Location") or r.headers.get("location")
+        if not loc:
+            print("  ⚠️ 유튜브 업로드 세션 URL 없음")
+            return False
+        with open(mp4_path, "rb") as f:
+            data = f.read()
+        r2 = requests.put(loc, data=data, timeout=600,
+                          headers={"Authorization": f"Bearer {tok}", "Content-Type": "video/mp4"})
+        if not r2.ok:
+            print(f"  ⚠️ 유튜브 업로드 실패: {r2.status_code} {r2.text[:300]}")
+            return False
+        vid = r2.json().get("id")
+        print(f"  ✅ 유튜브 쇼츠 업로드 완료: https://youtube.com/shorts/{vid}")
+        return True
+    except Exception as e:  # noqa: BLE001
+        print(f"  ⚠️ 유튜브 업로드 오류: {e}")
+        return False
+
+
 # ─────────────────────── 메인 진입점 ───────────────────────
 def run_daily(db, df):
     """크롤링 완료 후 호출. 설정이 없으면 무동작.
@@ -715,11 +807,17 @@ def run_daily(db, df):
     today = _today_kst()
     state = cfg.get("state") if isinstance(cfg.get("state"), dict) else {}
     if state.get("date") != today:
-        state = {"date": today, "drive": False, "ig": False, "script": False}
+        state = {"date": today, "drive": False, "ig": False, "script": False, "yt": False}
     need_drive = not state.get("drive")
     need_ig = bool(cfg.get("ig_reels", True)) and not state.get("ig")
     need_script = not state.get("script")
-    if not need_drive and not need_ig and not need_script:
+    # 유튜브: 인증(youtube_refresh_token)이 있어야만 시도 대상 — 미설정 상태에서
+    # '해야 할 일'로 남겨두면 매 실행마다 영상을 다시 만드는 낭비가 생기므로 제외
+    yt_ready = bool(cfg.get("youtube_refresh_token"))
+    need_yt = yt_ready and bool(cfg.get("youtube", True)) and not state.get("yt")
+    if not yt_ready and cfg.get("youtube", True):
+        print("  (유튜브 업로드 미설정 — Cloud Shell 에서 `python3 youtube_auth.py` 1회 실행 시 활성화)")
+    if not need_drive and not need_ig and not need_script and not need_yt:
         print("  (오늘 쇼츠는 이미 저장·게시 완료 → 건너뜀)")
         return
 
@@ -753,5 +851,9 @@ def run_daily(db, df):
         if need_ig:
             if post_reels(db, mp4, rows):
                 state["ig"] = True
+
+        if need_yt:
+            if upload_to_youtube(mp4, cfg, rows):
+                state["yt"] = True
 
     ref.set({"last_run": today, "state": state}, merge=True)
