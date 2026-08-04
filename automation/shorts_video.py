@@ -707,11 +707,13 @@ YOUTUBE_SCOPE = "https://www.googleapis.com/auth/youtube.upload"
 
 
 def _yt_access_token(cfg):
-    """유튜브용 액세스 토큰 발급 (드라이브와 같은 OAuth 클라이언트 + 유튜브 전용 리프레시 토큰)."""
+    """유튜브용 액세스 토큰 발급. 반환: (토큰, 실패사유) — 실패 시 (None, 사유)."""
     cid, csec = cfg.get("drive_client_id"), cfg.get("drive_client_secret")
     rtok = cfg.get("youtube_refresh_token")
-    if not (cid and csec and rtok):
-        return None
+    if not rtok:
+        return None, "인증 미설정: youtube_refresh_token 없음 → Cloud Shell 에서 python3 youtube_auth.py 실행"
+    if not (cid and csec):
+        return None, "OAuth 클라이언트 정보 없음(drive_client_id/secret) → drive_auth.py 재실행 필요"
     r = requests.post("https://oauth2.googleapis.com/token", data={
         "client_id": cid, "client_secret": csec,
         "refresh_token": rtok, "grant_type": "refresh_token",
@@ -719,8 +721,8 @@ def _yt_access_token(cfg):
     if not r.ok:
         print(f"  ⚠️ 유튜브 토큰 갱신 실패: {r.status_code} {r.text[:200]}")
         print("     → Cloud Shell 에서 `python3 youtube_auth.py` 를 다시 실행해 재인증해 주세요.")
-        return None
-    return r.json().get("access_token")
+        return None, f"토큰 갱신 실패({r.status_code}): {r.text[:150]} → youtube_auth.py 재실행"
+    return r.json().get("access_token"), ""
 
 
 def _yt_meta(rows):
@@ -749,12 +751,14 @@ def _yt_meta(rows):
 
 
 def upload_to_youtube(mp4_path: str, cfg: dict, rows) -> bool:
-    """유튜브 쇼츠 업로드 (재개형 업로드). 성공 시 True."""
+    """유튜브 쇼츠 업로드 (재개형 업로드). 성공 시 True.
+    실패 시 사유를 upload_to_youtube.last_error 에 남긴다 (state.yt_error 로 기록됨)."""
+    upload_to_youtube.last_error = ""
     try:
-        tok = _yt_access_token(cfg)
+        tok, terr = _yt_access_token(cfg)
         if not tok:
-            print("  (유튜브 개인 인증 미설정 → Cloud Shell 에서 `python3 youtube_auth.py` 를 "
-                  "한 번 실행해 주세요)")
+            upload_to_youtube.last_error = terr
+            print(f"  (유튜브 업로드 불가: {terr})")
             return False
         title, desc, tags = _yt_meta(rows)
         body = {
@@ -770,10 +774,12 @@ def upload_to_youtube(mp4_path: str, cfg: dict, rows) -> bool:
             json=body, timeout=30,
             headers={"Authorization": f"Bearer {tok}", "X-Upload-Content-Type": "video/mp4"})
         if not r.ok:
+            upload_to_youtube.last_error = f"업로드 시작 실패({r.status_code}): {r.text[:200]}"
             print(f"  ⚠️ 유튜브 업로드 시작 실패: {r.status_code} {r.text[:300]}")
             return False
         loc = r.headers.get("Location") or r.headers.get("location")
         if not loc:
+            upload_to_youtube.last_error = "업로드 세션 URL 없음"
             print("  ⚠️ 유튜브 업로드 세션 URL 없음")
             return False
         with open(mp4_path, "rb") as f:
@@ -781,12 +787,14 @@ def upload_to_youtube(mp4_path: str, cfg: dict, rows) -> bool:
         r2 = requests.put(loc, data=data, timeout=600,
                           headers={"Authorization": f"Bearer {tok}", "Content-Type": "video/mp4"})
         if not r2.ok:
+            upload_to_youtube.last_error = f"업로드 실패({r2.status_code}): {r2.text[:200]}"
             print(f"  ⚠️ 유튜브 업로드 실패: {r2.status_code} {r2.text[:300]}")
             return False
         vid = r2.json().get("id")
         print(f"  ✅ 유튜브 쇼츠 업로드 완료: https://youtube.com/shorts/{vid}")
         return True
     except Exception as e:  # noqa: BLE001
+        upload_to_youtube.last_error = f"오류: {str(e)[:200]}"
         print(f"  ⚠️ 유튜브 업로드 오류: {e}")
         return False
 
@@ -855,5 +863,9 @@ def run_daily(db, df):
         if need_yt:
             if upload_to_youtube(mp4, cfg, rows):
                 state["yt"] = True
+                state.pop("yt_error", None)
+            else:
+                # 실패 사유를 Firestore 에 기록 → Firebase 콘솔에서 바로 확인 가능
+                state["yt_error"] = getattr(upload_to_youtube, "last_error", "") or "알 수 없음"
 
     ref.set({"last_run": today, "state": state}, merge=True)
