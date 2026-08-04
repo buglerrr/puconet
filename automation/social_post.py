@@ -452,7 +452,7 @@ def _coupang_comment_text() -> str:
     import random
     book = random.choice(COUPANG_CATALOG)
     return (f"{book['copy']}\n"
-            f"🎓 공공기관 경영평가위원 현직 교수 PICK\n"
+            f"🎓 공공기관 경영평가위원 출신 교수 PICK\n"
             f"👉 {book['url']}\n\n{COUPANG_DISCLOSURE}")
 
 
