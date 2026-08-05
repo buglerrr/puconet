@@ -219,6 +219,17 @@ cd ~/puconet/automation && python3 youtube_auth.py
 
 업로드 성공 여부는 `_config/shorts` 의 `state.yt` 로 확인할 수 있습니다.
 
+### 설명 요약 댓글 자동 작성
+
+업로드 직후, 설명란 내용(해시태그 제외)을 영상의 첫 댓글로도 자동 작성합니다.
+댓글 권한은 TV 기기 코드 인증으로는 받을 수 없어(구글 제한) **웹 방식 인증**이
+한 번 필요합니다: 콘솔에서 '웹 애플리케이션' OAuth 클라이언트를 만들고
+(리디렉션 URI: `https://www.allgongin.com/yt_auth.html`),
+`python3 youtube_auth2.py` 를 실행해 안내를 따르면 됩니다.
+이 인증 하나로 업로드+댓글이 모두 처리됩니다.
+끄려면 `youtube_comment: false` 필드를 추가하세요.
+댓글 결과는 `state.yt_comment` / 실패 사유는 `state.yt_comment_error` 로 확인.
+
 ---
 
 ## 📰 공공기관 뉴스 자동 게시 — `news_sync.py`

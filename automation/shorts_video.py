@@ -707,8 +707,11 @@ YOUTUBE_SCOPE = "https://www.googleapis.com/auth/youtube.upload"
 
 
 def _yt_access_token(cfg):
-    """유튜브용 액세스 토큰 발급. 반환: (토큰, 실패사유) — 실패 시 (None, 사유)."""
-    cid, csec = cfg.get("drive_client_id"), cfg.get("drive_client_secret")
+    """유튜브용 액세스 토큰 발급. 반환: (토큰, 실패사유) — 실패 시 (None, 사유).
+    웹 방식 인증(youtube_auth2.py — 업로드+댓글 권한)이 있으면 그 클라이언트를,
+    없으면 기존 TV 방식(youtube_auth.py — 업로드 권한만) 클라이언트를 사용."""
+    cid = cfg.get("yt_web_client_id") or cfg.get("drive_client_id")
+    csec = cfg.get("yt_web_client_secret") or cfg.get("drive_client_secret")
     rtok = cfg.get("youtube_refresh_token")
     if not rtok:
         return None, "인증 미설정: youtube_refresh_token 없음 → Cloud Shell 에서 python3 youtube_auth.py 실행"
@@ -726,7 +729,8 @@ def _yt_access_token(cfg):
 
 
 def _yt_meta(rows):
-    """유튜브 제목(100자 한도)·설명·해시태그 자동 생성 — 그날 공고 내용 기반."""
+    """유튜브 제목(100자 한도)·설명·해시태그·댓글 자동 생성 — 그날 공고 내용 기반.
+    반환: (제목, 설명, 태그목록, 댓글텍스트) — 댓글은 설명과 같되 해시태그 줄 제외."""
     now = datetime.now(KST)
     orgs = [str(r.get("기관명", "")).strip() for r in rows]
     title = f"{now.month}월 {now.day}일 마감임박 공공기관 채용 TOP{len(rows)} | {orgs[0]} 외 #Shorts"
@@ -742,12 +746,33 @@ def _yt_meta(rows):
         "",
         f"👉 전체 공고와 채용달력은 올공에서: {SITE_URL}",
         "매일 아침, 공공기관 채용정보를 가장 빠르게 전해드립니다.",
-        "",
-        "#공공기관채용 #공기업채용 #채용공고 #취업 #취준 #마감임박 #NCS #공기업 #Shorts",
     ]
+    comment = "\n".join(lines)  # 댓글: 해시태그 줄 없이
+    desc = comment + "\n\n#공공기관채용 #공기업채용 #채용공고 #취업 #취준 #마감임박 #NCS #공기업 #Shorts"
     tags = ["공공기관 채용", "공기업 채용", "채용공고", "취업", "취준",
             "마감임박", "NCS", "공기업", "공채", "올공", "shorts"]
-    return title, "\n".join(lines), tags
+    return title, desc, tags, comment
+
+
+def _yt_comment(cfg: dict, video_id: str, text: str):
+    """방금 올린 유튜브 영상에 설명 요약 댓글 작성. 반환: (성공여부, 실패사유)."""
+    tok, terr = _yt_access_token(cfg)
+    if not tok:
+        return False, terr
+    r = requests.post(
+        "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet",
+        json={"snippet": {"videoId": video_id,
+                          "topLevelComment": {"snippet": {"textOriginal": text}}}},
+        headers={"Authorization": f"Bearer {tok}"}, timeout=30)
+    if r.ok:
+        print("  ✅ 유튜브 댓글 작성 완료")
+        return True, ""
+    err = f"{r.status_code} {r.text[:200]}"
+    if r.status_code == 403 and ("insufficient" in r.text.lower() or "scope" in r.text.lower()):
+        err = ("댓글 권한 없음 — 현재 인증은 업로드 전용입니다. "
+               "Cloud Shell 에서 python3 youtube_auth2.py 로 재인증하면 댓글까지 가능해집니다.")
+    print(f"  ⚠️ 유튜브 댓글 실패: {err}")
+    return False, err
 
 
 def upload_to_youtube(mp4_path: str, cfg: dict, rows) -> bool:
@@ -760,7 +785,7 @@ def upload_to_youtube(mp4_path: str, cfg: dict, rows) -> bool:
             upload_to_youtube.last_error = terr
             print(f"  (유튜브 업로드 불가: {terr})")
             return False
-        title, desc, tags = _yt_meta(rows)
+        title, desc, tags, _ = _yt_meta(rows)
         body = {
             "snippet": {"title": title, "description": desc, "tags": tags,
                         "categoryId": str(cfg.get("youtube_category") or "22"),
@@ -792,7 +817,7 @@ def upload_to_youtube(mp4_path: str, cfg: dict, rows) -> bool:
             return False
         vid = r2.json().get("id")
         print(f"  ✅ 유튜브 쇼츠 업로드 완료: https://youtube.com/shorts/{vid}")
-        return True
+        return vid or True  # 영상 ID 반환 (댓글 작성용)
     except Exception as e:  # noqa: BLE001
         upload_to_youtube.last_error = f"오류: {str(e)[:200]}"
         print(f"  ⚠️ 유튜브 업로드 오류: {e}")
@@ -825,7 +850,21 @@ def run_daily(db, df):
     need_yt = yt_ready and bool(cfg.get("youtube", True)) and not state.get("yt")
     if not yt_ready and cfg.get("youtube", True):
         print("  (유튜브 업로드 미설정 — Cloud Shell 에서 `python3 youtube_auth.py` 1회 실행 시 활성화)")
+    # 유튜브 댓글: 업로드는 됐는데 댓글만 실패한 경우 다음 슬롯에서 댓글만 재시도 (영상 재생성 없음)
+    need_yt_comment = (yt_ready and bool(cfg.get("youtube_comment", True))
+                       and state.get("yt") and state.get("yt_video_id")
+                       and not state.get("yt_comment"))
     if not need_drive and not need_ig and not need_script and not need_yt:
+        if need_yt_comment:
+            ok, err = _yt_comment(cfg, state["yt_video_id"], state.get("yt_comment_text") or "")
+            state["yt_comment"] = ok
+            if ok:
+                state.pop("yt_comment_error", None)
+                state.pop("yt_comment_text", None)
+            else:
+                state["yt_comment_error"] = err[:300]
+            ref.set({"state": state}, merge=True)
+            return
         print("  (오늘 쇼츠는 이미 저장·게시 완료 → 건너뜀)")
         return
 
@@ -861,9 +900,23 @@ def run_daily(db, df):
                 state["ig"] = True
 
         if need_yt:
-            if upload_to_youtube(mp4, cfg, rows):
+            vid = upload_to_youtube(mp4, cfg, rows)
+            if vid:
                 state["yt"] = True
                 state.pop("yt_error", None)
+                if isinstance(vid, str):
+                    state["yt_video_id"] = vid
+                    # 업로드 직후 설명 요약 댓글 자동 작성 (실패해도 업로드에는 영향 없음)
+                    if cfg.get("youtube_comment", True):
+                        comment_text = _yt_meta(rows)[3]
+                        ok, err = _yt_comment(cfg, vid, comment_text)
+                        state["yt_comment"] = ok
+                        if ok:
+                            state.pop("yt_comment_error", None)
+                        else:
+                            # 다음 슬롯에서 댓글만 재시도할 수 있게 내용 보관
+                            state["yt_comment_error"] = err[:300]
+                            state["yt_comment_text"] = comment_text
             else:
                 # 실패 사유를 Firestore 에 기록 → Firebase 콘솔에서 바로 확인 가능
                 state["yt_error"] = getattr(upload_to_youtube, "last_error", "") or "알 수 없음"
