@@ -28,7 +28,8 @@ echo "▶ [1/6] API 활성화..."
 gcloud services enable \
   cloudfunctions.googleapis.com run.googleapis.com cloudbuild.googleapis.com \
   cloudscheduler.googleapis.com secretmanager.googleapis.com \
-  texttospeech.googleapis.com drive.googleapis.com aiplatform.googleapis.com
+  texttospeech.googleapis.com drive.googleapis.com aiplatform.googleapis.com \
+  youtube.googleapis.com
 
 # ── 2) 알리오 서비스키를 Secret Manager에 저장 ──
 echo "▶ [2/6] 알리오 서비스키 입력 (입력 내용은 화면에 표시되지 않습니다)"
