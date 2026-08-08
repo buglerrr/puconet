@@ -6826,7 +6826,9 @@
       .site-footer .footer-col-info { flex: 1.4; min-width: 320px; }
       .site-footer .footer-col-links { flex: 1; min-width: 260px; }
       .site-footer .footer-col-cs { flex: 1; min-width: 250px; }
-      .site-footer .footer-links-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; margin-bottom: 18px; }
+      .site-footer .footer-links-grid { display: grid; grid-template-columns: max-content max-content; gap: 12px 36px; margin-bottom: 18px; }
+      /* 링크·고객센터 열을 회사정보의 '대표' 줄 높이에 맞춰 아래로 정렬 (PC 전용) */
+      .site-footer .footer-col-links, .site-footer .footer-col-cs { margin-top: var(--footer-col-offset, 46px); }
       .site-footer .footer-links-grid a { color: inherit; text-decoration: none; font-size: .92rem; }
       .site-footer .footer-links-grid a:hover { text-decoration: underline; }
       .site-footer .footer-links-grid a.strong { font-weight: 800; }
@@ -6851,7 +6853,7 @@
         <!-- ① 회사 정보 -->
         <div class="footer-col-info">
           <div class="brand" style="text-align:left;">(주)한국퍼블릭잡컨설팅</div>
-          <div class="footer-line">대표 : 이경한·노성민 | 사업자등록번호 : 12-725-87957 </div>
+          <div class="footer-line">대표 : 이경한·노성민 | 사업자등록번호 : 399-88-03453 </div>
           <div class="footer-line">(34430) 대전광역시 대덕구 한남로70 (오정동133) 경상대학</div>
           <div class="footer-line">통신판매업 신고번호 : 314-2345호 제 2026-대전의창-371호| 직업정보제공사업 : 대전 제 2026-321</div>
           <div class="footer-line">청소년보호책임자 : 서동훈</div>
@@ -6869,6 +6871,7 @@
             <a href="#" class="strong" onclick="openFooterDoc('privacy'); return false;">개인정보처리방침</a>
             <a href="#" onclick="openFooterDoc('youth'); return false;">청소년보호정책</a>
             <a href="#" onclick="openFooterDoc('noemail'); return false;">이메일주소무단수집거부</a>
+            <a href="#" onclick="window.open('https://storage.googleapis.com/recruit-board.firebasestorage.app/docs/business_license.jpg', '_blank', 'noopener'); return false;">사업자등록증</a>
           </div>
           <div class="footer-sns">
             <a href="https://www.instagram.com/allgongin_kr" target="_blank" rel="noopener" title="인스타그램">
@@ -13656,7 +13659,7 @@ function initCarousel(carouselContainer) {
         '</ul><br>' +
         '<p><b>회사 정보</b><br>상호: (주)한국퍼블릭잡컨설팅 | 대표: 이경한·노성민<br>' +
         '소재지: (34430) 대전광역시 대덕구 한남로70 (오정동133) 경상대학<br>' +
-        '사업자등록번호: 12-725-87957</p>'
+        '사업자등록번호: 399-88-03453</p>'
       )},
       partnership: { title: '제휴문의', body: H(
         '<p>올공(ALLGONG)은 공공기관 채용 생태계를 함께 만들어 갈 파트너를 기다립니다.</p><br>' +
@@ -14474,6 +14477,7 @@ function initCarousel(carouselContainer) {
   html.mobile-view .site-footer .container { max-width: 100% !important; }
   html.mobile-view .site-footer .container { padding: 0 12px !important; } /* PC용 우측 여백(350px) 해제 */
   html.mobile-view .site-footer .footer-grid { flex-direction: column; gap: 24px !important; }
+  html.mobile-view .site-footer .footer-col-links, html.mobile-view .site-footer .footer-col-cs { margin-top: 0 !important; }
   html.mobile-view .site-footer .footer-col-info,
   html.mobile-view .site-footer .footer-col-links,
   html.mobile-view .site-footer .footer-col-cs { min-width: 0 !important; width: 100%; }

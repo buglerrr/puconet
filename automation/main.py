@@ -382,6 +382,14 @@ def stable_doc_id(row) -> str:
 # ──────────────────── Firestore 동기화 ───────────────────────
 def load_logo_files(bucket):
     print("📂 Storage logos/ 에서 로고 목록 로드 중...")
+    # 부수 작업: docs/ 폴더 파일(사업자등록증 등)을 공개 URL 로 접근 가능하게 처리
+    # (Firebase 콘솔에서 업로드만 하면 다음 실행 때 자동으로 사이트에서 열림)
+    try:
+        for blob in bucket.list_blobs(prefix="docs/"):
+            if blob.name != "docs/":
+                blob.make_public()
+    except Exception as e:  # noqa: BLE001
+        print(f"  (docs/ 공개 처리 생략: {e})")
     logo_files = {}
     try:
         for blob in bucket.list_blobs(prefix="logos/"):
