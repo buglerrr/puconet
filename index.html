@@ -13919,6 +13919,47 @@ function initCarousel(carouselContainer) {
 </script>
 
 <!-- ============================================================
+     ===== 홈 접속 공지 팝업 =====
+     Storage `docs/popup.jpg` 파일이 있을 때만 자동 표시됩니다.
+     - 팝업 교체: Firebase 콘솔 → Storage → docs 폴더에 popup.jpg 새로 업로드
+     - 팝업 중단: docs/popup.jpg 삭제 (코드 수정 불필요)
+     - 이미지가 없거나 로드 실패 시 아무것도 뜨지 않습니다.
+     ============================================================ -->
+<div id="homeNoticePopup"
+  style="display:none; position:fixed; top:110px; left:60px; z-index:10500; width:430px; max-width:90vw;
+         background:#fff; border:1px solid #dee2e6; border-radius:12px; overflow:hidden;
+         box-shadow:0 12px 40px rgba(0,0,0,.28);">
+  <img id="homeNoticeImg" alt="올공 공지" title="클릭하면 크게 볼 수 있습니다"
+    style="display:block; width:100%; height:auto; max-height:70vh; object-fit:contain; cursor:pointer;"
+    onclick="window.open(this.src, '_blank', 'noopener')">
+  <div style="display:flex; border-top:1px solid #e9ecef;">
+    <button type="button" onclick="closeHomeNoticePopup(true)"
+      style="flex:1; padding:11px 0; border:none; background:#f8f9fa; color:#495057; font-size:.85rem; cursor:pointer;">
+      오늘 하루 열지 않음</button>
+    <button type="button" onclick="closeHomeNoticePopup(false)"
+      style="flex:1; padding:11px 0; border:none; border-left:1px solid #e9ecef; background:#343a40; color:#fff;
+             font-size:.85rem; font-weight:700; cursor:pointer;">닫기</button>
+  </div>
+</div>
+<script>
+  (function () {
+    var POPUP_IMG = 'https://storage.googleapis.com/recruit-board.firebasestorage.app/docs/popup.jpg';
+    window.closeHomeNoticePopup = function (hideToday) {
+      if (hideToday) { try { localStorage.setItem('allgong_popup_hide', new Date().toDateString()); } catch (e) { } }
+      var p = document.getElementById('homeNoticePopup');
+      if (p) p.style.display = 'none';
+    };
+    try { if (localStorage.getItem('allgong_popup_hide') === new Date().toDateString()) return; } catch (e) { }
+    var h = (location.hash || '').replace('#', '');
+    if (h && h !== 'home') return; // 홈 화면으로 들어온 경우에만 표시
+    var img = document.getElementById('homeNoticeImg');
+    img.onload = function () { document.getElementById('homeNoticePopup').style.display = 'block'; };
+    // 이미지가 없으면(업로드 전/삭제 후) 팝업을 띄우지 않음
+    img.src = POPUP_IMG + '?v=' + new Date().toISOString().slice(0, 10); // 교체 시 하루 내 반영
+  })();
+</script>
+
+<!-- ============================================================
      ===== [모바일 전용 CSS] =====
      핸드폰으로 접속했을 때만 적용됩니다.
      (문서 상단 <head>의 감지 스크립트가 스마트폰에서만 <html>에
@@ -14231,6 +14272,12 @@ function initCarousel(carouselContainer) {
     gap: 14px !important;
   }
   html.mobile-view #eduBannerMirror .edu-banner { height: 300px !important; }
+
+  /* ---------- 7-9. 홈 공지 팝업: 화면 중앙 배치 ---------- */
+  html.mobile-view #homeNoticePopup {
+    left: 50% !important; top: 50% !important; transform: translate(-50%, -50%);
+    width: 86vw !important;
+  }
 
   /* ---------- 8-0. 올공몰: 4열 → 2열 ---------- */
   html.mobile-view #mall-section .mall-grid {
