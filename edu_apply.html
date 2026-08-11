@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>교육 신청 — 올공(ALLGONG)</title>
+  <link rel="icon" type="image/png" href="https://github.com/buglerrr/puconet/blob/main/ALLGONG%20CI.png?raw=true">
+  <!-- EmailJS (기존 1:1 문의와 동일 설정 재사용) -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>(function () { emailjs.init({ publicKey: 'rUFBb4XT-CKbLj2iA' }); })();</script>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Pretendard", "Malgun Gothic", "맑은 고딕", "Apple SD Gothic Neo", sans-serif; color: #222; background: #fff; }
+    .hero { background: linear-gradient(150deg, #16255c 0%, #1b2f78 50%, #2a4bb5 100%); color: #fff; text-align: center; padding: 52px 16px; }
+    .hero h1 { margin: 0; font-size: 2.1rem; letter-spacing: .18em; font-weight: 400; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 0 18px 70px; }
+    h2.sec { font-size: 1.05rem; margin: 44px 0 12px; font-weight: 800; }
+    table.info { width: 100%; border-collapse: collapse; border-top: 2px solid #444; }
+    table.info th, table.info td { border: 1px solid #e1e4e8; padding: 11px 14px; font-size: .95rem; }
+    table.info th { background: #f4f5f7; font-weight: 700; width: 170px; text-align: center; }
+    table.info td input[type=text], table.info td input[type=email] { width: 100%; max-width: 420px; padding: 8px 10px; border: 1px solid #c8cdd4; border-radius: 4px; font-size: .92rem; }
+    .pay-fixed { font-weight: 700; color: #16255c; }
+    .pay-fixed small { display: block; color: #868e96; font-weight: 400; margin-top: 3px; }
+    table.apply { width: 100%; border-collapse: collapse; border-top: 2px solid #444; }
+    table.apply th, table.apply td { border: 1px solid #e1e4e8; padding: 8px 6px; font-size: .9rem; text-align: center; }
+    table.apply th { background: #f4f5f7; }
+    table.apply input { width: 100%; padding: 7px 8px; border: 1px solid #c8cdd4; border-radius: 4px; font-size: .88rem; }
+    .row-del { background: #fff; border: 1px solid #dee2e6; color: #adb5bd; border-radius: 4px; cursor: pointer; padding: 4px 8px; }
+    .row-del:hover { color: #e03131; border-color: #e03131; }
+    .btn-add { display: block; margin: 18px auto 0; background: #d9480f; color: #fff; border: none; padding: 12px 26px; font-size: 1rem; font-weight: 700; cursor: pointer; border-radius: 4px; }
+    .btn-add:hover { background: #c92a2a; }
+    .contact-bar { border: 1px solid #e1e4e8; border-top: 2px solid #444; padding: 16px 18px; display: flex; align-items: center; gap: 26px; flex-wrap: wrap; font-size: .95rem; }
+    .contact-bar .lb { color: #adb5bd; }
+    .doc-btn { background: #e8590c; color: #fff; border: none; padding: 9px 14px; font-size: .88rem; font-weight: 700; cursor: pointer; border-radius: 3px; text-decoration: none; display: inline-block; }
+    .doc-btn:hover { background: #d9480f; }
+    .privacy { border: 1px solid #e1e4e8; border-top: 2px solid #444; padding: 18px 20px; font-size: .92rem; line-height: 1.9; color: #444; }
+    .agree-line { text-align: right; margin: 12px 2px 0; font-size: .95rem; }
+    .btn-submit { display: block; margin: 34px auto 0; background: #d9480f; color: #fff; border: none; padding: 15px 60px; font-size: 1.15rem; letter-spacing: .2em; font-weight: 700; cursor: pointer; border-radius: 4px; }
+    .btn-submit:hover { background: #c92a2a; }
+    .btn-submit:disabled { background: #adb5bd; cursor: default; }
+    .topbar { border-bottom: 1px solid #e6e8ef; background: #fff; }
+    .topbar .in { max-width: 1100px; margin: 0 auto; padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; }
+    .topbar img { height: 42px; }
+    .topbar a.back { color: #3b5bdb; font-weight: 700; text-decoration: none; border: 1.5px solid #3b5bdb; padding: 7px 14px; border-radius: 8px; font-size: .9rem; }
+    @media (max-width: 760px) {
+      table.info th { width: 96px; font-size: .82rem; padding: 9px 6px; }
+      table.info td { padding: 9px 8px; }
+      .apply-scroll { overflow-x: auto; }
+      table.apply { min-width: 760px; }
+      .contact-bar { gap: 12px; font-size: .88rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="in">
+      <a href="https://www.allgongin.com"><img src="https://github.com/buglerrr/puconet/blob/main/ALLGONG%20CI.png?raw=true" alt="올공(ALLGONG)"></a>
+      <a class="back" href="https://www.allgongin.com">← 메인으로</a>
+    </div>
+  </div>
+
+  <div class="hero"><h1>교 육 신 청</h1></div>
+
+  <div class="wrap">
+
+    <h2 class="sec">교육정보</h2>
+    <table class="info">
+      <tr>
+        <th>교육명</th><td>공공기관·지방공기업 경영평가 역량 강화 세미나</td>
+        <th>교육일정</th><td>8월 26일(수) ~ 8월 27일(목), 12시간</td>
+      </tr>
+      <tr>
+        <th>교육비(VAT별도)</th><td>600,000 원 <span style="color:#868e96; font-size:.85rem;">(3인 이상 신청 시 10% 할인)</span></td>
+        <th>교육장</th><td>한남대학교 56주년기념관 소회의실2</td>
+      </tr>
+    </table>
+
+    <h2 class="sec">회사 기본정보</h2>
+    <table class="info">
+      <tr><th>회사명 *</th><td><input type="text" id="c_name"></td><th>대표자</th><td><input type="text" id="c_ceo"></td></tr>
+      <tr><th>사업자번호</th><td><input type="text" id="c_bizno"></td><th>주소</th><td><input type="text" id="c_addr"></td></tr>
+      <tr><th>업종</th><td><input type="text" id="c_upjong"></td><th>업태</th><td><input type="text" id="c_uptae"></td></tr>
+      <tr><th>세금계산서담당자</th><td><input type="text" id="c_tax"></td><th>담당자부서</th><td><input type="text" id="c_dept"></td></tr>
+      <tr><th>담당자전화</th><td><input type="text" id="c_tel"></td><th>담당자휴대폰 *</th><td><input type="text" id="c_mobile"></td></tr>
+      <tr><th>담당자메일 *</th><td><input type="email" id="c_email"></td>
+          <th>결제방법</th><td class="pay-fixed">세금계산서(계좌이체)<small>본 교육은 세금계산서(계좌이체) 결제만 가능합니다.</small></td></tr>
+    </table>
+
+    <h2 class="sec">교육신청(필수항목) <span style="font-weight:400; font-size:.85rem; color:#868e96;">— '신청자 추가' 버튼으로 인원을 늘릴 수 있습니다</span></h2>
+    <div class="apply-scroll">
+      <table class="apply">
+        <thead>
+          <tr><th style="width:44px;">NO</th><th>신청자명 *</th><th>부서</th><th>직위</th><th>전화</th><th>휴대폰</th><th>팩스</th><th>이메일</th><th style="width:46px;"></th></tr>
+        </thead>
+        <tbody id="applicantRows"></tbody>
+      </table>
+    </div>
+    <button type="button" class="btn-add" onclick="addApplicantRow()">신청자 추가</button>
+
+    <h2 class="sec">교육문의 및 문서다운</h2>
+    <div class="contact-bar">
+      <span><span class="lb">교육담당_</span> <b>서동훈 주임</b></span>
+      <span><span class="lb">T_</span> 010-4899-9701</span>
+      <span><span class="lb">email_</span> gong@allgongin.com</span>
+      <span style="margin-left:auto; display:flex; gap:8px; flex-wrap:wrap;">
+        <button type="button" class="doc-btn" onclick="openEduGuide()">교육안내</button>
+        <button type="button" class="doc-btn" onclick="openEduMap()">교육장약도</button>
+        <a class="doc-btn" href="docs/license_bankbook.pdf" target="_blank" rel="noopener">사업자등록증/통장사본</a>
+      </span>
+    </div>
+
+    <h2 class="sec">개인정보수집에 대한동의</h2>
+    <div class="privacy">
+      1) 귀하의 개인정보 수집과 관련하여 개인정보보호정책에 대한 동의를 받고 있습니다.<br>
+      2) 수집/이용항목 : 회사명, 대표자, 사업자번호, 주소, 업종, 업태, 이름, 부서, 직위, 전화, 휴대폰, 팩스, 이메일<br>
+      3) 수집/이용목적 : 교육서비스 제공 및 세금계산서 발행<br>
+      4) 보유기간 : 교육신청 완료 시점부터 3년 보관 후 삭제<br>
+      5) 위의 정보 수집, 이용에 대한 동의를 거부할 수 있습니다. 그러나 동의 거부시 원활한 교육서비스를 제공할 수 없습니다.
+    </div>
+    <p class="agree-line">개인정보 이용에 동의합니다. <input type="checkbox" id="agreeChk" style="width:16px; height:16px; vertical-align:-3px;"></p>
+
+    <button type="button" class="btn-submit" id="submitBtn" onclick="submitApplication()">신 청 하 기</button>
+  </div>
+
+  <script>
+    // ── 교육안내(세미나 포스터) / 교육장약도 ──
+    var POSTER = 'https://firebasestorage.googleapis.com/v0/b/recruit-board.firebasestorage.app/o/docs%2Fpopup.jpg?alt=media';
+    var MAP_IMG = 'https://firebasestorage.googleapis.com/v0/b/recruit-board.firebasestorage.app/o/docs%2Fmap.jpg?alt=media';
+    function openWithFallback(url, fallback, missingMsg) {
+      var probe = new Image();
+      probe.onload = function () { window.open(url, '_blank', 'noopener'); };
+      probe.onerror = function () {
+        if (fallback) window.open(fallback, '_blank', 'noopener');
+        else alert(missingMsg || '자료 준비 중입니다.');
+      };
+      probe.src = url;
+    }
+    function openEduGuide() { openWithFallback(POSTER, 'images/education/7.png'); }
+    function openEduMap() { openWithFallback(MAP_IMG, null, '교육장 약도 준비 중입니다. 문의: 010-4899-9701'); }
+
+    // ── 신청자 행 관리 ──
+    function addApplicantRow() {
+      var tb = document.getElementById('applicantRows');
+      var n = tb.children.length + 1;
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td class="no">' + n + '</td>'
+        + '<td><input data-f="name"></td><td><input data-f="dept"></td><td><input data-f="position"></td>'
+        + '<td><input data-f="tel"></td><td><input data-f="mobile"></td><td><input data-f="fax"></td>'
+        + '<td><input data-f="email" type="email"></td>'
+        + '<td>' + (n > 1 ? '<button type="button" class="row-del" onclick="removeApplicantRow(this)">✕</button>' : '') + '</td>';
+      tb.appendChild(tr);
+    }
+    function removeApplicantRow(btn) {
+      var tr = btn.closest('tr');
+      tr.parentNode.removeChild(tr);
+      // 번호 다시 매기기
+      var rows = document.querySelectorAll('#applicantRows tr');
+      rows.forEach(function (r, i) { r.querySelector('.no').textContent = i + 1; });
+    }
+    addApplicantRow(); // 기본 1명
+
+    function collect() {
+      var v = function (id) { return (document.getElementById(id).value || '').trim(); };
+      var applicants = [];
+      document.querySelectorAll('#applicantRows tr').forEach(function (tr) {
+        var a = {};
+        tr.querySelectorAll('input[data-f]').forEach(function (inp) { a[inp.getAttribute('data-f')] = inp.value.trim(); });
+        if (Object.values(a).some(function (x) { return x; })) applicants.push(a);
+      });
+      return {
+        company: { name: v('c_name'), ceo: v('c_ceo'), bizno: v('c_bizno'), addr: v('c_addr'),
+                   upjong: v('c_upjong'), uptae: v('c_uptae'), taxManager: v('c_tax'), dept: v('c_dept'),
+                   tel: v('c_tel'), mobile: v('c_mobile'), email: v('c_email') },
+        applicants: applicants,
+      };
+    }
+
+    function buildMailMessage(d) {
+      var esc = function (s) { var t = document.createElement('div'); t.textContent = s || '-'; return t.innerHTML; };
+      var c = d.company;
+      var html = '<b>[교육신청] 공공기관·지방공기업 경영평가 역량 강화 세미나</b><br>'
+        + '일정: 8월 26일(수)~27일(목) · 한남대학교 56주년기념관 소회의실2 · 600,000원(VAT별도)<br><br>'
+        + '<b>■ 회사 기본정보</b><br>'
+        + '회사명: ' + esc(c.name) + ' | 대표자: ' + esc(c.ceo) + '<br>'
+        + '사업자번호: ' + esc(c.bizno) + ' | 주소: ' + esc(c.addr) + '<br>'
+        + '업종: ' + esc(c.upjong) + ' | 업태: ' + esc(c.uptae) + '<br>'
+        + '세금계산서담당자: ' + esc(c.taxManager) + ' | 부서: ' + esc(c.dept) + '<br>'
+        + '전화: ' + esc(c.tel) + ' | 휴대폰: ' + esc(c.mobile) + ' | 메일: ' + esc(c.email) + '<br>'
+        + '결제방법: 세금계산서(계좌이체)<br><br>'
+        + '<b>■ 신청자 (' + d.applicants.length + '명)</b><br>';
+      d.applicants.forEach(function (a, i) {
+        html += (i + 1) + '. ' + esc(a.name) + ' / ' + esc(a.dept) + ' / ' + esc(a.position)
+          + ' / 전화 ' + esc(a.tel) + ' / 휴대폰 ' + esc(a.mobile) + ' / 팩스 ' + esc(a.fax) + ' / ' + esc(a.email) + '<br>';
+      });
+      return html;
+    }
+
+    window.submitApplication = async function () {
+      var d = collect();
+      if (!d.company.name) { alert('회사명을 입력해주세요.'); return; }
+      if (!d.company.mobile) { alert('담당자 휴대폰 번호를 입력해주세요.'); return; }
+      if (!d.company.email) { alert('담당자 메일을 입력해주세요.'); return; }
+      if (!d.applicants.length || !d.applicants[0].name) { alert('신청자 정보(최소 1명, 신청자명 필수)를 입력해주세요.'); return; }
+      if (!document.getElementById('agreeChk').checked) { alert('개인정보 이용에 동의해주세요.'); return; }
+
+      var btn = document.getElementById('submitBtn');
+      btn.disabled = true; btn.textContent = '접수 중...';
+
+      // ① 관리자 '교육신청 현황' 저장 (Firestore)
+      var saved = false;
+      try {
+        if (window.__db) {
+          await window.__addDoc(window.__collection(window.__db, 'edu_applications'), {
+            seminar: '2026 공공기관·지방공기업 경영평가 역량 강화 세미나 (8/26~27)',
+            company: d.company,
+            applicants: d.applicants,
+            count: d.applicants.length,
+            payment: '세금계산서(계좌이체)',
+            status: '접수',
+            createdAt: window.__serverTimestamp(),
+          });
+          saved = true;
+        }
+      } catch (e) { console.warn('현황 저장 실패(메일 접수로 계속):', e); }
+
+      // ② 회사 공식 메일(gong@allgongin.com)로 신청 내용 발송
+      var mailed = false;
+      try {
+        await emailjs.send('service_2mmkv4k', 'template_y19pd9h', {
+          category: '교육신청 (경영평가 세미나)',
+          from_name: d.company.name + ' / ' + (d.company.taxManager || d.applicants[0].name),
+          from_email: d.company.email,
+          phone: d.company.mobile || d.company.tel,
+          title: '[교육신청] 경영평가 세미나 — ' + d.company.name + ' (' + d.applicants.length + '명)',
+          message: buildMailMessage(d),
+        });
+        mailed = true;
+      } catch (e) { console.error('메일 발송 실패:', e); }
+
+      if (saved || mailed) {
+        alert('✅ 교육 신청이 접수되었습니다.\n담당자(서동훈 주임)가 확인 후 세금계산서 발행 등 후속 안내를 드리겠습니다.\n문의: 010-4899-9701 / gong@allgongin.com');
+        location.href = 'https://www.allgongin.com';
+      } else {
+        alert('접수에 실패했습니다. 잠시 후 다시 시도하시거나\n010-4899-9701 / gong@allgongin.com 으로 직접 연락 부탁드립니다.');
+        btn.disabled = false; btn.textContent = '신 청 하 기';
+      }
+    };
+  </script>
+
+  <!-- Firestore 저장용 (모듈) -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    try {
+      const app = initializeApp({
+        apiKey: "AIzaSyAxVeMDkNyI-3vW5BvDsq8J7POUPwraoy4",
+        authDomain: "recruit-board.firebaseapp.com",
+        projectId: "recruit-board",
+        storageBucket: "recruit-board.firebasestorage.app",
+        messagingSenderId: "614136048192",
+        appId: "1:614136048192:web:5153e389c9f26ddbb24da5"
+      });
+      window.__db = getFirestore(app);
+      window.__collection = collection;
+      window.__addDoc = addDoc;
+      window.__serverTimestamp = serverTimestamp;
+    } catch (e) { console.warn('Firebase 초기화 실패(메일 접수는 가능):', e); }
+  </script>
+</body>
+</html>
