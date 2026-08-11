@@ -5505,6 +5505,12 @@
                 <h1>공공기관 교육</h1>
               </div>
 
+              <!-- 교육 신청 바로가기 (눈에 띄는 강조 메뉴) -->
+              <ul style="margin-bottom: .4rem;">
+                <li><a href="edu_apply.html" target="_blank" rel="noopener"
+                    style="color:#e03131; font-weight:800; font-size:1.02rem;">📝 교육 신청하기</a></li>
+              </ul>
+
               <p class="sidebar-group-header">교육형태별</p>
               <ul>
                 <li><a href="#" onclick="switchEduBoard('type-online'); return false;" id="edu-menu-type-online">온라인</a></li>
@@ -5570,6 +5576,13 @@
                   #eduBannerMirror .edu-banner .meta p { font-size: 13px; color: #666; margin: 0; }
                 </style>
                 <div id="eduBannerMirror" style="display:none;"></div>
+                <!-- 교육 배너 바로 아래: 교육 신청 버튼 -->
+                <div style="text-align:center; margin: 0 0 1.6rem;">
+                  <a href="edu_apply.html" target="_blank" rel="noopener"
+                    style="display:inline-block; background:#d9480f; color:#fff; font-size:1.08rem; font-weight:800;
+                           padding:14px 46px; border-radius:10px; text-decoration:none; box-shadow:0 4px 14px rgba(217,72,15,.3);">
+                    📝 교육 신청하기</a>
+                </div>
 
                 <!-- 로딩 -->
                 <div id="eduLoading" class="loading">
@@ -5864,26 +5877,115 @@
       <!-- 회원 관리 시스템 섹션 -->
       <div id="user-manage-section" style="display:none; width:100%;">
         <div class="board-container">
-          <h1 class="board-title">회원 관리 시스템</h1>
-          <div style="background:white; padding:2rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
-            <table class="board-table">
-              <thead>
-                <tr>
-                  <th>이름</th>
-                  <th>이메일</th>
-                  <th>권한</th>
-                  <th>가입일</th>
-                  <th>최근로그인</th>
-                  <th>관리</th>
-                </tr>
-              </thead>
-              <tbody id="userTableBody">
-                <!-- 유저 목록 로드됨 -->
-              </tbody>
-            </table>
+          <h1 class="board-title">관리자 모드</h1>
+          <div style="display:flex; gap:22px; align-items:flex-start;">
+            <!-- 왼편 관리자 세부 메뉴 -->
+            <aside style="flex:0 0 185px; background:#fff; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.08); overflow:hidden;">
+              <p style="margin:0; padding:13px 16px; background:#1b2f78; color:#fff; font-weight:800; font-size:.98rem;">관리 메뉴</p>
+              <a href="#" id="adminTab-users" onclick="showAdminTab('users'); return false;"
+                style="display:block; padding:12px 16px; text-decoration:none; color:#1b2f78; font-weight:800; border-bottom:1px solid #f1f3f5;">회원 관리</a>
+              <a href="#" id="adminTab-eduapps" onclick="showAdminTab('eduapps'); return false;"
+                style="display:block; padding:12px 16px; text-decoration:none; color:#495057; font-weight:600;">교육신청 현황</a>
+            </aside>
+            <!-- 오른쪽 콘텐츠 -->
+            <div style="flex:1; min-width:0;">
+              <div id="adminUsersPanel" style="background:white; padding:2rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+                <h2 style="margin:0 0 1rem; font-size:1.15rem;">회원 관리 시스템</h2>
+                <table class="board-table">
+                  <thead>
+                    <tr>
+                      <th>이름</th>
+                      <th>이메일</th>
+                      <th>권한</th>
+                      <th>가입일</th>
+                      <th>최근로그인</th>
+                      <th>관리</th>
+                    </tr>
+                  </thead>
+                  <tbody id="userTableBody">
+                    <!-- 유저 목록 로드됨 -->
+                  </tbody>
+                </table>
+              </div>
+              <div id="adminEduAppsPanel" style="display:none; background:white; padding:2rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+                <h2 style="margin:0 0 .4rem; font-size:1.15rem;">교육신청 현황</h2>
+                <p style="margin:0 0 1.2rem; color:#868e96; font-size:.9rem;">
+                  교육 신청 페이지에서 접수된 신청 내역입니다. (총 <b id="eduAppsCount">0</b>건)</p>
+                <div id="eduAppsList" style="display:flex; flex-direction:column; gap:14px;">
+                  <p style="color:#adb5bd;">불러오는 중...</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+      <script>
+        // ── 관리자 세부 메뉴 전환 + 교육신청 현황 로드 ──
+        window.showAdminTab = function (tab) {
+          var users = document.getElementById('adminUsersPanel');
+          var apps = document.getElementById('adminEduAppsPanel');
+          var tu = document.getElementById('adminTab-users');
+          var te = document.getElementById('adminTab-eduapps');
+          var on = 'color:#1b2f78; font-weight:800;', off = 'color:#495057; font-weight:600;';
+          if (tab === 'eduapps') {
+            users.style.display = 'none'; apps.style.display = 'block';
+            tu.style.cssText += off; te.style.cssText += on;
+            loadEduApplications();
+          } else {
+            users.style.display = 'block'; apps.style.display = 'none';
+            tu.style.cssText += on; te.style.cssText += off;
+          }
+        };
+        window.loadEduApplications = async function () {
+          var box = document.getElementById('eduAppsList');
+          var cnt = document.getElementById('eduAppsCount');
+          if (!window.db || !window.collection) { box.innerHTML = '<p style="color:#e03131;">데이터 연결 준비 중 — 잠시 후 다시 클릭해주세요.</p>'; return; }
+          box.innerHTML = '<p style="color:#adb5bd;">불러오는 중...</p>';
+          function esc(s) { var d = document.createElement('div'); d.textContent = (s == null || s === '' ? '-' : String(s)); return d.innerHTML; }
+          try {
+            var snap = await window.getDocs(window.query(
+              window.collection(window.db, 'edu_applications'), window.orderBy('createdAt', 'desc')));
+            if (snap.empty) { cnt.textContent = '0'; box.innerHTML = '<p style="color:#adb5bd;">아직 접수된 신청이 없습니다.</p>'; return; }
+            var html = [], n = 0;
+            snap.forEach(function (doc) {
+              n++;
+              var d = doc.data(); var c = d.company || {};
+              var when = d.createdAt && d.createdAt.seconds
+                ? new Date(d.createdAt.seconds * 1000).toLocaleString('ko-KR') : '-';
+              var rows = (d.applicants || []).map(function (a, i) {
+                return '<tr><td style="padding:4px 8px; border:1px solid #f1f3f5;">' + (i + 1) + '</td>'
+                  + '<td style="padding:4px 8px; border:1px solid #f1f3f5;">' + esc(a.name) + '</td>'
+                  + '<td style="padding:4px 8px; border:1px solid #f1f3f5;">' + esc(a.dept) + '</td>'
+                  + '<td style="padding:4px 8px; border:1px solid #f1f3f5;">' + esc(a.position) + '</td>'
+                  + '<td style="padding:4px 8px; border:1px solid #f1f3f5;">' + esc(a.mobile || a.tel) + '</td>'
+                  + '<td style="padding:4px 8px; border:1px solid #f1f3f5;">' + esc(a.email) + '</td></tr>';
+              }).join('');
+              html.push('<details style="border:1px solid #e9ecef; border-radius:10px; padding:14px 18px;">'
+                + '<summary style="cursor:pointer; font-size:.98rem;"><b>' + esc(c.name) + '</b>'
+                + ' — 신청 ' + (d.count || (d.applicants || []).length) + '명 · ' + esc(when)
+                + ' <span style="color:#2b8a3e; font-weight:700;">[' + esc(d.status || '접수') + ']</span></summary>'
+                + '<div style="margin-top:12px; font-size:.92rem; line-height:1.8; color:#333;">'
+                + '대표자: ' + esc(c.ceo) + ' | 사업자번호: ' + esc(c.bizno) + '<br>'
+                + '주소: ' + esc(c.addr) + '<br>업종: ' + esc(c.upjong) + ' | 업태: ' + esc(c.uptae) + '<br>'
+                + '세금계산서담당자: ' + esc(c.taxManager) + ' (' + esc(c.dept) + ')<br>'
+                + '연락처: ' + esc(c.tel) + ' / ' + esc(c.mobile) + ' | 메일: ' + esc(c.email) + '<br>'
+                + '결제방법: ' + esc(d.payment) + '<br>'
+                + '<table style="border-collapse:collapse; margin-top:8px; font-size:.88rem;">'
+                + '<tr style="background:#f8f9fa;"><th style="padding:4px 8px; border:1px solid #f1f3f5;">NO</th>'
+                + '<th style="padding:4px 8px; border:1px solid #f1f3f5;">신청자명</th><th style="padding:4px 8px; border:1px solid #f1f3f5;">부서</th>'
+                + '<th style="padding:4px 8px; border:1px solid #f1f3f5;">직위</th><th style="padding:4px 8px; border:1px solid #f1f3f5;">연락처</th>'
+                + '<th style="padding:4px 8px; border:1px solid #f1f3f5;">이메일</th></tr>' + rows + '</table>'
+                + '</div></details>');
+            });
+            cnt.textContent = n;
+            box.innerHTML = html.join('');
+          } catch (e) {
+            console.error('교육신청 현황 로드 실패:', e);
+            box.innerHTML = '<p style="color:#e03131;">불러오기 실패: ' + esc(e.message)
+              + '<br><span style="font-size:.85rem; color:#868e96;">Firestore 보안 규칙에 edu_applications 읽기 권한이 필요할 수 있습니다.</span></p>';
+          }
+        };
+      </script>
 
       <!-- ===== 회원 정보 열람 모달 (관리자 전용, 회원관리 '관리' 버튼으로 열림) ===== -->
       <div id="memberDetailModal" class="modal">
