@@ -5963,6 +5963,7 @@
             var html = [], n = 0;
             snap.forEach(function (doc) {
               n++;
+              var docId = doc.id;
               var d = doc.data(); var c = d.company || {};
               var when = d.createdAt && d.createdAt.seconds
                 ? new Date(d.createdAt.seconds * 1000).toLocaleString('ko-KR') : '-';
@@ -5977,7 +5978,12 @@
               html.push('<details style="border:1px solid #e9ecef; border-radius:10px; padding:14px 18px;">'
                 + '<summary style="cursor:pointer; font-size:.98rem;"><b>' + esc(c.name) + '</b>'
                 + ' — 신청 ' + (d.count || (d.applicants || []).length) + '명 · ' + esc(when)
-                + ' <span style="color:#2b8a3e; font-weight:700;">[' + esc(d.status || '접수') + ']</span></summary>'
+                + ' <span style="color:#2b8a3e; font-weight:700;">[' + esc(d.status || '접수') + ']</span>'
+                + '<button type="button" onclick="event.preventDefault(); event.stopPropagation();'
+                + ' deleteEduApplication(\'' + docId + '\', \'' + esc(c.name).replace(/'/g, '') + '\');"'
+                + ' style="float:right; background:#fff; border:1px solid #dee2e6; color:#e03131;'
+                + ' font-size:.82rem; font-weight:700; padding:4px 12px; border-radius:6px; cursor:pointer;">삭제</button>'
+                + '</summary>'
                 + '<div style="margin-top:12px; font-size:.92rem; line-height:1.8; color:#333;">'
                 + '대표자: ' + esc(c.ceo) + ' | 사업자번호: ' + esc(c.bizno) + '<br>'
                 + '주소: ' + esc(c.addr) + '<br>업종: ' + esc(c.upjong) + ' | 업태: ' + esc(c.uptae) + '<br>'
@@ -5997,6 +6003,18 @@
             console.error('교육신청 현황 로드 실패:', e);
             box.innerHTML = '<p style="color:#e03131;">불러오기 실패: ' + esc(e.message)
               + '<br><span style="font-size:.85rem; color:#868e96;">Firestore 보안 규칙에 edu_applications 읽기 권한이 필요할 수 있습니다.</span></p>';
+          }
+        };
+        // 교육신청 삭제 (관리자 전용 — 확인 후 영구 삭제, 목록 자동 갱신)
+        window.deleteEduApplication = async function (docId, companyName) {
+          if (!confirm('『' + (companyName || '해당') + '』 신청 내역을 삭제하시겠습니까?\n삭제하면 되돌릴 수 없습니다.')) return;
+          try {
+            await window.deleteDoc(window.doc(window.db, 'edu_applications', docId));
+            alert('✅ 삭제되었습니다.');
+            window.loadEduApplications();
+          } catch (e) {
+            console.error('교육신청 삭제 실패:', e);
+            alert('삭제 실패: ' + e.message);
           }
         };
       </script>
@@ -14086,6 +14104,7 @@ function initCarousel(carouselContainer) {
     }
     window.closeHomeNoticePopup = function () {
       hideIfChecked();
+      window.__homeNoticeClosed = true; // 늦게 로드된 이미지가 닫은 팝업을 되살리지 않게
       var o = document.getElementById('homeNoticeOverlay');
       if (o) o.style.display = 'none';
     };
@@ -14111,12 +14130,16 @@ function initCarousel(carouselContainer) {
 
     var shown = false;
     function showPopup(src) {
-      if (shown) return;
+      if (shown || window.__homeNoticeClosed) return;
       try { if (localStorage.getItem('allgong_popup_hide') === new Date().toDateString()) return; } catch (e) { }
       var h = (location.hash || '').replace('#', '');
       if (h && h !== 'home') return; // 홈 화면으로 들어온 경우에만 표시
       var img = document.getElementById('homeNoticeImg');
       img.onload = function () {
+        // 이미지 로드가 늦어진 사이 사용자가 닫았거나 다른 화면으로 이동했으면 표시하지 않음
+        if (window.__homeNoticeClosed) return;
+        var h2 = (location.hash || '').replace('#', '');
+        if (h2 && h2 !== 'home') return;
         shown = true;
         document.getElementById('homeNoticeOverlay').style.display = 'block';
       };
