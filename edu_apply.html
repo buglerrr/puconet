@@ -88,6 +88,8 @@
       <tr><th>담당자전화</th><td><input type="text" id="c_tel"></td><th>담당자휴대폰 *</th><td><input type="text" id="c_mobile"></td></tr>
       <tr><th>담당자메일 *</th><td><input type="email" id="c_email"></td>
           <th>결제방법</th><td class="pay-fixed">세금계산서(계좌이체)<small>본 교육은 세금계산서(계좌이체) 결제만 가능합니다.</small></td></tr>
+      <tr><th>요청사항<br><span style="font-weight:400; font-size:.8rem; color:#868e96;">(자료, 서류 등)</span></th>
+          <td colspan="3"><input type="text" id="c_request" placeholder="예) 견적서·참가확인서 발급 요청, 세금계산서 발행 관련 요청 등" style="max-width:none; width:100%;"></td></tr>
     </table>
 
     <h2 class="sec">교육신청(필수항목) <span style="font-weight:400; font-size:.85rem; color:#868e96;">— '신청자 추가' 버튼으로 인원을 늘릴 수 있습니다</span></h2>
@@ -174,7 +176,7 @@
       return {
         company: { name: v('c_name'), ceo: v('c_ceo'), bizno: v('c_bizno'), addr: v('c_addr'),
                    upjong: v('c_upjong'), uptae: v('c_uptae'), taxManager: v('c_tax'), dept: v('c_dept'),
-                   tel: v('c_tel'), mobile: v('c_mobile'), email: v('c_email') },
+                   tel: v('c_tel'), mobile: v('c_mobile'), email: v('c_email'), request: v('c_request') },
         applicants: applicants,
       };
     }
@@ -190,7 +192,8 @@
         + '업종: ' + esc(c.upjong) + ' | 업태: ' + esc(c.uptae) + '<br>'
         + '세금계산서담당자: ' + esc(c.taxManager) + ' | 부서: ' + esc(c.dept) + '<br>'
         + '전화: ' + esc(c.tel) + ' | 휴대폰: ' + esc(c.mobile) + ' | 메일: ' + esc(c.email) + '<br>'
-        + '결제방법: 세금계산서(계좌이체)<br><br>'
+        + '결제방법: 세금계산서(계좌이체)<br>'
+        + '요청사항(자료, 서류 등): ' + esc(c.request) + '<br><br>'
         + '<b>■ 신청자 (' + d.applicants.length + '명)</b><br>';
       d.applicants.forEach(function (a, i) {
         html += (i + 1) + '. ' + esc(a.name) + ' / ' + esc(a.dept) + ' / ' + esc(a.position)
