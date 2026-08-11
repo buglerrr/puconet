@@ -5042,6 +5042,14 @@
           <h2 class="section-title" style="color:#5c7cfa;">공공기관 임직원 교육과정 <span class="apply">상품신청&gt;</span> </h2>
 
           <div class="edu-banner-list">
+            <!-- 배너 0: 경영평가 세미나 (홈 팝업과 연동 — 클릭 시 세미나 포스터 표시) -->
+            <a class="edu-banner" id="seminarBannerLink" href="images/education/7.png" target="_blank" rel="noopener">
+              <div class="thumb">
+                <img loading="lazy" decoding="async" src="images/baner/banner7.png"
+                  alt="2026 공공기관·지방공기업 경영평가 역량강화 세미나">
+              </div>
+            </a>
+
             <!-- 배너 1 -->
             <a class="edu-banner" href="https://github.com/buglerrr/puconet/blob/main/images/education/1.png?raw=true" target="_blank" rel="noopener">
               <div class="thumb">
@@ -13919,43 +13927,83 @@ function initCarousel(carouselContainer) {
 </script>
 
 <!-- ============================================================
-     ===== 홈 접속 공지 팝업 =====
-     Storage `docs/popup.jpg` 파일이 있을 때만 자동 표시됩니다.
-     - 팝업 교체: Firebase 콘솔 → Storage → docs 폴더에 popup.jpg 새로 업로드
-     - 팝업 중단: docs/popup.jpg 삭제 (코드 수정 불필요)
-     - 이미지가 없거나 로드 실패 시 아무것도 뜨지 않습니다.
+     ===== 홈 접속 공지 팝업 (인크루트 스타일: 중앙 + 어두운 배경) =====
+     이미지 우선순위: Storage docs/popup.jpg(실제 포스터) → 없으면
+     저장소의 세미나 카드(images/education/7.png)로 자동 대체.
+     - 포스터 교체: Firebase Storage docs 폴더에 popup.jpg 재업로드
+     - 팝업 클릭/바로가기: '공공기관 교육' 게시판으로 이동
      ============================================================ -->
-<div id="homeNoticePopup"
-  style="display:none; position:fixed; top:110px; left:60px; z-index:10500; width:430px; max-width:90vw;
-         background:#fff; border:1px solid #dee2e6; border-radius:12px; overflow:hidden;
-         box-shadow:0 12px 40px rgba(0,0,0,.28);">
-  <img id="homeNoticeImg" alt="올공 공지" title="클릭하면 크게 볼 수 있습니다"
-    style="display:block; width:100%; height:auto; max-height:70vh; object-fit:contain; cursor:pointer;"
-    onclick="window.open(this.src, '_blank', 'noopener')">
-  <div style="display:flex; border-top:1px solid #e9ecef;">
-    <button type="button" onclick="closeHomeNoticePopup(true)"
-      style="flex:1; padding:11px 0; border:none; background:#f8f9fa; color:#495057; font-size:.85rem; cursor:pointer;">
-      오늘 하루 열지 않음</button>
-    <button type="button" onclick="closeHomeNoticePopup(false)"
-      style="flex:1; padding:11px 0; border:none; border-left:1px solid #e9ecef; background:#343a40; color:#fff;
-             font-size:.85rem; font-weight:700; cursor:pointer;">닫기</button>
+<div id="homeNoticeOverlay"
+  style="display:none; position:fixed; inset:0; z-index:10500; background:rgba(0,0,0,.55);">
+  <div id="homeNoticePopup"
+    style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:440px; max-width:92vw;">
+    <img id="homeNoticeImg" alt="올공 공지" title="클릭하면 공공기관 교육으로 이동합니다"
+      style="display:block; width:100%; height:auto; max-height:72vh; object-fit:contain; cursor:pointer;
+             border-radius:14px; background:#fff; box-shadow:0 16px 48px rgba(0,0,0,.35);"
+      onclick="goHomeNotice()">
+    <div style="display:flex; gap:10px; margin-top:12px;">
+      <button type="button" onclick="closeHomeNoticePopup()"
+        style="flex:0 0 32%; padding:13px 0; border:none; border-radius:10px; background:#ced4da; color:#495057;
+               font-size:1rem; font-weight:700; cursor:pointer;">닫기</button>
+      <button type="button" onclick="goHomeNotice()"
+        style="flex:1; padding:13px 0; border:none; border-radius:10px; background:#e8590c; color:#fff;
+               font-size:1rem; font-weight:800; cursor:pointer;">바로가기</button>
+    </div>
+    <label style="display:flex; align-items:center; gap:7px; margin-top:12px; color:#fff; font-size:.9rem; cursor:pointer;">
+      <input type="checkbox" id="homeNoticeToday" style="width:16px; height:16px; accent-color:#e8590c;">
+      오늘 하루 그만 보기</label>
   </div>
 </div>
 <script>
   (function () {
-    var POPUP_IMG = 'https://storage.googleapis.com/recruit-board.firebasestorage.app/docs/popup.jpg';
-    window.closeHomeNoticePopup = function (hideToday) {
-      if (hideToday) { try { localStorage.setItem('allgong_popup_hide', new Date().toDateString()); } catch (e) { } }
-      var p = document.getElementById('homeNoticePopup');
-      if (p) p.style.display = 'none';
+    var POSTER = 'https://storage.googleapis.com/recruit-board.firebasestorage.app/docs/popup.jpg';
+    var FALLBACK = 'images/education/7.png'; // 저장소 내 세미나 카드 (항상 사용 가능)
+
+    function hideIfChecked() {
+      try {
+        if (document.getElementById('homeNoticeToday').checked) {
+          localStorage.setItem('allgong_popup_hide', new Date().toDateString());
+        }
+      } catch (e) { }
+    }
+    window.closeHomeNoticePopup = function () {
+      hideIfChecked();
+      var o = document.getElementById('homeNoticeOverlay');
+      if (o) o.style.display = 'none';
     };
-    try { if (localStorage.getItem('allgong_popup_hide') === new Date().toDateString()) return; } catch (e) { }
-    var h = (location.hash || '').replace('#', '');
-    if (h && h !== 'home') return; // 홈 화면으로 들어온 경우에만 표시
-    var img = document.getElementById('homeNoticeImg');
-    img.onload = function () { document.getElementById('homeNoticePopup').style.display = 'block'; };
-    // 이미지가 없으면(업로드 전/삭제 후) 팝업을 띄우지 않음
-    img.src = POPUP_IMG + '?v=' + new Date().toISOString().slice(0, 10); // 교체 시 하루 내 반영
+    window.goHomeNotice = function () {
+      window.closeHomeNoticePopup();
+      if (window.showEduBoard) window.showEduBoard(); // '공공기관 교육' 게시판으로 이동
+    };
+    // 어두운 배경 클릭 시 닫기
+    document.getElementById('homeNoticeOverlay').addEventListener('click', function (e) {
+      if (e.target === this) window.closeHomeNoticePopup();
+    });
+
+    // 실제 포스터(공개 시) 우선 사용 — 세미나 배너의 상세 이미지도 함께 업그레이드
+    var probe = new Image();
+    probe.onload = function () {
+      window.__seminarPosterUrl = POSTER;
+      var link = document.getElementById('seminarBannerLink');
+      if (link) link.setAttribute('href', POSTER);
+      showPopup(POSTER);
+    };
+    probe.onerror = function () { showPopup(FALLBACK); };
+    probe.src = POSTER + '?v=' + new Date().toISOString().slice(0, 10);
+
+    var shown = false;
+    function showPopup(src) {
+      if (shown) return;
+      try { if (localStorage.getItem('allgong_popup_hide') === new Date().toDateString()) return; } catch (e) { }
+      var h = (location.hash || '').replace('#', '');
+      if (h && h !== 'home') return; // 홈 화면으로 들어온 경우에만 표시
+      var img = document.getElementById('homeNoticeImg');
+      img.onload = function () {
+        shown = true;
+        document.getElementById('homeNoticeOverlay').style.display = 'block';
+      };
+      img.src = src === FALLBACK ? src : src + '?v=' + new Date().toISOString().slice(0, 10);
+    }
   })();
 </script>
 
@@ -14273,11 +14321,9 @@ function initCarousel(carouselContainer) {
   }
   html.mobile-view #eduBannerMirror .edu-banner { height: 300px !important; }
 
-  /* ---------- 7-9. 홈 공지 팝업: 화면 중앙 배치 ---------- */
-  html.mobile-view #homeNoticePopup {
-    left: 50% !important; top: 50% !important; transform: translate(-50%, -50%);
-    width: 86vw !important;
-  }
+  /* ---------- 7-9. 홈 공지 팝업: 모바일 폭 조정 ---------- */
+  html.mobile-view #homeNoticePopup { width: 86vw !important; }
+  html.mobile-view #homeNoticeImg { max-height: 62vh !important; }
 
   /* ---------- 8-0. 올공몰: 4열 → 2열 ---------- */
   html.mobile-view #mall-section .mall-grid {
