@@ -6879,7 +6879,7 @@
             <a href="#" class="strong" onclick="openFooterDoc('privacy'); return false;">개인정보처리방침</a>
             <a href="#" onclick="openFooterDoc('youth'); return false;">청소년보호정책</a>
             <a href="#" onclick="openFooterDoc('noemail'); return false;">이메일주소무단수집거부</a>
-            <a href="#" onclick="window.open('https://storage.googleapis.com/recruit-board.firebasestorage.app/docs/business_license.jpg', '_blank', 'noopener'); return false;">사업자등록증</a>
+            <a href="#" onclick="window.open('https://firebasestorage.googleapis.com/v0/b/recruit-board.firebasestorage.app/o/docs%2Fbusiness_license.jpg?alt=media', '_blank', 'noopener'); return false;">사업자등록증</a>
           </div>
           <div class="footer-sns">
             <a href="https://www.instagram.com/allgongin_kr" target="_blank" rel="noopener" title="인스타그램">
@@ -13956,7 +13956,7 @@ function initCarousel(carouselContainer) {
 </div>
 <script>
   (function () {
-    var POSTER = 'https://storage.googleapis.com/recruit-board.firebasestorage.app/docs/popup.jpg';
+    var POSTER = 'https://firebasestorage.googleapis.com/v0/b/recruit-board.firebasestorage.app/o/docs%2Fpopup.jpg?alt=media';  // 업로드 즉시 접근 가능한 주소(공개 처리 불필요)
     var FALLBACK = 'images/education/7.png'; // 저장소 내 세미나 카드 (항상 사용 가능)
 
     function hideIfChecked() {
@@ -13989,7 +13989,7 @@ function initCarousel(carouselContainer) {
       showPopup(POSTER);
     };
     probe.onerror = function () { showPopup(FALLBACK); };
-    probe.src = POSTER + '?v=' + new Date().toISOString().slice(0, 10);
+    probe.src = POSTER + '&v=' + new Date().toISOString().slice(0, 10);
 
     var shown = false;
     function showPopup(src) {
@@ -14002,7 +14002,7 @@ function initCarousel(carouselContainer) {
         shown = true;
         document.getElementById('homeNoticeOverlay').style.display = 'block';
       };
-      img.src = src === FALLBACK ? src : src + '?v=' + new Date().toISOString().slice(0, 10);
+      img.src = src === FALLBACK ? src : src + '&v=' + new Date().toISOString().slice(0, 10);
     }
   })();
 </script>
