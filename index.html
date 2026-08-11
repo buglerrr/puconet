@@ -1560,6 +1560,20 @@
 
 
     /* === [교육과정 배너 전용 스타일] 폭은 .container로 자동 일치 === */
+    /* 마감된 교육 배너: 이미지 옅게 + '마감' 도장 + 클릭 무효 (홈·교육 게시판 공통) */
+    .edu-banner.edu-closed { cursor: default; }
+    .edu-banner.edu-closed .thumb { position: relative; }
+    .edu-banner.edu-closed .thumb img { filter: grayscale(45%) opacity(.35); }
+    .edu-banner.edu-closed .thumb::after {
+      content: '마 감';
+      position: absolute; left: 50%; top: 50%;
+      transform: translate(-50%, -50%) rotate(-10deg);
+      background: rgba(224, 49, 49, .92); color: #fff;
+      font-size: 2.4rem; font-weight: 900; letter-spacing: .18em;
+      padding: 14px 34px; border-radius: 14px; border: 3px solid #fff;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, .3); white-space: nowrap;
+    }
+
     #edu-courses .edu-banner-list {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -5051,7 +5065,7 @@
             </a>
 
             <!-- 배너 1 -->
-            <a class="edu-banner" href="https://github.com/buglerrr/puconet/blob/main/images/education/1.png?raw=true" target="_blank" rel="noopener">
+            <a class="edu-banner edu-closed" title="마감된 교육입니다">
               <div class="thumb">
                 <img loading="lazy" decoding="async" src="https://github.com/buglerrr/puconet/blob/main/images/baner/banner1.png?raw=true"
                   alt="교육과정 1 썸네일">
@@ -5059,7 +5073,7 @@
             </a>
 
             <!-- 배너 2 -->
-            <a class="edu-banner" href="https://github.com/buglerrr/puconet/blob/main/images/education/2.png?raw=true" target="_blank" rel="noopener">
+            <a class="edu-banner edu-closed" title="마감된 교육입니다">
               <div class="thumb">
                 <img loading="lazy" decoding="async" src="https://github.com/buglerrr/puconet/blob/main/images/baner/banner2.png?raw=true"
                   alt="교육과정 2 썸네일">
@@ -5067,7 +5081,7 @@
             </a>
 
             <!-- 배너 3 -->
-            <a class="edu-banner" href="https://github.com/buglerrr/puconet/blob/main/images/education/3.png?raw=true" target="_blank" rel="noopener">
+            <a class="edu-banner edu-closed" title="마감된 교육입니다">
               <div class="thumb">
                 <img loading="lazy" decoding="async" src="https://github.com/buglerrr/puconet/blob/main/images/baner/banner3.png?raw=true"
                   alt="교육과정 3 썸네일">
@@ -12531,7 +12545,9 @@ function initCarousel(carouselContainer) {
   document.querySelectorAll('#edu-courses .edu-banner').forEach(function (link) {
     link.addEventListener('click', function (e) {
       e.preventDefault();
+      if (this.classList.contains('edu-closed')) return; // 마감된 교육: 페이지 표출 없음
       var url = this.getAttribute('href');
+      if (!url) return;
       var w = 800, h = 600;
       var left = (screen.width - w) / 2;
       var top = (screen.height - h) / 2;
