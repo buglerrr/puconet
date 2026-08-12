@@ -12122,9 +12122,19 @@ function initCarousel(carouselContainer) {
         window.showStoryBoard(true);
         history.replaceState({ section: 'story', category: 'free' }, '', hash);
       } else if (hash.startsWith('#job-detail-')) {
-        // 채용정보 상세는 데이터 로드가 필요하므로 채용정보 목록으로 이동
+        // 상세 직접 진입: 목록을 먼저 띄우고, 공고 데이터가 준비되는 대로 해당 공고를 연다
+        var jobId = hash.slice('#job-detail-'.length);
         window.showBoard(true);
         history.replaceState({ section: 'board', category: 'market-public' }, '', '#board');
+        var jobDetailTries = 0;
+        (function openJobWhenReady() {
+          if (window.jobsData && window.jobsData[jobId] && typeof window.viewDetail === 'function') {
+            window.viewDetail(jobId, false);
+            return;
+          }
+          if (++jobDetailTries < 40) setTimeout(openJobWhenReady, 250);
+          // 40회(약 10초) 내 데이터가 없으면 마감·삭제된 공고로 보고 목록을 유지한다
+        })();
       } else if (hash === '#user-manage') {
         window.showUserManagement(true);
         history.replaceState({ section: 'user-manage' }, '', hash);
