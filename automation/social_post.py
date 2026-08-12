@@ -141,7 +141,7 @@ def _dday_text(end) -> str:
 
 
 def _short_link(row) -> str:
-    """공고별 짧은 지원 링크 (go.html 리다이렉트). 실패 시 사이트 주소."""
+    """공고별 짧은 링크 (go.html → 올공 사이트의 해당 공고 상세로 리다이렉트). 실패 시 사이트 주소."""
     try:
         import main as _crawler
         doc_id = _crawler.stable_doc_id(row)
