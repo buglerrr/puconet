@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /go.html
+Disallow: /yt_auth.html
+
+Sitemap: https://www.allgongin.com/sitemap.xml
