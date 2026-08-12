@@ -3,28 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="robots" content="noindex">
-  <title>올공 - 채용 페이지로 이동 중...</title>
+  <title>올공 - 공고 페이지로 이동 중...</title>
   <style>body{font-family:'Malgun Gothic',sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;color:#495057}</style>
 </head>
 <body>
-  <p>채용 페이지로 이동 중입니다...</p>
+  <p>공고 페이지로 이동 중입니다...</p>
   <script>
-    // SNS 게시물용 짧은 링크: ?c=짧은코드 또는 ?j=문서ID → 해당 공고의 지원 URL로 리다이렉트
+    // SNS 게시물용 짧은 링크: ?c=짧은코드 또는 ?j=문서ID → 올공 사이트의 해당 공고 상세로 리다이렉트
+    // (기관 원문 링크는 상세 화면의 '지원하기' 버튼으로 제공 — 방문자가 올공을 거쳐 가도록)
     (function () {
       var FS = 'https://firestore.googleapis.com/v1/projects/recruit-board/databases/(default)/documents';
       var p = new URLSearchParams(location.search);
       var HOME = 'https://www.allgongin.com';
       function fail() { location.replace(HOME); }
-      function goUrl(u) {
-        if (u && /^https?:\/\//.test(u)) location.replace(u);
+      function goDetail(id) {
+        if (id) location.replace(HOME + '/#job-detail-' + encodeURIComponent(id));
         else fail();
       }
       var j = p.get('j'), c = p.get('c');
       if (j) {
-        fetch(FS + '/jobs/' + encodeURIComponent(j))
-          .then(function (r) { return r.ok ? r.json() : null; })
-          .then(function (d) { goUrl(d && d.fields && d.fields.detailUrl && d.fields.detailUrl.stringValue); })
-          .catch(fail);
+        // 문서 ID를 이미 알고 있으므로 조회 없이 바로 상세로 이동
+        // (마감·삭제된 공고는 사이트가 목록으로 처리)
+        goDetail(j);
       } else if (c) {
         fetch(FS + ':runQuery', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -32,8 +32,8 @@
         })
           .then(function (r) { return r.ok ? r.json() : null; })
           .then(function (rows) {
-            var f = rows && rows[0] && rows[0].document && rows[0].document.fields;
-            goUrl(f && f.detailUrl && f.detailUrl.stringValue);
+            var name = rows && rows[0] && rows[0].document && rows[0].document.name;
+            goDetail(name ? name.split('/').pop() : null);
           })
           .catch(fail);
       } else { fail(); }
