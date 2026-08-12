@@ -14148,9 +14148,10 @@ function initCarousel(carouselContainer) {
     // 실제 포스터(공개 시) 우선 사용 — 세미나 배너의 상세 이미지도 함께 업그레이드
     var probe = new Image();
     probe.onload = function () {
-      window.__seminarPosterUrl = POSTER;
+      var fresh = POSTER + '&v=' + new Date().toISOString().slice(0, 10); // 교체 시 하루 내 반영
+      window.__seminarPosterUrl = fresh;
       var link = document.getElementById('seminarBannerLink');
-      if (link) link.setAttribute('href', POSTER);
+      if (link) link.setAttribute('href', fresh);
       showPopup(POSTER);
     };
     probe.onerror = function () { showPopup(FALLBACK); };
