@@ -4534,8 +4534,7 @@
             <a href="#" onclick="showBoard(); return false;">채용정보</a>
             <a href="#" onclick="showCalendarBoard(); return false;">채용달력</a>
             <a href="#" onclick="showEduBoard(); return false;">공공기관 교육</a>
-            <a href="#"
-              onclick="checkLoginAndExecute(window.showInstIntroBoard, '공공기관소개를 보려면 로그인이 필요합니다.'); return false;">공공기관소개</a>
+            <!-- '공공기관소개' 메뉴는 푸터 '주요 고객사 명단' 링크로 이동 (섹션 자체는 유지) -->
             <a href="#" onclick="showNewsBoard(); return false;">공공기관
               뉴스</a>
             <a href="#"
@@ -7071,6 +7070,7 @@
             <a href="#" onclick="openFooterDoc('noemail'); return false;">이메일주소무단수집거부</a>
             <a href="#" onclick="window.open('https://firebasestorage.googleapis.com/v0/b/recruit-board.firebasestorage.app/o/docs%2Fbusiness_license.jpg?alt=media', '_blank', 'noopener'); return false;">사업자등록증</a>
             <a href="#" onclick="openFooterDoc('refund'); return false;">취소 및 환불 규정</a>
+            <a href="#" onclick="window.open(location.pathname + '#inst-intro', '_blank', 'noopener'); return false;">주요 고객사 명단</a>
           </div>
           <div class="footer-sns">
             <a href="https://www.instagram.com/allgongin_kr" target="_blank" rel="noopener" title="인스타그램">
