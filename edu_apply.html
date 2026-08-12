@@ -133,13 +133,15 @@
     var POSTER = 'https://firebasestorage.googleapis.com/v0/b/recruit-board.firebasestorage.app/o/docs%2Fpopup.jpg?alt=media';
     var MAP_IMG = 'https://firebasestorage.googleapis.com/v0/b/recruit-board.firebasestorage.app/o/docs%2Fmap.jpg?alt=media';
     function openWithFallback(url, fallback, missingMsg) {
+      // 파일 교체 시 하루 안에 새 이미지가 보이도록 캐시 무효화 파라미터 부여
+      var fresh = url + (url.indexOf('?') > -1 ? '&' : '?') + 'v=' + new Date().toISOString().slice(0, 10);
       var probe = new Image();
-      probe.onload = function () { window.open(url, '_blank', 'noopener'); };
+      probe.onload = function () { window.open(fresh, '_blank', 'noopener'); };
       probe.onerror = function () {
         if (fallback) window.open(fallback, '_blank', 'noopener');
         else alert(missingMsg || '자료 준비 중입니다.');
       };
-      probe.src = url;
+      probe.src = fresh;
     }
     function openEduGuide() { openWithFallback(POSTER, 'images/education/7.png'); }
     function openEduMap() { openWithFallback(MAP_IMG, null, '교육장 약도 준비 중입니다. 문의: 010-4899-9701'); }
