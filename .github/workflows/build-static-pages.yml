@@ -1,0 +1,46 @@
+name: Build Static Pages
+
+# 공고·뉴스 정적 페이지 생성 (검색엔진 색인용)
+# - 매일 3회: 크롤링(07/12/18 KST) 직후인 08:50/13:50/18:50 KST
+# - 배포(Auto Deploy) 완료 직후에도 1회 실행해 최신 상태 유지
+on:
+  schedule:
+    - cron: '50 23 * * *'   # 08:50 KST
+    - cron: '50 4 * * *'    # 13:50 KST
+    - cron: '50 9 * * *'    # 18:50 KST
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Claude Code Auto Deploy"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-static-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: main 체크아웃
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: 정적 페이지 생성
+        run: node tools/build_static_pages.js
+
+      - name: 변경 사항 커밋 & 푸시
+        run: |
+          git config user.name "Allgong Pages Bot"
+          git config user.email "pages-bot@allgongin.com"
+          git add -A job news sitemap-pages.xml
+          if git diff --cached --quiet; then
+            echo "변경 사항 없음 - 커밋 생략"
+            exit 0
+          fi
+          git commit -m "공고·뉴스 정적 페이지 자동 갱신"
+          git pull --rebase origin main || true
+          git push origin main
