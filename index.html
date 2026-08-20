@@ -7561,7 +7561,8 @@
   service cloud.firestore {
     match /databases/{database}/documents {
       
-      // users 컬렉션: 본인 또는 관리자만 읽기(전체 회원 PII 노출 방지), 자신의 문서만 쓰기
+      // users 컬렉션: 본인 또는 관리자만 읽기(전체 회원 PII 노출 방지)
+      // 쓰기: 본인 문서 또는 소유자 계정(관리자 지정/해제 버튼용 — 소유자만 role 변경 가능)
       match /users/{userId} {
         allow read: if request.auth != null && (
           request.auth.uid == userId
@@ -7569,7 +7570,10 @@
           || (exists(/databases/$(database)/documents/users/$(request.auth.uid))
               && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
         );
-        allow write: if request.auth != null && request.auth.uid == userId;
+        allow write: if request.auth != null && (
+          request.auth.uid == userId
+          || request.auth.token.email == 'ilovetruman@gmail.com'
+        );
       }
       
       // jobs 컬렉션: 모든 사용자 읽기 가능, 등록/삭제는 관리자만
@@ -9487,11 +9491,23 @@ function displayStoriesForPage(page) {
         window._adminUsers = {};
         window._fmtUserDateForAdmin = _fmtUserDate;
 
+        // 관리자 지정/해제 버튼은 소유자 계정(ADMIN_EMAIL)에게만 노출
+        // (Firestore 규칙도 소유자만 다른 회원의 role 변경을 허용)
+        const _viewerEmail = (auth.currentUser && auth.currentUser.email) || '';
+        const _isOwnerViewer = _viewerEmail === window.ADMIN_EMAIL;
+
         users.forEach((user) => {
           window._adminUsers[user.id] = user;
           const tr = document.createElement('tr');
           const created = _fmtUserDate(user.createdAt);
           const lastLogin = _fmtUserDate(user.lastLoginAt);
+
+          let roleBtn = '';
+          if (_isOwnerViewer && user.email !== window.ADMIN_EMAIL) {
+            roleBtn = user.role === 'admin'
+              ? `<button onclick="setUserRole('${user.id}', 'user')" style="font-size:0.8rem; padding:0.3rem 0.6rem; margin-left:4px; background:#868e96; color:#fff; border:none; border-radius:4px; cursor:pointer;">관리자 해제</button>`
+              : `<button onclick="setUserRole('${user.id}', 'admin')" style="font-size:0.8rem; padding:0.3rem 0.6rem; margin-left:4px; background:#e74c3c; color:#fff; border:none; border-radius:4px; cursor:pointer;">관리자 지정</button>`;
+          }
 
           tr.innerHTML = `
                     <td>${escapeHtml(user.name)}</td>
@@ -9499,8 +9515,8 @@ function displayStoriesForPage(page) {
                     <td><span class="badge" style="background:${user.role === 'admin' ? '#e74c3c' : '#95a5a6'}; color:white;">${user.role || 'user'}</span></td>
                     <td>${created}</td>
                     <td>${lastLogin}</td>
-                    <td>
-                        <button onclick="viewMemberDetail('${user.id}')" class="btn-edit" style="font-size:0.8rem; padding:0.3rem 0.6rem;">관리</button>
+                    <td style="white-space:nowrap;">
+                        <button onclick="viewMemberDetail('${user.id}')" class="btn-edit" style="font-size:0.8rem; padding:0.3rem 0.6rem;">관리</button>${roleBtn}
                     </td>
                 `;
           tbody.appendChild(tr);
@@ -9508,6 +9524,24 @@ function displayStoriesForPage(page) {
       } catch (e) {
         console.error("Load users Error:", e);
         tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">데이터 로딩 실패 (관리자 권한 확인 필요)</td></tr>';
+      }
+    }
+
+    // 회원 관리자 권한 지정/해제 (소유자 전용)
+    window.setUserRole = async function (uid, role) {
+      const user = (window._adminUsers || {})[uid];
+      const name = (user && (user.name || user.email)) || '이 회원';
+      const msg = role === 'admin'
+        ? `${name}님에게 관리자 권한을 부여할까요?\n\n관리자는 회원관리·교육신청 현황 열람, 채용공고 등록/수정/삭제, 게시글 관리 등 사이트 관리 기능을 사용할 수 있습니다.`
+        : `${name}님의 관리자 권한을 해제할까요?\n\n해제 후에는 일반 회원과 동일하게 이용하게 됩니다.`;
+      if (!confirm(msg)) return;
+      try {
+        await updateDoc(doc(db, 'users', uid), { role: role });
+        alert(role === 'admin' ? `✅ ${name}님이 관리자로 지정되었습니다.\n(본인이 로그아웃 후 다시 로그인하면 회원관리 메뉴가 보입니다.)` : `✅ ${name}님의 관리자 권한이 해제되었습니다.`);
+        loadUsers();
+      } catch (e) {
+        console.error('setUserRole Error:', e);
+        alert('권한 변경에 실패했습니다.\n\nFirebase 보안 규칙이 아직 갱신되지 않았을 수 있습니다.\n(Firebase Console → Firestore → 규칙에서 users 쓰기 규칙에 소유자 허용 추가 필요)\n\n오류: ' + (e && e.message ? e.message : e));
       }
     }
 
