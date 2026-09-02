@@ -1628,6 +1628,8 @@
       padding: 14px 34px; border-radius: 14px; border: 3px solid #fff;
       box-shadow: 0 6px 20px rgba(0, 0, 0, .3); white-space: nowrap;
     }
+    /* 종료된 교육 배너: 도장 문구만 '교육 종료'로 (세미나 등) */
+    .edu-banner.edu-ended .thumb::after { content: '교육 종료'; font-size: 2rem; letter-spacing: .12em; }
 
     #edu-courses .edu-banner-list {
       display: grid;
@@ -5110,11 +5112,11 @@
           <h2 class="section-title" style="color:#5c7cfa;">공공기관 임직원 교육과정 <span class="apply">상품신청&gt;</span> </h2>
 
           <div class="edu-banner-list">
-            <!-- 배너 0: 경영평가 세미나 (홈 팝업과 연동 — 클릭 시 세미나 포스터 표시) -->
-            <a class="edu-banner" id="seminarBannerLink" href="images/education/7.png" target="_blank" rel="noopener">
+            <!-- 배너 0: 경영평가 세미나 — 교육 종료 -->
+            <a class="edu-banner edu-closed edu-ended" id="seminarBannerLink" title="종료된 교육입니다">
               <div class="thumb">
                 <img loading="lazy" decoding="async" src="images/baner/banner7.png"
-                  alt="2026 공공기관·지방공기업 경영평가 역량강화 세미나">
+                  alt="2026 공공기관·지방공기업 경영평가 역량강화 세미나 — 교육 종료">
               </div>
             </a>
 
@@ -14278,17 +14280,23 @@ function initCarousel(carouselContainer) {
       if (e.target === this) window.closeHomeNoticePopup();
     });
 
+    // 홈 공지 팝업 사용 여부 — 2026-08 세미나 종료로 중단.
+    // 새 행사 홍보 때 true 로 바꾸고 Storage docs/popup.jpg 를 교체하면 재개됨.
+    var POPUP_ENABLED = false;
+
     // 실제 포스터(공개 시) 우선 사용 — 세미나 배너의 상세 이미지도 함께 업그레이드
-    var probe = new Image();
-    probe.onload = function () {
-      var fresh = POSTER + '&v=' + new Date().toISOString().slice(0, 10); // 교체 시 하루 내 반영
-      window.__seminarPosterUrl = fresh;
-      var link = document.getElementById('seminarBannerLink');
-      if (link) link.setAttribute('href', fresh);
-      showPopup(POSTER);
-    };
-    probe.onerror = function () { showPopup(FALLBACK); };
-    probe.src = POSTER + '&v=' + new Date().toISOString().slice(0, 10);
+    if (POPUP_ENABLED) {
+      var probe = new Image();
+      probe.onload = function () {
+        var fresh = POSTER + '&v=' + new Date().toISOString().slice(0, 10); // 교체 시 하루 내 반영
+        window.__seminarPosterUrl = fresh;
+        var link = document.getElementById('seminarBannerLink');
+        if (link) link.setAttribute('href', fresh);
+        showPopup(POSTER);
+      };
+      probe.onerror = function () { showPopup(FALLBACK); };
+      probe.src = POSTER + '&v=' + new Date().toISOString().slice(0, 10);
+    }
 
     var shown = false;
     function showPopup(src) {
