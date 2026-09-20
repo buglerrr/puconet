@@ -5112,6 +5112,14 @@
           <h2 class="section-title" style="color:#5c7cfa;">공공기관 임직원 교육과정 <span class="apply">상품신청&gt;</span> </h2>
 
           <div class="edu-banner-list">
+            <!-- 배너 신규: 세부지표별 대응전략 세미나 (11/26~27) — 클릭 시 교육 신청 페이지로 -->
+            <a class="edu-banner" href="edu_apply.html" target="_blank" rel="noopener">
+              <div class="thumb">
+                <img loading="lazy" decoding="async" src="images/baner/banner8.png"
+                  alt="2026 공공기관·지방공기업 세부지표별 대응전략 세미나 (11월 26일~27일) — 교육 신청">
+              </div>
+            </a>
+
             <!-- 배너 0: 경영평가 세미나 — 교육 종료 -->
             <a class="edu-banner edu-closed edu-ended" id="seminarBannerLink" title="종료된 교육입니다">
               <div class="thumb">
@@ -5939,7 +5947,9 @@
               <a href="#" id="adminTab-users" onclick="showAdminTab('users'); return false;"
                 style="display:block; padding:12px 16px; text-decoration:none; color:#1b2f78; font-weight:800; border-bottom:1px solid #f1f3f5;">회원 관리</a>
               <a href="#" id="adminTab-eduapps" onclick="showAdminTab('eduapps'); return false;"
-                style="display:block; padding:12px 16px; text-decoration:none; color:#495057; font-weight:600;">교육신청 현황</a>
+                style="display:block; padding:12px 16px; text-decoration:none; color:#495057; font-weight:600; border-bottom:1px solid #f1f3f5;">교육신청 현황</a>
+              <a href="#" id="adminTab-eduapps2" onclick="showAdminTab('eduapps2'); return false;"
+                style="display:block; padding:12px 16px; text-decoration:none; color:#495057; font-weight:600;">교육신청 현황2</a>
             </aside>
             <!-- 오른쪽 콘텐츠 -->
             <div style="flex:1; min-width:0;">
@@ -5969,42 +5979,59 @@
                   <p style="color:#adb5bd;">불러오는 중...</p>
                 </div>
               </div>
+              <div id="adminEduAppsPanel2" style="display:none; background:white; padding:2rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+                <h2 style="margin:0 0 .4rem; font-size:1.15rem;">교육신청 현황2 — 세부지표별 대응전략 세미나 (11/26~27)</h2>
+                <p style="margin:0 0 1.2rem; color:#868e96; font-size:.9rem;">
+                  세부지표별 대응전략 세미나 신청 내역입니다. (총 <b id="eduAppsCount2">0</b>건)</p>
+                <div id="eduAppsList2" style="display:flex; flex-direction:column; gap:14px;">
+                  <p style="color:#adb5bd;">불러오는 중...</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
       <script>
         // ── 관리자 세부 메뉴 전환 + 교육신청 현황 로드 ──
+        // 새 세미나(현황2) 구분 키: 신청 데이터의 seminar 필드에 이 단어가 있으면 현황2로 분류
+        var EDU_APPS2_KEY = '세부지표별';
         window.showAdminTab = function (tab) {
-          var users = document.getElementById('adminUsersPanel');
-          var apps = document.getElementById('adminEduAppsPanel');
-          var tu = document.getElementById('adminTab-users');
-          var te = document.getElementById('adminTab-eduapps');
+          var panels = {
+            users: document.getElementById('adminUsersPanel'),
+            eduapps: document.getElementById('adminEduAppsPanel'),
+            eduapps2: document.getElementById('adminEduAppsPanel2'),
+          };
+          var links = {
+            users: document.getElementById('adminTab-users'),
+            eduapps: document.getElementById('adminTab-eduapps'),
+            eduapps2: document.getElementById('adminTab-eduapps2'),
+          };
           var on = 'color:#1b2f78; font-weight:800;', off = 'color:#495057; font-weight:600;';
-          if (tab === 'eduapps') {
-            users.style.display = 'none'; apps.style.display = 'block';
-            tu.style.cssText += off; te.style.cssText += on;
-            loadEduApplications();
-          } else {
-            users.style.display = 'block'; apps.style.display = 'none';
-            tu.style.cssText += on; te.style.cssText += off;
-          }
+          if (!panels[tab]) tab = 'users';
+          Object.keys(panels).forEach(function (k) {
+            if (panels[k]) panels[k].style.display = (k === tab) ? 'block' : 'none';
+            if (links[k]) links[k].style.cssText += (k === tab) ? on : off;
+          });
+          if (tab === 'eduapps') loadEduApplications();
+          else if (tab === 'eduapps2') loadEduApplications2();
         };
-        window.loadEduApplications = async function () {
-          var box = document.getElementById('eduAppsList');
-          var cnt = document.getElementById('eduAppsCount');
+        // 공용 렌더러 — filterFn 으로 세미나별 분리 (표시 형식은 기존과 동일)
+        async function renderEduApplications(listId, cntId, filterFn) {
+          var box = document.getElementById(listId);
+          var cnt = document.getElementById(cntId);
           if (!window.db || !window.collection) { box.innerHTML = '<p style="color:#e03131;">데이터 연결 준비 중 — 잠시 후 다시 클릭해주세요.</p>'; return; }
           box.innerHTML = '<p style="color:#adb5bd;">불러오는 중...</p>';
           function esc(s) { var d = document.createElement('div'); d.textContent = (s == null || s === '' ? '-' : String(s)); return d.innerHTML; }
           try {
             var snap = await window.getDocs(window.query(
               window.collection(window.db, 'edu_applications'), window.orderBy('createdAt', 'desc')));
-            if (snap.empty) { cnt.textContent = '0'; box.innerHTML = '<p style="color:#adb5bd;">아직 접수된 신청이 없습니다.</p>'; return; }
             var html = [], n = 0;
             snap.forEach(function (doc) {
+              var d = doc.data();
+              if (!filterFn(d)) return;
               n++;
               var docId = doc.id;
-              var d = doc.data(); var c = d.company || {};
+              var c = d.company || {};
               var when = d.createdAt && d.createdAt.seconds
                 ? new Date(d.createdAt.seconds * 1000).toLocaleString('ko-KR') : '-';
               var rows = (d.applicants || []).map(function (a, i) {
@@ -6039,12 +6066,22 @@
                 + '</div></details>');
             });
             cnt.textContent = n;
-            box.innerHTML = html.join('');
+            box.innerHTML = n ? html.join('') : '<p style="color:#adb5bd;">아직 접수된 신청이 없습니다.</p>';
           } catch (e) {
             console.error('교육신청 현황 로드 실패:', e);
             box.innerHTML = '<p style="color:#e03131;">불러오기 실패: ' + esc(e.message)
               + '<br><span style="font-size:.85rem; color:#868e96;">Firestore 보안 규칙에 edu_applications 읽기 권한이 필요할 수 있습니다.</span></p>';
           }
+        }
+        // 현황1: 기존(경영평가 역량 강화 세미나 등) — 새 세미나(세부지표별) 건은 제외
+        window.loadEduApplications = function () {
+          return renderEduApplications('eduAppsList', 'eduAppsCount',
+            function (d) { return String(d.seminar || '').indexOf(EDU_APPS2_KEY) === -1; });
+        };
+        // 현황2: 세부지표별 대응전략 세미나(11/26~27) 신청 건만
+        window.loadEduApplications2 = function () {
+          return renderEduApplications('eduAppsList2', 'eduAppsCount2',
+            function (d) { return String(d.seminar || '').indexOf(EDU_APPS2_KEY) > -1; });
         };
         // 교육신청 삭제 (관리자 전용 — 확인 후 영구 삭제, 목록 자동 갱신)
         window.deleteEduApplication = async function (docId, companyName) {
@@ -6052,7 +6089,10 @@
           try {
             await window.deleteDoc(window.doc(window.db, 'edu_applications', docId));
             alert('✅ 삭제되었습니다.');
-            window.loadEduApplications();
+            // 현재 열려 있는 현황 탭을 새로고침
+            var p2 = document.getElementById('adminEduAppsPanel2');
+            if (p2 && p2.style.display !== 'none') window.loadEduApplications2();
+            else window.loadEduApplications();
           } catch (e) {
             console.error('교육신청 삭제 실패:', e);
             alert('삭제 실패: ' + e.message);
