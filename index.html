@@ -5112,8 +5112,8 @@
           <h2 class="section-title" style="color:#5c7cfa;">공공기관 임직원 교육과정 <span class="apply">상품신청&gt;</span> </h2>
 
           <div class="edu-banner-list">
-            <!-- 배너 신규: 세부지표별 대응전략 세미나 (11/26~27) — 클릭 시 교육 신청 페이지로 -->
-            <a class="edu-banner" href="edu_apply.html" target="_blank" rel="noopener">
+            <!-- 배너 신규: 세부지표별 대응전략 세미나 (11/26~27) — 클릭 시 현재 화면에서 교육 신청 페이지로 -->
+            <a class="edu-banner" href="edu_apply.html">
               <div class="thumb">
                 <img loading="lazy" decoding="async" src="images/baner/banner8.png"
                   alt="2026 공공기관·지방공기업 세부지표별 대응전략 세미나 (11월 26일~27일) — 교육 신청">
@@ -13388,8 +13388,8 @@ function initCarousel(carouselContainer) {
     list.className = 'edu-mirror-list';
     banners.forEach(function (a) {
       var clone = a.cloneNode(true); // 링크/이미지/제목(있다면) 전부 복제
-      clone.setAttribute('target', '_blank');
-      clone.setAttribute('rel', 'noopener');
+      // 새 창 여부는 원본 배너의 설정을 그대로 따른다
+      // (신청 페이지 배너는 현재 화면에서 열리고, 새 창이 필요한 배너만 target 유지)
       list.appendChild(clone);
     });
     mirror.innerHTML = '';
