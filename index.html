@@ -14276,7 +14276,7 @@ function initCarousel(carouselContainer) {
   style="display:none; position:fixed; inset:0; z-index:10500; background:rgba(0,0,0,.55);">
   <div id="homeNoticePopup"
     style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:440px; max-width:92vw;">
-    <img id="homeNoticeImg" alt="올공 공지" title="클릭하면 공공기관 교육으로 이동합니다"
+    <img id="homeNoticeImg" alt="올공 공지" title="클릭하면 교육 신청으로 이동합니다"
       style="display:block; width:100%; height:auto; max-height:72vh; object-fit:contain; cursor:pointer;
              border-radius:14px; background:#fff; box-shadow:0 16px 48px rgba(0,0,0,.35);"
       onclick="goHomeNotice()">
@@ -14295,8 +14295,8 @@ function initCarousel(carouselContainer) {
 </div>
 <script>
   (function () {
-    // 세부지표별 대응전략 세미나(11/26~27) 포스터 — 신청 페이지 '교육안내'와 동일한 이미지
-    var POSTER = 'images/education/8.png?v=2';
+    // 세부지표별 대응전략 세미나(11/26~27) 포스터 — 신청마감 11/20 표기 버전 (v=교체 시 캐시 무효화)
+    var POSTER = 'images/education/8.png?v=3';
     var FALLBACK = POSTER;
 
     function hideIfChecked() {
@@ -14314,7 +14314,7 @@ function initCarousel(carouselContainer) {
     };
     window.goHomeNotice = function () {
       window.closeHomeNoticePopup();
-      if (window.showEduBoard) window.showEduBoard(); // '공공기관 교육' 게시판으로 이동
+      location.href = 'edu_apply.html'; // 교육 신청 페이지로 이동 (현재 화면에서)
     };
     // 어두운 배경 클릭 시 닫기
     document.getElementById('homeNoticeOverlay').addEventListener('click', function (e) {
