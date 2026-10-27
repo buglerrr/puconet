@@ -7962,34 +7962,25 @@
             logoutBtn.onclick = function(e) { window.handleLogout(e); return false; };
         }
 
-        // 관리자 확인
+        // 관리자 판별: 소유자 이메일은 Firestore 조회 성공 여부와 무관하게 항상 관리자.
+        // (Firestore 읽기 실패 시에도 회원관리/방문자 통계가 사라지지 않도록 먼저 확정)
+        var isAdmin = (user.email === window.ADMIN_EMAIL);
+        window.currentUserRole = isAdmin ? 'admin' : null;
         try {
           const userSnap = await getDoc(doc(db, 'users', user.uid));
-          if (userSnap.exists()) {
-            const userData = userSnap.data();
-            if (userData.role === 'admin') {
-              // 관리자 메뉴 노출 (네비게이션에 추가)
-              if (!document.getElementById('nav-admin-users')) {
-                const ul = document.querySelector('#global_bar .right');
-                const li = document.createElement('li');
-                li.innerHTML = '<a href="#" onclick="showUserManagement(); return false;" id="nav-admin-users" style="color: #e74c3c; font-weight:bold;">회원관리</a>';
-                if (ul) ul.insertBefore(li, ul.firstChild); // 맨 앞에 추가
-              }
-            }
+          if (userSnap.exists() && userSnap.data().role === 'admin') {
+            isAdmin = true;
+            window.currentUserRole = 'admin';
           }
         } catch (e) { console.error("Admin check failed", e); }
 
-        // 전역 변수에 역할 저장
-        try {
-          const snap = await getDoc(doc(db, 'users', user.uid));
-          if (snap.exists()) {
-            window.currentUserRole = snap.data().role;
-          }
-          // 관리자 이메일 fallback: Firestore role 무관하게 관리자 처리
-          if (user.email === 'ilovetruman@gmail.com') {
-            window.currentUserRole = 'admin';
-          }
-        } catch (e) { }
+        // 관리자 메뉴 노출 (네비게이션에 추가)
+        if (isAdmin && !document.getElementById('nav-admin-users')) {
+          const ul = document.querySelector('#global_bar .right');
+          const li = document.createElement('li');
+          li.innerHTML = '<a href="#" onclick="showUserManagement(); return false;" id="nav-admin-users" style="color: #e74c3c; font-weight:bold;">회원관리</a>';
+          if (ul) ul.insertBefore(li, ul.firstChild); // 맨 앞에 추가
+        }
 
         // 관리자(ilovetruman) 방문은 집계 제외: 오늘 이 IP가 이미 카운트됐다면 되돌림
         if (user.email === window.ADMIN_EMAIL && typeof window.excludeAdminVisit === 'function') {
