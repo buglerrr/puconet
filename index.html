@@ -5972,7 +5972,7 @@
                 </table>
               </div>
               <div id="adminEduAppsPanel" style="display:none; background:white; padding:2rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
-                <h2 style="margin:0 0 .4rem; font-size:1.15rem;">교육신청 현황</h2>
+                <button type="button" onclick="exportEduAppsExcel()" style="float:right; background:#2b8a3e; color:#fff; border:none; font-size:.85rem; font-weight:700; padding:6px 14px; border-radius:6px; cursor:pointer;">엑셀 다운로드</button><h2 style="margin:0 0 .4rem; font-size:1.15rem;">교육신청 현황</h2>
                 <p style="margin:0 0 1.2rem; color:#868e96; font-size:.9rem;">
                   교육 신청 페이지에서 접수된 신청 내역입니다. (총 <b id="eduAppsCount">0</b>건)</p>
                 <div id="eduAppsList" style="display:flex; flex-direction:column; gap:14px;">
@@ -5980,7 +5980,7 @@
                 </div>
               </div>
               <div id="adminEduAppsPanel2" style="display:none; background:white; padding:2rem; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
-                <h2 style="margin:0 0 .4rem; font-size:1.15rem;">교육신청 현황2 — 세부지표별 대응전략 세미나 (11/26~27)</h2>
+                <button type="button" onclick="exportEduAppsExcel()" style="float:right; background:#2b8a3e; color:#fff; border:none; font-size:.85rem; font-weight:700; padding:6px 14px; border-radius:6px; cursor:pointer;">엑셀 다운로드</button><h2 style="margin:0 0 .4rem; font-size:1.15rem;">교육신청 현황2 — 세부지표별 대응전략 세미나 (11/26~27)</h2>
                 <p style="margin:0 0 1.2rem; color:#868e96; font-size:.9rem;">
                   세부지표별 대응전략 세미나 신청 내역입니다. (총 <b id="eduAppsCount2">0</b>건)</p>
                 <div id="eduAppsList2" style="display:flex; flex-direction:column; gap:14px;">
@@ -6082,6 +6082,48 @@
         window.loadEduApplications2 = function () {
           return renderEduApplications('eduAppsList2', 'eduAppsCount2',
             function (d) { return String(d.seminar || '').indexOf(EDU_APPS2_KEY) > -1; });
+        };
+        // 교육신청 엑셀 다운로드 (관리자 전용 — 신청자 1명당 1행, 기관 정보 함께 기재 / 현황1·현황2 시트 분리)
+        window.exportEduAppsExcel = async function () {
+          if (!window.db || !window.collection) { alert('데이터 연결 준비 중 — 잠시 후 다시 시도해주세요.'); return; }
+          try {
+            if (!window.XLSX) {
+              await new Promise(function (ok, fail) {
+                var s = document.createElement('script');
+                s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+                s.onload = ok; s.onerror = function () { fail(new Error('엑셀 라이브러리 로드 실패')); };
+                document.head.appendChild(s);
+              });
+            }
+            var snap = await window.getDocs(window.query(
+              window.collection(window.db, 'edu_applications'), window.orderBy('createdAt', 'desc')));
+            var head = ['세미나', '신청일시', '상태', '기관명', 'NO', '신청자명', '부서', '직위', '연락처', '휴대폰', '이메일',
+              '대표자', '사업자번호', '주소', '업종', '업태', '세금계산서담당자', '담당자 부서', '담당자 연락처', '담당자 휴대폰', '담당자 메일',
+              '결제방법', '요청사항'];
+            var sheet1 = [head], sheet2 = [head];
+            snap.forEach(function (doc) {
+              var d = doc.data(), c = d.company || {};
+              var when = d.createdAt && d.createdAt.seconds ? new Date(d.createdAt.seconds * 1000).toLocaleString('ko-KR') : '';
+              var target = String(d.seminar || '').indexOf(EDU_APPS2_KEY) > -1 ? sheet2 : sheet1;
+              var apps = (d.applicants && d.applicants.length) ? d.applicants : [{}];
+              apps.forEach(function (a, i) {
+                target.push([d.seminar || '', when, d.status || '접수', c.name || '', i + 1, a.name || '', a.dept || '', a.position || '',
+                  a.tel || '', a.mobile || '', a.email || '', c.ceo || '', c.bizno || '', c.addr || '', c.upjong || '', c.uptae || '',
+                  c.taxManager || '', c.dept || '', c.tel || '', c.mobile || '', c.email || '', d.payment || '', c.request || '']);
+              });
+            });
+            var wb = XLSX.utils.book_new();
+            [['교육신청 현황', sheet1], ['교육신청 현황2', sheet2]].forEach(function (p) {
+              var ws = XLSX.utils.aoa_to_sheet(p[1]);
+              ws['!cols'] = head.map(function (h) { return { wch: h === '주소' || h === '세미나' ? 40 : 16 }; });
+              XLSX.utils.book_append_sheet(wb, ws, p[0]);
+            });
+            var t = new Date(), pad = function (n) { return (n < 10 ? '0' : '') + n; };
+            XLSX.writeFile(wb, '교육신청현황_' + t.getFullYear() + pad(t.getMonth() + 1) + pad(t.getDate()) + '.xlsx');
+          } catch (e) {
+            console.error('엑셀 다운로드 실패:', e);
+            alert('엑셀 다운로드 실패: ' + e.message);
+          }
         };
         // 교육신청 삭제 (관리자 전용 — 확인 후 영구 삭제, 목록 자동 갱신)
         window.deleteEduApplication = async function (docId, companyName) {
