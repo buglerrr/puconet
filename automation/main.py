@@ -645,18 +645,26 @@ def run() -> dict:
     print(f"⏱️ SNS 단계: {time.time() - t0:.0f}초")
 
     # ── ③ 쇼츠(마감임박 TOP5) 자동 생성 — 설정 없으면 무동작 ──
+    # ⛔ 소유자 요청(2026-11)으로 동영상 자동 생성·인스타 업로드 중단(비용 절감).
+    #    다시 켜려면 아래 SHORTS_ENABLED 를 True 로 바꾸고 재배포하거나,
+    #    Firestore _config/shorts.enabled 로 제어하면 된다(둘 다 참이어야 실행).
+    SHORTS_ENABLED = False
     t0 = time.time()
-    try:
-        import shorts_video
-        print("🎬 쇼츠 자동 생성 시도")
-        if df is not None and len(df):
-            shorts_video.run_daily(firestore.client(), df)
-            _write_status("shorts", True, "실행됨 (_config/shorts 의 state 참고)")
-        else:
-            print("  (데이터 없음 → 쇼츠 생략)")
-    except Exception as e:  # noqa: BLE001
-        print(f"  ⚠️ 쇼츠 생성 오류(무시): {e}")
-        _write_status("shorts", False, e)
+    if not SHORTS_ENABLED:
+        print("⏭️ 쇼츠 자동 생성 비활성(소유자 요청) — 건너뜀")
+        _write_status("shorts", True, "비활성(소유자 요청으로 중단)")
+    else:
+        try:
+            import shorts_video
+            print("🎬 쇼츠 자동 생성 시도")
+            if df is not None and len(df):
+                shorts_video.run_daily(firestore.client(), df)
+                _write_status("shorts", True, "실행됨 (_config/shorts 의 state 참고)")
+            else:
+                print("  (데이터 없음 → 쇼츠 생략)")
+        except Exception as e:  # noqa: BLE001
+            print(f"  ⚠️ 쇼츠 생성 오류(무시): {e}")
+            _write_status("shorts", False, e)
     print(f"⏱️ 쇼츠 단계: {time.time() - t0:.0f}초")
 
     # ── ④ 공공기관 뉴스 자동 게시(하루 3건) — 설정 없으면 무동작 ──
