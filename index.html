@@ -4590,6 +4590,13 @@
 
   <div class="content-with-sidebar-wrapper">
     <div class="main-content-area">
+      <!-- ===== 플래티넘 채용정보 (관리자 직접 등록 공고, 프리미엄 위) ===== -->
+      <section class="section section--compact" id="platinum-features" style="display:none;">
+        <div class="container">
+          <h2 class="section-title" style="color:#8a6d1a;">플래티넘 채용정보 <a class="apply" href="product.html" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;">상품신청&gt;</a></h2>
+          <div id="platinumHomeGrid" class="job-grid job-grid--premium"></div>
+        </div>
+      </section>
       <section class="section section--compact" id="features">
         <div class="container">
           <h2 class="section-title">프리미엄 채용정보 <a class="apply" href="product.html" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;">상품신청&gt;</a></h2>
@@ -5359,6 +5366,7 @@
               <!-- ① 주요 채용정보 -->
               <p class="sidebar-group-header">주요 채용정보</p>
               <ul>
+                <li><a href="#" onclick="switchBoard('platinum'); return false;" id="board-menu-platinum" style="color:#8a6d1a; font-weight:800;">플래티넘</a></li>
                 <li><a href="#" onclick="switchBoard('premium'); return false;" id="board-menu-premium">프리미엄</a></li>
                 <li><a href="#" onclick="switchBoard('recommended'); return false;" id="board-menu-recommended">추천</a>
                 </li>
@@ -10602,6 +10610,11 @@ function displayStoriesForPage(page) {
       const dl = _boardDaysLeft(job.deadline || job.closingDate);
       return dl !== null && dl < 0;
     }
+    // '플래티넘' 게시판 = 관리자가 직접 등록한 플래티넘 공고(category='platinum' 또는 platinum=true).
+    //  마감 지난 건은 상위 _baseJobs 에서 이미 제외되므로 여기서는 표식만 확인한다.
+    function isPlatinumJob(job) {
+      return job.category === 'platinum' || job.platinum === true || job.source === 'platinum-manual';
+    }
     // '프리미엄' 게시판 = 고용유형이 '정규직' 단독(다른 유형과 합쳐지지 않은)인 자동수집 공고 (미마감)
     function isPremiumJob(job) {
       if (job.source !== 'alio-auto') return false;
@@ -10622,6 +10635,7 @@ function displayStoriesForPage(page) {
     }
     function computeBoardTypeFilter(boardType) {
       if (!boardType) return null;
+      if (boardType === 'platinum') return { predicate: isPlatinumJob };
       if (boardType === 'premium') return { predicate: isPremiumJob };
       if (boardType === 'featured') return { predicate: isFeaturedJob };
       if (boardType === 'recommended') return { predicate: isRecommendedJob };
@@ -10646,6 +10660,7 @@ function displayStoriesForPage(page) {
 
       // 2. 게시판 제목 업데이트
       const boardTitles = {
+        'platinum': '플래티넘',
         'premium': '프리미엄',
         'recommended': '추천',
         'featured': '주요',
@@ -11729,6 +11744,13 @@ function displayStoriesForPage(page) {
           category: window.currentJobCategory, // 현재 카테고리 저장
           createdAt: window.Timestamp.now()
         };
+
+        // 플래티넘 게시판에서 등록한 공고는 플래티넘 표식을 함께 저장
+        // (홈 '플래티넘 채용정보' 섹션과 플래티넘 게시판이 이 표식으로 조회)
+        if (window.currentJobCategory === 'platinum') {
+          data.platinum = true;
+          data.source = 'platinum-manual';
+        }
 
         await window.addDoc(window.collection(window.db, 'jobs'), data);
         alert('✅ 등록되었습니다!');
@@ -13297,6 +13319,119 @@ function initCarousel(carouselContainer) {
         setTimeout(wait, 250);
       }
     })();
+  })();
+
+  // ===== 플래티넘 채용정보 (홈 첫 화면, 프리미엄 위) — 관리자 직접 등록 공고 =====
+  (function () {
+    var CACHE_KEY = 'allgong_platinum_home_v1';
+    function esc(s) { var d = document.createElement('div'); d.textContent = (s == null ? '' : String(s)); return d.innerHTML; }
+    function escA(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+    function daysLeft(deadline) {
+      if (!deadline) return null;
+      var e = new Date(deadline); if (isNaN(e.getTime())) return null;
+      e.setHours(0, 0, 0, 0); var t = new Date(); t.setHours(0, 0, 0, 0);
+      return Math.round((e - t) / 86400000);
+    }
+    function notExpired(it) { var l = daysLeft(it.deadline || it.closingDate); return l === null || l >= 0; }
+    function ddayText(dl) { var l = daysLeft(dl); if (l === null) return ''; if (l < 0) return '마감'; if (l === 0) return 'D-DAY'; return 'D-' + l; }
+    function fmtLoc(loc) {
+      if (!loc) return '-';
+      var items = String(loc).split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+      if (items.length <= 2) return items.join(', ');
+      return items[0] + ', ' + items[1] + ' 외 ' + (items.length - 2) + '개';
+    }
+    function normalize(id, d) {
+      var createdMs = (d.createdAt && d.createdAt.seconds) ? d.createdAt.seconds * 1000 : 0;
+      return {
+        id: id, title: d.title || '', company: d.company || '',
+        employmentType: d.employmentType || d.jobType || '', jobType: d.jobType || d.employmentType || '',
+        location: d.location || '', deadline: d.deadline || d.closingDate || '', closingDate: d.closingDate || d.deadline || '',
+        ncsCode: d.ncsCode || '', careerType: d.careerType || '', recruitmentCount: d.recruitmentCount || '',
+        education: d.education || '', preference: d.preference || '', detailUrl: d.detailUrl || '#',
+        imageUrl: d.imageUrl || '', content: d.content || '', category: d.category || '',
+        contentImageUrl: d.contentImageUrl || '', attachmentUrl: d.attachmentUrl || '', attachmentName: d.attachmentName || '',
+        platinum: true, source: d.source || 'platinum-manual',
+        createdMs: createdMs, createdDate: createdMs ? new Date(createdMs).toLocaleDateString('ko-KR') : ''
+      };
+    }
+    // 홈 플래티넘 카드 클릭 → 플래티넘 게시판 상태로 맞춘 뒤 해당 공고 상세 열기
+    window.openPlatinumJob = function (id) {
+      try {
+        if (window.showBoard) window.showBoard(true);
+        if (window.switchBoard) window.switchBoard('platinum', true);
+      } catch (e) { /* 무시 */ }
+      var tries = 0;
+      (function open() {
+        if (window.jobsData && window.jobsData[id] && typeof window.viewDetail === 'function') {
+          window.viewDetail(id, false); return;
+        }
+        if (++tries < 40) setTimeout(open, 150);
+      })();
+    };
+    function render(items) {
+      var grid = document.getElementById('platinumHomeGrid');
+      var section = document.getElementById('platinum-features');
+      if (!grid || !section) return false;
+      items = (items || []).filter(notExpired).sort(function (a, b) {
+        var da = Date.parse(a.deadline || a.closingDate || '') || 0;
+        var db = Date.parse(b.deadline || b.closingDate || '') || 0;
+        return db - da;
+      });
+      if (!items.length) { section.style.display = 'none'; return false; }
+      window.jobsData = window.jobsData || {};
+      var html = '';
+      items.forEach(function (it) {
+        window.jobsData[it.id] = Object.assign({}, it, { createdDate: it.createdDate }); // 상세보기용
+        var dl = it.deadline || it.closingDate || '';
+        var img = (it.imageUrl && it.imageUrl !== './logo.png' && !/^\.\//.test(it.imageUrl)) ? it.imageUrl
+          : (it.contentImageUrl || './올공 CI.png');
+        html += '<a class="job-card" href="javascript:void(0)" role="button" data-platinum-id="' + escA(it.id) + '" '
+          + 'onclick="openPlatinumJob(\'' + escA(it.id).replace(/'/g, '') + '\'); return false;">'
+          + '<span class="premium-bubble" style="display:inline-block;background:linear-gradient(135deg,#b8912f,#8a6d1a);color:#fff;font-size:.68rem;font-weight:800;padding:2px 9px;border-radius:999px;letter-spacing:.02em;">플래티넘</span>'
+          + '<img loading="lazy" decoding="async" class="banner-image" alt="' + escA(it.company) + '" src="' + escA(img) + '" onerror="this.onerror=null;this.src=\'./올공 CI.png\'" />'
+          + '<h3 title="' + escA(it.title) + '">' + esc(it.title) + '</h3>'
+          + '<p>' + esc(it.company) + '</p>'
+          + '<div class="deadline"><strong>마감:</strong> <span class="deadline-date">' + esc(dl || '상시') + '</span> '
+          + '<span style="color:#e74c3c;font-weight:600;">' + esc(ddayText(dl)) + '</span></div>'
+          + '</a>';
+      });
+      grid.innerHTML = html;
+      section.style.display = 'block';
+      return true;
+    }
+    function renderFromCache() {
+      try { var c = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); if (c && c.items) return render(c.items); } catch (e) {}
+      return false;
+    }
+    function saveCache(items) { try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), items: items })); } catch (e) {} }
+    async function fetchPlatinum() {
+      if (!(window.db && window.getDocs && window.query) && window.__fsRestQuery) {
+        try {
+          var rows = await window.__fsRestQuery('platinum');
+          return rows.map(function (o) { return normalize(o.__id, o); });
+        } catch (e) { /* 폴백 아래 */ }
+      }
+      try {
+        var q = window.query(window.collection(window.db, 'jobs'), window.where('platinum', '==', true));
+        var s = await window.getDocs(q);
+        var a = []; s.forEach(function (ds) { a.push(normalize(ds.id, ds.data())); });
+        return a;
+      } catch (e) { console.warn('플래티넘 조회 실패:', e); return []; }
+    }
+    async function refresh() {
+      var items = await fetchPlatinum();
+      saveCache(items);
+      return render(items);
+    }
+    renderFromCache();
+    (function wait() {
+      if (((window.db && window.getDocs && window.query && window.collection) || window.__fsRestQuery)
+          && document.getElementById('platinumHomeGrid')) {
+        refresh().catch(function () {});
+      } else { setTimeout(wait, 250); }
+    })();
+    // 전체 공고 갱신 이벤트에도 반영 (관리자 등록/삭제 직후 즉시 최신화)
+    window.addEventListener('allgong:jobs-updated', function () { refresh().catch(function () {}); });
   })();
 </script>
 
