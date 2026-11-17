@@ -1256,6 +1256,10 @@
     #features #premiumAutoGrid > .job-card h3 { min-width: 0; max-width: 100%; }
     /* '올공 문의' 광고 배너: 내용 세로 가운데 정렬 (기존 프리미엄 카드의 flex-start !important 를 덮어씀) */
     #features #premiumAutoGrid > .job-card.ad { justify-content: center !important; }
+    /* 플래티넘 그리드도 프리미엄과 동일하게: 1/4 고정 + 광고카드 세로 가운데 정렬 */
+    #features #platinumHomeGrid > .job-card { min-width: 0 !important; max-width: 100% !important; }
+    #features #platinumHomeGrid > .job-card h3 { min-width: 0; max-width: 100%; }
+    #features #platinumHomeGrid > .job-card.ad { justify-content: center !important; }
     #premiumAutoGrid:empty { display: none !important; margin: 0 !important; }
 
     /* 자동 생성 주요 배너 그리드: 기존 주요 배너(연두색)와 동일 크기, 한 줄 4개 고정 */
@@ -4542,8 +4546,6 @@
             <a href="#"
               onclick="showContestBoard(); return false;">공모전
               소식</a>
-            <a href="#" onclick="showMallBoard(); return false;"
-              style="color: #e8590c; font-weight:bold;">올공몰</a>
             <a href="#" onclick="checkLoginAndExecute(showStoryBoard, '취업 이야기를 보려면 로그인이 필요합니다.'); return false;"
               style="color: #666; font-weight:bold;">취업 이야기</a>
           </div>
@@ -4596,49 +4598,8 @@
           <h2 class="section-title" style="color:#8a6d1a;">플래티넘 채용정보 <a class="apply" href="product.html" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;">상품신청&gt;</a></h2>
           <div id="platinumHomeGrid" class="job-grid job-grid--premium" style="margin-bottom:1.6rem;"></div>
           <h2 class="section-title">프리미엄 채용정보 <a class="apply" href="product.html" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;">상품신청&gt;</a></h2>
-          <!-- ===== 정적 관리 배너 4개 (VIP 고객용, 관리자가 직접 이 코드를 수정) ===== -->
-          <div class="premium-carousel-wrapper">
-            <div class="job-grid job-grid--premium premium-carousel-container">
-              <a aria-label="프리미엄 - 한국도로공사 채용공고 이동" class="job-card" data-url="https://www.ex.co.kr/portal/biz/bbs/layout1/selectBoardList.do?bbsId=BBSMSTR_000000000211"
-                href="javascript:void(0)" role="button">
-                <span class="premium-bubble">프리미엄</span>
-                <img alt="한국도로공사" class="banner-image" src="./한국도로공사.png" />
-                <h3>한국도로공사</h3>
-                <p>신입·경력 / 사무·전기</p>
-                <div class="deadline"><strong>마감:</strong> <span class="deadline-date" data-deadline="2026-07-01">2026.07.01</span> <span
-                    style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-07-01"></span></span></div>
-              </a>
-              <a aria-label="프리미엄 - 국가철도공단 채용공고 이동" class="job-card" data-url="https://www.kr.or.kr/boardCnts/list.do?boardID=72"
-                href="javascript:void(0)" role="button">
-                <span class="premium-bubble">프리미엄</span>
-                <img alt="국가철도공단" class="banner-image" src="./images/ci/국가철도공단.png" />
-                <h3>국가철도공단</h3>
-                <p>사무·기술</p>
-                <div class="deadline"><strong>마감:</strong> <span class="deadline-date" data-deadline="2026-08-08">2026.08.08</span> <span
-                    style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-08-08"></span></span></div>
-              </a>
-              <a aria-label="프리미엄 - 광주광역시도시공사 채용공고 이동" class="job-card" data-url="https://gmcc.ai-recruit.kr/"
-                href="javascript:void(0)" role="button">
-                <span class="premium-bubble">프리미엄</span>
-                <img alt="광주광역시도시공사" class="banner-image" src="./images/ci/광주광역시도시공사.png" />
-                <h3>광주광역시도시공사</h3>
-                <p>토목·전기·통신</p>
-                <div class="deadline"><strong>마감:</strong> <span class="deadline-date" data-deadline="2026-07-05">2026.07.05</span> <span
-                    style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-07-05"></span></span></div>
-              </a>
-              <a aria-label="프리미엄 - 국립공원공단 채용공고 이동" class="job-card"
-                data-url="https://knps.fairy.im/"
-                href="javascript:void(0)" role="button">
-                <span class="premium-bubble">프리미엄</span>
-                <img alt="국립공원공단" class="banner-image" src="./images/ci/국립공원공단.png" />
-                <h3>국립공원공단</h3>
-                <p>청년인턴</p>
-                <div class="deadline"><strong>마감:</strong> <span class="deadline-date" data-deadline="2026-07-22">2026.07.22</span> <span
-                    style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-07-22"></span></span></div>
-              </a>
-            </div>
-          </div>
-          <!-- 자동 크롤링 프리미엄 배너 (정적 4개 아래에 한 줄 4개씩) -->
+          <!-- (정적 프리미엄 배너 4개 제거됨 — 아래 자동 갱신 배너만 사용) -->
+          <!-- 자동 크롤링 프리미엄 배너 (매일 자동 갱신, 한 줄 4개씩) -->
           <div id="premiumAutoGrid" class="job-grid job-grid--premium"></div>
         </div>
       </section>
@@ -9682,6 +9643,58 @@ function displayStoriesForPage(page) {
     // ── 공공기관 뉴스 캐시 ──
     let _newsCache = null;
 
+    // 뉴스 문서를 createdAt 내림차순으로 정렬하기 위한 ms 변환 (SDK Timestamp / REST {seconds} / 문자열 호환)
+    function _newsMs(d) {
+      var c = d && d.createdAt;
+      if (c && typeof c === 'object') {
+        if (typeof c.seconds === 'number') return c.seconds * 1000;
+        if (typeof c.toDate === 'function') { try { return c.toDate().getTime(); } catch (e) {} }
+      }
+      var t = Date.parse(d && (d.date || d.createdAt) || '');
+      return isNaN(t) ? 0 : t;
+    }
+    // REST 조회 (SDK 미준비/지연 시 폴백) — 'news' 컬렉션 전체를 읽어 클라이언트에서 정렬
+    async function _fetchNewsREST() {
+      var res = await fetch(
+        'https://firestore.googleapis.com/v1/projects/recruit-board/databases/(default)/documents:runQuery',
+        { method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ structuredQuery: { from: [{ collectionId: 'news' }], limit: 500 } }) }
+      );
+      if (!res.ok) throw new Error('news REST ' + res.status);
+      var rows = await res.json();
+      var out = [];
+      (rows || []).forEach(function (r) {
+        if (!r.document) return;
+        var f = r.document.fields || {}; var o = {};
+        Object.keys(f).forEach(function (k) {
+          var v = f[k];
+          if ('stringValue' in v) o[k] = v.stringValue;
+          else if ('integerValue' in v) o[k] = Number(v.integerValue);
+          else if ('booleanValue' in v) o[k] = v.booleanValue;
+          else if ('timestampValue' in v) o[k] = { seconds: Math.floor(Date.parse(v.timestampValue) / 1000) };
+        });
+        var name = r.document.name; o.id = name.substring(name.lastIndexOf('/') + 1);
+        out.push(o);
+      });
+      return out;
+    }
+    // 뉴스 문서 조회: SDK 준비 시 SDK(6초 타임아웃), 미준비/지연/오류 시 REST 폴백 → 무한 로딩 방지
+    async function _getNewsDocs() {
+      var sdkReady = window.db && window.getDocs && window.query && window.collection && window.orderBy;
+      if (sdkReady) {
+        try {
+          var q = window.query(window.collection(window.db, 'news'), window.orderBy('createdAt', 'desc'));
+          var snapshot = await Promise.race([
+            window.getDocs(q),
+            new Promise(function (_, rej) { setTimeout(function () { rej(new Error('news SDK timeout')); }, 6000); })
+          ]);
+          var docs = []; snapshot.forEach(function (ds) { docs.push({ id: ds.id, ...ds.data() }); });
+          return docs;
+        } catch (e) { console.warn('뉴스 SDK 조회 실패 → REST 폴백:', e); }
+      }
+      return await _fetchNewsREST();
+    }
+
     // loadNews: Firestore에서 뉴스 기사 로드
     window.loadNews = async function () {
       const listBody = document.getElementById('newsListBody');
@@ -9724,25 +9737,19 @@ function displayStoriesForPage(page) {
       if (pagination) pagination.style.display = 'none';
 
       try {
-        const q = window.query(
-          window.collection(window.db, 'news'),
-          window.orderBy('createdAt', 'desc')
-        );
-        const snapshot = await window.getDocs(q);
+        const docs = await _getNewsDocs();
+        docs.sort((a, b) => _newsMs(b) - _newsMs(a)); // 최신순 (SDK/REST 공통 클라이언트 정렬)
 
         if (loading) loading.style.display = 'none';
 
-        if (snapshot.empty) {
+        if (!docs.length) {
           if (empty) empty.style.display = 'block';
           if (totalCnt) totalCnt.textContent = '0';
           renderNewsAside([]);
           return;
         }
 
-        allNewsData = [];
-        snapshot.forEach(docSnap => {
-          allNewsData.push({ id: docSnap.id, ...docSnap.data() });
-        });
+        allNewsData = docs;
 
         // 결과 캐시 저장
         _newsCache = { docs: [...allNewsData], ts: now };
