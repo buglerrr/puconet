@@ -10871,8 +10871,8 @@ function displayStoriesForPage(page) {
       const _descEsc = document.createElement('div'); _descEsc.textContent = content || '';
       document.getElementById('detail-desc').innerHTML = content ? _descEsc.innerHTML.replace(/\n/g, '<br>') : '내용이 없습니다.';
 
-      // 쿠팡파트너스 추천 교재: 공고 NCS코드명과 매칭되는 카드 표시 (하단 스크립트에서 정의)
-      try { if (typeof window.renderAffiliateBox === 'function') window.renderAffiliateBox(job); } catch (e) { /* 무시 */ }
+      // 쿠팡파트너스 추천 교재 박스 제거(소유자 요청) — 상세 화면에서 노출하지 않음
+      try { var _affBox = document.getElementById('affiliate-box'); if (_affBox) _affBox.style.display = 'none'; } catch (e) { /* 무시 */ }
 
       // 이미지 처리
       const imgArea = document.getElementById('detail-image-area');
