@@ -1260,6 +1260,12 @@
     #features #platinumHomeGrid > .job-card { min-width: 0 !important; max-width: 100% !important; }
     #features #platinumHomeGrid > .job-card h3 { min-width: 0; max-width: 100%; }
     #features #platinumHomeGrid > .job-card.ad { justify-content: center !important; }
+    /* 프리미엄 맨 윗줄 관리자 등록형 그리드: 플래티넘과 동일 규칙 (열 수는 공통 규칙: PC 4열 / 모바일 2열) */
+    #features #premiumVipGrid > .job-card { min-width: 0 !important; max-width: 100% !important; }
+    #features #premiumVipGrid > .job-card h3 { min-width: 0; max-width: 100%; }
+    #features #premiumVipGrid > .job-card.ad { justify-content: center !important; }
+    /* 추천 맨 윗줄 관리자 등록형 그리드: 1/4 고정 */
+    #jobs #recVipGrid > .job-card { min-width: 0 !important; max-width: 100% !important; }
     #premiumAutoGrid:empty { display: none !important; margin: 0 !important; }
 
     /* 자동 생성 주요 배너 그리드: 기존 주요 배너(연두색)와 동일 크기, 한 줄 4개 고정 */
@@ -4598,7 +4604,8 @@
           <h2 class="section-title" style="color:#8a6d1a;">플래티넘 채용정보 <a class="apply" href="product.html" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;">상품신청&gt;</a></h2>
           <div id="platinumHomeGrid" class="job-grid job-grid--premium" style="margin-bottom:1.6rem;"></div>
           <h2 class="section-title">프리미엄 채용정보 <a class="apply" href="product.html" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;">상품신청&gt;</a></h2>
-          <!-- (정적 프리미엄 배너 4개 제거됨 — 아래 자동 갱신 배너만 사용) -->
+          <!-- ===== 프리미엄 채용정보 맨 윗줄: 관리자 등록형 배너 4칸 (빈 칸은 광고 문의 카드) ===== -->
+          <div id="premiumVipGrid" class="job-grid job-grid--premium"></div>
           <!-- 자동 크롤링 프리미엄 배너 (매일 자동 갱신, 한 줄 4개씩) -->
           <div id="premiumAutoGrid" class="job-grid job-grid--premium"></div>
         </div>
@@ -4908,44 +4915,8 @@
       <section class="section section--tight-top" id="jobs" style="background: white;">
         <div class="container">
           <h2 class="section-title">추천 채용정보 <a class="apply" href="product.html" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;">상품신청&gt;</a></h2>
-          <!-- ===== 정적 관리 배너 4개 (관리자가 직접 이 코드를 수정, 맨 윗줄 고정) ===== -->
-          <div class="job-grid" style="margin-bottom:0;">
-            <a aria-label="기술보증기금 채용공고 상세로 이동" class="job-card" data-job="1" data-url="https://kibo.saramin.co.kr" href="javascript:void(0)"
-              role="button">
-              <img alt="기술보증기금" loading="lazy" decoding="async" class="banner-image" src="./images/ci/기술보증기금.png" />
-              <h3 title="기술보증기금 전문인력 채용공고">기술보증기금 전문인력 채용공고</h3>
-              <p>정규직</p>
-              <p class="meta"><span class="meta-loc">근무지: 경기 외</span><span class="meta-sep"> · </span><span class="meta-deadline">마감: <span class="deadline-date" data-deadline="2026-08-18">2026.08.18</span> <span class="dday" data-deadline="2026-08-18" style="color:#e74c3c;font-weight:600;"></span></span></p>
-              <div class="job-badges"></div>
-            </a>
-
-            <a aria-label="대전관광공사 채용공고 상세로 이동" class="job-card" data-job="2" data-url="https://djto.saramin.co.kr/" href="javascript:void(0)"
-              role="button">
-              <img alt="대전관광공사" loading="lazy" decoding="async" class="banner-image" src="./images/ci/대전관광공사.png" />
-              <h3 title="대전관광공사 정규직 수시채용 공고">대전관광공사 정규직 수시채용 공고</h3>
-              <p>정규직</p>
-              <p class="meta"><span class="meta-loc">근무지: 전남</span><span class="meta-sep"> · </span><span class="meta-deadline">마감: <span class="deadline-date" data-deadline="2026-07-13">2026.07.13</span> <span class="dday" data-deadline="2026-07-13" style="color:#e74c3c;font-weight:600;"></span></span></p>
-              <div class="job-badges"></div>
-            </a>
-
-            <a aria-label="대전광역시시설관리공단 채용공고 상세로 이동" class="job-card" data-job="3" data-url="https://www.djsiseol.or.kr/portal/sub060302_list.asp?bbs_id=jobinf&homepage_id=main" href="javascript:void(0)"
-              role="button">
-              <img alt="대전광역시시설관리공단" loading="lazy" decoding="async" class="banner-image" src="./images/ci/대전광역시시설관리공단.png" />
-              <h3 title="대전광역시시설관리공단 일반직 신입사원 채용">대전광역시시설관리공단 일반직 신입사원 채용</h3>
-              <p>정규직</p>
-              <p class="meta"><span class="meta-loc">근무지: 서울</span><span class="meta-sep"> · </span><span class="meta-deadline">마감: <span class="deadline-date" data-deadline="2026-07-18">2026.07.18</span> <span class="dday" data-deadline="2026-07-18" style="color:#e74c3c;font-weight:600;"></span></span></p>
-              <div class="job-badges"></div>
-            </a>
-
-            <a aria-label="대전교통공사 채용공고 상세로 이동" class="job-card" data-job="4" data-url="https://djtc.kr/kor/board.do?menuIdx=366" href="javascript:void(0)"
-              role="button">
-              <img alt="대전교통공사" loading="lazy" decoding="async" class="banner-image" src="./images/ci/대전교통공사.png" />
-              <h3 title="대전교통공사 하반기 보훈 채용공고">대전교통공사 하반기 보훈 채용공고</h3>
-              <p>정규직</p>
-              <p class="meta"><span class="meta-loc">근무지: 서울 외</span><span class="meta-sep"> · </span><span class="meta-deadline">마감: <span class="deadline-date" data-deadline="2026-08-27">2026.08.27</span> <span class="dday" data-deadline="2026-08-27" style="color:#e74c3c;font-weight:600;"></span></span></p>
-              <div class="job-badges"></div>
-            </a>
-          </div>
+          <!-- ===== 추천 채용정보 맨 윗줄: 관리자 등록형 배너 4칸 (빈 칸은 광고 문의 카드) ===== -->
+          <div id="recVipGrid" class="job-grid" style="margin-bottom:0;"></div>
           <!-- 자동 크롤링 추천 배너가 이 그리드 맨 앞에 삽입되고, 올공 광고 배너는 그 뒤에 남음 -->
           <div id="recAutoGrid" class="job-grid">
 
@@ -5803,6 +5774,10 @@
               <input type="text" id="add_image_url" placeholder="예: ./logo.png 또는 https://...">
             </div>
             <div class="form-group">
+              <label>기업 CI(로고) 이미지 업로드<span style="font-weight:400;color:#868e96;font-size:.82rem;"> — 배너와 상세화면 상단에 표시됩니다 (PNG/JPG, 가로형 로고 권장)</span></label>
+              <input type="file" id="add_ci_file" accept="image/*">
+            </div>
+            <div class="form-group">
               <label>원본공고URL</label>
               <input type="text" id="add_detail_url" placeholder="예: https://...">
             </div>
@@ -5878,6 +5853,10 @@
             <div class="form-group">
               <label>로고 이미지 URL</label>
               <input type="text" id="edit_image_url">
+            </div>
+            <div class="form-group">
+              <label>기업 CI(로고) 이미지 업로드<span style="font-weight:400;color:#868e96;font-size:.82rem;"> — 배너와 상세화면 상단에 표시됩니다 (PNG/JPG, 가로형 로고 권장)</span></label>
+              <input type="file" id="edit_ci_file" accept="image/*">
             </div>
             <div class="form-group">
               <label>원본공고URL</label>
@@ -7219,15 +7198,19 @@
               // 플래티넘 광고(빈) 카드: 관리자 → 플래티넘 등록창 바로 열기, 그 외 → 상품신청
               var _isAdm = (window.currentUserRole === 'admin') ||
                 (window.auth && window.auth.currentUser && window.auth.currentUser.email === 'ilovetruman@gmail.com');
-              if (el.classList.contains('platinum-ad') && _isAdm && typeof window.openPlatinumRegister === 'function') {
-                window.openPlatinumRegister();
+              // 관리자 등록형 배너(플래티넘/프리미엄/추천)의 빈 칸: 관리자 → 해당 게시판 등록창
+              var _adTier = el.getAttribute('data-vip-tier') || (el.classList.contains('platinum-ad') ? 'platinum' : '');
+              if (_adTier && _isAdm && typeof window.openVipRegister === 'function') {
+                window.openVipRegister(_adTier);
                 return;
               }
               // 일반 광고 카드(ALLGONG 상품신청) → '상품안내' 페이지를 새 탭에서 열기
               window.open('product.html', '_blank', 'noopener,noreferrer');
               return;
             }
-            // 플래티넘 공고 배너 → 플래티넘 게시판의 해당 공고 상세글로 이동
+            // 관리자 등록형 공고 배너 → 해당 게시판(플래티넘/프리미엄/추천)의 공고 상세글로 이동
+            var _vid = el.getAttribute('data-vip-id');
+            if (_vid && typeof window.openVipJob === 'function') { window.openVipJob(_vid, el.getAttribute('data-vip-tier')); return; }
             var _ppid = el.getAttribute('data-platinum-id');
             if (_ppid && typeof window.openPlatinumJob === 'function') { window.openPlatinumJob(_ppid); return; }
             // 자동 생성 배너(프리미엄/주요 등) → 내부 '채용정보' 해당 공고 상세글로 이동
@@ -10605,6 +10588,7 @@ function displayStoriesForPage(page) {
     }
     // '추천' 게시판 = 첫 화면 '추천 채용정보' 배너와 동일 (자동수집 + 정규직/청년인턴 + 미마감)
     function isRecommendedJob(job) {
+      if (job.recommendedVip === true) return true; // 관리자 등록형 추천 배너 공고 (마감은 상위에서 제외)
       if (job.source !== 'alio-auto') return false;
       const TARGET = ['정규직', '청년인턴(채용형)', '청년인턴(체험형)'];
       const emps = String(job.employmentType || job.jobType || '').split(/[,+/]/).map(function (s) { return s.trim(); });
@@ -10630,6 +10614,7 @@ function displayStoriesForPage(page) {
     }
     // '프리미엄' 게시판 = 고용유형이 '정규직' 단독(다른 유형과 합쳐지지 않은)인 자동수집 공고 (미마감)
     function isPremiumJob(job) {
+      if (job.premiumVip === true) return true; // 관리자 등록형 프리미엄 배너 공고 (마감은 상위에서 제외)
       if (job.source !== 'alio-auto') return false;
       const emps = String(job.employmentType || job.jobType || '').split(/[,+/、，]/).map(function (s) { return s.trim(); }).filter(Boolean);
       if (!(emps.length === 1 && emps[0] === '정규직')) return false;
@@ -11633,6 +11618,10 @@ function displayStoriesForPage(page) {
 
     // 모달 열기/닫기
     function openAddModal() {
+      // 관리자 등록형 배너 게시판(플래티넘/프리미엄/추천)에서 열면 제목에 어느 배너인지 표시
+      var _h = document.querySelector('#addModal h2');
+      var _tierLabel = { platinum: '플래티넘', premium: '프리미엄', recommended: '추천' }[window.currentJobCategory];
+      if (_h) _h.textContent = _tierLabel ? ('📝 ' + _tierLabel + ' 채용정보 배너 등록') : '📝 채용정보 등록';
       document.getElementById('addModal').style.display = 'block';
     }
     function closeAddModal() {
@@ -11666,6 +11655,7 @@ function displayStoriesForPage(page) {
       // 파일 input 초기화 (보안상 값 설정 불가)
       document.getElementById('edit_content_image').value = '';
       document.getElementById('edit_attachment_file').value = '';
+      document.getElementById('edit_ci_file').value = '';
 
       editModal.style.display = 'block';
     }
@@ -11729,6 +11719,10 @@ function displayStoriesForPage(page) {
           attachmentUrl = await uploadFile(attachmentFile, 'attachments');
           attachmentName = attachmentFile.name;
         }
+        // 기업 CI(로고) 업로드 시 로고 URL 칸보다 우선
+        let ciUrl = '';
+        const ciFile = document.getElementById('add_ci_file').files[0];
+        if (ciFile) ciUrl = await uploadFile(ciFile, 'ci_logos');
 
         const employmentTypeValue = document.getElementById('add_employment_type').value;
 
@@ -11741,7 +11735,7 @@ function displayStoriesForPage(page) {
           jobType: employmentTypeValue, // 호환성을 위해 jobType에도 동일한 값 저장
           location: document.getElementById('add_location').value,
           deadline: deadlineValue,
-          imageUrl: document.getElementById('add_image_url').value,
+          imageUrl: ciUrl || document.getElementById('add_image_url').value,
           detailUrl: document.getElementById('add_detail_url').value,
           content: document.getElementById('add_content').value,
           contentImageUrl: contentImageUrl,
@@ -11758,11 +11752,13 @@ function displayStoriesForPage(page) {
           createdAt: window.Timestamp.now()
         };
 
-        // 플래티넘 게시판에서 등록한 공고는 플래티넘 표식을 함께 저장
-        // (홈 '플래티넘 채용정보' 섹션과 플래티넘 게시판이 이 표식으로 조회)
-        if (window.currentJobCategory === 'platinum') {
-          data.platinum = true;
-          data.source = 'platinum-manual';
+        // 관리자 등록형 배너 게시판에서 등록한 공고는 등급 표식을 함께 저장
+        // (홈 맨 윗줄 배너와 해당 게시판이 이 표식으로 조회. 자동수집 공고의
+        //  recommended/premium 표식과는 별개 필드라 자동 배너에 섞이지 않음)
+        const _tierFlag = { platinum: 'platinum', premium: 'premiumVip', recommended: 'recommendedVip' }[window.currentJobCategory];
+        if (_tierFlag) {
+          data[_tierFlag] = true;
+          data.source = window.currentJobCategory + '-manual';
         }
 
         await window.addDoc(window.collection(window.db, 'jobs'), data);
@@ -11822,6 +11818,8 @@ function displayStoriesForPage(page) {
           data.attachmentUrl = await uploadFile(attachmentFile, 'attachments');
           data.attachmentName = attachmentFile.name;
         }
+        const ciFile = document.getElementById('edit_ci_file').files[0];
+        if (ciFile) data.imageUrl = await uploadFile(ciFile, 'ci_logos');
 
         await window.updateDoc(window.doc(window.db, 'jobs', id), data);
         alert('✅ 수정되었습니다!');
@@ -13334,9 +13332,19 @@ function initCarousel(carouselContainer) {
     })();
   })();
 
-  // ===== 플래티넘 채용정보 (홈 첫 화면, 프리미엄 위) — 관리자 직접 등록 공고 =====
+  // ===== 관리자 등록형 배너 (홈 맨 윗줄 4칸): 플래티넘 / 프리미엄 / 추천 =====
+  //  - 등록 공고(마감 전, 최대 4건) + 빈 칸은 '올공 광고 문의' 카드로 항상 4칸
+  //  - 공고 배너 클릭 → 해당 게시판의 공고 상세 / 빈 칸 클릭 → 관리자: 등록창, 그 외: 상품신청
+  //  - 자동수집 배너(#premiumAutoGrid, #recAutoGrid)와는 별도 표식(platinum/premiumVip/recommendedVip)으로 조회
   (function () {
-    var CACHE_KEY = 'allgong_platinum_home_v1';
+    var TIERS = [
+      { tier: 'platinum', grid: 'platinumHomeGrid', flag: 'platinum', board: 'platinum', cache: 'allgong_platinum_home_v1', style: 'premium', pLine: 'company' },
+      { tier: 'premium', grid: 'premiumVipGrid', flag: 'premiumVip', board: 'premium', cache: 'allgong_premium_vip_v1', style: 'premium', pLine: 'emp' },
+      { tier: 'recommended', grid: 'recVipGrid', flag: 'recommendedVip', board: 'recommended', cache: 'allgong_rec_vip_v1', style: 'rec', pLine: 'emp' }
+    ];
+    var TIER_BY_NAME = {}; TIERS.forEach(function (t) { TIER_BY_NAME[t.tier] = t; });
+    var SLOTS = 4; // 프리미엄과 동일하게 항상 4칸
+
     function esc(s) { var d = document.createElement('div'); d.textContent = (s == null ? '' : String(s)); return d.innerHTML; }
     function escA(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
     function daysLeft(deadline) {
@@ -13347,15 +13355,16 @@ function initCarousel(carouselContainer) {
     }
     function notExpired(it) { var l = daysLeft(it.deadline || it.closingDate); return l === null || l >= 0; }
     function ddayText(dl) { var l = daysLeft(dl); if (l === null) return ''; if (l < 0) return '마감'; if (l === 0) return 'D-DAY'; return 'D-' + l; }
+    function fmtDate(dl) { return dl ? String(dl).replace(/-/g, '.') : '상시'; }
     function fmtLoc(loc) {
       if (!loc) return '-';
       var items = String(loc).split(',').map(function (s) { return s.trim(); }).filter(Boolean);
-      if (items.length <= 2) return items.join(', ');
-      return items[0] + ', ' + items[1] + ' 외 ' + (items.length - 2) + '개';
+      if (!items.length) return '-';
+      return items.length === 1 ? items[0] : (items[0] + ' 외');
     }
-    function normalize(id, d) {
+    function normalize(cfg, id, d) {
       var createdMs = (d.createdAt && d.createdAt.seconds) ? d.createdAt.seconds * 1000 : 0;
-      return {
+      var o = {
         id: id, title: d.title || '', company: d.company || '',
         employmentType: d.employmentType || d.jobType || '', jobType: d.jobType || d.employmentType || '',
         location: d.location || '', deadline: d.deadline || d.closingDate || '', closingDate: d.closingDate || d.deadline || '',
@@ -13363,15 +13372,18 @@ function initCarousel(carouselContainer) {
         education: d.education || '', preference: d.preference || '', detailUrl: d.detailUrl || '#',
         imageUrl: d.imageUrl || '', content: d.content || '', category: d.category || '',
         contentImageUrl: d.contentImageUrl || '', attachmentUrl: d.attachmentUrl || '', attachmentName: d.attachmentName || '',
-        platinum: true, source: d.source || 'platinum-manual',
+        source: d.source || (cfg.tier + '-manual'), createdAt: d.createdAt || null,
         createdMs: createdMs, createdDate: createdMs ? new Date(createdMs).toLocaleDateString('ko-KR') : ''
       };
+      o[cfg.flag] = true;
+      return o;
     }
-    // 홈 플래티넘 공고 배너 클릭 → 플래티넘 게시판 상태로 맞춘 뒤 해당 공고 상세 열기
-    window.openPlatinumJob = function (id) {
+    // 공고 배너 클릭 → 해당 게시판 상태로 맞춘 뒤 공고 상세 열기
+    window.openVipJob = function (id, tier) {
+      var cfg = TIER_BY_NAME[tier] || TIER_BY_NAME.platinum;
       try {
         if (window.showBoard) window.showBoard(true);
-        if (window.switchBoard) window.switchBoard('platinum', true);
+        if (window.switchBoard) window.switchBoard(cfg.board, true);
       } catch (e) { /* 무시 */ }
       var tries = 0;
       (function open() {
@@ -13381,88 +13393,109 @@ function initCarousel(carouselContainer) {
         if (++tries < 40) setTimeout(open, 150);
       })();
     };
-    // 플래티넘 광고(빈) 카드 — 관리자 클릭 시: 플래티넘 게시판 등록창 바로 열기
-    window.openPlatinumRegister = function () {
+    // 빈(광고) 칸 — 관리자 클릭 시: 해당 게시판의 등록창 바로 열기
+    window.openVipRegister = function (tier) {
+      var cfg = TIER_BY_NAME[tier] || TIER_BY_NAME.platinum;
       try {
         if (window.showBoard) window.showBoard(true);
-        if (window.switchBoard) window.switchBoard('platinum', true);
+        if (window.switchBoard) window.switchBoard(cfg.board, true);
       } catch (e) { /* 무시 */ }
       setTimeout(function () {
         if (typeof window.openAddModal === 'function') window.openAddModal();
       }, 60);
     };
+    window.openPlatinumJob = function (id) { window.openVipJob(id, 'platinum'); };
+    window.openPlatinumRegister = function () { window.openVipRegister('platinum'); };
+
     var AD_SVG = '<svg aria-hidden="true" viewbox="0 0 24 24"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.97 22 2 13.03 2 2a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.2 2.2z"></path></svg>';
-    function adCardHtml() {
-      // 기존 '올공 광고 문의' 광고 카드와 동일 디자인 + 플래티넘 표식(platinum-ad)
-      return '<a class="job-card ad platinum-ad" href="javascript:void(0)" role="button" aria-label="올공 플래티넘 광고 문의">'
+    function adCardHtml(cfg) {
+      // 기존 '올공 광고 문의' 광고 카드와 동일 디자인 + 등급 표식(data-vip-tier)
+      return '<a class="job-card ad vip-ad' + (cfg.tier === 'platinum' ? ' platinum-ad' : '') + '" data-vip-tier="' + cfg.tier + '"'
+        + ' href="javascript:void(0)" role="button" aria-label="올공 광고 문의">'
         + '<div class="ad-title">ALLGONG(올공) 광고 문의</div>'
         + '<div class="ad-phone">' + AD_SVG + ' 042)629-8159</div>'
         + '<span class="ad-cta">상품신청</span></a>';
     }
-    var PLAT_SLOTS = 4; // 프리미엄과 동일하게 항상 4칸
-    function render(items) {
-      var grid = document.getElementById('platinumHomeGrid');
+    function logoOf(it) {
+      // 업로드한 기업 CI(https) 우선, 없으면 올공 CI
+      return (it.imageUrl && /^https?:\/\//.test(it.imageUrl)) ? it.imageUrl : './올공 CI.png';
+    }
+    function jobCardHtml(cfg, it) {
+      var dl = it.deadline || it.closingDate || '';
+      var img = logoOf(it);
+      var attrs = ' href="javascript:void(0)" role="button" data-vip-id="' + escA(it.id) + '" data-vip-tier="' + cfg.tier + '"';
+      var imgTag = '<img loading="lazy" decoding="async" class="banner-image" alt="' + escA(it.company) + '" src="' + escA(img) + '" onerror="this.onerror=null;this.src=\'./올공 CI.png\'" />';
+      var sub = (cfg.pLine === 'emp') ? (it.employmentType || it.company) : it.company;
+      if (cfg.style === 'rec') {
+        // 추천 채용정보 카드와 동일 구성: 로고 / 제목 / 고용유형 / 근무지·마감
+        return '<a class="job-card"' + attrs + '>' + imgTag
+          + '<h3 title="' + escA(it.title) + '">' + esc(it.title) + '</h3>'
+          + '<p>' + esc(sub) + '</p>'
+          + '<p class="meta"><span class="meta-loc">근무지: ' + esc(fmtLoc(it.location)) + '</span><span class="meta-sep"> · </span>'
+          + '<span class="meta-deadline">마감: <span class="deadline-date">' + esc(fmtDate(dl)) + '</span> '
+          + '<span class="dday" style="color:#e74c3c;font-weight:600;">' + esc(ddayText(dl)) + '</span></span></p>'
+          + '<div class="job-badges"></div></a>';
+      }
+      // 프리미엄 카드와 동일 구성: 로고 / 제목 / 부제 / 마감 띠
+      return '<a class="job-card"' + attrs + '>' + imgTag
+        + '<h3 title="' + escA(it.title) + '">' + esc(it.title) + '</h3>'
+        + '<p>' + esc(sub) + '</p>'
+        + '<div class="deadline"><strong>마감:</strong> <span class="deadline-date">' + esc(fmtDate(dl)) + '</span> '
+        + '<span style="color:#e74c3c;font-weight:600;">' + esc(ddayText(dl)) + '</span></div>'
+        + '</a>';
+    }
+    function render(cfg, items) {
+      var grid = document.getElementById(cfg.grid);
       if (!grid) return false;
-      // 등록된 공고: 마감 제외 + 최신(마감 늦은) 순, 최대 4건
+      // 등록된 공고: 마감 제외 + 마감 늦은 순, 최대 4건
       var jobs = (items || []).filter(notExpired).sort(function (a, b) {
         var da = Date.parse(a.deadline || a.closingDate || '') || 0;
         var db = Date.parse(b.deadline || b.closingDate || '') || 0;
         return db - da;
-      }).slice(0, PLAT_SLOTS);
+      }).slice(0, SLOTS);
       window.jobsData = window.jobsData || {};
       var html = '';
       jobs.forEach(function (it) {
-        window.jobsData[it.id] = Object.assign({}, it, { createdDate: it.createdDate }); // 상세보기용
-        var dl = it.deadline || it.closingDate || '';
-        var hasLogo = it.imageUrl && /^https?:\/\//.test(it.imageUrl);
-        var img = hasLogo ? it.imageUrl : './올공 CI.png';
-        html += '<a class="job-card" href="javascript:void(0)" role="button" data-platinum-id="' + escA(it.id) + '">'
-          + '<span class="premium-bubble" style="display:inline-block;background:linear-gradient(135deg,#b8912f,#8a6d1a);color:#fff;font-size:.68rem;font-weight:800;padding:2px 9px;border-radius:999px;letter-spacing:.02em;">플래티넘</span>'
-          + '<img loading="lazy" decoding="async" class="banner-image" alt="' + escA(it.company) + '" src="' + escA(img) + '" onerror="this.onerror=null;this.src=\'./올공 CI.png\'" />'
-          + '<h3 title="' + escA(it.title) + '">' + esc(it.title) + '</h3>'
-          + '<p>' + esc(it.company) + '</p>'
-          + '<div class="deadline"><strong>마감:</strong> <span class="deadline-date">' + esc(dl || '상시') + '</span> '
-          + '<span style="color:#e74c3c;font-weight:600;">' + esc(ddayText(dl)) + '</span></div>'
-          + '</a>';
+        window.jobsData[it.id] = Object.assign({}, window.jobsData[it.id] || {}, it, { createdDate: it.createdDate }); // 상세보기용
+        html += jobCardHtml(cfg, it);
       });
-      // 남은 칸은 '올공 광고 문의' 카드로 채워 항상 4칸 유지
-      for (var i = jobs.length; i < PLAT_SLOTS; i++) html += adCardHtml();
+      for (var i = jobs.length; i < SLOTS; i++) html += adCardHtml(cfg);
       grid.innerHTML = html;
       return true;
     }
-    function renderFromCache() {
-      try { var c = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); if (c && c.items) return render(c.items); } catch (e) {}
+    function renderFromCache(cfg) {
+      try { var c = JSON.parse(localStorage.getItem(cfg.cache) || 'null'); if (c && c.items) return render(cfg, c.items); } catch (e) {}
       return false;
     }
-    function saveCache(items) { try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), items: items })); } catch (e) {} }
-    async function fetchPlatinum() {
+    function saveCache(cfg, items) { try { localStorage.setItem(cfg.cache, JSON.stringify({ ts: Date.now(), items: items })); } catch (e) {} }
+    async function fetchTier(cfg) {
       if (!(window.db && window.getDocs && window.query) && window.__fsRestQuery) {
         try {
-          var rows = await window.__fsRestQuery('platinum');
-          return rows.map(function (o) { return normalize(o.__id, o); });
+          var rows = await window.__fsRestQuery(cfg.flag);
+          return rows.map(function (o) { return normalize(cfg, o.__id, o); });
         } catch (e) { /* 폴백 아래 */ }
       }
       try {
-        var q = window.query(window.collection(window.db, 'jobs'), window.where('platinum', '==', true));
+        var q = window.query(window.collection(window.db, 'jobs'), window.where(cfg.flag, '==', true));
         var s = await window.getDocs(q);
-        var a = []; s.forEach(function (ds) { a.push(normalize(ds.id, ds.data())); });
+        var a = []; s.forEach(function (ds) { a.push(normalize(cfg, ds.id, ds.data())); });
         return a;
-      } catch (e) { console.warn('플래티넘 조회 실패:', e); return []; }
+      } catch (e) { console.warn(cfg.tier + ' 배너 조회 실패:', e); return []; }
     }
-    async function refresh() {
-      var items = await fetchPlatinum();
-      saveCache(items);
-      return render(items);
+    async function refresh(cfg) {
+      var items = await fetchTier(cfg);
+      saveCache(cfg, items);
+      return render(cfg, items);
     }
-    if (!renderFromCache()) render([]); // 캐시 없으면 광고카드 4칸으로 즉시 표시
+    function refreshAll() { TIERS.forEach(function (cfg) { refresh(cfg).catch(function () {}); }); }
+
+    TIERS.forEach(function (cfg) { if (!renderFromCache(cfg)) render(cfg, []); }); // 캐시 없으면 광고카드 4칸으로 즉시 표시
     (function wait() {
-      if (((window.db && window.getDocs && window.query && window.collection) || window.__fsRestQuery)
-          && document.getElementById('platinumHomeGrid')) {
-        refresh().catch(function () {});
-      } else { setTimeout(wait, 250); }
+      if ((window.db && window.getDocs && window.query && window.collection) || window.__fsRestQuery) refreshAll();
+      else setTimeout(wait, 250);
     })();
-    // 전체 공고 갱신 이벤트에도 반영 (관리자 등록/삭제 직후 즉시 최신화)
-    window.addEventListener('allgong:jobs-updated', function () { refresh().catch(function () {}); });
+    // 전체 공고 갱신 이벤트에도 반영 (관리자 등록/수정/삭제 직후 즉시 최신화)
+    window.addEventListener('allgong:jobs-updated', refreshAll);
   })();
 </script>
 
