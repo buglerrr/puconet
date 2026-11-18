@@ -10869,7 +10869,19 @@ function displayStoriesForPage(page) {
       const content = job.content || '';
       // XSS 방지: 크롤링/입력 원문을 먼저 HTML 이스케이프한 뒤 줄바꿈만 <br> 로 변환
       const _descEsc = document.createElement('div'); _descEsc.textContent = content || '';
-      document.getElementById('detail-desc').innerHTML = content ? _descEsc.innerHTML.replace(/\n/g, '<br>') : '내용이 없습니다.';
+      // 글 본문이 비어 있어도 공고 이미지/첨부파일이 있으면 안내 문구 없이 이미지만 표시
+      const _descEl = document.getElementById('detail-desc');
+      const _hasMedia = !!(job.contentImageUrl || job.attachmentUrl);
+      if (content) {
+        _descEl.innerHTML = _descEsc.innerHTML.replace(/\n/g, '<br>');
+        _descEl.style.display = '';
+      } else if (_hasMedia) {
+        _descEl.innerHTML = '';
+        _descEl.style.display = 'none';
+      } else {
+        _descEl.innerHTML = '내용이 없습니다.';
+        _descEl.style.display = '';
+      }
 
       // 쿠팡파트너스 추천 교재 박스 제거(소유자 요청) — 상세 화면에서 노출하지 않음
       try { var _affBox = document.getElementById('affiliate-box'); if (_affBox) _affBox.style.display = 'none'; } catch (e) { /* 무시 */ }
