@@ -1260,6 +1260,8 @@
     #features #platinumHomeGrid > .job-card { min-width: 0 !important; max-width: 100% !important; }
     #features #platinumHomeGrid > .job-card h3 { min-width: 0; max-width: 100%; }
     #features #platinumHomeGrid > .job-card.ad { justify-content: center !important; }
+    /* 플래티넘 배너 4칸 기본 배경색: 매우 연한 하늘색 (로고 칸은 흰색 유지) */
+    #features #platinumHomeGrid > .job-card { background: #effaff !important; }
     /* 프리미엄 맨 윗줄 관리자 등록형 그리드: 플래티넘과 동일 규칙 (열 수는 공통 규칙: PC 4열 / 모바일 2열) */
     #features #premiumVipGrid > .job-card { min-width: 0 !important; max-width: 100% !important; }
     #features #premiumVipGrid > .job-card h3 { min-width: 0; max-width: 100%; }
@@ -5734,6 +5736,15 @@
               <input type="text" id="add_company" required placeholder="예: 한국전력공사">
             </div>
             <div class="form-group">
+              <label>기관유형</label>
+              <input type="text" id="add_inst_type" list="instTypeOptions" placeholder="예: 공기업(시장형), 준정부기관(위탁집행형), 지방공기업 (목록에서 선택 또는 직접 입력)">
+              <datalist id="instTypeOptions">
+                <option value="공기업(시장형)"><option value="공기업(준시장형)">
+                <option value="준정부기관(기금관리형)"><option value="준정부기관(위탁집행형)">
+                <option value="기타공공기관"><option value="지방공기업"><option value="지방출자·출연기관">
+              </datalist>
+            </div>
+            <div class="form-group">
               <label>고용유형</label>
               <input type="text" id="add_employment_type" placeholder="예: 정규직, 무기계약직">
             </div>
@@ -5813,6 +5824,10 @@
             <div class="form-group">
               <label>기관명 *</label>
               <input type="text" id="edit_company" required>
+            </div>
+            <div class="form-group">
+              <label>기관유형</label>
+              <input type="text" id="edit_inst_type" list="instTypeOptions" placeholder="예: 공기업(시장형), 준정부기관(위탁집행형), 지방공기업">
             </div>
             <div class="form-group">
               <label>고용유형</label>
@@ -11638,6 +11653,7 @@ function displayStoriesForPage(page) {
       document.getElementById('edit_id').value = id;
       document.getElementById('edit_title').value = job.title;
       document.getElementById('edit_company').value = job.company;
+      document.getElementById('edit_inst_type').value = job.instType || '';
       document.getElementById('edit_employment_type').value = job.employmentType || job.jobType || '';
       document.getElementById('edit_location').value = job.location || '';
       document.getElementById('edit_deadline').value = job.deadline || '';
@@ -11731,6 +11747,7 @@ function displayStoriesForPage(page) {
         const data = {
           title: document.getElementById('add_title').value,
           company: document.getElementById('add_company').value,
+          instType: document.getElementById('add_inst_type').value.trim(), // 기관유형 (상세화면 표시용)
           employmentType: employmentTypeValue,
           jobType: employmentTypeValue, // 호환성을 위해 jobType에도 동일한 값 저장
           location: document.getElementById('add_location').value,
@@ -11791,6 +11808,7 @@ function displayStoriesForPage(page) {
         const data = {
           title: document.getElementById('edit_title').value,
           company: document.getElementById('edit_company').value,
+          instType: document.getElementById('edit_inst_type').value.trim(), // 기관유형 (상세화면 표시용)
           employmentType: employmentTypeValue,
           jobType: employmentTypeValue, // 호환성을 위해 jobType에도 동일한 값 저장
           location: document.getElementById('edit_location').value,
@@ -13372,6 +13390,7 @@ function initCarousel(carouselContainer) {
         education: d.education || '', preference: d.preference || '', detailUrl: d.detailUrl || '#',
         imageUrl: d.imageUrl || '', content: d.content || '', category: d.category || '',
         contentImageUrl: d.contentImageUrl || '', attachmentUrl: d.attachmentUrl || '', attachmentName: d.attachmentName || '',
+        instType: d.instType || '',
         source: d.source || (cfg.tier + '-manual'), createdAt: d.createdAt || null,
         createdMs: createdMs, createdDate: createdMs ? new Date(createdMs).toLocaleDateString('ko-KR') : ''
       };
@@ -13425,7 +13444,9 @@ function initCarousel(carouselContainer) {
       var img = logoOf(it);
       var attrs = ' href="javascript:void(0)" role="button" data-vip-id="' + escA(it.id) + '" data-vip-tier="' + cfg.tier + '"';
       var imgTag = '<img loading="lazy" decoding="async" class="banner-image" alt="' + escA(it.company) + '" src="' + escA(img) + '" onerror="this.onerror=null;this.src=\'./올공 CI.png\'" />';
-      var sub = (cfg.pLine === 'emp') ? (it.employmentType || it.company) : it.company;
+      // 부제: '고용유형/채용구분 채용' (예: 정규직/신입.경력 채용). 둘 다 비면 기관명
+      var _hire = [it.employmentType, it.careerType].map(function (v) { return String(v || '').trim(); }).filter(Boolean);
+      var sub = _hire.length ? (_hire.join('/') + ' 채용') : it.company;
       if (cfg.style === 'rec') {
         // 추천 채용정보 카드와 동일 구성: 로고 / 제목 / 고용유형 / 근무지·마감
         return '<a class="job-card"' + attrs + '>' + imgTag
