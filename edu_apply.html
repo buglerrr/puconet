@@ -83,8 +83,25 @@
     .topbar img { height: 42px; }
     .topbar a.back { color: #3b5bdb; font-weight: 700; text-decoration: none; border: 1.5px solid #3b5bdb; padding: 7px 14px; border-radius: 8px; font-size: .9rem; }
     @media (max-width: 760px) {
-      table.info th { width: 96px; font-size: .82rem; padding: 9px 6px; }
-      table.info td { padding: 9px 8px; }
+      /* 교육정보·회사정보 표: 좁은 화면에서는 '라벨 위, 값 아래' 세로 1열로 쌓아
+         각 값이 화면 전체 폭을 쓰게 한다(글자가 한 글자씩 세로로 끊기는 문제 해결).
+         PC(761px 이상)에는 전혀 적용되지 않음. */
+      table.info, table.info tbody, table.info tr, table.info th, table.info td {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      table.info { border-top: 2px solid #444; }
+      table.info th {
+        width: 100%; text-align: left; background: #f4f5f7;
+        font-size: .9rem; font-weight: 700; padding: 9px 12px;
+        border: none; border-top: 1px solid #e1e4e8;
+      }
+      table.info td {
+        width: 100%; padding: 9px 12px; border: none;
+        font-size: .96rem; line-height: 1.5; word-break: keep-all;
+      }
+      table.info td input[type=text], table.info td input[type=email] { max-width: none; }
       .apply-scroll { overflow-x: auto; }
       table.apply { min-width: 760px; }
       .contact-bar { gap: 12px; font-size: .88rem; }
@@ -184,7 +201,7 @@
       probe.src = fresh;
     }
     // 교육안내: 세부지표별 대응전략 세미나 상세 안내문 (PDF, 새 탭 / v=교체 시 캐시 무효화)
-    function openEduGuide() { window.open('docs/edu_guide_261126.pdf?v=2', '_blank', 'noopener'); }
+    function openEduGuide() { window.open('docs/edu_guide_261126.pdf?v=3', '_blank', 'noopener'); }
     function openEduMap() { openWithFallback(MAP_IMG, null, '교육장 약도 준비 중입니다. 문의: 010-4899-9701'); }
 
     // ── 신청자 행 관리 ──

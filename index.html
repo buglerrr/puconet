@@ -1256,6 +1256,18 @@
     #features #premiumAutoGrid > .job-card h3 { min-width: 0; max-width: 100%; }
     /* '올공 문의' 광고 배너: 내용 세로 가운데 정렬 (기존 프리미엄 카드의 flex-start !important 를 덮어씀) */
     #features #premiumAutoGrid > .job-card.ad { justify-content: center !important; }
+    /* 플래티넘 그리드도 프리미엄과 동일하게: 1/4 고정 + 광고카드 세로 가운데 정렬 */
+    #features #platinumHomeGrid > .job-card { min-width: 0 !important; max-width: 100% !important; }
+    #features #platinumHomeGrid > .job-card h3 { min-width: 0; max-width: 100%; }
+    #features #platinumHomeGrid > .job-card.ad { justify-content: center !important; }
+    /* 플래티넘 배너 4칸 기본 배경색: 매우 연한 하늘색 (로고 칸은 흰색 유지) */
+    #features #platinumHomeGrid > .job-card { background: #effaff !important; }
+    /* 프리미엄 맨 윗줄 관리자 등록형 그리드: 플래티넘과 동일 규칙 (열 수는 공통 규칙: PC 4열 / 모바일 2열) */
+    #features #premiumVipGrid > .job-card { min-width: 0 !important; max-width: 100% !important; }
+    #features #premiumVipGrid > .job-card h3 { min-width: 0; max-width: 100%; }
+    #features #premiumVipGrid > .job-card.ad { justify-content: center !important; }
+    /* 추천 맨 윗줄 관리자 등록형 그리드: 1/4 고정 */
+    #jobs #recVipGrid > .job-card { min-width: 0 !important; max-width: 100% !important; }
     #premiumAutoGrid:empty { display: none !important; margin: 0 !important; }
 
     /* 자동 생성 주요 배너 그리드: 기존 주요 배너(연두색)와 동일 크기, 한 줄 4개 고정 */
@@ -4542,8 +4554,6 @@
             <a href="#"
               onclick="showContestBoard(); return false;">공모전
               소식</a>
-            <a href="#" onclick="showMallBoard(); return false;"
-              style="color: #e8590c; font-weight:bold;">올공몰</a>
             <a href="#" onclick="checkLoginAndExecute(showStoryBoard, '취업 이야기를 보려면 로그인이 필요합니다.'); return false;"
               style="color: #666; font-weight:bold;">취업 이야기</a>
           </div>
@@ -4592,50 +4602,104 @@
     <div class="main-content-area">
       <section class="section section--compact" id="features">
         <div class="container">
-          <h2 class="section-title">프리미엄 채용정보 <a class="apply" href="product.html" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;">상품신청&gt;</a></h2>
-          <!-- ===== 정적 관리 배너 4개 (VIP 고객용, 관리자가 직접 이 코드를 수정) ===== -->
-          <div class="premium-carousel-wrapper">
-            <div class="job-grid job-grid--premium premium-carousel-container">
-              <a aria-label="프리미엄 - 한국도로공사 채용공고 이동" class="job-card" data-url="https://www.ex.co.kr/portal/biz/bbs/layout1/selectBoardList.do?bbsId=BBSMSTR_000000000211"
-                href="javascript:void(0)" role="button">
-                <span class="premium-bubble">프리미엄</span>
-                <img alt="한국도로공사" class="banner-image" src="./한국도로공사.png" />
-                <h3>한국도로공사</h3>
-                <p>신입·경력 / 사무·전기</p>
-                <div class="deadline"><strong>마감:</strong> <span class="deadline-date" data-deadline="2026-07-01">2026.07.01</span> <span
-                    style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-07-01"></span></span></div>
-              </a>
-              <a aria-label="프리미엄 - 국가철도공단 채용공고 이동" class="job-card" data-url="https://www.kr.or.kr/boardCnts/list.do?boardID=72"
-                href="javascript:void(0)" role="button">
-                <span class="premium-bubble">프리미엄</span>
-                <img alt="국가철도공단" class="banner-image" src="./images/ci/국가철도공단.png" />
-                <h3>국가철도공단</h3>
-                <p>사무·기술</p>
-                <div class="deadline"><strong>마감:</strong> <span class="deadline-date" data-deadline="2026-08-08">2026.08.08</span> <span
-                    style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-08-08"></span></span></div>
-              </a>
-              <a aria-label="프리미엄 - 광주광역시도시공사 채용공고 이동" class="job-card" data-url="https://gmcc.ai-recruit.kr/"
-                href="javascript:void(0)" role="button">
-                <span class="premium-bubble">프리미엄</span>
-                <img alt="광주광역시도시공사" class="banner-image" src="./images/ci/광주광역시도시공사.png" />
-                <h3>광주광역시도시공사</h3>
-                <p>토목·전기·통신</p>
-                <div class="deadline"><strong>마감:</strong> <span class="deadline-date" data-deadline="2026-07-05">2026.07.05</span> <span
-                    style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-07-05"></span></span></div>
-              </a>
-              <a aria-label="프리미엄 - 국립공원공단 채용공고 이동" class="job-card"
-                data-url="https://knps.fairy.im/"
-                href="javascript:void(0)" role="button">
-                <span class="premium-bubble">프리미엄</span>
-                <img alt="국립공원공단" class="banner-image" src="./images/ci/국립공원공단.png" />
-                <h3>국립공원공단</h3>
-                <p>청년인턴</p>
-                <div class="deadline"><strong>마감:</strong> <span class="deadline-date" data-deadline="2026-07-22">2026.07.22</span> <span
-                    style="color:#e74c3c;font-weight:600;"><span class="dday" data-deadline="2026-07-22"></span></span></div>
-              </a>
+          <!-- ===== 이용 기관 로고 롤링 (올공 서비스를 1회 이상 이용한 기관 · 왼쪽으로 계속 흐름) =====
+               로고 추가/교체: images/clients/ 에 파일을 넣고 아래 두 목록(원본·복제)에 같은 순서로 한 줄씩 추가 -->
+          <style>
+            .client-marquee { position: relative; overflow: hidden; background: #fff; border: 1px solid #eef2f7;
+              border-radius: 12px; padding: 16px 0; margin: 0 0 2.2rem; }
+            .client-marquee::before, .client-marquee::after { content: ''; position: absolute; top: 0; bottom: 0; width: 60px; z-index: 1; pointer-events: none; }
+            .client-marquee::before { left: 0; background: linear-gradient(90deg, #fff, rgba(255,255,255,0)); }
+            .client-marquee::after { right: 0; background: linear-gradient(270deg, #fff, rgba(255,255,255,0)); }
+            .client-track { display: flex; width: max-content; animation: clientScroll 80s linear infinite; }
+            .client-marquee:hover .client-track { animation-play-state: paused; }
+            .client-list { display: flex; align-items: center; list-style: none; margin: 0; padding: 0; }
+            /* 칸 폭을 고정하고 간격을 margin 으로 주어, 원본·복제 목록 너비가 정확히 같게 → -50% 이동 시 끊김 없음 */
+            .client-logo { flex: 0 0 auto; width: 160px; height: 56px; margin-right: 44px; display: flex; align-items: center; justify-content: center; }
+            .client-logo img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; display: block; }
+            @keyframes clientScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+            @media (prefers-reduced-motion: reduce) {
+              .client-track { animation: none; }
+              .client-marquee { overflow-x: auto; }
+            }
+          </style>
+          <h2 class="section-title" style="color:#111;">올공(ALLGONG)과 함께한 공공기관</h2>
+          <div class="client-marquee" role="region" aria-label="올공 서비스 이용 기관">
+            <div class="client-track">
+            <ul class="client-list">
+              <li class="client-logo"><img src="images/clients/01.webp" alt="대구교통공사" title="대구교통공사" decoding="async" width="217" height="85"></li>
+              <li class="client-logo"><img src="images/clients/02.webp" alt="대전관광공사" title="대전관광공사" decoding="async" width="228" height="42"></li>
+              <li class="client-logo"><img src="images/clients/03.webp" alt="대전광역시시설관리공단" title="대전광역시시설관리공단" decoding="async" width="228" height="31"></li>
+              <li class="client-logo"><img src="images/clients/04.webp" alt="대전교통공사" title="대전교통공사" decoding="async" width="227" height="49"></li>
+              <li class="client-logo"><img src="images/clients/05.webp" alt="대전도시공사" title="대전도시공사" decoding="async" width="233" height="85"></li>
+              <li class="client-logo"><img src="images/clients/06.webp" alt="대전광역시사회서비스원" title="대전광역시사회서비스원" decoding="async" width="234" height="28"></li>
+              <li class="client-logo"><img src="images/clients/07.webp" alt="사립학교교직원연금공단" title="사립학교교직원연금공단" decoding="async" width="228" height="46"></li>
+              <li class="client-logo"><img src="images/clients/08.webp" alt="국민체육진흥공단" title="국민체육진흥공단" decoding="async" width="233" height="93"></li>
+              <li class="client-logo"><img src="images/clients/09.webp" alt="세종특별자치시시설관리공단" title="세종특별자치시시설관리공단" decoding="async" width="229" height="67"></li>
+              <li class="client-logo"><img src="images/clients/10.webp" alt="예금보험공사" title="예금보험공사" decoding="async" width="234" height="61"></li>
+              <li class="client-logo"><img src="images/clients/11.webp" alt="용산구시설관리공단" title="용산구시설관리공단" decoding="async" width="228" height="41"></li>
+              <li class="client-logo"><img src="images/clients/12.webp" alt="울산항만공사" title="울산항만공사" decoding="async" width="233" height="70"></li>
+              <li class="client-logo"><img src="images/clients/13.webp" alt="청주도시공사" title="청주도시공사" decoding="async" width="225" height="63"></li>
+              <li class="client-logo"><img src="images/clients/14.webp" alt="한국남부발전" title="한국남부발전" decoding="async" width="234" height="35"></li>
+              <li class="client-logo"><img src="images/clients/15.webp" alt="한국무역보험공사" title="한국무역보험공사" decoding="async" width="187" height="94"></li>
+              <li class="client-logo"><img src="images/clients/16.webp" alt="한국보훈복지의료공단" title="한국보훈복지의료공단" decoding="async" width="224" height="45"></li>
+              <li class="client-logo"><img src="images/clients/17.webp" alt="한국산림복지진흥원" title="한국산림복지진흥원" decoding="async" width="229" height="51"></li>
+              <li class="client-logo"><img src="images/clients/18.webp" alt="한국수목원정원관리원" title="한국수목원정원관리원" decoding="async" width="164" height="90"></li>
+              <li class="client-logo"><img src="images/clients/19.webp" alt="한국수자원공사" title="한국수자원공사" decoding="async" width="230" height="81"></li>
+              <li class="client-logo"><img src="images/clients/20.webp" alt="한국스포츠레저" title="한국스포츠레저" decoding="async" width="231" height="68"></li>
+              <li class="client-logo"><img src="images/clients/21.webp" alt="한국환경공단" title="한국환경공단" decoding="async" width="233" height="68"></li>
+              <li class="client-logo"><img src="images/clients/22.webp" alt="한전원자력연료" title="한전원자력연료" decoding="async" width="228" height="30"></li>
+              <li class="client-logo"><img src="images/clients/23.webp" alt="서울교통공사" title="서울교통공사" decoding="async" width="233" height="65"></li>
+              <li class="client-logo"><img src="images/clients/24.webp" alt="한국철도공사" title="한국철도공사" decoding="async" width="233" height="66"></li>
+              <li class="client-logo"><img src="images/clients/25.webp" alt="대전문화재단" title="대전문화재단" decoding="async" width="252" height="55"></li>
+              <li class="client-logo"><img src="images/clients/26.webp" alt="제주국제자유도시개발센터" title="제주국제자유도시개발센터" decoding="async" width="345" height="83"></li>
+              <li class="client-logo"><img src="images/clients/27.webp" alt="한국서부발전" title="한국서부발전" decoding="async" width="317" height="91"></li>
+              <li class="client-logo"><img src="images/clients/28.webp" alt="한국전력공사" title="한국전력공사" decoding="async" width="406" height="68"></li>
+              <li class="client-logo"><img src="images/clients/29.webp" alt="한국체육산업개발" title="한국체육산업개발" decoding="async" width="343" height="67"></li>
+              <li class="client-logo"><img src="images/clients/30.webp" alt="한국해양교통안전공단" title="한국해양교통안전공단" decoding="async" width="260" height="112"></li>
+              <li class="client-logo"><img src="images/clients/31.webp" alt="한국환경산업기술원" title="한국환경산업기술원" decoding="async" width="204" height="112"></li>
+            </ul>
+            <ul class="client-list" aria-hidden="true">
+              <li class="client-logo"><img src="images/clients/01.webp" alt="" title="대구교통공사" decoding="async" width="217" height="85"></li>
+              <li class="client-logo"><img src="images/clients/02.webp" alt="" title="대전관광공사" decoding="async" width="228" height="42"></li>
+              <li class="client-logo"><img src="images/clients/03.webp" alt="" title="대전광역시시설관리공단" decoding="async" width="228" height="31"></li>
+              <li class="client-logo"><img src="images/clients/04.webp" alt="" title="대전교통공사" decoding="async" width="227" height="49"></li>
+              <li class="client-logo"><img src="images/clients/05.webp" alt="" title="대전도시공사" decoding="async" width="233" height="85"></li>
+              <li class="client-logo"><img src="images/clients/06.webp" alt="" title="대전광역시사회서비스원" decoding="async" width="234" height="28"></li>
+              <li class="client-logo"><img src="images/clients/07.webp" alt="" title="사립학교교직원연금공단" decoding="async" width="228" height="46"></li>
+              <li class="client-logo"><img src="images/clients/08.webp" alt="" title="국민체육진흥공단" decoding="async" width="233" height="93"></li>
+              <li class="client-logo"><img src="images/clients/09.webp" alt="" title="세종특별자치시시설관리공단" decoding="async" width="229" height="67"></li>
+              <li class="client-logo"><img src="images/clients/10.webp" alt="" title="예금보험공사" decoding="async" width="234" height="61"></li>
+              <li class="client-logo"><img src="images/clients/11.webp" alt="" title="용산구시설관리공단" decoding="async" width="228" height="41"></li>
+              <li class="client-logo"><img src="images/clients/12.webp" alt="" title="울산항만공사" decoding="async" width="233" height="70"></li>
+              <li class="client-logo"><img src="images/clients/13.webp" alt="" title="청주도시공사" decoding="async" width="225" height="63"></li>
+              <li class="client-logo"><img src="images/clients/14.webp" alt="" title="한국남부발전" decoding="async" width="234" height="35"></li>
+              <li class="client-logo"><img src="images/clients/15.webp" alt="" title="한국무역보험공사" decoding="async" width="187" height="94"></li>
+              <li class="client-logo"><img src="images/clients/16.webp" alt="" title="한국보훈복지의료공단" decoding="async" width="224" height="45"></li>
+              <li class="client-logo"><img src="images/clients/17.webp" alt="" title="한국산림복지진흥원" decoding="async" width="229" height="51"></li>
+              <li class="client-logo"><img src="images/clients/18.webp" alt="" title="한국수목원정원관리원" decoding="async" width="164" height="90"></li>
+              <li class="client-logo"><img src="images/clients/19.webp" alt="" title="한국수자원공사" decoding="async" width="230" height="81"></li>
+              <li class="client-logo"><img src="images/clients/20.webp" alt="" title="한국스포츠레저" decoding="async" width="231" height="68"></li>
+              <li class="client-logo"><img src="images/clients/21.webp" alt="" title="한국환경공단" decoding="async" width="233" height="68"></li>
+              <li class="client-logo"><img src="images/clients/22.webp" alt="" title="한전원자력연료" decoding="async" width="228" height="30"></li>
+              <li class="client-logo"><img src="images/clients/23.webp" alt="" title="서울교통공사" decoding="async" width="233" height="65"></li>
+              <li class="client-logo"><img src="images/clients/24.webp" alt="" title="한국철도공사" decoding="async" width="233" height="66"></li>
+              <li class="client-logo"><img src="images/clients/25.webp" alt="" title="대전문화재단" decoding="async" width="252" height="55"></li>
+              <li class="client-logo"><img src="images/clients/26.webp" alt="" title="제주국제자유도시개발센터" decoding="async" width="345" height="83"></li>
+              <li class="client-logo"><img src="images/clients/27.webp" alt="" title="한국서부발전" decoding="async" width="317" height="91"></li>
+              <li class="client-logo"><img src="images/clients/28.webp" alt="" title="한국전력공사" decoding="async" width="406" height="68"></li>
+              <li class="client-logo"><img src="images/clients/29.webp" alt="" title="한국체육산업개발" decoding="async" width="343" height="67"></li>
+              <li class="client-logo"><img src="images/clients/30.webp" alt="" title="한국해양교통안전공단" decoding="async" width="260" height="112"></li>
+              <li class="client-logo"><img src="images/clients/31.webp" alt="" title="한국환경산업기술원" decoding="async" width="204" height="112"></li>
+            </ul>
             </div>
           </div>
-          <!-- 자동 크롤링 프리미엄 배너 (정적 4개 아래에 한 줄 4개씩) -->
+          <!-- ===== 플래티넘 채용정보 (관리자 직접 등록, 프리미엄 위 · #features 내부라 동일 스타일) ===== -->
+          <h2 class="section-title" style="color:#8a6d1a;">플래티넘 채용정보 <a class="apply" href="product.html" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;">상품신청&gt;</a></h2>
+          <div id="platinumHomeGrid" class="job-grid job-grid--premium" style="margin-bottom:1.6rem;"></div>
+          <h2 class="section-title">프리미엄 채용정보 <a class="apply" href="product.html" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;">상품신청&gt;</a></h2>
+          <!-- ===== 프리미엄 채용정보 맨 윗줄: 관리자 등록형 배너 4칸 (빈 칸은 광고 문의 카드) ===== -->
+          <div id="premiumVipGrid" class="job-grid job-grid--premium"></div>
+          <!-- 자동 크롤링 프리미엄 배너 (매일 자동 갱신, 한 줄 4개씩) -->
           <div id="premiumAutoGrid" class="job-grid job-grid--premium"></div>
         </div>
       </section>
@@ -4944,44 +5008,8 @@
       <section class="section section--tight-top" id="jobs" style="background: white;">
         <div class="container">
           <h2 class="section-title">추천 채용정보 <a class="apply" href="product.html" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;">상품신청&gt;</a></h2>
-          <!-- ===== 정적 관리 배너 4개 (관리자가 직접 이 코드를 수정, 맨 윗줄 고정) ===== -->
-          <div class="job-grid" style="margin-bottom:0;">
-            <a aria-label="기술보증기금 채용공고 상세로 이동" class="job-card" data-job="1" data-url="https://kibo.saramin.co.kr" href="javascript:void(0)"
-              role="button">
-              <img alt="기술보증기금" loading="lazy" decoding="async" class="banner-image" src="./images/ci/기술보증기금.png" />
-              <h3 title="기술보증기금 전문인력 채용공고">기술보증기금 전문인력 채용공고</h3>
-              <p>정규직</p>
-              <p class="meta"><span class="meta-loc">근무지: 경기 외</span><span class="meta-sep"> · </span><span class="meta-deadline">마감: <span class="deadline-date" data-deadline="2026-08-18">2026.08.18</span> <span class="dday" data-deadline="2026-08-18" style="color:#e74c3c;font-weight:600;"></span></span></p>
-              <div class="job-badges"></div>
-            </a>
-
-            <a aria-label="대전관광공사 채용공고 상세로 이동" class="job-card" data-job="2" data-url="https://djto.saramin.co.kr/" href="javascript:void(0)"
-              role="button">
-              <img alt="대전관광공사" loading="lazy" decoding="async" class="banner-image" src="./images/ci/대전관광공사.png" />
-              <h3 title="대전관광공사 정규직 수시채용 공고">대전관광공사 정규직 수시채용 공고</h3>
-              <p>정규직</p>
-              <p class="meta"><span class="meta-loc">근무지: 전남</span><span class="meta-sep"> · </span><span class="meta-deadline">마감: <span class="deadline-date" data-deadline="2026-07-13">2026.07.13</span> <span class="dday" data-deadline="2026-07-13" style="color:#e74c3c;font-weight:600;"></span></span></p>
-              <div class="job-badges"></div>
-            </a>
-
-            <a aria-label="대전광역시시설관리공단 채용공고 상세로 이동" class="job-card" data-job="3" data-url="https://www.djsiseol.or.kr/portal/sub060302_list.asp?bbs_id=jobinf&homepage_id=main" href="javascript:void(0)"
-              role="button">
-              <img alt="대전광역시시설관리공단" loading="lazy" decoding="async" class="banner-image" src="./images/ci/대전광역시시설관리공단.png" />
-              <h3 title="대전광역시시설관리공단 일반직 신입사원 채용">대전광역시시설관리공단 일반직 신입사원 채용</h3>
-              <p>정규직</p>
-              <p class="meta"><span class="meta-loc">근무지: 서울</span><span class="meta-sep"> · </span><span class="meta-deadline">마감: <span class="deadline-date" data-deadline="2026-07-18">2026.07.18</span> <span class="dday" data-deadline="2026-07-18" style="color:#e74c3c;font-weight:600;"></span></span></p>
-              <div class="job-badges"></div>
-            </a>
-
-            <a aria-label="대전교통공사 채용공고 상세로 이동" class="job-card" data-job="4" data-url="https://djtc.kr/kor/board.do?menuIdx=366" href="javascript:void(0)"
-              role="button">
-              <img alt="대전교통공사" loading="lazy" decoding="async" class="banner-image" src="./images/ci/대전교통공사.png" />
-              <h3 title="대전교통공사 하반기 보훈 채용공고">대전교통공사 하반기 보훈 채용공고</h3>
-              <p>정규직</p>
-              <p class="meta"><span class="meta-loc">근무지: 서울 외</span><span class="meta-sep"> · </span><span class="meta-deadline">마감: <span class="deadline-date" data-deadline="2026-08-27">2026.08.27</span> <span class="dday" data-deadline="2026-08-27" style="color:#e74c3c;font-weight:600;"></span></span></p>
-              <div class="job-badges"></div>
-            </a>
-          </div>
+          <!-- ===== 추천 채용정보 맨 윗줄: 관리자 등록형 배너 4칸 (빈 칸은 광고 문의 카드) ===== -->
+          <div id="recVipGrid" class="job-grid" style="margin-bottom:0;"></div>
           <!-- 자동 크롤링 추천 배너가 이 그리드 맨 앞에 삽입되고, 올공 광고 배너는 그 뒤에 남음 -->
           <div id="recAutoGrid" class="job-grid">
 
@@ -5359,6 +5387,7 @@
               <!-- ① 주요 채용정보 -->
               <p class="sidebar-group-header">주요 채용정보</p>
               <ul>
+                <li><a href="#" onclick="switchBoard('platinum'); return false;" id="board-menu-platinum" style="color:#8a6d1a; font-weight:800;">플래티넘</a></li>
                 <li><a href="#" onclick="switchBoard('premium'); return false;" id="board-menu-premium">프리미엄</a></li>
                 <li><a href="#" onclick="switchBoard('recommended'); return false;" id="board-menu-recommended">추천</a>
                 </li>
@@ -5798,6 +5827,15 @@
               <input type="text" id="add_company" required placeholder="예: 한국전력공사">
             </div>
             <div class="form-group">
+              <label>기관유형</label>
+              <input type="text" id="add_inst_type" list="instTypeOptions" placeholder="예: 공기업(시장형), 준정부기관(위탁집행형), 지방공기업 (목록에서 선택 또는 직접 입력)">
+              <datalist id="instTypeOptions">
+                <option value="공기업(시장형)"><option value="공기업(준시장형)">
+                <option value="준정부기관(기금관리형)"><option value="준정부기관(위탁집행형)">
+                <option value="기타공공기관"><option value="지방공기업"><option value="지방출자·출연기관">
+              </datalist>
+            </div>
+            <div class="form-group">
               <label>고용유형</label>
               <input type="text" id="add_employment_type" placeholder="예: 정규직, 무기계약직">
             </div>
@@ -5838,6 +5876,10 @@
               <input type="text" id="add_image_url" placeholder="예: ./logo.png 또는 https://...">
             </div>
             <div class="form-group">
+              <label>기업 CI(로고) 이미지 업로드<span style="font-weight:400;color:#868e96;font-size:.82rem;"> — 배너와 상세화면 상단에 표시됩니다 (PNG/JPG, 가로형 로고 권장)</span></label>
+              <input type="file" id="add_ci_file" accept="image/*">
+            </div>
+            <div class="form-group">
               <label>원본공고URL</label>
               <input type="text" id="add_detail_url" placeholder="예: https://...">
             </div>
@@ -5873,6 +5915,10 @@
             <div class="form-group">
               <label>기관명 *</label>
               <input type="text" id="edit_company" required>
+            </div>
+            <div class="form-group">
+              <label>기관유형</label>
+              <input type="text" id="edit_inst_type" list="instTypeOptions" placeholder="예: 공기업(시장형), 준정부기관(위탁집행형), 지방공기업">
             </div>
             <div class="form-group">
               <label>고용유형</label>
@@ -5913,6 +5959,10 @@
             <div class="form-group">
               <label>로고 이미지 URL</label>
               <input type="text" id="edit_image_url">
+            </div>
+            <div class="form-group">
+              <label>기업 CI(로고) 이미지 업로드<span style="font-weight:400;color:#868e96;font-size:.82rem;"> — 배너와 상세화면 상단에 표시됩니다 (PNG/JPG, 가로형 로고 권장)</span></label>
+              <input type="file" id="edit_ci_file" accept="image/*">
             </div>
             <div class="form-group">
               <label>원본공고URL</label>
@@ -7293,10 +7343,24 @@
           if (el.classList && el.classList.contains('job-card')) {
             e.preventDefault();
             if (el.classList.contains('ad')) {
-              // 광고 카드(ALLGONG 상품신청) → '상품안내' 페이지를 새 탭에서 열기
+              // 플래티넘 광고(빈) 카드: 관리자 → 플래티넘 등록창 바로 열기, 그 외 → 상품신청
+              var _isAdm = (window.currentUserRole === 'admin') ||
+                (window.auth && window.auth.currentUser && window.auth.currentUser.email === 'ilovetruman@gmail.com');
+              // 관리자 등록형 배너(플래티넘/프리미엄/추천)의 빈 칸: 관리자 → 해당 게시판 등록창
+              var _adTier = el.getAttribute('data-vip-tier') || (el.classList.contains('platinum-ad') ? 'platinum' : '');
+              if (_adTier && _isAdm && typeof window.openVipRegister === 'function') {
+                window.openVipRegister(_adTier);
+                return;
+              }
+              // 일반 광고 카드(ALLGONG 상품신청) → '상품안내' 페이지를 새 탭에서 열기
               window.open('product.html', '_blank', 'noopener,noreferrer');
               return;
             }
+            // 관리자 등록형 공고 배너 → 해당 게시판(플래티넘/프리미엄/추천)의 공고 상세글로 이동
+            var _vid = el.getAttribute('data-vip-id');
+            if (_vid && typeof window.openVipJob === 'function') { window.openVipJob(_vid, el.getAttribute('data-vip-tier')); return; }
+            var _ppid = el.getAttribute('data-platinum-id');
+            if (_ppid && typeof window.openPlatinumJob === 'function') { window.openPlatinumJob(_ppid); return; }
             // 자동 생성 배너(프리미엄/주요 등) → 내부 '채용정보' 해당 공고 상세글로 이동
             var _pid = el.getAttribute('data-job-id');
             if (_pid && typeof window.openRecommendedJob === 'function') { window.openRecommendedJob(_pid); return; }
@@ -9710,6 +9774,58 @@ function displayStoriesForPage(page) {
     // ── 공공기관 뉴스 캐시 ──
     let _newsCache = null;
 
+    // 뉴스 문서를 createdAt 내림차순으로 정렬하기 위한 ms 변환 (SDK Timestamp / REST {seconds} / 문자열 호환)
+    function _newsMs(d) {
+      var c = d && d.createdAt;
+      if (c && typeof c === 'object') {
+        if (typeof c.seconds === 'number') return c.seconds * 1000;
+        if (typeof c.toDate === 'function') { try { return c.toDate().getTime(); } catch (e) {} }
+      }
+      var t = Date.parse(d && (d.date || d.createdAt) || '');
+      return isNaN(t) ? 0 : t;
+    }
+    // REST 조회 (SDK 미준비/지연 시 폴백) — 'news' 컬렉션 전체를 읽어 클라이언트에서 정렬
+    async function _fetchNewsREST() {
+      var res = await fetch(
+        'https://firestore.googleapis.com/v1/projects/recruit-board/databases/(default)/documents:runQuery',
+        { method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ structuredQuery: { from: [{ collectionId: 'news' }], limit: 500 } }) }
+      );
+      if (!res.ok) throw new Error('news REST ' + res.status);
+      var rows = await res.json();
+      var out = [];
+      (rows || []).forEach(function (r) {
+        if (!r.document) return;
+        var f = r.document.fields || {}; var o = {};
+        Object.keys(f).forEach(function (k) {
+          var v = f[k];
+          if ('stringValue' in v) o[k] = v.stringValue;
+          else if ('integerValue' in v) o[k] = Number(v.integerValue);
+          else if ('booleanValue' in v) o[k] = v.booleanValue;
+          else if ('timestampValue' in v) o[k] = { seconds: Math.floor(Date.parse(v.timestampValue) / 1000) };
+        });
+        var name = r.document.name; o.id = name.substring(name.lastIndexOf('/') + 1);
+        out.push(o);
+      });
+      return out;
+    }
+    // 뉴스 문서 조회: SDK 준비 시 SDK(6초 타임아웃), 미준비/지연/오류 시 REST 폴백 → 무한 로딩 방지
+    async function _getNewsDocs() {
+      var sdkReady = window.db && window.getDocs && window.query && window.collection && window.orderBy;
+      if (sdkReady) {
+        try {
+          var q = window.query(window.collection(window.db, 'news'), window.orderBy('createdAt', 'desc'));
+          var snapshot = await Promise.race([
+            window.getDocs(q),
+            new Promise(function (_, rej) { setTimeout(function () { rej(new Error('news SDK timeout')); }, 6000); })
+          ]);
+          var docs = []; snapshot.forEach(function (ds) { docs.push({ id: ds.id, ...ds.data() }); });
+          return docs;
+        } catch (e) { console.warn('뉴스 SDK 조회 실패 → REST 폴백:', e); }
+      }
+      return await _fetchNewsREST();
+    }
+
     // loadNews: Firestore에서 뉴스 기사 로드
     window.loadNews = async function () {
       const listBody = document.getElementById('newsListBody');
@@ -9752,25 +9868,19 @@ function displayStoriesForPage(page) {
       if (pagination) pagination.style.display = 'none';
 
       try {
-        const q = window.query(
-          window.collection(window.db, 'news'),
-          window.orderBy('createdAt', 'desc')
-        );
-        const snapshot = await window.getDocs(q);
+        const docs = await _getNewsDocs();
+        docs.sort((a, b) => _newsMs(b) - _newsMs(a)); // 최신순 (SDK/REST 공통 클라이언트 정렬)
 
         if (loading) loading.style.display = 'none';
 
-        if (snapshot.empty) {
+        if (!docs.length) {
           if (empty) empty.style.display = 'block';
           if (totalCnt) totalCnt.textContent = '0';
           renderNewsAside([]);
           return;
         }
 
-        allNewsData = [];
-        snapshot.forEach(docSnap => {
-          allNewsData.push({ id: docSnap.id, ...docSnap.data() });
-        });
+        allNewsData = docs;
 
         // 결과 캐시 저장
         _newsCache = { docs: [...allNewsData], ts: now };
@@ -10626,6 +10736,7 @@ function displayStoriesForPage(page) {
     }
     // '추천' 게시판 = 첫 화면 '추천 채용정보' 배너와 동일 (자동수집 + 정규직/청년인턴 + 미마감)
     function isRecommendedJob(job) {
+      if (job.recommendedVip === true) return true; // 관리자 등록형 추천 배너 공고 (마감은 상위에서 제외)
       if (job.source !== 'alio-auto') return false;
       const TARGET = ['정규직', '청년인턴(채용형)', '청년인턴(체험형)'];
       const emps = String(job.employmentType || job.jobType || '').split(/[,+/]/).map(function (s) { return s.trim(); });
@@ -10644,8 +10755,14 @@ function displayStoriesForPage(page) {
       const dl = _boardDaysLeft(job.deadline || job.closingDate);
       return dl !== null && dl < 0;
     }
+    // '플래티넘' 게시판 = 관리자가 직접 등록한 플래티넘 공고(category='platinum' 또는 platinum=true).
+    //  마감 지난 건은 상위 _baseJobs 에서 이미 제외되므로 여기서는 표식만 확인한다.
+    function isPlatinumJob(job) {
+      return job.category === 'platinum' || job.platinum === true || job.source === 'platinum-manual';
+    }
     // '프리미엄' 게시판 = 고용유형이 '정규직' 단독(다른 유형과 합쳐지지 않은)인 자동수집 공고 (미마감)
     function isPremiumJob(job) {
+      if (job.premiumVip === true) return true; // 관리자 등록형 프리미엄 배너 공고 (마감은 상위에서 제외)
       if (job.source !== 'alio-auto') return false;
       const emps = String(job.employmentType || job.jobType || '').split(/[,+/、，]/).map(function (s) { return s.trim(); }).filter(Boolean);
       if (!(emps.length === 1 && emps[0] === '정규직')) return false;
@@ -10664,6 +10781,7 @@ function displayStoriesForPage(page) {
     }
     function computeBoardTypeFilter(boardType) {
       if (!boardType) return null;
+      if (boardType === 'platinum') return { predicate: isPlatinumJob };
       if (boardType === 'premium') return { predicate: isPremiumJob };
       if (boardType === 'featured') return { predicate: isFeaturedJob };
       if (boardType === 'recommended') return { predicate: isRecommendedJob };
@@ -10688,6 +10806,7 @@ function displayStoriesForPage(page) {
 
       // 2. 게시판 제목 업데이트
       const boardTitles = {
+        'platinum': '플래티넘',
         'premium': '프리미엄',
         'recommended': '추천',
         'featured': '주요',
@@ -10883,10 +11002,22 @@ function displayStoriesForPage(page) {
       const content = job.content || '';
       // XSS 방지: 크롤링/입력 원문을 먼저 HTML 이스케이프한 뒤 줄바꿈만 <br> 로 변환
       const _descEsc = document.createElement('div'); _descEsc.textContent = content || '';
-      document.getElementById('detail-desc').innerHTML = content ? _descEsc.innerHTML.replace(/\n/g, '<br>') : '내용이 없습니다.';
+      // 글 본문이 비어 있어도 공고 이미지/첨부파일이 있으면 안내 문구 없이 이미지만 표시
+      const _descEl = document.getElementById('detail-desc');
+      const _hasMedia = !!(job.contentImageUrl || job.attachmentUrl);
+      if (content) {
+        _descEl.innerHTML = _descEsc.innerHTML.replace(/\n/g, '<br>');
+        _descEl.style.display = '';
+      } else if (_hasMedia) {
+        _descEl.innerHTML = '';
+        _descEl.style.display = 'none';
+      } else {
+        _descEl.innerHTML = '내용이 없습니다.';
+        _descEl.style.display = '';
+      }
 
-      // 쿠팡파트너스 추천 교재: 공고 NCS코드명과 매칭되는 카드 표시 (하단 스크립트에서 정의)
-      try { if (typeof window.renderAffiliateBox === 'function') window.renderAffiliateBox(job); } catch (e) { /* 무시 */ }
+      // 쿠팡파트너스 추천 교재 박스 제거(소유자 요청) — 상세 화면에서 노출하지 않음
+      try { var _affBox = document.getElementById('affiliate-box'); if (_affBox) _affBox.style.display = 'none'; } catch (e) { /* 무시 */ }
 
       // 이미지 처리
       const imgArea = document.getElementById('detail-image-area');
@@ -11647,6 +11778,10 @@ function displayStoriesForPage(page) {
 
     // 모달 열기/닫기
     function openAddModal() {
+      // 관리자 등록형 배너 게시판(플래티넘/프리미엄/추천)에서 열면 제목에 어느 배너인지 표시
+      var _h = document.querySelector('#addModal h2');
+      var _tierLabel = { platinum: '플래티넘', premium: '프리미엄', recommended: '추천' }[window.currentJobCategory];
+      if (_h) _h.textContent = _tierLabel ? ('📝 ' + _tierLabel + ' 채용정보 배너 등록') : '📝 채용정보 등록';
       document.getElementById('addModal').style.display = 'block';
     }
     function closeAddModal() {
@@ -11663,6 +11798,7 @@ function displayStoriesForPage(page) {
       document.getElementById('edit_id').value = id;
       document.getElementById('edit_title').value = job.title;
       document.getElementById('edit_company').value = job.company;
+      document.getElementById('edit_inst_type').value = job.instType || '';
       document.getElementById('edit_employment_type').value = job.employmentType || job.jobType || '';
       document.getElementById('edit_location').value = job.location || '';
       document.getElementById('edit_deadline').value = job.deadline || '';
@@ -11680,6 +11816,7 @@ function displayStoriesForPage(page) {
       // 파일 input 초기화 (보안상 값 설정 불가)
       document.getElementById('edit_content_image').value = '';
       document.getElementById('edit_attachment_file').value = '';
+      document.getElementById('edit_ci_file').value = '';
 
       editModal.style.display = 'block';
     }
@@ -11743,6 +11880,10 @@ function displayStoriesForPage(page) {
           attachmentUrl = await uploadFile(attachmentFile, 'attachments');
           attachmentName = attachmentFile.name;
         }
+        // 기업 CI(로고) 업로드 시 로고 URL 칸보다 우선
+        let ciUrl = '';
+        const ciFile = document.getElementById('add_ci_file').files[0];
+        if (ciFile) ciUrl = await uploadFile(ciFile, 'ci_logos');
 
         const employmentTypeValue = document.getElementById('add_employment_type').value;
 
@@ -11751,11 +11892,12 @@ function displayStoriesForPage(page) {
         const data = {
           title: document.getElementById('add_title').value,
           company: document.getElementById('add_company').value,
+          instType: document.getElementById('add_inst_type').value.trim(), // 기관유형 (상세화면 표시용)
           employmentType: employmentTypeValue,
           jobType: employmentTypeValue, // 호환성을 위해 jobType에도 동일한 값 저장
           location: document.getElementById('add_location').value,
           deadline: deadlineValue,
-          imageUrl: document.getElementById('add_image_url').value,
+          imageUrl: ciUrl || document.getElementById('add_image_url').value,
           detailUrl: document.getElementById('add_detail_url').value,
           content: document.getElementById('add_content').value,
           contentImageUrl: contentImageUrl,
@@ -11771,6 +11913,15 @@ function displayStoriesForPage(page) {
           category: window.currentJobCategory, // 현재 카테고리 저장
           createdAt: window.Timestamp.now()
         };
+
+        // 관리자 등록형 배너 게시판에서 등록한 공고는 등급 표식을 함께 저장
+        // (홈 맨 윗줄 배너와 해당 게시판이 이 표식으로 조회. 자동수집 공고의
+        //  recommended/premium 표식과는 별개 필드라 자동 배너에 섞이지 않음)
+        const _tierFlag = { platinum: 'platinum', premium: 'premiumVip', recommended: 'recommendedVip' }[window.currentJobCategory];
+        if (_tierFlag) {
+          data[_tierFlag] = true;
+          data.source = window.currentJobCategory + '-manual';
+        }
 
         await window.addDoc(window.collection(window.db, 'jobs'), data);
         alert('✅ 등록되었습니다!');
@@ -11802,6 +11953,7 @@ function displayStoriesForPage(page) {
         const data = {
           title: document.getElementById('edit_title').value,
           company: document.getElementById('edit_company').value,
+          instType: document.getElementById('edit_inst_type').value.trim(), // 기관유형 (상세화면 표시용)
           employmentType: employmentTypeValue,
           jobType: employmentTypeValue, // 호환성을 위해 jobType에도 동일한 값 저장
           location: document.getElementById('edit_location').value,
@@ -11829,6 +11981,8 @@ function displayStoriesForPage(page) {
           data.attachmentUrl = await uploadFile(attachmentFile, 'attachments');
           data.attachmentName = attachmentFile.name;
         }
+        const ciFile = document.getElementById('edit_ci_file').files[0];
+        if (ciFile) data.imageUrl = await uploadFile(ciFile, 'ci_logos');
 
         await window.updateDoc(window.doc(window.db, 'jobs', id), data);
         alert('✅ 수정되었습니다!');
@@ -13340,6 +13494,175 @@ function initCarousel(carouselContainer) {
       }
     })();
   })();
+
+  // ===== 관리자 등록형 배너 (홈 맨 윗줄 4칸): 플래티넘 / 프리미엄 / 추천 =====
+  //  - 등록 공고(마감 전, 최대 4건) + 빈 칸은 '올공 광고 문의' 카드로 항상 4칸
+  //  - 공고 배너 클릭 → 해당 게시판의 공고 상세 / 빈 칸 클릭 → 관리자: 등록창, 그 외: 상품신청
+  //  - 자동수집 배너(#premiumAutoGrid, #recAutoGrid)와는 별도 표식(platinum/premiumVip/recommendedVip)으로 조회
+  (function () {
+    var TIERS = [
+      { tier: 'platinum', grid: 'platinumHomeGrid', flag: 'platinum', board: 'platinum', cache: 'allgong_platinum_home_v1', style: 'premium', pLine: 'company' },
+      { tier: 'premium', grid: 'premiumVipGrid', flag: 'premiumVip', board: 'premium', cache: 'allgong_premium_vip_v1', style: 'premium', pLine: 'emp' },
+      { tier: 'recommended', grid: 'recVipGrid', flag: 'recommendedVip', board: 'recommended', cache: 'allgong_rec_vip_v1', style: 'rec', pLine: 'emp' }
+    ];
+    var TIER_BY_NAME = {}; TIERS.forEach(function (t) { TIER_BY_NAME[t.tier] = t; });
+    var SLOTS = 4; // 프리미엄과 동일하게 항상 4칸
+
+    function esc(s) { var d = document.createElement('div'); d.textContent = (s == null ? '' : String(s)); return d.innerHTML; }
+    function escA(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+    function daysLeft(deadline) {
+      if (!deadline) return null;
+      var e = new Date(deadline); if (isNaN(e.getTime())) return null;
+      e.setHours(0, 0, 0, 0); var t = new Date(); t.setHours(0, 0, 0, 0);
+      return Math.round((e - t) / 86400000);
+    }
+    function notExpired(it) { var l = daysLeft(it.deadline || it.closingDate); return l === null || l >= 0; }
+    function ddayText(dl) { var l = daysLeft(dl); if (l === null) return ''; if (l < 0) return '마감'; if (l === 0) return 'D-DAY'; return 'D-' + l; }
+    function fmtDate(dl) { return dl ? String(dl).replace(/-/g, '.') : '상시'; }
+    function fmtLoc(loc) {
+      if (!loc) return '-';
+      var items = String(loc).split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+      if (!items.length) return '-';
+      return items.length === 1 ? items[0] : (items[0] + ' 외');
+    }
+    function normalize(cfg, id, d) {
+      var createdMs = (d.createdAt && d.createdAt.seconds) ? d.createdAt.seconds * 1000 : 0;
+      var o = {
+        id: id, title: d.title || '', company: d.company || '',
+        employmentType: d.employmentType || d.jobType || '', jobType: d.jobType || d.employmentType || '',
+        location: d.location || '', deadline: d.deadline || d.closingDate || '', closingDate: d.closingDate || d.deadline || '',
+        ncsCode: d.ncsCode || '', careerType: d.careerType || '', recruitmentCount: d.recruitmentCount || '',
+        education: d.education || '', preference: d.preference || '', detailUrl: d.detailUrl || '#',
+        imageUrl: d.imageUrl || '', content: d.content || '', category: d.category || '',
+        contentImageUrl: d.contentImageUrl || '', attachmentUrl: d.attachmentUrl || '', attachmentName: d.attachmentName || '',
+        instType: d.instType || '',
+        source: d.source || (cfg.tier + '-manual'), createdAt: d.createdAt || null,
+        createdMs: createdMs, createdDate: createdMs ? new Date(createdMs).toLocaleDateString('ko-KR') : ''
+      };
+      o[cfg.flag] = true;
+      return o;
+    }
+    // 공고 배너 클릭 → 해당 게시판 상태로 맞춘 뒤 공고 상세 열기
+    window.openVipJob = function (id, tier) {
+      var cfg = TIER_BY_NAME[tier] || TIER_BY_NAME.platinum;
+      try {
+        if (window.showBoard) window.showBoard(true);
+        if (window.switchBoard) window.switchBoard(cfg.board, true);
+      } catch (e) { /* 무시 */ }
+      var tries = 0;
+      (function open() {
+        if (window.jobsData && window.jobsData[id] && typeof window.viewDetail === 'function') {
+          window.viewDetail(id, false); return;
+        }
+        if (++tries < 40) setTimeout(open, 150);
+      })();
+    };
+    // 빈(광고) 칸 — 관리자 클릭 시: 해당 게시판의 등록창 바로 열기
+    window.openVipRegister = function (tier) {
+      var cfg = TIER_BY_NAME[tier] || TIER_BY_NAME.platinum;
+      try {
+        if (window.showBoard) window.showBoard(true);
+        if (window.switchBoard) window.switchBoard(cfg.board, true);
+      } catch (e) { /* 무시 */ }
+      setTimeout(function () {
+        if (typeof window.openAddModal === 'function') window.openAddModal();
+      }, 60);
+    };
+    window.openPlatinumJob = function (id) { window.openVipJob(id, 'platinum'); };
+    window.openPlatinumRegister = function () { window.openVipRegister('platinum'); };
+
+    var AD_SVG = '<svg aria-hidden="true" viewbox="0 0 24 24"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V21a1 1 0 01-1 1C10.97 22 2 13.03 2 2a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.2 2.2z"></path></svg>';
+    function adCardHtml(cfg) {
+      // 기존 '올공 광고 문의' 광고 카드와 동일 디자인 + 등급 표식(data-vip-tier)
+      return '<a class="job-card ad vip-ad' + (cfg.tier === 'platinum' ? ' platinum-ad' : '') + '" data-vip-tier="' + cfg.tier + '"'
+        + ' href="javascript:void(0)" role="button" aria-label="올공 광고 문의">'
+        + '<div class="ad-title">ALLGONG(올공) 광고 문의</div>'
+        + '<div class="ad-phone">' + AD_SVG + ' 042)629-8159</div>'
+        + '<span class="ad-cta">상품신청</span></a>';
+    }
+    function logoOf(it) {
+      // 업로드한 기업 CI(https) 우선, 없으면 올공 CI
+      return (it.imageUrl && /^https?:\/\//.test(it.imageUrl)) ? it.imageUrl : './올공 CI.png';
+    }
+    function jobCardHtml(cfg, it) {
+      var dl = it.deadline || it.closingDate || '';
+      var img = logoOf(it);
+      var attrs = ' href="javascript:void(0)" role="button" data-vip-id="' + escA(it.id) + '" data-vip-tier="' + cfg.tier + '"';
+      var imgTag = '<img loading="lazy" decoding="async" class="banner-image" alt="' + escA(it.company) + '" src="' + escA(img) + '" onerror="this.onerror=null;this.src=\'./올공 CI.png\'" />';
+      // 부제: '고용유형/채용구분 채용' (예: 정규직/신입.경력 채용). 둘 다 비면 기관명
+      var _hire = [it.employmentType, it.careerType].map(function (v) { return String(v || '').trim(); }).filter(Boolean);
+      var sub = _hire.length ? (_hire.join('/') + ' 채용') : it.company;
+      if (cfg.style === 'rec') {
+        // 추천 채용정보 카드와 동일 구성: 로고 / 제목 / 고용유형 / 근무지·마감
+        return '<a class="job-card"' + attrs + '>' + imgTag
+          + '<h3 title="' + escA(it.title) + '">' + esc(it.title) + '</h3>'
+          + '<p>' + esc(sub) + '</p>'
+          + '<p class="meta"><span class="meta-loc">근무지: ' + esc(fmtLoc(it.location)) + '</span><span class="meta-sep"> · </span>'
+          + '<span class="meta-deadline">마감: <span class="deadline-date">' + esc(fmtDate(dl)) + '</span> '
+          + '<span class="dday" style="color:#e74c3c;font-weight:600;">' + esc(ddayText(dl)) + '</span></span></p>'
+          + '<div class="job-badges"></div></a>';
+      }
+      // 프리미엄 카드와 동일 구성: 로고 / 제목 / 부제 / 마감 띠
+      return '<a class="job-card"' + attrs + '>' + imgTag
+        + '<h3 title="' + escA(it.title) + '">' + esc(it.title) + '</h3>'
+        + '<p>' + esc(sub) + '</p>'
+        + '<div class="deadline"><strong>마감:</strong> <span class="deadline-date">' + esc(fmtDate(dl)) + '</span> '
+        + '<span style="color:#e74c3c;font-weight:600;">' + esc(ddayText(dl)) + '</span></div>'
+        + '</a>';
+    }
+    function render(cfg, items) {
+      var grid = document.getElementById(cfg.grid);
+      if (!grid) return false;
+      // 등록된 공고: 마감 제외 + 마감 늦은 순, 최대 4건
+      var jobs = (items || []).filter(notExpired).sort(function (a, b) {
+        var da = Date.parse(a.deadline || a.closingDate || '') || 0;
+        var db = Date.parse(b.deadline || b.closingDate || '') || 0;
+        return db - da;
+      }).slice(0, SLOTS);
+      window.jobsData = window.jobsData || {};
+      var html = '';
+      jobs.forEach(function (it) {
+        window.jobsData[it.id] = Object.assign({}, window.jobsData[it.id] || {}, it, { createdDate: it.createdDate }); // 상세보기용
+        html += jobCardHtml(cfg, it);
+      });
+      for (var i = jobs.length; i < SLOTS; i++) html += adCardHtml(cfg);
+      grid.innerHTML = html;
+      return true;
+    }
+    function renderFromCache(cfg) {
+      try { var c = JSON.parse(localStorage.getItem(cfg.cache) || 'null'); if (c && c.items) return render(cfg, c.items); } catch (e) {}
+      return false;
+    }
+    function saveCache(cfg, items) { try { localStorage.setItem(cfg.cache, JSON.stringify({ ts: Date.now(), items: items })); } catch (e) {} }
+    async function fetchTier(cfg) {
+      if (!(window.db && window.getDocs && window.query) && window.__fsRestQuery) {
+        try {
+          var rows = await window.__fsRestQuery(cfg.flag);
+          return rows.map(function (o) { return normalize(cfg, o.__id, o); });
+        } catch (e) { /* 폴백 아래 */ }
+      }
+      try {
+        var q = window.query(window.collection(window.db, 'jobs'), window.where(cfg.flag, '==', true));
+        var s = await window.getDocs(q);
+        var a = []; s.forEach(function (ds) { a.push(normalize(cfg, ds.id, ds.data())); });
+        return a;
+      } catch (e) { console.warn(cfg.tier + ' 배너 조회 실패:', e); return []; }
+    }
+    async function refresh(cfg) {
+      var items = await fetchTier(cfg);
+      saveCache(cfg, items);
+      return render(cfg, items);
+    }
+    function refreshAll() { TIERS.forEach(function (cfg) { refresh(cfg).catch(function () {}); }); }
+
+    TIERS.forEach(function (cfg) { if (!renderFromCache(cfg)) render(cfg, []); }); // 캐시 없으면 광고카드 4칸으로 즉시 표시
+    (function wait() {
+      if ((window.db && window.getDocs && window.query && window.collection) || window.__fsRestQuery) refreshAll();
+      else setTimeout(wait, 250);
+    })();
+    // 전체 공고 갱신 이벤트에도 반영 (관리자 등록/수정/삭제 직후 즉시 최신화)
+    window.addEventListener('allgong:jobs-updated', refreshAll);
+  })();
 </script>
 
 <!-- (로그인 안내 팝업 제거됨) -->
@@ -14583,6 +14906,9 @@ function initCarousel(carouselContainer) {
     max-width: 100% !important;
     overflow: hidden;
   }
+  /* 이용 기관 로고 롤링: 폰에서는 칸·간격 축소 */
+  html.mobile-view .client-marquee { padding: 10px 0; margin-bottom: 1.4rem; }
+  html.mobile-view .client-logo { width: 104px; height: 38px; margin-right: 26px; }
   html.mobile-view #features .job-grid.job-grid--premium {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: .6rem !important;
